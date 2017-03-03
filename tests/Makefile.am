@@ -93,6 +93,7 @@ comment4.test \
 comment5.test \
 comment6.test \
 comment7.test \
+comment8.test \
 compile.test \
 compile_f90_c_cxx.test \
 compile_f_c_cxx.test \
@@ -403,6 +404,7 @@ pr307.test \
 prefix.test \
 primary.test \
 primary2.test \
+primary3.test \
 proginst.test \
 python.test \
 python2.test \

@@ -1,8 +1,8 @@
 This is automake.info, produced by makeinfo version 4.7 from
 automake.texi.
 
-   This manual is for GNU Automake (version 1.9.2, 19 September 2004),
-a program which creates GNU standards-compliant Makefiles from template
+   This manual is for GNU Automake (version 1.9.3, 1 November 2004), a
+program which creates GNU standards-compliant Makefiles from template
 files.
 
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
@@ -22,7 +22,7 @@ files.
 
 INFO-DIR-SECTION Software development
 START-INFO-DIR-ENTRY
-* automake: (automake).		Making Makefile.in's.
+* automake: (automake).         Making Makefile.in's.
 END-INFO-DIR-ENTRY
 
 INFO-DIR-SECTION Individual utilities
@@ -74,9 +74,9 @@ File: automake.info,  Node: Timeline,  Next: Dependency Tracking Evolution,  Up:
      files, however Automake aims to be portable and to conform to the
      GNU standards for `Makefile' variables and targets.
 
-     At this point, the last release of Autoconf is version 1.11, and
-     David is preparing to release Autoconf 2.0 in late October.  As a
-     matter of fact, he will almost not touch Automake after September.
+     At this point, the most recent release of Autoconf is version 1.11,
+     and David is preparing to release Autoconf 2.0 in late October.
+     As a matter of fact, he will barely touch Automake after September.
 
 1994-11-05 David MacKenzie's last commit.
      At this point Automake is a 200 line portable shell script, plus
@@ -94,8 +94,8 @@ File: automake.info,  Node: Timeline,  Next: Dependency Tracking Evolution,  Up:
           appropriate language.
 
      Automake is described as "an experimental Makefile generator".
-     There is no documentation.  Adventurous users are refereed to
-     example and patches needed to use Automake with GNU m4 1.3,
+     There is no documentation.  Adventurous users are referred to the
+     examples and patches needed to use Automake with GNU m4 1.3,
      fileutils 3.9, time 1.6, and development versions of find and
      indent.
 
@@ -113,8 +113,8 @@ File: automake.info,  Node: Timeline,  Next: Dependency Tracking Evolution,  Up:
      `ftp://alpha.gnu.org/', grabbed it and tried it out.
 
      Tom didn't talk to djm about it until later, just to make sure he
-     didn't mind if he did a release.  He did a bunch of early releases
-     to the Gnits folks.
+     didn't mind if he made a release.  He did a bunch of early
+     releases to the Gnits folks.
 
      Gnits was (and still is) totally informal, just a few GNU friends
      who Franc,ois Pinard knew, who were all interested in making a
@@ -154,11 +154,12 @@ File: automake.info,  Node: Timeline,  Next: Dependency Tracking Evolution,  Up:
           PROGRAMS = hello
           hello_SOURCES = hello.c
 
-     This looks pretty much like we do today, except the `PROGRAMS'
-     variable has no directory prefix specifying where `hello' should
-     be installed: all programs are installed in `$(bindir)'.
-     `LIBPROGRAMS' can be used to specify programs that must be built
-     but not installed (it is called `noinst_PROGRAMS' nowadays).
+     This looks pretty much like what we do today, except the
+     `PROGRAMS' variable has no directory prefix specifying where
+     `hello' should be installed: all programs are installed in
+     `$(bindir)'.  `LIBPROGRAMS' can be used to specify programs that
+     must be built but not installed (it is called `noinst_PROGRAMS'
+     nowadays).
 
      Programs can be built conditionally using `AC_SUBST'itutions:
 
@@ -179,7 +180,7 @@ File: automake.info,  Node: Timeline,  Next: Dependency Tracking Evolution,  Up:
      Extra files to distribute must be listed in `DIST_OTHER' (the
      ancestor of `EXTRA_DIST').  Also extra directories that are to be
      distributed should appear in `DIST_SUBDIRS', but the manual
-     describe this as a temporary ugly hack (today extra directories
+     describes this as a temporary ugly hack (today extra directories
      should also be listed in `EXTRA_DIST', and `DIST_SUBDIRS' is used
      for another purpose, see *Note Conditional Subdirectories::).
 
@@ -245,7 +246,7 @@ File: automake.info,  Node: Timeline,  Next: Dependency Tracking Evolution,  Up:
      `configure.in' to better automate the Autoconf integration.
 
      0.28 also introduces the `AUTOMAKE_OPTIONS' variable and the
-     `--gnu' and `--gnits' options, the later being stricter.
+     `--gnu' and `--gnits' options, the latter being stricter.
 
 1996-02-07 Automake 0.29
      Thanks to `configure.in' scanning, `CONFIG_HEADER' is gone, and
@@ -256,8 +257,8 @@ File: automake.info,  Node: Timeline,  Next: Dependency Tracking Evolution,  Up:
 
 1996-02-24 Automake 0.30
      The test suite is born.  It contains 9 tests.  From now on test
-     cases will be added pretty much regularly (*note Releases::), and
-     this proved to be really helpful later on.
+     cases will be added pretty regularly (*note Releases::), and this
+     proved to be really helpful later on.
 
      `EXTRA_PROGRAMS' finally replaces `AM_PROGRAMS'.
 
@@ -301,7 +302,7 @@ File: automake.info,  Node: Timeline,  Next: Dependency Tracking Evolution,  Up:
 
 1996-05-28 Automake 1.0
      After only six months of heavy development, the automake script is
-     3134 line long, plus 973 lines of `Makefile' fragments.  The
+     3134 lines long, plus 973 lines of `Makefile' fragments.  The
      package has 30 pages of documentation, and 38 test cases.
      `aclocal.m4' contains 4 macros.
 
@@ -318,8 +319,8 @@ File: automake.info,  Node: Timeline,  Next: Dependency Tracking Evolution,  Up:
      staled.  Roland McGrath has been working at the beginning of the
      year.  David comes back in November to release 2.12, but he won't
      touch Autoconf anymore after this year, and Autoconf then really
-     stales.  The desolated Autoconf `ChangeLog' for 1997 lists only 7
-     commits.
+     stagnates.  The desolate Autoconf `ChangeLog' for 1997 lists only
+     7 commits.
 
 1997-02-28 <automake@gnu.ai.mit.edu> list alive
      The mailing list is announced as follows:
@@ -463,9 +464,9 @@ File: automake.info,  Node: Timeline,  Next: Dependency Tracking Evolution,  Up:
           face.
           - Tom Tromey on <autoconf@gnu.org>
 
-     Actually Akim works like a submarine: he will pile up patches when
-     he work off-line on week-end, and flush them in batch when he
-     surfaces back on Monday.
+     Actually Akim works like a submarine: he will pile up patches
+     while he works off-line during the weekend, and flush them in
+     batch when he resurfaces on Monday.
 
 2001-01-24
      On this Wednesday, Autoconf 2.49c, the last beta before Autoconf
@@ -627,7 +628,7 @@ File: automake.info,  Node: Timeline,  Next: Dependency Tracking Evolution,  Up:
 
 2002-04-11 Automake 1.6.1
      1.6, and the upcoming 1.4-p6 release were the last release by Tom.
-     This one and the followings will be handled by Alexandre
+     This one and those following will be handled by Alexandre
      Duret-Lutz.  Tom is still around, and will be there until about
      1.7, but his interest into Automake is drifting away towards
      projects like `gcj'.
@@ -1560,12 +1561,15 @@ B.1 Macro and Variable Index
 * AC_CONFIG_AUX_DIR:                     Optional.            (line  29)
 * AC_CONFIG_FILES:                       Requirements.        (line  28)
 * AC_CONFIG_HEADERS:                     Optional.            (line  14)
+* AC_CONFIG_LIBOBJ_DIR:                  LIBOBJS.             (line  48)
 * AC_CONFIG_LINKS:                       Optional.            (line  19)
 * AC_CONFIG_SUBDIRS:                     Subpackages.         (line   6)
 * AC_DEFUN:                              Extending aclocal.   (line  29)
 * AC_F77_LIBRARY_LDFLAGS:                Optional.            (line  84)
-* AC_LIBOBJ <1>:                         LTLIBOBJ.            (line   6)
+* AC_LIBOBJ <1>:                         LIBOBJS.             (line  11)
+* AC_LIBOBJ <2>:                         LTLIBOBJS.           (line   6)
 * AC_LIBOBJ:                             Optional.            (line  61)
+* AC_LIBSOURCE <1>:                      LIBOBJS.             (line  17)
 * AC_LIBSOURCE:                          Optional.            (line  61)
 * AC_LIBSOURCES:                         Optional.            (line  61)
 * AC_OUTPUT:                             Requirements.        (line  28)
@@ -1580,6 +1584,8 @@ B.1 Macro and Variable Index
 * AC_SUBST:                              Optional.            (line 106)
 * ACLOCAL_AMFLAGS <1>:                   Rebuilding.          (line  12)
 * ACLOCAL_AMFLAGS:                       Local Macros.        (line  19)
+* ALLOCA <1>:                            LIBOBJS.             (line   6)
+* ALLOCA:                                LTLIBOBJS.           (line   6)
 * AM_C_PROTOTYPES <1>:                   ANSI.                (line  30)
 * AM_C_PROTOTYPES <2>:                   Public macros.       (line  24)
 * AM_C_PROTOTYPES:                       Optional.            (line 118)
@@ -1691,7 +1697,8 @@ B.1 Macro and Variable Index
 * LIBADD:                                A Library.           (line  27)
 * libexec_PROGRAMS:                      Program Sources.     (line   6)
 * libexec_SCRIPTS:                       Scripts.             (line  38)
-* LIBOBJS <1>:                           LTLIBOBJ.            (line   6)
+* LIBOBJS <1>:                           LIBOBJS.             (line   6)
+* LIBOBJS <2>:                           LTLIBOBJS.           (line   6)
 * LIBOBJS:                               Optional.            (line  65)
 * LIBRARIES:                             Uniform.             (line  78)
 * LIBS:                                  Program variables.   (line  11)
@@ -1700,7 +1707,10 @@ B.1 Macro and Variable Index
 * LISP:                                  Uniform.             (line  78)
 * lisp_LISP:                             Emacs Lisp.          (line   6)
 * localstate_DATA:                       Data.                (line   9)
-* LTLIBOBJS:                             LTLIBOBJ.            (line   6)
+* LTALLOCA <1>:                          LIBOBJS.             (line   6)
+* LTALLOCA:                              LTLIBOBJS.           (line   6)
+* LTLIBOBJS <1>:                         LIBOBJS.             (line   6)
+* LTLIBOBJS:                             LTLIBOBJS.           (line   6)
 * m4_include:                            Optional.            (line 134)
 * m4_include, distribution:              Dist.                (line  30)
 * MAINTAINERCLEANFILES:                  Clean.               (line  13)
@@ -1862,6 +1872,8 @@ B.2 General Index
 * Adding new SUFFIXES:                   Suffixes.            (line   6)
 * all:                                   Extending.           (line  40)
 * all-local:                             Extending.           (line  40)
+* ALLOCA, and Libtool:                   LTLIBOBJS.           (line   6)
+* ALLOCA, example:                       LIBOBJS.             (line   6)
 * ALLOCA, special handling:              LIBOBJS.             (line   6)
 * AM_CONDITIONAL and SUBDIRS:            Conditional Subdirectories.
                                                               (line  65)
@@ -1896,7 +1908,8 @@ B.2 General Index
 * check-local:                           Extending.           (line  40)
 * check_PROGRAMS example:                Default _SOURCES.    (line  29)
 * clean:                                 Extending.           (line  40)
-* clean-local:                           Extending.           (line  40)
+* clean-local <1>:                       Extending.           (line  40)
+* clean-local:                           Clean.               (line  15)
 * Comment, special to Automake:          General Operation.   (line  54)
 * Complete example:                      Complete.            (line   6)
 * Conditional example,  -enable-debug:   Conditionals.        (line  23)
@@ -1955,7 +1968,8 @@ B.2 General Index
 * distclean <1>:                         distcleancheck.      (line   6)
 * distclean:                             Extending.           (line  40)
 * distclean, diagnostic:                 distcleancheck.      (line   6)
-* distclean-local:                       Extending.           (line  40)
+* distclean-local <1>:                   Extending.           (line  40)
+* distclean-local:                       Clean.               (line  15)
 * distcleancheck <1>:                    distcleancheck.      (line   6)
 * distcleancheck:                        Dist.                (line 140)
 * distdir:                               Third-Party Makefiles.
@@ -2079,6 +2093,8 @@ B.2 General Index
 * LIBADD primary, defined:               A Library.           (line  25)
 * libltdl, introduction:                 Libtool Concept.     (line  30)
 * LIBOBJS and ansi2knr:                  ANSI.                (line  48)
+* LIBOBJS, and Libtool:                  LTLIBOBJS.           (line   6)
+* LIBOBJS, example:                      LIBOBJS.             (line   6)
 * LIBOBJS, special handling:             LIBOBJS.             (line   6)
 * LIBRARIES primary, defined:            A Library.           (line   6)
 * libtool convenience libraries:         Libtool Convenience Libraries.
@@ -2096,12 +2112,14 @@ B.2 General Index
 * LISP primary, defined:                 Emacs Lisp.          (line   6)
 * LN_S example:                          Extending.           (line  72)
 * local targets:                         Extending.           (line  36)
+* LTALLOCA, special handling:            LTLIBOBJS.           (line   6)
 * LTLIBOBJS and ansi2knr:                ANSI.                (line  48)
-* LTLIBOBJS, special handling:           LTLIBOBJ.            (line   6)
+* LTLIBOBJS, special handling:           LTLIBOBJS.           (line   6)
 * LTLIBRARIES primary, defined:          Libtool Libraries.   (line   6)
 * ltmain.sh not found:                   Libtool Issues.      (line   9)
 * Macro search path:                     Macro search path.   (line   6)
 * Macros Automake recognizes:            Optional.            (line   6)
+* maintainerclean-local:                 Clean.               (line  15)
 * make check:                            Tests.               (line   6)
 * make clean support:                    Clean.               (line   6)
 * make dist:                             Dist.                (line   9)
@@ -2126,7 +2144,8 @@ B.2 General Index
                                                               (line   6)
 * modules, libtool:                      Libtool Modules.     (line   6)
 * mostlyclean:                           Extending.           (line  40)
-* mostlyclean-local:                     Extending.           (line  40)
+* mostlyclean-local <1>:                 Extending.           (line  40)
+* mostlyclean-local:                     Clean.               (line  15)
 * Multiple configure.ac files:           Invoking Automake.   (line   6)
 * Multiple lex lexers:                   Yacc and Lex.        (line  60)
 * multiple outputs, rules with:          Multiple Outputs.    (line   6)

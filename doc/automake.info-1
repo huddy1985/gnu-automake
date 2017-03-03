@@ -1,8 +1,8 @@
 This is automake.info, produced by makeinfo version 4.7 from
 automake.texi.
 
-   This manual is for GNU Automake (version 1.9.2, 19 September 2004),
-a program which creates GNU standards-compliant Makefiles from template
+   This manual is for GNU Automake (version 1.9.3, 1 November 2004), a
+program which creates GNU standards-compliant Makefiles from template
 files.
 
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
@@ -22,7 +22,7 @@ files.
 
 INFO-DIR-SECTION Software development
 START-INFO-DIR-ENTRY
-* automake: (automake).		Making Makefile.in's.
+* automake: (automake).         Making Makefile.in's.
 END-INFO-DIR-ENTRY
 
 INFO-DIR-SECTION Individual utilities
@@ -36,7 +36,7 @@ File: automake.info,  Node: Top,  Next: Introduction,  Up: (dir)
 GNU Automake
 ************
 
-This manual is for GNU Automake (version 1.9.2, 19 September 2004), a
+This manual is for GNU Automake (version 1.9.3, 1 November 2004), a
 program which creates GNU standards-compliant Makefiles from template
 files.
 
@@ -170,7 +170,7 @@ Building a Shared Library
 * Libtool Convenience Libraries::  Building Convenience Libtool Libraries
 * Libtool Modules::             Building Libtool Modules
 * Libtool Flags::               Using _LIBADD and _LDFLAGS
-* LTLIBOBJ::                    Using $(LTLIBOBJ)
+* LTLIBOBJS::                   Using $(LTLIBOBJS) and $(LTALLOCA)
 * Libtool Issues::              Common Issues Related to Libtool's Use
 
 Fortran 77 Support
@@ -1892,7 +1892,7 @@ first will cause a `prefix' ordering of directories.
 will cause `lib/' to be built before `src/', then the current directory
 will be built, finally the `test/' directory will be built.  It is
 customary to arrange test directories to be built after everything else
-since they are meant to test what have been constructed.
+since they are meant to test what has been constructed.
 
    All `clean' rules are run in reverse order of build rules.
 
@@ -2526,7 +2526,7 @@ created to help build shared libraries in a platform-independent way.
 * Libtool Convenience Libraries::  Building Convenience Libtool Libraries
 * Libtool Modules::             Building Libtool Modules
 * Libtool Flags::               Using _LIBADD and _LDFLAGS
-* LTLIBOBJ::                    Using $(LTLIBOBJ)
+* LTLIBOBJS::                   Using $(LTLIBOBJS) and $(LTALLOCA)
 * Libtool Issues::              Common Issues Related to Libtool's Use
 
 
@@ -2728,6 +2728,38 @@ subdirectories into one main `libtop.la' library.
        sub22/libsub22.la \
        ...
 
+   When using such setup, beware that `automake' will assume
+`libtop.la' is to be linked with the C linker.  This is because
+`libtop_la_SOURCES' is empty, so `automake' picks C as default
+language.  If `libtop_la_SOURCES' was not empty, `automake' would
+select the linker as explained in *Note How the Linker is Chosen::.
+
+   If one of the sublibraries contains non-C source, it is important
+that the appropriate linker be chosen.  One way to achieve this is to
+pretend that there is such a non-C file among the sources of the
+library, thus forcing `automake' to select the appropriate linker.
+Here is the top-level `Makefile' of our example updated to force C++
+linking.
+
+     SUBDIRS = sub1 sub2 ...
+     lib_LTLIBRARIES = libtop.la
+     libtop_la_SOURCES =
+     # Dummy C++ source to cause C++ linking.
+     nodist_EXTRA_libtop_la_SOURCES = dummy.cxx
+     libtop_la_LIBADD = \
+       sub1/libsub1.la \
+       sub2/libsub2.la \
+       ...
+
+   `EXTRA_*_SOURCES' variables are used to keep track of source files
+that might be compiled (this is mostly useful when doing conditional
+compilation using `AC_SUBST', see *Note Conditional Libtool Sources::),
+and the `nodist_' prefix means the listed sources are not to be
+distributed (*note Program and Library Variables::).  In effect the
+file `dummy.cxx' does not need to exist in the source tree.  Of course
+if you have some real source file to list in `libtop_la_SOURCES' there
+is no point in cheating with `nodist_EXTRA_libtop_la_SOURCES'.
+
 
 File: automake.info,  Node: Libtool Modules,  Next: Libtool Flags,  Prev: Libtool Convenience Libraries,  Up: A Shared Library
 
@@ -2749,7 +2781,7 @@ wish to use a "nonstandard" name.
 single file `mymodule.c' (*note Default _SOURCES::).
 
 
-File: automake.info,  Node: Libtool Flags,  Next: LTLIBOBJ,  Prev: Libtool Modules,  Up: A Shared Library
+File: automake.info,  Node: Libtool Flags,  Next: LTLIBOBJS,  Prev: Libtool Modules,  Up: A Shared Library
 
 7.3.7 _LIBADD and _LDFLAGS
 --------------------------
@@ -2763,21 +2795,22 @@ libtool flags, such as `-version-info', `-static', and a lot more.  See
 *Note Using libltdl: (libtool)Link mode.
 
 
-File: automake.info,  Node: LTLIBOBJ,  Next: Libtool Issues,  Prev: Libtool Flags,  Up: A Shared Library
+File: automake.info,  Node: LTLIBOBJS,  Next: Libtool Issues,  Prev: Libtool Flags,  Up: A Shared Library
 
-7.3.8 `LTLIBOBJS'
------------------
+7.3.8 `LTLIBOBJS' and `LTALLOCA'
+--------------------------------
 
-Where an ordinary library might include `$(LIBOBJS)', a libtool library
-must use `$(LTLIBOBJS)'.  This is required because the object files
-that libtool operates on do not necessarily end in `.o'.
+Where an ordinary library might include `$(LIBOBJS)' or `$(ALLOCA)'
+(*note LIBOBJS::), a libtool library must use `$(LTLIBOBJS)' or
+`$(LTALLOCA)'.  This is required because the object files that libtool
+operates on do not necessarily end in `.o'.
 
    Nowadays, the computation of `LTLIBOBJS' from `LIBOBJS' is performed
 automatically by Autoconf (*note `AC_LIBOBJ' vs. `LIBOBJS':
 (autoconf)AC_LIBOBJ vs LIBOBJS.).
 
 
-File: automake.info,  Node: Libtool Issues,  Prev: LTLIBOBJ,  Up: A Shared Library
+File: automake.info,  Node: Libtool Issues,  Prev: LTLIBOBJS,  Up: A Shared Library
 
 7.3.9 Common Issues Related to Libtool's Use
 --------------------------------------------
@@ -3091,15 +3124,98 @@ File: automake.info,  Node: LIBOBJS,  Next: Program variables,  Prev: Default _S
 7.6 Special handling for LIBOBJS and ALLOCA
 ===========================================
 
-Automake explicitly recognizes the use of `$(LIBOBJS)' and `$(ALLOCA)',
-and uses this information, plus the list of `LIBOBJS' files derived
-from `configure.ac' to automatically include the appropriate source
-files in the distribution (*note Dist::).  These source files are also
-automatically handled in the dependency-tracking scheme; see *Note
-Dependencies::.
+The `$(LIBOBJS)' and `$(ALLOCA)' variables list object files that
+should be compiled into the project to provide an implementation for
+functions that are missing or broken on the host system.  They are
+substituted by `configure'.
 
-   `$(LIBOBJS)' and `$(ALLOCA)' are specially recognized in any
-`_LDADD' or `_LIBADD' variable.
+   These variables are defined by Autoconf macros such as `AC_LIBOBJ',
+`AC_REPLACE_FUNCS' (*note Generic Function Checks: (autoconf)Generic
+Functions.), or `AC_FUNC_ALLOCA' (*note Particular Function Checks:
+(autoconf)Particular Functions.).  Many other Autoconf macros call
+`AC_LIBOBJ' or `AC_REPLACE_FUNCS' to populate `$(LIBOBJS)'.
+
+   Using these variables is very similar to doing conditional
+compilation using `AC_SUBST' variables, as described in *Note
+Conditional Sources::.  That is, when building a program, `$(LIBOBJS)'
+and `$(ALLOCA)' should be added to the associated `*_LDADD' variable,
+or to the `*_LIBADD' variable when building a library.  However there
+is no need to list the corresponding sources in `EXTRA_*_SOURCES' nor
+to define `*_DEPENDENCIES'.  Automake automatically adds `$(LIBOBJS)'
+and `$(ALLOCA)' to the dependencies, and it will discover the list of
+corresponding source files automatically (by tracing the invocations of
+the `AC_LIBSOURCE' Autoconf macros).
+
+   These variables are usually used to build a portability library that
+is linked with all the programs of the project.  We now review a sample
+setup.  First, `configure.ac' contains some checks that affect either
+`LIBOBJS' or `ALLOCA'.
+
+     # configure.ac
+     ...
+     AC_CONFIG_LIBOBJ_DIR([lib])
+     ...
+     AC_FUNC_MALLOC             dnl May add malloc.$(OBJEXT) to LIBOBJS
+     AC_FUNC_MEMCMP             dnl May add memcmp.$(OBJEXT) to LIBOBJS
+     AC_REPLACE_FUNCS([strdup]) dnl May add strdup.$(OBJEXT) to LIBOBJS
+     AC_FUNC_ALLOCA             dnl May add alloca.$(OBJEXT) to ALLOCA
+     ...
+     AC_CONFIG_FILES([
+       lib/Makefile
+       src/Makefile
+     ])
+     AC_OUTPUT
+
+   The `AC_CONFIG_LIBOBJ_DIR' tells Autoconf that the source files of
+these object files are to be found in the `lib/' directory.  Automake
+does not yet use this information; it knows the source files are
+expected to be in the directory where the `$(LIBOBJS)' and `$(ALLOCA)'
+variables are used.
+
+   The `lib/' directory should therefore contain `malloc.c',
+`memcmp.c', `strdup.c', `alloca.c'.  Here is its `Makefile.am':
+
+     # lib/Makefile.am
+
+     noinst_LIBRARIES = libcompat.a
+     libcompat_a_SOURCES =
+     libcompat_a_LIBADD = $(LIBOBJS) $(ALLOCA)
+
+   Nothing else is required.  The library can have any name, of course,
+and anyway it is not going to be installed: it just holds the
+replacement versions of the missing or broken functions so we can later
+link them in.  In many projects also include extra functions, specific
+to the project, in that library: they are simply added on the
+`_SOURCES' line.
+
+   Finally here is how this library could be used from the `src/'
+directory.
+
+     # src/Makefile.am
+
+     # Link all programs in this directory with libcompat.a
+     LDADD = ../lib/libcompat.a
+
+     bin_PROGRAMS = tool1 tool2 ...
+     tool1_SOURCES = ...
+     tool2_SOURCES = ...
+
+   Please note it would be wrong to use the `$(LIBOBJS)' or `$(ALLOCA)'
+in `src/Makefile.am', because these variables contains unprefixed
+object names, and for instance `malloc.$(OBJEXT)' is not buildable in
+the `src/' directory.  (Actually if you try using `$(LIBOBJS)' in
+`src/', Automake will require a copy of `malloc.c', `memcmp.c',
+`strdup.c', `alloca.c' in `src/' too.)
+
+   Because `$(LIBOBJS)' and `$(ALLOCA)' contain object filenames that
+end with `.$(OBJEXT)', they are not suitable for Libtool libraries
+(where the expected object extension is `.lo'): `LTLIBOBJS' and
+`LTALLOCA' should be used instead.
+
+   `LTLIBOBJS' is defined automatically by Autoconf and should not be
+defined by hand (as in the past), however at the time of writing
+`LTALLOCA' still needs to be defined from `ALLOCA' manually.  See *Note
+`AC_LIBOBJ' vs. `LIBOBJS': (autoconf)AC_LIBOBJ vs LIBOBJS.
 
 
 File: automake.info,  Node: Program variables,  Next: Yacc and Lex,  Prev: LIBOBJS,  Up: Programs
@@ -3234,44 +3350,44 @@ of its default locations (*note Finding `configure' Input:
 possible to link two `yacc' parsers into the same executable.
 
    We recommend using the following renaming hack used in `gdb':
-     #define	yymaxdepth c_maxdepth
-     #define	yyparse	c_parse
-     #define	yylex	c_lex
-     #define	yyerror	c_error
-     #define	yylval	c_lval
-     #define	yychar	c_char
-     #define	yydebug	c_debug
-     #define	yypact	c_pact
-     #define	yyr1	c_r1
-     #define	yyr2	c_r2
-     #define	yydef	c_def
-     #define	yychk	c_chk
-     #define	yypgo	c_pgo
-     #define	yyact	c_act
-     #define	yyexca	c_exca
+     #define yymaxdepth c_maxdepth
+     #define yyparse c_parse
+     #define yylex   c_lex
+     #define yyerror c_error
+     #define yylval  c_lval
+     #define yychar  c_char
+     #define yydebug c_debug
+     #define yypact  c_pact
+     #define yyr1    c_r1
+     #define yyr2    c_r2
+     #define yydef   c_def
+     #define yychk   c_chk
+     #define yypgo   c_pgo
+     #define yyact   c_act
+     #define yyexca  c_exca
      #define yyerrflag c_errflag
-     #define yynerrs	c_nerrs
-     #define	yyps	c_ps
-     #define	yypv	c_pv
-     #define	yys	c_s
-     #define	yy_yys	c_yys
-     #define	yystate	c_state
-     #define	yytmp	c_tmp
-     #define	yyv	c_v
-     #define	yy_yyv	c_yyv
-     #define	yyval	c_val
-     #define	yylloc	c_lloc
-     #define yyreds	c_reds
-     #define yytoks	c_toks
-     #define yylhs	c_yylhs
-     #define yylen	c_yylen
+     #define yynerrs c_nerrs
+     #define yyps    c_ps
+     #define yypv    c_pv
+     #define yys     c_s
+     #define yy_yys  c_yys
+     #define yystate c_state
+     #define yytmp   c_tmp
+     #define yyv     c_v
+     #define yy_yyv  c_yyv
+     #define yyval   c_val
+     #define yylloc  c_lloc
+     #define yyreds  c_reds
+     #define yytoks  c_toks
+     #define yylhs   c_yylhs
+     #define yylen   c_yylen
      #define yydefred c_yydefred
-     #define yydgoto	c_yydgoto
+     #define yydgoto c_yydgoto
      #define yysindex c_yysindex
      #define yyrindex c_yyrindex
      #define yygindex c_yygindex
-     #define yytable	 c_yytable
-     #define yycheck	 c_yycheck
+     #define yytable  c_yytable
+     #define yycheck  c_yycheck
      #define yyname   c_yyname
      #define yyrule   c_yyrule
 
@@ -3928,7 +4044,7 @@ Suppose that `foo.c' includes `foo.h'.  When it first compiles `foo.o',
 this compilation `depcomp' records the `foo.h' dependency so that
 following invocations of `make' will honor it.  In these conditions,
 it's clear there is no problem: either `foo.o' doesn't exist and has to
-be built (regardless of the dependencies), either accurate dependencies
+be built (regardless of the dependencies), or accurate dependencies
 exist and they can be used to decide whether `foo.o' should be rebuilt.
 
    It's a different story if `foo.h' doesn't exist by the first `make'
@@ -4626,7 +4742,7 @@ is done correctly.
 `bin_PROGRAMS') are installed by `install-exec'.
 
    Any variable using a user-defined directory prefix with `exec' in
-the name (e.g. `myexecbin_PROGRAMS' is installed by `install-exec'.
+the name (e.g. `myexecbin_PROGRAMS') is installed by `install-exec'.
 All other user-defined prefixes are installed by `install-data'.
 
 11.3 Extending installation
@@ -4641,7 +4757,7 @@ almost anything; care is required.
 `install-data-hook'.  These hooks are run after all other install rules
 of the appropriate type, exec or data, have completed.  So, for
 instance, it is possible to perform post-installation modifications
-using an install hook.  
+using an install hook.  *Note Extending:: gives some examples.  
 
 11.4 Staged installs
 ====================
@@ -4699,9 +4815,19 @@ can be defined to specify additional files to clean.  These variables
 are `MOSTLYCLEANFILES', `CLEANFILES', `DISTCLEANFILES', and
 `MAINTAINERCLEANFILES'.  
 
+   When cleaning involves more than deleting some hard-coded list of
+files, it is also possible to supplement the cleaning rules with your
+own commands.  Simply define a rule for any of the `mostlyclean-local',
+`clean-local', `distclean-local', or `maintainerclean-local' targets
+(*note Extending::).  A common case is deleting a directory, for
+instance a directory created by the test suite:
+
+     clean-local:
+             -rm -rf testSubDir
+
    As the GNU Standards aren't always explicit as to which files should
-be removed by which rule, we've adopted a heuristic which we believe was
-first formulated by Franc,ois Pinard:
+be removed by which rule, we've adopted a heuristic which we believe
+was first formulated by Franc,ois Pinard:
 
    * If `make' built it, and it is commonly something that one would
      want to rebuild (for instance, a `.o' file), then `mostlyclean'
@@ -4806,7 +4932,7 @@ recursively included by specifying a directory in EXTRA_DIST:
      EXTRA_DIST = doc
 
      dist-hook:
-     	rm -rf `find $(distdir)/doc -name CVS`
+             rm -rf `find $(distdir)/doc -name CVS`
 
    Two variables that come handy when writing `dist-hook' rules are
 `$(distdir)' and `$(top_distdir)'.
@@ -5659,7 +5785,7 @@ possible to append new dependencies to an `automake'-defined target
 without redefining the entire rule.
 
    However, various useful targets have a `-local' version you can
-specify in your `Makefile.in'.  Automake will supplement the standard
+specify in your `Makefile.am'.  Automake will supplement the standard
 target with these user-supplied targets.
 
    The targets that support a local version are `all', `info', `dvi',
@@ -5705,6 +5831,13 @@ program using `$(LN_S)':
    Note that we rename the program so that a new version will erase the
 symbolic link, not the real binary.  Also we `cd' into the destination
 directory in order to create relative links.
+
+   When writing `install-exec-hook' or `install-data-hook', please bear
+in mind that the exec/data distinction is based on the installation
+directory, not on the primary used (*note Install::).  So a
+`foo_SCRIPTS' will be installed by `install-data', and a
+`barexec_SCRIPTS' will be installed by `install-exec'.  You should
+define your hooks consequently.
 
 
 File: automake.info,  Node: Third-Party Makefiles,  Prev: Extending,  Up: Not Enough
@@ -5803,7 +5936,7 @@ many Automake users have never heard of `make distcheck').  Other
 people may prefer to revamp the existing `Makefile's to support VPATH.
 Doing so does not necessarily require Automake, only Autoconf is needed
 (*note Build Directories: (autoconf)Build Directories.).  The necessary
-substitutions: `@scrdir@', `@top_srcdir@', and `@top_buildir@' are
+substitutions: `@scrdir@', `@top_srcdir@', and `@top_builddir@' are
 defined by `configure' when it processes a `Makefile' (*note Preset
 Output Variables: (autoconf)Preset Output Variables.), they are not
 computed by the Makefile like the aforementioned `$(distdir)' and
@@ -6348,7 +6481,7 @@ the generated man page using the following setup.
      dist_man_MANS = foo.1
 
      foo.1: foo$(EXEEXT)
-     	help2man --output=foo.1 ./foo$(EXEEXT)
+             help2man --output=foo.1 ./foo$(EXEEXT)
 
    This will effectively distribute the man page.  However, `make
 distcheck' will fail with:
@@ -6382,7 +6515,7 @@ is to not depend on `foo$(EXEEXT)'.  For instance, assuming `foo
 
      foo.1: foo.c $(top_srcdir)/configure.ac
              $(MAKE) $(AM_MAKEFLAGS) foo$(EXEEXT)
-     	help2man --output=foo.1 ./foo$(EXEEXT)
+             help2man --output=foo.1 ./foo$(EXEEXT)
 
    This way, `foo.1' will not get rebuilt every time `foo$(EXEEXT)'
 changes.  The `make' call makes sure `foo$(EXEEXT)' is up-to-date

@@ -1,3 +1,125 @@
+2004-11-01  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.ac, NEWS: Bump version to 1.9.3.
+
+	* lib/config.guess, lib/texinfo.tex: New upstream versions.
+
+	* doc/automake.texi (LIBOBJS): Spelling and grammar corrections
+	from Ralf Wildenhues.
+
+2004-10-31  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (LIBOBJS): Augment with an example setup.
+	(LTLIBOBJ): Rename as ...
+	(LTLIBOBJS): ... this.  Link to LIBOBJS, and mention LTALLOCA.
+
+2004-10-25  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi: Untabify, tabs in the examples are poorly
+	rendered.
+	* Makefile.am (maintainer-check): Grep tabs in the manual.
+
+	* tests/comment8.test: Use $MAKE, not make.
+
+2004-10-24  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/distcom3.test: Typo.
+
+2004-10-22  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (Libtool Convenience Libraries): Explain how
+	to force the linker selection.
+
+	* lib/install-sh: Fix the dirname emulation to ignore trailing
+	slashes, i.e., the direname of `a/b/' is `a', not `a/b/'.  This
+	caused `install-sh a/b/' to fail.
+	* tests/instsh2.test: Augment.
+	Report from Пухальский Юрий Андреевич.
+
+2004-10-21  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (get_object_extension): The extension to use is know
+	by the caller, and cannot be selected by looking only at the
+	target name.  Simplify this function to simply conditionally
+	prepend $U to the given extension.
+	(handle_programs, handle_libraries, handle_ltlibraries): Hard-code
+	the extension to use.  This way Automake won't mistake a program
+	named `foo.la' as a libtool library.
+	* tests/primary3.test: New file.
+	* tests/Makefile.am (TESTS): Add primary3.test.
+
+2004-10-12  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (Install): Link to node Extending for examples.
+	(Extending): More comments about install-data-hook vs
+	install-exec-hook, and link to Install.
+
+	* configure.ac: Export @am_AUTOCONF@.
+	* tests/defs.in (AUTOCONF): Define as @am_AUTOCONF@, not @AUTOCONF@,
+	so the test suite runs `autoconf' and not `missing --run autoconf'.
+	* tests/missing.test, tests/missing2.test: Arrange for missing
+	to be used in front of autoconf even if the user has exported
+	AUTOCONF.  This fixes two spurious failures reported by
+	Mark D. Baushke.
+
+	* lib/compile: Handle output.obj in addition to output.o.
+	* tests/compile.test: Check for this.
+
+2004-10-11  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (Sources): Typo, reported by Karl Berry.
+
+2004-10-10  Kelley Cook  <kcook@gcc.gnu.org>  (tiny change)
+	    Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* aclocal.in ($ac_defun_rx): Match AC_DEFUN_ONCE.
+	(trace_used_macros): Trace AC_DEFUN_ONCE.
+	* tests/aclocal5.test: Use AC_DEFUN_ONCE.
+
+2004-10-10  Stepan Kasal  <kasal@ucw.cz>  (tiny change)
+
+	* doc/automake.texi (Extending): Typo.
+
+2004-09-29  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/subobj9.test: Adjust regexes after previous patch.
+
+2004-09-28  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (handle_languages, define_compiler_variable): Output
+	Libtool's --tag= option before --mode=compile, because depcomp use
+	--mode=compile as end marker for libtool arguments.
+	(define_linker_variable): Likewise before --mode=link, for
+	uniformity.
+	* tests/pr307.test: Make sure dependency files are updated.  That
+	was not the case because depcomp thought `--tag=CC' was the
+	compiler to get dependencies from.
+	Report from Пухальский Юрий Андреевич.
+
+2004-09-25  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (Clean): Document -local targets.
+
+2004-09-25  Ralf Wildenhues <Ralf.Wildenhues@gmx.de>
+
+	* doc/automake.texi: Typos.
+
+2004-09-21  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	Typos and other English mistakes reported...
+	* doc/automake.texi (Timeline): ... by Jim and Gary.
+	* NEWS: ... by Richard Dawe.
+
+	* lib/Automake/VarDef.pm (append): Strip comments from augmented
+	variables.
+	* tests/comment8.test: New file.
+	* tests/Makefile.am (TESTS): Add comment8.test.
+	Report from Stepan Kasal.
+
+2004-09-20  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.ac, NEWS: Bump version to 1.9.2a.
+
 2004-09-19  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* configure.ac, NEWS: Bump version to 1.9.2.
@@ -1114,7 +1236,7 @@
 
 	* tests/txinfo24.test, tests/txinfo25.test, tests/txinfo28.test:
 	Require texi2dvi-o.
-	Report from V�clav Haisman.
+	Report from Václav Haisman.
 
 2003-12-10  Alexandre Duret-Lutz  <adl@gnu.org>
 
@@ -2975,9 +3097,9 @@
 
 2003-05-22  Alexandre Duret-Lutz  <adl@gnu.org>
 
-	* automake.texi (maintainer-mode): s/Fran�ois/Fran@,{c}ois/.
+	* automake.texi (maintainer-mode): s/François/Fran@,{c}ois/.
 
-	* lib/elisp-comp: s/Fran�ois/Franc,ois/.
+	* lib/elisp-comp: s/François/Franc,ois/.
 	Suggested by Paul Eggert.
 
 	* automake.in: Move the "main" code at the end.
@@ -4030,3 +4152,7 @@ You should have received a copy of the GNU General Public License
 along with autoconf; see the file COPYING.  If not, write to
 the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
+
+;; Local Variables:
+;; coding: utf-8
+;; End:

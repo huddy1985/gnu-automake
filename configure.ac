@@ -24,17 +24,17 @@ dnl (abs_top_builddir is used in tests/automake.in).  Note that
 dnl this is a requirement for the Automake package itself.
 dnl Automake users can still use Autoconf 2.58.
 AC_PREREQ(2.58a)
-AC_INIT([GNU Automake], [1.9.2], [bug-automake@gnu.org])
+AC_INIT([GNU Automake], [1.9.3], [bug-automake@gnu.org])
 
 AC_CONFIG_SRCDIR(automake.in)
 AC_CONFIG_AUX_DIR(lib)
 
 AC_CANONICAL_BUILD
 
-# Save the AUTOCONF setting before AM_INIT_AUTOMAKE overrides it;
-# this way we can run Autoconf tests from configure without being
-# bothered by `missing'.
-am_AUTOCONF=${AUTOCONF-autoconf}
+# Save the AUTOCONF setting before AM_INIT_AUTOMAKE overrides it; this
+# way we can run Autoconf tests from configure (or from the test
+# suite) without being bothered by `missing'.
+AC_SUBST([am_AUTOCONF], ["${AUTOCONF-autoconf}"])
 
 AM_INIT_AUTOMAKE([1.8a dist-bzip2 filename-length-max=99])
 
