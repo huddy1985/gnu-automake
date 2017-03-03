@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 
-XFAIL_TESTS = condd.test subdir5.test auxdir2.test cond17.test specflags8.test
+XFAIL_TESTS = condd.test subdir5.test auxdir2.test cond17.test
 
 TESTS =	\
 acinclude.test \
@@ -60,6 +60,7 @@ comment2.test \
 comment3.test \
 comment4.test \
 comment5.test \
+comment6.test \
 compile_f_c_cxx.test \
 cond.test \
 cond2.test \
@@ -81,6 +82,7 @@ cond17.test \
 cond18.test \
 cond19.test \
 cond20.test \
+cond22.test \
 condd.test \
 condincl.test \
 condincl2.test \
@@ -129,6 +131,7 @@ distcommon2.test \
 distcommon3.test \
 distdir.test \
 distname.test \
+dollar.test \
 double.test \
 dup2.test \
 dup3.test \
@@ -160,6 +163,7 @@ fpinstall.test \
 gcj.test \
 gcj2.test \
 gcj3.test \
+gcj4.test \
 gnits.test \
 header.test \
 implicit.test \
@@ -179,6 +183,7 @@ instman2.test \
 interp.test \
 interp2.test \
 java.test \
+java2.test \
 javaprim.test \
 javasubst.test \
 ldadd.test \
@@ -202,6 +207,7 @@ libobj11.test \
 library.test \
 libtool.test \
 libtool2.test \
+libtool3.test \
 link_c_cxx.test	\
 link_dist.test \
 link_f_c.test \
@@ -212,9 +218,11 @@ lisp.test \
 listval.test \
 ltdeps.test \
 ltlibobjs.test \
+maintclean.test \
 make.test \
 makevars.test \
 man.test \
+man2.test \
 mclean.test \
 mdate.test \
 mdate2.test \
@@ -252,6 +260,7 @@ pluseq5.test \
 pluseq6.test \
 pluseq7.test \
 pluseq8.test \
+postproc.test \
 ppf77.test \
 pr2.test \
 pr9.test \
@@ -270,6 +279,7 @@ pr287.test \
 pr300-lib.test \
 pr300-ltlib.test \
 pr300-prog.test \
+pr307.test \
 prefix.test \
 primary.test \
 primary2.test \
@@ -282,6 +292,7 @@ remake.test \
 remake2.test \
 remake3.test \
 req.test \
+required.test \
 rulepat.test \
 scripts.test \
 seenc.test \
@@ -308,6 +319,7 @@ subdir2.test \
 subdir3.test \
 subdir4.test \
 subdir5.test \
+subdir6.test \
 subdirbuiltsources.test \
 subdircond.test \
 subobj.test \
@@ -319,6 +331,7 @@ subobj6.test \
 subobj7.test \
 subobj8.test \
 subobj9.test \
+subobjname.test \
 subst.test \
 substref.test \
 substtarg.test \
@@ -355,6 +368,7 @@ version2.test \
 version3.test \
 version4.test \
 version5.test \
+version6.test \
 vpath.test \
 vtexi.test \
 vtexi2.test \
