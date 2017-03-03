@@ -3,7 +3,7 @@ automake.texi.
 
 
 
-   This manual is for GNU Automake (version 1.8.1, 7 January 2004), a
+   This manual is for GNU Automake (version 1.8.2, 7 January 2004), a
 program which creates GNU standards-compliant Makefiles from template
 files.
 
