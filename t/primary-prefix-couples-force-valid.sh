@@ -24,7 +24,7 @@
 # should work.
 
 required=cc
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac <<'END'
 AC_PROG_CC
@@ -77,7 +77,7 @@ $ACLOCAL
 $AUTOMAKE -a
 $AUTOCONF
 
-cwd=`pwd` || fatal_ "cannot get current working directory"
+cwd=$(pwd) || fatal_ "getting current working directory"
 ./configure --prefix="$cwd/_inst"
 
 $MAKE install

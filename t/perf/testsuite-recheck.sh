@@ -19,7 +19,7 @@
 # FIXME: performance is too low, and FAIL accordingly; it just offers an
 # FIXME: easy way to verify how effective a performance optimization is.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 count=5000
 
@@ -69,7 +69,7 @@ END
 # Temporarily disable shell traces, to avoid bloating the log file.
 set +x
 
-for i in `seq_ 1 $count`; do
+for i in $(seq_ 1 $count); do
   echo dummy $i > $i.log
   echo :global-test-result: PASS > $i.trs
   echo :test-result: PASS >> $i.trs

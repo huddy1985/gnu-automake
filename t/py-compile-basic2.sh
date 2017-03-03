@@ -19,9 +19,9 @@
 # related test 'py-compile-basic.test'.
 
 required=python
-. ./defs || Exit 1
+. ./defs || exit 1
 
-ocwd=`pwd` || Exit 99
+ocwd=$(pwd) || fatal_ "getting current working directory"
 
 pyfiles="
   foo.py

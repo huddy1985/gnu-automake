@@ -19,7 +19,7 @@
 # Report from Tom Tromey.
 
 required='makeinfo tex texi2dvi'
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat > configure.ac << END
 AC_INIT([$me], [1.0])
@@ -55,8 +55,8 @@ $ACLOCAL
 $AUTOMAKE --add-missing
 $AUTOCONF
 
-test ! -f texinfo.tex
-test ! -f aux1/texinfo.tex
+test ! -e texinfo.tex
+test ! -e aux1/texinfo.tex
 test -f tex/texinfo.tex
 
 ./configure

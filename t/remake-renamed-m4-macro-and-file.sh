@@ -18,7 +18,7 @@
 # an m4 macro in it gets renamed.  Kudos to Bruno Haible for thinking
 # about this situation.  See also related test 'acloca22.test'.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac <<'END'
 MY_MACRO
@@ -62,7 +62,7 @@ $MAKE distdir
 ls -l $distdir $distdir/*
 test -f $distdir/m4/bar.m4
 test -f $distdir/m4/macros.m4
-test ! -f $distdir/m4/foo.m4
+test ! -e $distdir/m4/foo.m4
 
 # Rename both at once.
 
@@ -80,7 +80,7 @@ $MAKE distdir
 ls -l $distdir $distdir/*
 test -f $distdir/m4/quux.m4
 test -f $distdir/m4/defs.m4
-test ! -f $distdir/m4/bar.m4
-test ! -f $distdir/m4/macros.m4
+test ! -e $distdir/m4/bar.m4
+test ! -e $distdir/m4/macros.m4
 
 :

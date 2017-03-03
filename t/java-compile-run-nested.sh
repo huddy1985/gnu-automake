@@ -25,7 +25,7 @@
 # of the older non-parallel 'simple-tests' driver.
 
 required='java javac'
-. ./defs || Exit 1
+. ./defs || exit 1
 
 echo "AC_SUBST([PATH_SEPARATOR], ['$PATH_SEPARATOR'])" >> configure.ac
 
@@ -239,7 +239,7 @@ $AUTOMAKE -a
 # To have the parallel testsuite more verbose.
 VERBOSE=yes; export VERBOSE
 
-./configure --prefix="`pwd`/_inst"
+./configure --prefix="$(pwd)/_inst"
 cat jprog/PkgLocation.java # For debugging.
 $MAKE check
 $MAKE install

@@ -19,10 +19,10 @@
 
 am_create_testdir=empty
 required=cc
-. ./defs || Exit 1
+. ./defs || exit 1
 
 count=0
-ocwd=`pwd` || fatal_ "cannot get current working directory"
+ocwd=$(pwd) || fatal_ "cannot get current working directory"
 
 # Usage: do_check [--add-missing] [CONFIG-AUXDIR-PATH=.]
 do_check ()
@@ -33,7 +33,7 @@ do_check ()
   esac
   auxdir=${1-.}
 
-  count=`expr $count + 1`
+  count=$(($count + 1))
   mkdir T$count.d
   cd T$count.d
 

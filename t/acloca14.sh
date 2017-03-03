@@ -17,7 +17,7 @@
 # Make sure m4_included files are also scanned for definitions.
 # Report from Phil Edwards.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac << 'END'
 AM_PROG_LIBTOOL
@@ -68,12 +68,12 @@ $ACLOCAL -I defs
 $FGREP acinclude.m4 aclocal.m4
 # None of the following macro should be included.  acinclude.m4
 # includes the first four, and the last two are not needed at all.
-$FGREP a.m4 aclocal.m4 && Exit 1
-$FGREP b.m4 aclocal.m4 && Exit 1
-$FGREP c.m4 aclocal.m4 && Exit 1
-$FGREP d.m4 aclocal.m4 && Exit 1
-$FGREP defs/e.m4 aclocal.m4 && Exit 1
-$FGREP defs/f.m4 aclocal.m4 && Exit 1
+$FGREP a.m4 aclocal.m4 && exit 1
+$FGREP b.m4 aclocal.m4 && exit 1
+$FGREP c.m4 aclocal.m4 && exit 1
+$FGREP d.m4 aclocal.m4 && exit 1
+$FGREP defs/e.m4 aclocal.m4 && exit 1
+$FGREP defs/f.m4 aclocal.m4 && exit 1
 
 $AUTOCONF
 $AUTOMAKE
@@ -81,37 +81,27 @@ $AUTOMAKE
 ./configure
 $MAKE testdist1
 
-cp aclocal.m4 stamp
+cp aclocal.m4 aclocal.old
 $sleep
-
-cat >>c.m4 <<\EOF
-AC_DEFUN([FOO], [ANOTHER_MACRO])
-EOF
-
+echo 'AC_DEFUN([FOO], [ANOTHER_MACRO])' >> c.m4
 $MAKE
-
 # Because c.m4 has changed, aclocal.m4 must have been rebuilt.
-test `ls -1t aclocal.m4 stamp | sed 1q` = aclocal.m4
+is_newest aclocal.m4 aclocal.old
 # However, since FOO is not used, f.m4 should not be included
 # and the contents of aclocal.m4 should remain the same
-diff aclocal.m4 stamp
+diff aclocal.m4 aclocal.old
 
-# If FOO where to be used, that would be another story, of course.
-cat >>configure.ac <<EOF
-FOO
-EOF
-
-cp aclocal.m4 stamp
+# If FOO where to be used, that would be another story, of course:
+# f.m4 should be included
 $sleep
-
+echo FOO >> configure.ac
 $MAKE
-
 $FGREP defs/f.m4 aclocal.m4
 $MAKE testdist2
 
 # Make sure aclocal diagnose missing included files with correct 'file:line:'.
 rm -f b.m4
-$ACLOCAL 2>stderr && { cat stderr >&2; Exit 1; }
+$ACLOCAL 2>stderr && { cat stderr >&2; exit 1; }
 cat stderr >&2
 grep 'a\.m4:1: .*b\.m4.*does not exist' stderr
 

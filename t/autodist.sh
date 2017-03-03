@@ -20,7 +20,7 @@
 # Keep this test in sync with sister test 'autodist-subdir.test'.
 
 am_create_testdir=empty
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat > configure.ac <<END
 AC_INIT([$me], [1.0])
@@ -35,11 +35,11 @@ $AUTOCONF
 
 # The automake manual states that the list of automatically-distributed
 # files should be given by 'automake --help'.
-list=`$AUTOMAKE --help \
-        | sed -n '/^Files.*automatically distributed.*if found.*always/,/^ *$/p' \
-        | sed 1d`
+list=$($AUTOMAKE --help \
+         | sed -n '/^Files.*automatically distributed.*if found.*always/,/^ *$/p' \
+         | sed 1d)
 # Normalize whitespace, just in case.
-list=`echo $list`
+list=$(echo $list)
 
 test -n "$list"
 
@@ -80,7 +80,7 @@ $MAKE distdir
 autodist_list="$list" $MAKE check
 
 $MAKE maintainer-clean
-test ! -f README        # Sanity check.
+test ! -e README        # Sanity check.
 rm -rf $me-1.0          # Remove $(distdir).
 
 : Now try creating the automatically-distributed files before

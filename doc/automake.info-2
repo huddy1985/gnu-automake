@@ -1,7 +1,7 @@
-This is automake.info, produced by makeinfo version 4.13 from
-/home/stefano/src/am/branches/trunks/doc/automake.texi.
+This is doc/automake.info, produced by makeinfo version 4.13 from
+./doc/automake.texi.
 
-This manual is for GNU Automake (version 1.12.1, 1 June 2012), a
+This manual is for GNU Automake (version 1.12.2, 8 July 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -400,7 +400,7 @@ HP-UX's `/bin/sh',
 
      AM_TESTS_ENVIRONMENT = \
      ## Some environment initializations are kept in a separate shell
-     ## file `tests-env.sh', which can make it easier to also run tests
+     ## file 'tests-env.sh', which can make it easier to also run tests
      ## from the command line.
        . $(srcdir)/tests-env.sh; \
      ## On Solaris, prefer more POSIX-compliant versions of the standard
@@ -2139,13 +2139,24 @@ determined at configure time, and cannot be overridden at make time.
 Future versions of POSIX are likely to require nested variable
 expansion, so this minor limitation should go away with time.
 
-   To extend the silent mode to your own rules, you have two choices:
+   To extend the silent mode to your own rules, you have few choices:
 
    * You can use the predefined variable `AM_V_GEN' as a prefix to
      commands that should output a status line in silent mode, and
      `AM_V_at' as a prefix to commands that should not output anything
      in silent mode.  When output is to be verbose, both of these
      variables will expand to the empty string.
+
+   * You can silence a recipe unconditionally with `@', and then use
+     the predefined variable `AM_V_P' to know whether make is being run
+     in silent or verbose mode, adjust the verbose information your
+     recipe displays accordingly:
+
+          generate-headers:
+
+                  ... [commands defining a shell variable '$headers'] ...; \
+                  if $(AM_V_P); then set -x; else echo " GEN   [headers]"; fi; \
+                  rm -f $$headers && generate-header --flags $$headers
 
    * You can add your own variables, so strings of your own choice are
      shown.  The following snippet shows how you would define your own
@@ -2458,7 +2469,7 @@ third-party `Makefile's support them.
    If you have ever used Gettext in a project, this is a good example of
 how third-party `Makefile's can be used with Automake.  The `Makefile's
 `gettextize' puts in the `po/' and `intl/' directories are handwritten
-`Makefile's that implement all these targets.  That way they can be
+`Makefile's that implement all of these targets.  That way they can be
 added to `SUBDIRS' in Automake packages.
 
    Directories that are only listed in `DIST_SUBDIRS' but not in
@@ -2648,7 +2659,7 @@ Automake-supplied M4 macros.  Auxiliary tools are installed by
 macros put in `aclocal.m4' as well as the behavior of the auxiliary
 tools installed.
 
-   Because all these files are closely related, it is important to
+   Because all of these files are closely related, it is important to
 regenerate all of them when upgrading to a newer Automake release.  The
 usual way to do that is
 
@@ -2663,8 +2674,8 @@ or more conveniently:
    The use of `--force-missing' ensures that auxiliary tools will be
 overridden by new versions (*note automake Invocation::).
 
-   It is important to regenerate all these files each time Automake is
-upgraded, even between bug fixes releases.  For instance, it is not
+   It is important to regenerate all of these files each time Automake
+is upgraded, even between bug fixes releases.  For instance, it is not
 unusual for a bug fix to involve changes to both the rules generated in
 `Makefile.in' and the supporting M4 macros copied to `aclocal.m4'.
 
@@ -2793,8 +2804,8 @@ All Files in CVS
           (the GCC folks have such a script).
 
         * Or `configure.ac' uses `AM_MAINTAINER_MODE', which will
-          disable all these rebuild rules by default.  This is further
-          discussed in *note maintainer-mode::.
+          disable all of these rebuild rules by default.  This is
+          further discussed in *note maintainer-mode::.
 
    * Although we focused on spurious rebuilds, the converse can also
      happen.  CVS's timestamp handling can also let you think an
@@ -3316,7 +3327,7 @@ common idiom to ensure that `AM_CFLAGS' applies to every target in a
    Using variables like this gives you full control over the ordering of
 the flags.  For instance, if there is a flag in $(WARNINGCFLAGS) that
 you want to negate for a particular target, you can use something like
-`prog1_CFLAGS = $(AM_CFLAGS) -no-flag'.  If all these flags had been
+`prog1_CFLAGS = $(AM_CFLAGS) -no-flag'.  If all of these flags had been
 forcefully appended to `CFLAGS', there would be no way to disable one
 flag.  Yet another reason to leave user variables to users.
 
@@ -4104,7 +4115,7 @@ A.1 GNU Free Documentation License
      have printed covers) of the Document, numbering more than 100, and
      the Document's license notice requires Cover Texts, you must
      enclose the copies in covers that carry, clearly and legibly, all
-     these Cover Texts: Front-Cover Texts on the front cover, and
+     of these Cover Texts: Front-Cover Texts on the front cover, and
      Back-Cover Texts on the back cover.  Both covers must also clearly
      and legibly identify you as the publisher of these copies.  The
      front cover must present the full title with all words of the
@@ -4513,6 +4524,7 @@ B.1 Macro Index
 * AM_MAINTAINER_MODE:                    Rebuilding.          (line   9)
 * AM_MAINTAINER_MODE([DEFAULT-MODE]):    Optional.            (line 173)
 * AM_MAKE_INCLUDE:                       Private Macros.      (line  20)
+* AM_MISSING_PROG:                       Public Macros.       (line 100)
 * AM_OUTPUT_DEPENDENCY_COMMANDS:         Private Macros.      (line  15)
 * AM_PATH_LISPDIR:                       Public Macros.       (line  51)
 * AM_PATH_PYTHON:                        Python.              (line  29)
@@ -4527,10 +4539,10 @@ B.1 Macro Index
 * AM_PROG_VALAC:                         Vala Support.        (line  21)
 * AM_SANITY_CHECK:                       Private Macros.      (line  30)
 * AM_SET_DEPDIR:                         Private Macros.      (line  13)
-* AM_SILENT_RULES:                       Public Macros.       (line 100)
+* AM_SILENT_RULES:                       Public Macros.       (line 108)
 * AM_SUBST_NOTMAKE(VAR):                 Optional.            (line 181)
 * AM_SYS_POSIX_TERMIOS:                  Obsolete Macros.     (line  40)
-* AM_WITH_DMALLOC:                       Public Macros.       (line 104)
+* AM_WITH_DMALLOC:                       Public Macros.       (line 112)
 * m4_include <1>:                        Basics of Distribution.
                                                               (line  14)
 * m4_include:                            Optional.            (line 191)
@@ -4844,6 +4856,7 @@ B.2 Variable Index
                                                               (line 181)
 * maude_YFLAGS:                          Program and Library Variables.
                                                               (line 182)
+* MISSING:                               Public Macros.       (line 100)
 * mkdir_p:                               Obsolete Macros.     (line  25)
 * MKDIR_P:                               Obsolete Macros.     (line  25)
 * MOSTLYCLEANFILES:                      Clean.               (line  13)
@@ -4962,7 +4975,7 @@ B.2 Variable Index
                                                               (line   6)
 * WARNINGS <1>:                          aclocal Options.     (line  96)
 * WARNINGS:                              automake Invocation. (line 184)
-* WITH_DMALLOC:                          Public Macros.       (line 104)
+* WITH_DMALLOC:                          Public Macros.       (line 112)
 * XFAIL_TESTS:                           Scripts-based Testsuites.
                                                               (line  35)
 * XZ_OPT:                                The Types of Distributions.

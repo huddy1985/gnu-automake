@@ -18,7 +18,7 @@
 # (pr401b.test and pr401c.test do the same for LTLIBOBJS and ALLOCA)
 
 required=cc
-. ./defs || Exit 1
+. ./defs || exit 1
 
 mkdir lib src
 
@@ -100,7 +100,7 @@ $ACLOCAL
 $AUTOCONF
 $AUTOMAKE
 ./configure
-test ! -d lib/lib
+test ! -e lib/lib
 $MAKE distcheck
 
 ## -------------------------------------------- ##
@@ -144,8 +144,8 @@ $ACLOCAL
 $AUTOCONF
 $AUTOMAKE --add-missing
 ./configure
-test ! -d src/lib
-test ! -d 'src/$(top_builddir)'
+test ! -e src/lib
+test ! -e 'src/$(top_builddir)'
 $MAKE
 $MAKE check
 $MAKE distclean

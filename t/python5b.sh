@@ -18,7 +18,7 @@
 # Same as python5.test, but with the user forcing the python to use.
 
 required=python
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >>configure.ac << 'END'
 # Hopefully the Python team will never release such a version.
@@ -32,7 +32,7 @@ cat > bin/my-python << 'END'
 exec python ${1+"$@"}
 END
 chmod a+x bin/my-python
-PATH=`pwd`/bin$PATH_SEPARATOR$PATH
+PATH=$(pwd)/bin$PATH_SEPARATOR$PATH
 
 : > Makefile.am
 
@@ -43,7 +43,7 @@ $AUTOMAKE --add-missing
 ./configure PYTHON=my-python >stdout 2>stderr && {
   cat stdout
   cat stderr >&2
-  Exit 1
+  exit 1
 }
 cat stdout
 cat stderr >&2

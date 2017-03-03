@@ -17,7 +17,7 @@
 # Make sure nobase_* works for python files.
 
 required=python
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >>configure.ac <<EOF
 AM_PATH_PYTHON
@@ -45,8 +45,7 @@ END
 
 mkdir sub
 
-for file in one.py sub/base.py two.py sub/nobase.py
-do
+for file in one.py sub/base.py two.py sub/nobase.py; do
   echo 'def one(): return 1' >$file
 done
 
@@ -54,13 +53,13 @@ $ACLOCAL
 $AUTOCONF
 $AUTOMAKE --add-missing
 
-./configure --prefix "`pwd`/inst" --program-prefix=p
+./configure --prefix "$(pwd)/inst" --program-prefix=p
 
 $MAKE
 $MAKE test-install-data
 $MAKE uninstall
 
-find inst/my -type f -print | grep . && Exit 1
+find inst/my -type f -print | grep . && exit 1
 
 $MAKE install-strip
 
@@ -70,10 +69,10 @@ $MAKE uninstall
 $MAKE distclean
 mkdir build
 cd build
-../configure --prefix "`pwd`/inst" --program-prefix=p
+../configure --prefix "$(pwd)/inst" --program-prefix=p
 $MAKE
 $MAKE test-install-data
 $MAKE uninstall
-find inst/my -type f -print | grep . && Exit 1
+find inst/my -type f -print | grep . && exit 1
 
 :

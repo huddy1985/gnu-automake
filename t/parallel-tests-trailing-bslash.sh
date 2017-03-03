@@ -19,7 +19,7 @@
 # older bash versions (e.g., bash 2.05b).
 # See automake bug#10436.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 echo AC_OUTPUT >> configure.ac
 
@@ -94,7 +94,7 @@ chmod a+x my-shell
 
 cat my-shell
 
-CONFIG_SHELL=`pwd`/my-shell; export CONFIG_SHELL
+CONFIG_SHELL=$(pwd)/my-shell; export CONFIG_SHELL
 
 $ACLOCAL
 $AUTOCONF

@@ -16,9 +16,9 @@
 
 # Make sure the current version can be required.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
-amver=`$AUTOMAKE --version | sed -e 's/.* //;1q'`
+amver=$($AUTOMAKE --version | sed -e 's/.* //;1q')
 
 # Does the extracted version number seems legit?
 case $amver in

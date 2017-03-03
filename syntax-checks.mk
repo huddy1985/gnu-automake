@@ -31,7 +31,7 @@ xtests := $(shell \
      done; \
    done | sort)
 
-xdefs = $(srcdir)/defs $(srcdir)/defs-static.in
+xdefs = $(srcdir)/t/ax/test-init.sh $(srcdir)/defs $(srcdir)/defs-static.in
 
 ams := $(shell find $(srcdir) -name '*.dir' -prune -o -name '*.am' -print)
 
@@ -58,11 +58,14 @@ sc_AMDEP_TRUE_in_automake_in \
 sc_tests_make_without_am_makeflags \
 sc_tests_obsolete_variables \
 sc_tests_here_document_format \
+sc_tests_command_subst \
 sc_tests_Exit_not_exit \
 sc_tests_automake_fails \
 sc_tests_required_after_defs \
 sc_tests_overriding_macros_on_cmdline \
 sc_tests_plain_sleep \
+sc_tests_ls_t \
+sc_tests_executable \
 sc_m4_am_plain_egrep_fgrep \
 sc_tests_no_configure_in \
 sc_tests_PATH_SEPARATOR \
@@ -169,7 +172,7 @@ sc_no_brace_variable_expansions:
 ## Make sure 'rm' is called with '-f'.
 sc_rm_minus_f:
 	@if grep -v '^#' $(ams) $(xtests) \
-	   | grep -v '/spy-rm\.tap:' \
+	   | grep -vE '/(spy-rm\.tap|subobj-clean.*-pr10697\.sh):' \
 	   | grep -E '\<rm ([^-]|\-[^f ]*\>)'; \
 	then \
 	  echo "Suspicious 'rm' invocation." 1>&2; \
@@ -340,27 +343,45 @@ sc_tests_here_document_format:
 	  exit 1; \
 	fi
 
-## Tests should never call exit directly, but use Exit.
-## This is so that the exit status is transported correctly across the 0 trap.
-## Ignore comments and our testsuite's own self tests.
-sc_tests_Exit_not_exit:
-	@found=false; for file in $(xtests); do \
-	  case $$file in */self-check-*) continue;; esac; \
-	  res=`sed -n -e '/^#/d' -e '/<<.*END/,/^END/b' -e '/<<.*EOF/,/^EOF/b' \
-	              -e '/exit [$$0-9]/p' $$file`; \
+## Our test case should use the $(...) POSIX form for command substitution,
+## rather than the older `...` form.
+## The point of ignoring text on here-documents is that we want to exempt
+## Makefile.am rules, configure.ac code and helper shell script created and
+## used by out shell scripts, because Autoconf (as of version 2.69) does not
+## yet ensure that $CONFIG_SHELL will be set to a proper POSIX shell.
+sc_tests_command_subst:
+	@found=false; \
+	scan () { \
+	  sed -n -e '/^#/d' \
+	         -e '/<<.*END/,/^END/b' -e '/<<.*EOF/,/^EOF/b' \
+	         -e 's/\\`/\\{backtick}/' \
+	         -e "s/[^\\]'\([^']*\`[^']*\)*'/'{quoted-text}'/g" \
+	         -e '/`/p' $$*; \
+	}; \
+	for file in $(xtests); do \
+	  res=`scan $$file`; \
 	  if test -n "$$res"; then \
 	    echo "$$file:$$res"; \
 	    found=true; \
 	  fi; \
 	done; \
 	if $$found; then \
-	  echo 'Do not call plain "exit", use "Exit" instead, in above tests.' 1>&2; \
+	  echo 'Use $$(...), not `...`, for command substitutions.' >&2; \
+	  exit 1; \
+	fi
+
+## Tests should no more call 'Exit', just 'exit'.  That's because we
+## now have in place a better workaround to ensure the exit status is
+## transported correctly across the exit trap.
+sc_tests_Exit_not_exit:
+	@if grep 'Exit' $(xtests) $(xdefs) | grep -Ev '^[^:]+: *#' | grep .; then \
+	  echo "Use 'exit', not 'Exit'; it's obsolete now." 1>&2; \
 	  exit 1; \
 	fi
 
 ## Use AUTOMAKE_fails when appropriate
 sc_tests_automake_fails:
-	@if grep -v '^#' $(xtests) | grep '\$$AUTOMAKE.*&&.*[eE]xit'; then \
+	@if grep -v '^#' $(xtests) | grep '\$$AUTOMAKE.*&&.*exit'; then \
 	  echo 'Use AUTOMAKE_fails + grep to catch automake failures in the above tests.' 1>&2;  \
 	  exit 1; \
 	fi
@@ -415,6 +436,29 @@ sc_tests_overriding_macros_on_cmdline:
 	  echo 'the above lines.' 1>&2; \
 	  exit 1; \
 	fi
+
+## Prefer use of our 'is_newest' auxiliary script over the more hacky
+## idiom "test $(ls -1t new old | sed 1q) = new", which is both more
+## cumbersome and more fragile.
+sc_tests_ls_t:
+	@if LC_ALL=C grep -E '\bls(\s+-[a-zA-Z0-9]+)*\s+-[a-zA-Z0-9]*t' \
+	    $(xtests); then \
+	  echo "Use 'is_newest' rather than hacks based on 'ls -t'" 1>&2; \
+	  exit 1; \
+	fi
+
+## Test scripts must be executable.
+sc_tests_executable:
+	@st=0; \
+	for f in $(xtests); do \
+	  case $$f in \
+	    t/ax/*|./t/ax/*|$(srcdir)/t/ax/*);; \
+	    *) test -x $$f || { echo "$$f: not executable" >&2; st=1; }; \
+	  esac; \
+	done; \
+	test $$st -eq 0 || echo '$@: some test scripts are not executable' >&2; \
+	exit $$st;
+
 
 ## Never use 'sleep 1' to create files with different timestamps.
 ## Use '$sleep' instead.  Some filesystems (e.g., Windows) have only

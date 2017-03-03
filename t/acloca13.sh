@@ -16,7 +16,7 @@
 
 # Make sure changes to m4_included files also cause aclocal.m4 to change.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac << 'END'
 m4_include([somefile.m4])
@@ -47,23 +47,24 @@ EOF
 
 $ACLOCAL -I m4
 grep version2 aclocal.m4
-grep version1 aclocal.m4 && Exit 1
+grep version1 aclocal.m4 && exit 1
 
 $sleep
 echo MACRO2 >somefile.m4
 
 $ACLOCAL -I m4
-grep version2 aclocal.m4 && Exit 1
+grep version2 aclocal.m4 && exit 1
 grep version1 aclocal.m4
 
 $sleep
 # aclocal.m4 should change if we touch otherfile.m4
 touch m4/otherfile.m4
-$sleep
 $ACLOCAL -I m4
-test `ls -1t aclocal.m4 m4/otherfile.m4 | sed 1q` = aclocal.m4
+is_newest aclocal.m4 m4/otherfile.m4
 
 $AUTOCONF
 $AUTOMAKE
 ./configure
 $MAKE distcheck
+
+:

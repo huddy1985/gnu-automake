@@ -18,7 +18,7 @@
 # working.  Related to automake bug#9579.
 
 required='makeinfo tex texi2dvi install-info'
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac << 'END'
 AC_OUTPUT
@@ -55,7 +55,7 @@ $AUTOCONF
 $MAKE
 
 $MAKE distcheck
-infodir="`pwd`"/_info $MAKE -e distcheck
-test -f _info/dir || Exit 99 # Sanity check.
+infodir="$(pwd)/_info" $MAKE -e distcheck
+test -f _info/dir || exit 99 # Sanity check.
 
 :

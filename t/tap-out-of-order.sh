@@ -17,7 +17,7 @@
 # TAP support:
 #  - out-of-order test results
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 . "$am_testauxdir"/tap-setup.sh || fatal_ "sourcing tap-setup.sh"
 
@@ -58,15 +58,15 @@ ok 17
 END
 
 TESTS='a.test b.test c.test d.test' $MAKE -e check >stdout \
-  && { cat stdout; Exit 1; }
+  && { cat stdout; exit 1; }
 cat stdout
 
 count_test_results total=17 pass=8 fail=0 xpass=0 xfail=1 skip=0 error=8
 
-test `$FGREP -c ': a.test' stdout` -eq 3
-test `$FGREP -c ': b.test' stdout` -eq 5
-test `$FGREP -c ': c.test' stdout` -eq 4
-test `$FGREP -c ': d.test' stdout` -eq 5
+test $($FGREP -c ': a.test' stdout) -eq 3
+test $($FGREP -c ': b.test' stdout) -eq 5
+test $($FGREP -c ': c.test' stdout) -eq 4
+test $($FGREP -c ': d.test' stdout) -eq 5
 
 grep '^ERROR: a\.test 71 # OUT-OF-ORDER (expecting 3)$' stdout
 grep '^ERROR: b\.test 4 foo # OUT-OF-ORDER (expecting 3)$' stdout

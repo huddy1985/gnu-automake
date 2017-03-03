@@ -21,7 +21,7 @@
 
 am_serial_tests=yes
 am_create_testdir=empty
-. ./defs || Exit 1
+. ./defs || exit 1
 
 makefiles='hacky/Makefile src/Makefile data/Makefile tests/Makefile'
 
@@ -102,11 +102,11 @@ for f in $makefiles; do diff $f.sav $f.in; done
 
 ./configure
 ls -l . hacky src data tests # For debugging.
-test ! -f mkfile
+test ! -e mkfile
 $MAKE
 $MAKE distdir
-test ! -f $distdir/Makefile.in
-test ! -f $distdir/data/bar
+test ! -e $distdir/Makefile.in
+test ! -e $distdir/data/bar
 test -f $distdir/src/foo
 diff README $distdir/README
 diff mkfile.in $distdir/mkfile.in

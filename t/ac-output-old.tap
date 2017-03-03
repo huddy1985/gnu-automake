@@ -18,7 +18,7 @@
 # line breaking in the use of AC_OUTPUT.  Synthesised by a bunch
 # of older tests (referenced below).
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 plan_ 22
 
@@ -146,7 +146,7 @@ mkdir subdir
 command_ok_ "aclocal and AC_OUTPUT ($cur)" $ACLOCAL
 command_ok_ "automake and AC_OUTPUT ($cur)" $AUTOMAKE
 command_ok_ "foo.in mentioned two times in Makefile.in ($cur)" \
-             test `$FGREP foo.in Makefile.in | wc -l` -eq 2
+             test $($FGREP -c 'foo.in' Makefile.in) -eq 2
 
 # This ought to work as well.
 command_ok_ "'automake -a -f' and AC_OUTPUT ($cur)" \
@@ -179,4 +179,4 @@ cd ..
 # -----------------------------------------------------------------------
 
 # And we're done.
-Exit 0
+exit 0

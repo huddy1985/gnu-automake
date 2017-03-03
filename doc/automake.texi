@@ -540,7 +540,7 @@ illustration of the GNU Build System in action.
 @cindex @file{amhello-1.0.tar.gz}, use cases
 
 In this section we explore several use cases for the GNU Build System.
-You can replay all these examples on the @file{amhello-1.0.tar.gz}
+You can replay all of these examples on the @file{amhello-1.0.tar.gz}
 package distributed with Automake.  If Automake is installed on your
 system, you should find a copy of this file in
 @file{@var{prefix}/share/doc/automake/amhello-1.0.tar.gz}, where
@@ -1455,7 +1455,7 @@ package.
 @example
 ~/amhello % @kbd{cat README}
 This is a demonstration package for GNU Automake.
-Type `info Automake' to read the Automake manual.
+Type 'info Automake' to read the Automake manual.
 @end example
 
 @item
@@ -1497,9 +1497,9 @@ command as follows:
 
 @example
 ~/amhello % @kbd{autoreconf --install}
-configure.ac: installing `./install-sh'
-configure.ac: installing `./missing'
-src/Makefile.am: installing `./depcomp'
+configure.ac: installing './install-sh'
+configure.ac: installing './missing'
+src/Makefile.am: installing './depcomp'
 @end example
 
 At this point the build system is complete.
@@ -1567,7 +1567,7 @@ when you execute @command{make}.
 @command{autoreconf} is a script that calls @command{autoconf},
 @command{automake}, and a bunch of other commands in the right order.
 If you are beginning with these tools, it is not important to figure
-out in which order all these tools should be invoked and why.  However,
+out in which order all of these tools should be invoked and why.  However,
 because Autoconf and Automake have separate manuals, the important
 point to understand is that @command{autoconf} is in charge of
 creating @file{configure} from @file{configure.ac}, while
@@ -1840,8 +1840,8 @@ Also, using more complex macro in target names can cause trouble:
 % @kbd{cat Makefile.am}
 $(FOO:=x): bar
 % @kbd{automake}
-Makefile.am:1: bad characters in variable name `$(FOO'
-Makefile.am:1: `:='-style assignments are not portable
+Makefile.am:1: bad characters in variable name '$(FOO'
+Makefile.am:1: ':='-style assignments are not portable
 @end example
 
 @cindex Make targets, overriding
@@ -2868,7 +2868,7 @@ make reference to @samp{$file} as @samp{$@{file@}} (i.e., in a way
 that is compatible with @command{make}'s syntax) and furthermore use
 @code{AC_SUBST} to ensure that @samp{$@{file@}} is meaningful in a
 @file{Makefile}, then @command{automake} will be able to use
-@samp{$@{file@}} to generate all these rules.  For instance, here is
+@samp{$@{file@}} to generate all of these rules.  For instance, here is
 how the Automake package itself generates versioned scripts for its
 test suite:
 
@@ -3560,7 +3560,7 @@ lot of people, because @command{aclocal} was not so strict in the past
 and many third party macros are underquoted; and we have to apologize
 for this temporary inconvenience.  The reason we have to be stricter
 is that a future implementation of @command{aclocal} (@pxref{Future of
-aclocal}) will have to temporarily include all these third party
+aclocal}) will have to temporarily include all of these third party
 @file{.m4} files, maybe several times, including even files that are
 not actually needed.  Doing so should alleviate many problems of the
 current implementation, however it requires a stricter style from the
@@ -3626,7 +3626,7 @@ will be almost impossible to share macros between packages.
 
 @vindex ACLOCAL_AMFLAGS
 The second possibility, which we do recommend, is to write each macro
-in its own file and gather all these files in a directory.  This
+in its own file and gather all of these files in a directory.  This
 directory is usually called @file{m4/}.  To build @file{aclocal.m4},
 one should therefore instruct @command{aclocal} to scan @file{m4/}.
 From the command line, this is done with @samp{aclocal -I m4}.  The
@@ -4062,6 +4062,16 @@ variable.  The default @var{compiler-search-list} is @samp{upcc upc}.
 This macro will abort @command{configure} if no Unified Parallel C
 compiler is found.
 
+@item AM_MISSING_PROG(@var{name}, @var{program})
+@acindex AM_MISSING_PROG
+@vindex MISSING
+Find a maintainer tool @var{program} and define the @var{name}
+environment variable with its location.  If @var{program} is not
+detected, then @var{name} will instead invoke the @command{missing}
+script, in order to give useful advice to the user about the missing
+maintainer tool.  @xref{maintainer-mode}, for more information on when
+the @command{missing} script is appropriate.
+
 @item AM_SILENT_RULES
 @acindex AM_SILENT_RULES
 Enable the machinery for less verbose build output (@pxref{Options}).
@@ -4183,13 +4193,25 @@ For simple projects that distribute all files in the same directory
 it is enough to have a single @file{Makefile.am} that builds
 everything in place.
 
-In larger projects it is common to organize files in different
-directories, in a tree.  For instance one directory per program, per
-library or per module.  The traditional approach is to build these
-subdirectories recursively: each directory contains its @file{Makefile}
-(generated from @file{Makefile.am}), and when @command{make} is run
-from the top level directory it enters each subdirectory in turn to
-build its contents.
+In larger projects, it is common to organize files in different
+directories, in a tree.  For example, there could be a directory
+for the program's source, one for the testsuite, and one for the
+documentation; or, for very large projects, there could be one
+directory per program, per library or per module.
+
+The traditional approach is to build these subdirectories recursively,
+employing @emph{make recursion}: each directory contains its
+own @file{Makefile}, and when @command{make} is run from the top-level
+directory, it enters each subdirectory in turn, and invokes there a
+new @command{make} instance to build the directory's contents.
+
+Because this approach is very widespread, Automake offers built-in
+support for it.  However, it is worth nothing that the use of make
+recursion has its own serious issues and drawbacks, and that it's
+well possible to have packages with a multi directory layout that
+make little or no use of such recursion (examples of such packages
+are GNU Bison and GNU Automake itself); see also the @ref{Alternative}
+section below.
 
 @menu
 * Subdirectories::              Building subdirectories recursively
@@ -4203,7 +4225,7 @@ build its contents.
 
 @cindex @code{SUBDIRS}, explained
 
-In packages with subdirectories, the top level @file{Makefile.am} must
+In packages using make recursion, the top level @file{Makefile.am} must
 tell Automake which subdirectories are to be built.  This is done via
 the @code{SUBDIRS} variable.
 @vindex SUBDIRS
@@ -4260,8 +4282,6 @@ current directory will be built, finally the @file{test/} directory
 will be built.  It is customary to arrange test directories to be
 built after everything else since they are meant to test what has
 been constructed.
-
-All @code{clean} rules are run in reverse order of build rules.
 
 @node Conditional Subdirectories
 @section Conditional Subdirectories
@@ -4340,7 +4360,7 @@ does not know the possible values of these variables.  In this case
 @cindex @code{SUBDIRS} and @code{AM_CONDITIONAL}
 @cindex @code{AM_CONDITIONAL} and @code{SUBDIRS}
 
-@c Keep in sync with subcond2.sh
+@c Keep in sync with subdir-am-cond.sh
 
 @file{configure} should output the @file{Makefile} for each directory
 and define a condition into which @file{opt/} should be built.
@@ -4380,7 +4400,7 @@ automatically because it knows that @code{MAYBE_OPT} can contain
 @cindex @code{SUBDIRS} and @code{AC_SUBST}
 @cindex @code{AC_SUBST} and @code{SUBDIRS}
 
-@c Keep in sync with subcond3.sh
+@c Keep in sync with subdir-ac-subst.sh
 
 Another possibility is to define @code{MAYBE_OPT} from
 @file{./configure} using @code{AC_SUBST}:
@@ -4486,7 +4506,7 @@ variables it cannot ensure the corresponding directory exists.
 If you've ever read Peter Miller's excellent paper,
 @uref{http://miller.emu.id.au/pmiller/books/rmch/,
 Recursive Make Considered Harmful}, the preceding sections on the use of
-subdirectories will probably come as unwelcome advice.  For those who
+make recursion will probably come as unwelcome advice.  For those who
 haven't read the paper, Miller's main thesis is that recursive
 @command{make} invocations are both slow and error-prone.
 
@@ -4495,7 +4515,6 @@ believe.  This work is new and there are probably warts.
 @xref{Introduction}, for information on reporting bugs.} to enable you
 to write a single @file{Makefile.am} for a complex multi-directory
 package.
-
 
 By default an installable file specified in a subdirectory will have its
 directory name stripped before installation.  For instance, in this
@@ -5581,7 +5600,7 @@ replace) @file{foo.$(OBJEXT)}, and this cannot be avoided.
 Therefore, when Automake detects this situation it will complain
 with a message such as
 @example
-object `foo.$(OBJEXT)' created both with libtool and without
+object 'foo.$(OBJEXT)' created both with libtool and without
 @end example
 
 A workaround for this issue is to ensure that these two objects get
@@ -7790,7 +7809,7 @@ This is a convenience variable that is defined as
 @samp{$(pyexecdir)/$(PACKAGE)}.
 @end vtable
 
-All these directory variables have values that start with either
+All of these directory variables have values that start with either
 @samp{$@{prefix@}} or @samp{$@{exec_prefix@}} unexpanded.  This works
 fine in @file{Makefiles}, but it makes these variables hard to use in
 @file{configure}.  This is mandated by the GNU coding standards, so
@@ -7856,7 +7875,7 @@ can be installed with @samp{make install-dvi}, @samp{make install-ps},
 documentation installed by default as well as all the above optional
 formats.
 
-All these targets can be extended using @samp{-local} rules
+All of these targets can be extended using @samp{-local} rules
 (@pxref{Extending}).
 
 @cindex Texinfo flag, @code{VERSION}
@@ -8946,7 +8965,7 @@ HP-UX's @command{/bin/sh},
 @example
 AM_TESTS_ENVIRONMENT = \
 ## Some environment initializations are kept in a separate shell
-## file `tests-env.sh', which can make it easier to also run tests
+## file 'tests-env.sh', which can make it easier to also run tests
 ## from the command line.
   . $(srcdir)/tests-env.sh; \
 ## On Solaris, prefer more POSIX-compliant versions of the standard
@@ -9050,7 +9069,7 @@ rules that run the test scripts listed in @code{TESTS}, and, for each
 such script, save its output in a corresponding @file{.log} file and
 its results (and other ``metadata'', @pxref{API for Custom Test Drivers})
 in a corresponding @file{.trs} (as in @b{T}est @b{R}e@b{S}ults) file.
-@c We choose the `.trs' extension also because, at the time of writing,
+@c We choose the '.trs' extension also because, at the time of writing,
 @c it isn't already used for other significant purposes; see e.g.:
 @c   - http://filext.com/file-extension/trs
 @c   - http://www.file-extensions.org/search/?searchstring=trs
@@ -10966,15 +10985,31 @@ limitation should go away with time.
 @vindex @code{AM_DEFAULT_VERBOSITY}
 @vindex @code{AM_V}
 @vindex @code{AM_DEFAULT_V}
-To extend the silent mode to your own rules, you have two choices:
+To extend the silent mode to your own rules, you have few choices:
 
 @itemize @bullet
+
 @item
 You can use the predefined variable @code{AM_V_GEN} as a prefix to
 commands that should output a status line in silent mode, and
 @code{AM_V_at} as a prefix to commands that should not output anything
 in silent mode.  When output is to be verbose, both of these variables
 will expand to the empty string.
+
+@item
+You can silence a recipe unconditionally with @code{@@}, and then use
+the predefined variable @code{AM_V_P} to know whether make is being run
+in silent or verbose mode, adjust the verbose information your recipe
+displays accordingly:
+
+@example
+generate-headers:
+        @set -e; \
+        ... [commands defining a shell variable '$headers'] ...; \
+        if $(AM_V_P); then set -x; else echo " GEN   [headers]"; fi; \
+        rm -f $$headers && generate-header --flags $$headers
+@end example
+
 @item
 You can add your own variables, so strings of your own choice are shown.
 The following snippet shows how you would define your own equivalent of
@@ -11410,7 +11445,7 @@ If you have ever used Gettext in a project, this is a good example of
 how third-party @file{Makefile}s can be used with Automake.  The
 @file{Makefile}s @command{gettextize} puts in the @file{po/} and
 @file{intl/} directories are handwritten @file{Makefile}s that
-implement all these targets.  That way they can be added to
+implement all of these targets.  That way they can be added to
 @code{SUBDIRS} in Automake packages.
 
 Directories that are only listed in @code{DIST_SUBDIRS} but not in
@@ -11611,7 +11646,7 @@ built from @file{Makefile.am} by @command{automake}, and rely on the
 definitions of the M4 macros put in @file{aclocal.m4} as well as the
 behavior of the auxiliary tools installed.
 
-Because all these files are closely related, it is important to
+Because all of these files are closely related, it is important to
 regenerate all of them when upgrading to a newer Automake release.
 The usual way to do that is
 
@@ -11631,7 +11666,7 @@ autoreconf -vfi
 The use of @option{--force-missing} ensures that auxiliary tools will be
 overridden by new versions (@pxref{automake Invocation}).
 
-It is important to regenerate all these files each time Automake is
+It is important to regenerate all of these files each time Automake is
 upgraded, even between bug fixes releases.  For instance, it is not
 unusual for a bug fix to involve changes to both the rules generated
 in @file{Makefile.in} and the supporting M4 macros copied to
@@ -11768,7 +11803,7 @@ Or people use a script to fix the timestamp after a checkout (the GCC
 folks have such a script).
 @item
 Or @file{configure.ac} uses @code{AM_MAINTAINER_MODE}, which will
-disable all these rebuild rules by default.  This is further discussed
+disable all of these rebuild rules by default.  This is further discussed
 in @ref{maintainer-mode}.
 @end itemize
 
@@ -12398,7 +12433,7 @@ every target in a @file{Makefile.in}.
 Using variables like this gives you full control over the ordering of
 the flags.  For instance, if there is a flag in $(WARNINGCFLAGS) that
 you want to negate for a particular target, you can use something like
-@samp{prog1_CFLAGS = $(AM_CFLAGS) -no-flag}.  If all these flags had
+@samp{prog1_CFLAGS = $(AM_CFLAGS) -no-flag}.  If all of these flags had
 been forcefully appended to @code{CFLAGS}, there would be no way to
 disable one flag.  Yet another reason to leave user variables to
 users.

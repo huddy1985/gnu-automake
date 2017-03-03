@@ -25,7 +25,7 @@
 
 required='java javac'
 am_serial_tests=yes
-. ./defs || Exit 1
+. ./defs || exit 1
 
 echo "AC_SUBST([PATH_SEPARATOR], ['$PATH_SEPARATOR'])" >> configure.ac
 
@@ -230,7 +230,7 @@ $AUTOMAKE
 # To have the parallel testsuite more verbose.
 VERBOSE=yes; export VERBOSE
 
-./configure --prefix="`pwd`/_inst"
+./configure --prefix="$(pwd)/_inst"
 cat PkgLocation.java # For debugging.
 $MAKE check
 $MAKE install

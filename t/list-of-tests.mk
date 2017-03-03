@@ -125,7 +125,7 @@ t/amhello-cross-compile.sh \
 t/amhello-binpkg.sh \
 t/aminit-moreargs-deprecation.sh \
 t/amassign.sh \
-t/ammissing.sh \
+t/am-macro-not-found.sh \
 t/amopt.sh \
 t/amopts-location.sh \
 t/amopts-variable-expansion.sh \
@@ -255,7 +255,6 @@ t/compile_f90_c_cxx.sh \
 t/compile_f_c_cxx.sh \
 t/cond-basic.sh \
 t/cond.sh \
-t/cond2.sh \
 t/cond3.sh \
 t/cond4.sh \
 t/cond5.sh \
@@ -317,6 +316,7 @@ t/confh5.sh \
 t/confh6.sh \
 t/confh7.sh \
 t/confh8.sh \
+t/confh-subdir-clean.sh \
 t/confincl.sh \
 t/conflnk.sh \
 t/conflnk2.sh \
@@ -329,9 +329,12 @@ t/copy.sh \
 t/cscope.tap \
 t/cscope2.sh \
 t/cscope3.sh \
+t/c-demo.sh \
 t/cxx.sh \
 t/cxx2.sh \
 t/cxxcpp.sh \
+t/cxx-demo.sh \
+t/cxx-lt-demo.sh \
 t/cxxlibobj.sh \
 t/cxxlink.sh \
 t/cxxnoc.sh \
@@ -366,6 +369,7 @@ t/depcomp.sh \
 t/depcomp2.sh \
 t/depcomp8a.sh \
 t/depcomp8b.sh \
+t/depcomp-implicit-auxdir.sh \
 t/depdist.sh \
 t/depend.sh \
 t/depend3.sh \
@@ -374,6 +378,7 @@ t/depend5.sh \
 t/depend6.sh \
 t/deprecated-acinit.sh \
 t/destdir.sh \
+t/dir-named-obj-is-bad.sh \
 t/dirlist.sh \
 t/dirlist2.sh \
 t/dirlist-abspath.sh \
@@ -635,6 +640,7 @@ t/lisp6.sh \
 t/lisp7.sh \
 t/lisp8.sh \
 t/lispdry.sh \
+t/lisp-pr11806.sh \
 t/listval.sh \
 t/location.sh \
 t/longline.sh \
@@ -681,7 +687,9 @@ t/missing3.sh \
 t/missing4.sh \
 t/missing5.sh \
 t/missing6.sh \
+t/am-missing-prog.sh \
 t/missing-auxfile-stops-makefiles-creation.sh \
+t/mkdir_p.sh \
 t/mkdirp-deprecation.sh \
 t/mkinstall.sh \
 t/mkinst2.sh \
@@ -753,6 +761,7 @@ t/parallel-tests8.sh \
 t/parallel-tests9.sh \
 t/parallel-tests10.sh \
 t/parallel-tests-recheck-depends-on-all.sh \
+t/parallel-tests-recheck-pr11791.sh \
 t/parallel-tests-exeext.sh \
 t/parallel-tests-suffix.sh \
 t/parallel-tests-suffix-prog.sh \
@@ -948,7 +957,6 @@ t/reqd.sh \
 t/reqd2.sh \
 t/repeated-options.sh \
 t/rulepat.sh \
-t/self-check-cleanup.tap \
 t/self-check-configure-help.sh \
 t/self-check-dir.tap \
 t/self-check-env-sanitize.tap \
@@ -956,9 +964,7 @@ t/self-check-exit.tap \
 t/self-check-explicit-skips.sh \
 t/self-check-is_newest.tap \
 t/self-check-me.tap \
-t/self-check-reexec.tap \
 t/self-check-report.sh \
-t/self-check-sanity.sh \
 t/self-check-seq.tap \
 t/self-check-is-blocked-signal.tap \
 t/self-check-tap.sh \
@@ -974,6 +980,7 @@ t/silent6.sh \
 t/silent7.sh \
 t/silent8.sh \
 t/silent9.sh \
+t/silent-obsolescent-warns.sh \
 t/silentcxx.sh \
 t/silentcxx-gcc.sh \
 t/silentf77.sh \
@@ -987,8 +994,8 @@ t/silent-nested-vars.sh \
 t/silent-lex.sh \
 t/silent-yacc.sh \
 t/silent-yacc-headers.sh \
-t/srcsub.sh \
-t/srcsub2.sh \
+t/src-acsubst.sh \
+t/sourcefile-in-subdir.sh \
 t/space.sh \
 t/specflg.sh \
 t/specflg2.sh \
@@ -1015,19 +1022,18 @@ t/strip.sh \
 t/strip2.sh \
 t/strip3.sh \
 t/subdir.sh \
-t/subdir2.sh \
-t/subdir3.sh \
-t/subdir4.sh \
-t/subdir5.sh \
-t/subdir6.sh \
-t/subdir7.sh \
-t/subdir8.sh \
-t/subdir9.sh \
+t/subdir-ac-subst.sh \
+t/subdir-add-pr46.sh \
+t/subdir-add2-pr46.sh \
+t/subdir-am-cond.sh \
+t/subdir-cond-err.sh \
+t/subdir-cond-gettext.sh \
+t/subdir-order.sh \
+t/subdir-with-slash.sh \
+t/subdir-subsub.sh \
 t/subdir10.sh \
+t/subdir-distclean.sh \
 t/subdirbuiltsources.sh \
-t/subcond.sh \
-t/subcond2.sh \
-t/subcond3.sh \
 t/subobj.sh \
 t/subobj2.sh \
 t/subobj4.sh \
@@ -1041,6 +1047,8 @@ t/subobj11a.sh \
 t/subobj11b.sh \
 t/subobj11c.sh \
 t/subobjname.sh \
+t/subobj-clean-pr10697.sh \
+t/subobj-clean-lt-pr10697.sh \
 t/subpkg.sh \
 t/subpkg2.sh \
 t/subpkg3.sh \

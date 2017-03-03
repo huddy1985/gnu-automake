@@ -18,7 +18,7 @@
 # Same as python6.test, but requiring a version.
 
 # Python is not required for this test.
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >>configure.ac <<\EOF
 # Hopefully the Python team will never release such a version.
@@ -33,6 +33,6 @@ $AUTOCONF
 $AUTOMAKE --add-missing
 
 ./configure
-test x"`cat py`" = x:
+test x"$(cat py)" = x:
 
 :

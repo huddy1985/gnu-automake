@@ -18,7 +18,7 @@
 # programs, but not to @substitutions@.
 
 # For gen-testsuite-part: ==> try-with-serial-tests <==
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac << 'END'
 AM_CONDITIONAL([COND], [test -n "$cond"])
@@ -64,7 +64,7 @@ $MAKE test-cond
 
 # Only two am__EXEEXT_* variables are needed here: one for BAR, and one
 # BAZ.  The latter must use the former.
-test 2 = `grep '__EXEEXT_. =' Makefile.in | wc -l`
+test 2 -eq $(grep -c '__EXEEXT_. =' Makefile.in)
 grep 'am__EXEEXT_2 = .*am__EXEEXT_1' Makefile.in
 
 :

@@ -17,7 +17,7 @@
 # parallel-tests:
 #   - check2.am and interaction with $(EXEEXT)
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac << 'END'
 dnl We need to fool the init.m4 internals a little.
@@ -56,9 +56,9 @@ touch x y.bin a.test b.test.bin
 $MAKE check
 ls -l # For debugging.
 test -f y.log
-test ! -r y.bin.log
+test ! -e y.bin.log
 test -f b.log
-test ! -r b.test.log
+test ! -e b.test.log
 
 $EGREP '^y\.log: y(\$\(EXEEXT\)|\.bin)' Makefile
 $EGREP '^\.test(\$\(EXEEXT\)|\.bin)\.log:' Makefile

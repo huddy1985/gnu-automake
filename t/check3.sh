@@ -18,7 +18,7 @@
 # PR/359.
 
 # For gen-testsuite-part: ==> try-with-serial-tests <==
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac << 'END'
 AC_CONFIG_FILES([dir/Makefile])
@@ -56,12 +56,12 @@ END
 $ACLOCAL
 $AUTOCONF
 $AUTOMAKE -a
-./configure --prefix "`pwd`/inst"
+./configure --prefix "$(pwd)/inst"
 
-$MAKE check >stdout || { cat stdout; Exit 1; }
+$MAKE check >stdout || { cat stdout; exit 1; }
 cat stdout
 grep '^PASS: subrun\.sh *$' stdout
-grep 'PASS.*echo\.sh' stdout && Exit 1
+grep 'PASS.*echo\.sh' stdout && exit 1
 
 # check should depend directly on $(BUILT_SOURCES) (similar tests
 # are in check.test and check2.test).
@@ -70,8 +70,8 @@ $EGREP '^check:.* \$\(BUILT_SOURCES\)( |$)' dir/Makefile.in
 
 $MAKE clean
 # Sanity checks
-test ! -f command1.inc
-test ! -f dir/command2.inc
+test ! -e command1.inc
+test ! -e dir/command2.inc
 # Now make sure these two files are rebuilt during make install.
 $MAKE install
 test -f command1.inc

@@ -19,7 +19,7 @@
 # Keep in sync with sister test 'yacc-d-cxx.test'.
 
 required='cc yacc'
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac << 'END'
 AC_PROG_CC
@@ -75,7 +75,7 @@ $ACLOCAL
 $AUTOCONF
 
 $AUTOMAKE -a
-$FGREP parse.h foo/Makefile.in bar/Makefile.in baz/Makefile.in && Exit 1
+$FGREP parse.h foo/Makefile.in bar/Makefile.in baz/Makefile.in && exit 1
 
 cat >> foo/Makefile.am <<END
 BUILT_SOURCES = parse.h
@@ -144,11 +144,11 @@ test -f baz/zardoz-parse.c
 test -f baz/zardoz-parse.h
 ./configure # Re-create 'Makefile'.
 $MAKE maintainer-clean
-test ! -f foo/parse.c
-test ! -f foo/parse.h
-test ! -f bar/parse.c
-test ! -f bar/parse.h
-test ! -f baz/zardoz-parse.c
-test ! -f baz/zardoz-parse.h
+test ! -e foo/parse.c
+test ! -e foo/parse.h
+test ! -e bar/parse.c
+test ! -e bar/parse.h
+test ! -e baz/zardoz-parse.c
+test ! -e baz/zardoz-parse.h
 
 :

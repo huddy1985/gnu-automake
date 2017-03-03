@@ -20,7 +20,7 @@
 # test with a Makefile in the directory.
 # Also make sure that README appears first in DIST_COMMON.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac << 'END'
    AC_CONFIG_FILES([tests/autoconf:tests/wrapper.in],
@@ -69,7 +69,7 @@ sed -n -e '/^DIST_COMMON =.*\\$/ {
 
 cat dc.txt # For debugging.
 
-test 1 = `grep tests dc.txt | wc -l`
+test 1 -eq $(grep -c tests dc.txt)
 grep configure dc.txt
 # README must come first.
 grep 'DIST_COMMON = README' Makefile.in

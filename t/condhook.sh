@@ -18,7 +18,7 @@
 # Keep this in sync with sister test condhook2.test.
 # Report by Nik A. Melchior (PR/428).
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac << 'END'
 AM_CONDITIONAL([TEST], [false])
@@ -39,10 +39,10 @@ $ACLOCAL
 $AUTOCONF
 $AUTOMAKE
 
-./configure --prefix "`pwd`/inst"
+./configure --prefix "$(pwd)/inst"
 
 $MAKE install
 test -f inst/etc/mumble
-test ! -f bad
+test ! -e bad
 
 :

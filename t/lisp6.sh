@@ -17,7 +17,7 @@
 # Test for conditional _LISP.
 
 required=emacs
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat > Makefile.am << 'EOF'
 dist_lisp_LISP = am-one.el
@@ -38,6 +38,9 @@ AM_PATH_LISPDIR
 AC_OUTPUT
 EOF
 
+# Avoid possible spurious influences from the environment.
+want_two=; unset want_two
+
 echo "(provide 'am-one)" > am-one.el
 echo "(require 'am-one)" > am-two.el
 echo "(require 'am-one)" > am-three.el
@@ -46,31 +49,33 @@ $ACLOCAL
 $AUTOCONF
 $AUTOMAKE --add-missing
 
-./configure "--with-lispdir=`pwd`/lisp"
+cwd=$(pwd) || fatal_ "getting current working directory"
+
+./configure --with-lispdir="$cwd/lisp"
 
 $MAKE
 test -f am-one.elc
-test ! -f am-two.elc
+test ! -e am-two.elc
 test -f am-three.elc
 test -f elc-stamp
 
 $MAKE install
 test -f lisp/am-one.el
 test -f lisp/am-one.elc
-test ! -f lisp/am-two.el
-test ! -f lisp/am-two.elc
-test ! -f lisp/am-three.el
-test ! -f lisp/am-three.elc
+test ! -e lisp/am-two.el
+test ! -e lisp/am-two.elc
+test ! -e lisp/am-three.el
+test ! -e lisp/am-three.elc
 
 $MAKE dist-test
 
 $MAKE distclean
-test ! -f am-one.elc
-test ! -f am-two.elc
-test ! -f am-three.elc
-test ! -f elc-stamp
+test ! -e am-one.elc
+test ! -e am-two.elc
+test ! -e am-three.elc
+test ! -e elc-stamp
 
-./configure "--with-lispdir=`pwd`/lisp" want_two=1
+./configure --with-lispdir="$cwd/lisp" want_two=1
 
 $MAKE
 test -f am-one.elc
@@ -91,15 +96,15 @@ test -f lisp/am-one.el
 test -f lisp/am-one.elc
 test -f lisp/am-two.el
 test -f lisp/am-two.elc
-test ! -f lisp/am-three.el
-test ! -f lisp/am-three.elc
+test ! -e lisp/am-three.el
+test ! -e lisp/am-three.elc
 
 $MAKE dist-test
 
 $MAKE distclean
-test ! -f am-one.elc
-test ! -f am-two.elc
-test ! -f am-three.elc
-test ! -f elc-stamp
+test ! -e am-one.elc
+test ! -e am-two.elc
+test ! -e am-three.elc
+test ! -e elc-stamp
 
 :

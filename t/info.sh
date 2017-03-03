@@ -18,7 +18,7 @@
 # FIXME: This test is probably obsoleted, or wrong.  The generated
 #        Makefile.in seems not to define any 'INFOS' variable!
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat > Makefile.am << 'END'
 info_TEXINFOS = foo.texi
@@ -30,13 +30,13 @@ echo '@setfilename foo.info' > foo.texi
 $ACLOCAL
 $AUTOMAKE
 
-for i in `grep '^INFOS =' Makefile.in | sed -e 's/^INFOS = //'`; do
+for i in $(grep '^INFOS =' Makefile.in | sed -e 's/^INFOS = //'); do
    echo $i
    case "$i" in
     foo*)
        ;;
     *)
-       Exit 1
+       exit 1
        ;;
    esac
 done

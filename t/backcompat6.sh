@@ -21,7 +21,7 @@
 
 required=cc
 am_create_testdir=empty
-. ./defs || Exit 1
+. ./defs || exit 1
 
 # Anyone doing something like this in a real-life package probably
 # deserves to be killed.
@@ -97,7 +97,7 @@ $MAKE check
 distdir=nonesuch-zardoz-nonesuch-0.1
 $MAKE distdir
 test -f $distdir/quux.c
-test ! -f $distdir/foo.got
+test ! -e $distdir/foo.got
 
 $MAKE distcheck
 

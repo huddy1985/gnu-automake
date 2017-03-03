@@ -20,7 +20,7 @@
 # See also the related test 'vtexi4.test', which does similar checks, but
 # for version.texi only, and requires makeinfo, tex and texi2dvi.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 # We are going to override package version in AC_INIT, so we need
 # to redefine the name of the distdir as well.
@@ -91,7 +91,7 @@ do_check ()
   # Check that UPDATED seems right, and that UPDATED and UPDATED-MONTH
   # are consistent.
   $EGREP "^@set UPDATED $date$" $srcdir/$vfile.texi
-  vmonth=`grep '^@set UPDATED ' $srcdir/$vfile.texi | awk '{print $4, $5}'`
+  vmonth=$(grep '^@set UPDATED ' $srcdir/$vfile.texi | awk '{print $4, $5}')
   grep "^@set UPDATED-MONTH $vmonth$" $srcdir/$vfile.texi
   # Check that the vers*.texi file is distributed according
   # to $(DISTFILES).

@@ -17,7 +17,7 @@
 # Make sure that our macro 'AM_SILENT_RULES' adds proper text to
 # the configure help screen.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat > configure.ac <<END
 AC_INIT([$me], [1.0])
@@ -28,16 +28,14 @@ $ACLOCAL
 
 mv -f configure.ac configure.tmpl
 
-q="[\`'\"]"
-
 for args in '' '([])' '([yes])' '([no])'; do
   sed "s/AM_SILENT_RULES.*/&$args/" configure.tmpl >configure.ac
   cat configure.ac
   $AUTOCONF --force
   grep_configure_help --enable-silent-rules \
-                      " less verbose build.*\\(undo.*${q}make V=1${q}"
+                      ' less verbose build.*\(undo.*"make V=1".*\)'
   grep_configure_help --disable-silent-rules \
-                      " verbose build.*\\(undo.*${q}make V=0${q}"
+                      ' verbose build.*\(undo.*"make V=0".*\)'
 done
 
 :

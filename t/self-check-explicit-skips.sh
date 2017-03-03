@@ -15,43 +15,43 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Sanity check for the automake testsuite.
-# Check creation/removal of temporary test working directory by './defs'.
+# Check that our testsuite framework can be instructed not to consider
+# an early exit due to some command exiting unexpectedly with status 77.
 
-am_create_testdir=empty
-. ./defs || Exit 1
-
-# We still need a little hack to make ./defs work outside automake's
-# tree 'tests' subdirectory.  Not a big deal.
-sed "s|^am_top_builddir=.*|am_top_builddir='`pwd`'|" \
-  "$am_top_builddir"/defs-static > defs-static
-diff "$am_top_builddir"/defs-static defs-static \
-  && fatal_ "failed to edit defs-static"
-cp "$am_top_builddir"/defs .
+am_create_testdir=no
+. ./defs || exit 1
 
 set +e
 
 unset am_explicit_skips stderr_fileno_
-AM_TESTS_REEXEC=no; export AM_TESTS_REEXEC
 
-# I'm a lazy typist.
-sh=$AM_TEST_RUNNER_SHELL
+# FIXME: this can be simplified when we improve our runtime checks on the
+# testsuite shell to ensure it supports "VAR=val shell_func" correctly.
+run_dummy_test ()
+{
+  env $2 $AM_TEST_RUNNER_SHELL -c "
+    am_create_testdir=no
+    . ./defs
+    $1
+  " dummy.sh
+}
 
-$sh -c '. ./defs; (exit 77); exit 77' dummy.test
-test $? -eq 77 || Exit 1
+run_dummy_test '(exit 77); exit 77'
+test $? -eq 77 || exit 1
 
-am_explicit_skips=no $sh -c '. ./defs; sh -c "exit 77"' dummy.test
-test $? -eq 77 || Exit 1
+run_dummy_test 'sh -c "exit 77"' am_explicit_skips=no
+test $? -eq 77 || exit 1
 
-am_explicit_skips=yes $sh -c '. ./defs; (exit 77); exit 77' dummy.test
-test $? -eq 78 || Exit 1
+run_dummy_test '(exit 77); exit 77' am_explicit_skips=yes 
+test $? -eq 78 || exit 1
 
-am_explicit_skips=y $sh -c '. ./defs; sh -c "exit 77"' dummy.test
-test $? -eq 78 || Exit 1
+run_dummy_test 'sh -c "exit 77"' am_explicit_skips=y
+test $? -eq 78 || exit 1
 
-am_explicit_skips=yes $sh -c '. ./defs; Exit 77' dummy.test
-test $? -eq 77 || Exit 1
+run_dummy_test 'exit 77' am_explicit_skips=yes
+test $? -eq 77 || exit 1
 
-am_explicit_skips=y $sh -c '. ./defs; skip_ "foo"' dummy.test
-test $? -eq 77 || Exit 1
+run_dummy_test 'skip_ "foo"' am_explicit_skips=y
+test $? -eq 77 || exit 1
 
 :

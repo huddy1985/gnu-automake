@@ -17,7 +17,7 @@
 # Check that, in cygnus mode, target "check" does not depend target
 # "all".
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac <<'END'
 AM_MAINTAINER_MODE
@@ -35,16 +35,16 @@ END
 $ACLOCAL
 $AUTOMAKE --cygnus -Wno-obsolete
 
-$EGREP '(^| )all.*(:|:.* )check' Makefile.in && Exit 1
+$EGREP '(^| )all.*(:|:.* )check' Makefile.in && exit 1
 
 $AUTOCONF
 ./configure
 
 $MAKE check
 test -f check-target-has-run
-test ! -r all-target-has-failed
+test ! -e all-target-has-failed
 # Sanity checks.
-$MAKE && Exit 1
+$MAKE && exit 1
 test -f all-target-has-failed
 
 :

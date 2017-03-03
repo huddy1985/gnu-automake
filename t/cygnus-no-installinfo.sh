@@ -17,7 +17,7 @@
 # Check that cygnus mode enables the 'no-installinfo' option.
 
 required=makeinfo
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac <<'END'
 AM_MAINTAINER_MODE
@@ -40,13 +40,13 @@ $ACLOCAL
 $AUTOMAKE --cygnus -Wno-override -Wno-obsolete
 $AUTOCONF
 
-cwd=`pwd` || Exit 1
+cwd=$(pwd) || exit 1
 ./configure --prefix="$cwd"/_inst
 $MAKE
 $MAKE install
-test ! -d _inst
-test ! -r foo.info
-test ! -d _inst/share/info
+test ! -e _inst
+test ! -e foo.info
+test ! -e _inst/share/info
 $MAKE install-info
 ls -l _inst
 test -f foo.info

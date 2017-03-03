@@ -18,7 +18,7 @@
 # Similar to python8.test, but requiring a version.
 
 required=python
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >>configure.ac <<'EOF'
 # $PYTHON is supposed to be properly set in ACTION-IF-TRUE.
@@ -33,6 +33,6 @@ $AUTOCONF
 $AUTOMAKE --add-missing
 
 ./configure
-test x"`cat py.out`" = x0:1
+test x"$(cat py.out)" = x0:1
 
 :

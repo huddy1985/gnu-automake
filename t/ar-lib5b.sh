@@ -18,7 +18,7 @@
 # This test does not require Microsoft lib.
 # Keep this test in sync with sister test 'ar-lib5a.test'.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat > configure.ac << END
 AC_INIT([$me], [1.0])
@@ -80,7 +80,7 @@ case " $* " in
 esac
 END
 chmod +x bin/lib
-PATH=`pwd`/bin$PATH_SEPARATOR$PATH; export PATH
+PATH=$(pwd)/bin$PATH_SEPARATOR$PATH; export PATH
 
 $ACLOCAL
 $AUTOCONF

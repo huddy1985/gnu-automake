@@ -17,7 +17,7 @@
 # Make sure 'missing texinfo' does not create empty files.
 # Report from Bob Proulx.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 echo info_TEXINFOS = bar.texi >Makefile.am
 echo grepme >bar.info
@@ -39,7 +39,7 @@ EOF
 
 chmod +x makeinfo
 
-PATH=`pwd`$PATH_SEPARATOR$PATH
+PATH=$(pwd)$PATH_SEPARATOR$PATH
 export PATH
 
 # Otherwise configure might pick up a working makeinfo from the
@@ -57,7 +57,7 @@ test -f bar.info
 
 # We should not create a missing bar.info.
 rm -f bar.info
-$MAKE && Exit 1
-test ! -f bar.info
+$MAKE && exit 1
+test ! -e bar.info
 
 :

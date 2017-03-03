@@ -16,7 +16,7 @@
 
 # Expose bug in conditional definition of TEST_EXTENSIONS.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac << 'END'
 AM_CONDITIONAL([COND], [:])
@@ -60,9 +60,9 @@ END
 
 for i in 1 2 3; do
   AUTOMAKE_fails $i
-  lineno=`sed -n 's/^## lineno //p' $i.am` \
+  lineno=$(sed -n 's/^## lineno //p' $i.am) \
     && test 0 -lt "$lineno" \
-    || Exit 99
+    || exit 99
   grep "^$i\\.am:$lineno:.*TEST_EXTENSIONS.*conditional content" stderr
 done
 

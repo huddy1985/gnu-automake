@@ -328,7 +328,7 @@ TAP_LOG_DRIVER = AM_TAP_AWK='$(AWK)' $(SHELL) $(srcdir)/lib/tap-driver.sh
 
 AM_TAP_LOG_DRIVER_FLAGS = --merge
 
-EXTRA_DIST += t/README t/ax/is
+EXTRA_DIST += t/README t/ax/is t/ax/is_newest
 
 TESTS = ## Will be updated later.
 
@@ -336,7 +336,6 @@ TESTS = ## Will be updated later.
 # test scripts, but not from the environment.
 AM_TESTS_ENVIRONMENT = \
   for v in \
-    me \
     required \
     am_using_tap \
     am_serial_tests \
@@ -346,11 +345,6 @@ AM_TESTS_ENVIRONMENT = \
   ; do \
     eval test x"\$${$$v}" = x || unset $$v; \
   done;
-# The 'AM_TESTS_REEXEC=no' setting tells the tests not to needlessly
-# re-execute themselves with the shell detected at configure time, since
-# we are already running them under it explicitly in our setup (see e.g.
-# the definition of TEST_LOG_COMPILER above).
-AM_TESTS_ENVIRONMENT += AM_TESTS_REEXEC=no; export AM_TESTS_REEXEC;
 # We want warning messages and explanations for skipped tests to go to
 # the console if possible, so set up 'stderr_fileno_' properly.
 AM_TESTS_FD_REDIRECT = 9>&2
@@ -387,8 +381,11 @@ $(srcdir)/t/testsuite-part.am: $(srcdir)/gen-testsuite-part Makefile.am
 
 # Static dependencies valid for each test case.
 check_SCRIPTS = t/wrap/aclocal-$(APIVERSION) t/wrap/automake-$(APIVERSION)
-dist_check_DATA = t/ax/plain-functions.sh t/ax/tap-functions.sh
-check_DATA = defs defs-static
+dist_check_DATA = \
+  t/ax/test-init.sh  \
+  t/ax/plain-functions.sh  \
+  t/ax/tap-functions.sh
+nodist_check_DATA = defs-static
 
 # Few more static dependencies.
 t/distcheck-missing-m4.log: t/ax/distcheck-hook-m4.am
@@ -402,6 +399,17 @@ defs-static: defs-static.in Makefile
 	$(generated_file_finalize)
 EXTRA_DIST += defs-static.in
 CLEANFILES += defs-static
+
+runtest: runtest.in Makefile
+	$(AM_V_at)rm -f $@ $@-t
+	$(AM_V_GEN)in=runtest.in \
+	  && $(MKDIR_P) t/ax \
+	  && $(do_subst) <$(srcdir)/runtest.in >$@-t \
+	  && chmod a+x $@-t
+	$(generated_file_finalize)
+EXTRA_DIST += runtest.in
+CLEANFILES += runtest
+noinst_SCRIPTS = runtest
 
 # If two test scripts have the same basename, they will end up sharing
 # the same log file, leading to all sort of undefined and undesired
@@ -610,11 +618,6 @@ ChangeLog: am--changelog-regen-hook
 	       "$@ file has been found there" >&2; \
 	  exit 1; \
 	fi
-
-# Ensure tests are world-executable.
-# FIXME: this should be turned into a maintainer check...
-dist-hook:
-	$(am__cd) $(distdir)/t && chmod a+rx *.sh *.tap
 
 
 ## --------------------------- ##

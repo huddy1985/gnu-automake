@@ -21,7 +21,7 @@
 # for lex-generated C files.
 
 required='cc yacc'
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac <<'EOF'
 AM_MAINTAINER_MODE
@@ -77,8 +77,7 @@ $sleep
 touch parse.y parse2.y
 $sleep
 $MAKE parse.c parse2.c
-stat parse.c parse.y parse2.c parse2.y || : # For debugging.
-test `ls -t parse.c parse.y | sed 1q` = parse.c
-test `ls -t parse2.c parse2.y | sed 1q` = parse2.c
+is_newest parse.c parse.y
+is_newest parse2.c parse2.y
 
 :

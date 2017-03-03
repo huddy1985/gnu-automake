@@ -18,7 +18,7 @@
 # only once.
 # See also related test 'suffix2.test'.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac << 'END'
 AC_PROG_CC
@@ -46,13 +46,13 @@ for use_arlib in false :; do
 
   $AUTOMAKE $am_warns -i
   grep '^ *\.c' Makefile.in # For debugging.
-  test `grep -c '^\.c\.o:' Makefile.in` -eq 1
-  test `grep -c '^\.c\.obj:' Makefile.in` -eq 1
+  test $(grep -c '^\.c\.o:' Makefile.in) -eq 1
+  test $(grep -c '^\.c\.obj:' Makefile.in) -eq 1
 
   $AUTOMAKE $am_warns
   grep '^ *\.c' Makefile.in # For debugging.
-  test `grep -c '^\.c\.o:' Makefile.in` -eq 1
-  test `grep -c '^\.c\.obj:' Makefile.in` -eq 1
+  test $(grep -c '^\.c\.o:' Makefile.in) -eq 1
+  test $(grep -c '^\.c\.obj:' Makefile.in) -eq 1
 
 done
 

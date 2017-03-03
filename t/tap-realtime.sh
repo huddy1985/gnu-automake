@@ -22,7 +22,7 @@
 # children, and is pretty hacky and complex; is there a better way to
 # accomplish the checks done here?
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >expect-check <<'END'
 eval spawn $env(SHELL) -c ":"
@@ -30,7 +30,7 @@ expect eof
 END
 expect -f expect-check || {
     echo "$me: failed to find a working expect program" >&2
-    Exit 77
+    exit 77
 }
 rm -f expect-check
 
@@ -43,7 +43,7 @@ rm -f expect-check
 # out its output progressively and "in sync" with test execution -- it is
 # make that is stowing such output away instead of presenting it to the
 # user as soon as it gets it.
-if using_gmake; then :; else
+if ! using_gmake; then
   case $MAKE in
     *\ -j*) skip_ "doesn't with non-GNU concurrent make";;
   esac

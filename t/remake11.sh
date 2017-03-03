@@ -19,9 +19,9 @@
 # rules don't break in obvious ways in a slightly "heavier than usual"
 # setup.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
-ocwd=`pwd` || Exit 1
+ocwd=$(pwd) || fatal_ "getting current working directory"
 
 magic1=::MagicStringOne::
 magic2=__MagicStringTwo__
@@ -43,14 +43,15 @@ done
 echo AC_OUTPUT >> "$ocwd"/configure.ac
 : > Makefile.am
 unset d i
-bottom=`pwd`
+
+bottom=$(pwd) || fatal_ "getting current working directory"
 
 cd "$ocwd"
 
-makefiles_am_list=`find . -name Makefile.am | LC_ALL=C sort`
-makefiles_list=`echo "$makefiles_am_list" | sed 's/\.am$//'`
-bar_in_list=`find . -name bar.in | LC_ALL=C sort`
-bar_list=`echo "$bar_in_list" | sed 's/\.in$//'`
+makefiles_am_list=$(find . -name Makefile.am | LC_ALL=C sort)
+makefiles_list=$(echo "$makefiles_am_list" | sed 's/\.am$//')
+bar_in_list=$(find . -name bar.in | LC_ALL=C sort)
+bar_list=$(echo "$bar_in_list" | sed 's/\.in$//')
 
 cat configure.ac # For debugging.
 
@@ -75,7 +76,7 @@ cd "$ocwd"
 for f in configure config.status $makefiles_list $bar_list; do
   $FGREP "$magic2" $f
 done
-$FGREP "$magic1" configure config.status $makefiles_list $bar_list && Exit 1
+$FGREP "$magic1" configure config.status $makefiles_list $bar_list && exit 1
 
 $MAKE distcheck
 

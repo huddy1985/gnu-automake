@@ -18,7 +18,7 @@
 # This test also works as a mild stress-test on the python support.
 
 required='cc python virtualenv'
-. ./defs || Exit 1
+. ./defs || exit 1
 
 # In case the user's config.site defines pythondir or pyexecdir.
 CONFIG_SITE=/dev/null; export CONFIG_SITE
@@ -34,8 +34,8 @@ if test -z "$VIRTUAL_ENV"; then
   framework_failure_ "can't activate python virtual environment"
 fi
 
-cwd=`pwd`
-py_version=`python -c 'import sys; print("%u.%u" % tuple(sys.version_info[:2]))'`
+cwd=$(pwd) || fatal_ "getting current working directory"
+py_version=$(python -c 'import sys; print("%u.%u" % tuple(sys.version_info[:2]))')
 py_site=$VIRTUAL_ENV/lib/python$py_version/site-packages
 
 # We need control over the package name.
@@ -164,7 +164,7 @@ $MAKE distclean
 pythondir=$py_site pyexecdir=$py_site
 export pythondir pyexecdir
 $MAKE -e install
-test ! -d bad-prefix
+test ! -e bad-prefix
 $MAKE -e test-install
 $MAKE test-run
 $MAKE -e uninstall
@@ -181,7 +181,7 @@ $MAKE install
 python -c 'import am_foo; print(am_foo.__file__)'
 python -c 'import am_virtenv; print(am_virtenv.__file__)'
 deactivate "nondestructive"
-python -c 'import am_foo' && Exit 1
-python -c 'import am_virtenv' && Exit 1
+python -c 'import am_foo' && exit 1
+python -c 'import am_virtenv' && exit 1
 
 :

@@ -17,7 +17,7 @@
 # Make sure distclean works in cygnus mode.
 # Report from Daniel Jacobowitz.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac << 'END'
 AM_MAINTAINER_MODE
@@ -58,10 +58,10 @@ test -f bar
 test -f sub/foo
 $MAKE distclean
 ls -l
-test ! -r bar
-test ! -r sub/foo
-test ! -r Makefile
-test ! -r config.status
+test ! -e bar
+test ! -e sub/foo
+test ! -e Makefile
+test ! -e config.status
 test -f Makefile.in
 test -f configure
 

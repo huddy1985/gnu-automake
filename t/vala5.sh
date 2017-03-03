@@ -17,7 +17,7 @@
 # Test per-target flags.
 
 required="pkg-config valac gcc GNUmake"
-. ./defs || Exit 1
+. ./defs || exit 1
 
 mkdir src
 
@@ -73,11 +73,11 @@ grep PKG_CHECK_MODULES configure && skip_ "pkg-config m4 macros not found"
 ./configure
 $MAKE
 
-if cross_compiling; then :; else
+if ! cross_compiling; then
   ./src/foo
   ./src/bar
-  test `./src/foo` = foo
-  test `./src/bar` = bar
+  test "$(./src/foo)" = foo
+  test "$(./src/bar)" = bar
 fi
 
 # Test clean rules.
@@ -97,7 +97,7 @@ mv config.sav config.status
 ./config.status
 
 $MAKE maintainer-clean
-test ! -f src/xfoo.c
-test ! -f src/xbar.c
+test ! -e src/xfoo.c
+test ! -e src/xbar.c
 
 :

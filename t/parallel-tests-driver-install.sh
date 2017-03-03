@@ -17,7 +17,7 @@
 # Check that auxiliary script 'test-driver' gets automatically installed
 # in the correct directory by 'parallel-tests' option.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 : Try first with parallel-tests defined in AM_INIT_AUTOMAKE.
 
@@ -44,13 +44,13 @@ TESTS = bar.test
 END
 
 $ACLOCAL
-$AUTOMAKE -a 2>stderr || { cat stderr >&2; Exit 1; }
+$AUTOMAKE -a 2>stderr || { cat stderr >&2; exit 1; }
 cat stderr >&2
 
 ls -l . sub my_aux_dir # For debugging.
 test -f my_aux_dir/test-driver
-test ! -r test-driver
-test ! -r sub/test-driver
+test ! -e test-driver
+test ! -e sub/test-driver
 
 grep '^configure\.ac:3:.*installing.*my_aux_dir/test-driver' stderr
 
@@ -79,13 +79,13 @@ END
 
 $ACLOCAL
 $AUTOMAKE --add-missing --copy dir/GNUmakefile 2>stderr \
-  || { cat stderr >&2; Exit 1; }
+  || { cat stderr >&2; exit 1; }
 cat stderr >&2
 
 ls -l . dir build-aux # For debugging.
 test -f build-aux/test-driver
-test ! -r test-driver
-test ! -r dir/test-driver
+test ! -e test-driver
+test ! -e dir/test-driver
 
 grep '^dir/GNUmakefile\.am:2:.*installing.*build-aux/test-driver' stderr
 

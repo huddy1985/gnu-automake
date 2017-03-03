@@ -19,7 +19,7 @@
 # from Vincent Lefevre).
 
 required='makeinfo tex texi2dvi-o'
-. ./defs || Exit 1
+. ./defs || exit 1
 
 echo AC_OUTPUT >> configure.ac
 
@@ -61,5 +61,7 @@ cd build
 ../configure
 $MAKE distcheck
 test -f ../subdir/main.info
-test ! -f subdir/main.info
+test ! -e subdir/main.info
 test -f ../subdir/main.info.bak
+
+:

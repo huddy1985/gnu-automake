@@ -18,7 +18,7 @@
 #  - the special "plan with SKIP" can also be used "late" in the TAP
 #    stream, i.e., preceded by non-TAP output or TAP diagnostic.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 . "$am_testauxdir"/tap-setup.sh || fatal_ "sourcing tap-setup.sh"
 
@@ -32,12 +32,12 @@ cat > bar.test <<END
 1..0
 END
 
-TESTS='foo.test bar.test' $MAKE -e check >stdout || { cat stdout; Exit 1; }
+TESTS='foo.test bar.test' $MAKE -e check >stdout || { cat stdout; exit 1; }
 cat stdout
 
 grep '^SKIP: foo\.test .* from the last line$' stdout
 grep '^SKIP: bar\.test$' stdout
-test `grep -c ': .*\.test' stdout` -eq 2
+test $(grep -c ': .*\.test' stdout) -eq 2
 count_test_results total=2 pass=0 fail=0 xpass=0 xfail=0 skip=2 error=0
 
 :

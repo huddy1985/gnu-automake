@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 AC_PREREQ([2.69])
-AC_INIT([GNU Automake], [1.12.1], [bug-automake@gnu.org])
+AC_INIT([GNU Automake], [1.12.2], [bug-automake@gnu.org])
 
 AC_CONFIG_SRCDIR([automake.in])
 AC_CONFIG_AUX_DIR([lib])
@@ -262,6 +262,9 @@ exit 77" >&AS_MESSAGE_LOG_FD 2>&1; test $? -eq 77; }
 # We require that the shell can correctly trap EXIT when 'set -e' is in
 # effect (OSF1/Tru64 sh failed to do so, see commit v1.10b-52-g9fe8259).
 #
+# We want to able to define shell aliases with the same name of shell
+# builtins.
+#
 # We also prefer shells that, when 'set -x' is in effect, do not also
 # redirect traces upon stderr redirections.  For example,
 #  $ set -x; echo x 2>file
@@ -294,34 +297,36 @@ AC_DEFUN([_AM_CHECK_CANDIDATE_SHELL],
       [], [am_score=1; break])
 
     _AM_CHECK_SHELL_FEATURE([$1],
-      [supports \${var@%:@glob}],
-      [v=a/b/c; test ${v@%:@*/} = b/c],
+      [supports \${var@%:@glob} and \${var%glob}],
+      [v=a/b/c \
+        && test ${v@%:@*/} = b/c \
+        && test ${v@%:@@%:@*/} = c \
+        && test ${v%/*} = a/b \
+        && test ${v%%/*} = a],
       [], [am_score=1; break])
 
     _AM_CHECK_SHELL_FEATURE([$1],
-      [supports \${var@%:@@%:@glob}],
-      [v=a/b/c; test ${v@%:@@%:@*/} = c],
-      [], [am_score=1; break])
-
-    _AM_CHECK_SHELL_FEATURE([$1],
-      [supports \${var%glob}],
-      [v=a.b.c; test ${v%.*} = a.b],
-      [], [am_score=1; break])
-
-    _AM_CHECK_SHELL_FEATURE([$1],
-      [supports \${var%%glob}],
-      [v=a.b.c; test ${v%%.*} = a],
-      [], [am_score=1; break])
-
-    _AM_CHECK_SHELL_FEATURE([$1],
-      ["set -e" preserves exit traps],
+      [preserves exit traps with "set -e"],
       [set -e; trap 'exit $?' 0; (exit 77); exit 77],
       [], [am_score=1; break])
 
     _AM_CHECK_SHELL_FEATURE([$1],
-      ["set -x" corrupts stderr],
+      [corrupts stderr with "set -x"],
       [(set -x; P=1 true 2>&3) 3>&1 2>/dev/null | grep P=1],
       [am_score=9], [])
+
+    echo 'alias false=echo' > conftest-alias.sh
+    echo 'false && test "$(false 97)" = 97' >> conftest-alias.sh
+    _AM_CHECK_SHELL_FEATURE([$1],
+      [supports alias named like shell builtins],
+      [. ./conftest-alias.sh],
+      [rm -f conftest-alias.sh],
+      [rm -f conftest-alias.sh; am_score=1; break])
+
+    _AM_CHECK_SHELL_FEATURE([$1],
+      [supports "test -e"],
+      [test -e config.log && test -e . && test ! -e nonesuch],
+      [], [am_score=1; break])
 
     break
   done])
@@ -377,10 +382,6 @@ fi
 
 AC_ARG_VAR([AM_TEST_RUNNER_SHELL],
            [a sturdy POSIX shell for our testsuite])
-
-## ---------------------- ##
-##  Create output files.  ##
-## ---------------------- ##
 
 
 ###########################################################################
@@ -552,6 +553,10 @@ AC_SUBST([OBJEXT])
 AC_SUBST([EXEEXT])
 
 ###########################################################################
+
+## ---------------------- ##
+##  Create output files.  ##
+## ---------------------- ##
 
 AC_CONFIG_FILES([Makefile])
 

@@ -21,7 +21,7 @@
 # Keep this in sync with sister test 'remake8a.test', which performs the
 # same checks for a in-tree build.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 mv -f configure.ac configure.stub
 
@@ -76,7 +76,7 @@ using_gmake || $MAKE Makefile
 $MAKE
 cat bar
 grep '!Baz!' bar
-test ! -r foo
+test ! -e foo
 $MAKE distcheck
 
 rm -f bar
@@ -107,7 +107,7 @@ using_gmake || $MAKE Makefile
 $MAKE
 cat quux
 grep '!Zardoz!' quux
-test ! -r bar
+test ! -e bar
 $MAKE distcheck
 
 rm -f quux

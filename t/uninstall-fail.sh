@@ -20,7 +20,7 @@
 # tests for other primaries too?  E.g., SCRIPTS, PROGRAMS, LISP, PYTHON,
 # etc...
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 mkdir d
 : > d/f
@@ -53,15 +53,16 @@ $ACLOCAL
 $AUTOMAKE
 $AUTOCONF
 
+# Make it harder to experience false postives when grepping error messages.
 inst=__inst-dir__
 
-./configure --prefix="`pwd`/$inst"
+./configure --prefix="$(pwd)/$inst"
 
 mkdir $inst $inst/share
 : > $inst/share/foobar.txt
 
 chmod a-w $inst/share
-$MAKE uninstall >output 2>&1 && { cat output; Exit 1; }
+$MAKE uninstall >output 2>&1 && { cat output; exit 1; }
 cat output
 if test $rm_f_is_silent_on_error = yes; then
   : "rm -f" is silent on errors, skip the grepping of make output
@@ -72,24 +73,24 @@ fi
 chmod a-rwx $inst/share
 (cd $inst/share) && skip_ "cannot make directories fully unreadable"
 
-$MAKE uninstall >output 2>&1 && { cat output; Exit 1; }
+$MAKE uninstall >output 2>&1 && { cat output; exit 1; }
 cat output
 #
-# Some shells, like Solaris 10 /bin/sh and /bin/ksh, do not report
-# the name of the 'cd' builtin upon a chdir error:
+# Some shells, like Solaris 10 /bin/ksh and /usr/xpg4/bin/sh, do not
+# report the name of the 'cd' builtin upon a chdir error:
 #
-#   $ /bin/sh -c 'cd /none'
-#   /bin/sh: /none: does not exist
+#   $ /bin/ksh -c 'cd /none'
+#   /bin/ksh: /none: not found
 #
-# In addition, some shells, like Solaris 10 /usr/xpg4/bin/sh, also print
-# a line number in the error message *if the command contains newlines*:
+# and also print a line number in the error message *if the command
+# contains newlines*:
 #
-#   $ /usr/xpg4/bin/sh -c 'cd unreadable'
-#   /usr/xpg4/bin/sh: unreadable: permission denied
-#   $ /usr/xpg4/bin/sh -c '\
+#   $ /bin/ksh -c 'cd unreadable'
+#   /bin/ksh: unreadable: permission denied
+#   $ /bin/ksh -c '\
 #   > \
 #   > cd unreadable'
-#   /usr/xpg4/bin/sh[3]: unreadable: permission denied
+#   /bin/ksh[3]: unreadable: permission denied
 #
 $EGREP "(cd|sh)(\[[0-9]*[0-9]\])?: .*$inst/share" output
 

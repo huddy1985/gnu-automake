@@ -18,13 +18,13 @@
 # PR automake/483.
 
 am_create_testdir=empty
-. ./defs || Exit 1
+. ./defs || exit 1
 
 get_shell_script missing
 
 # These programs may be invoked by 'missing'.
 needed_tools='chmod find sed test touch'
-needed_tools_csep=`echo $needed_tools | sed 's/ /, /g'`
+needed_tools_csep=$(echo $needed_tools | sed 's/ /, /g')
 
 cat >configure.ac <<EOF
 AC_INIT([missing4], [1.0])
@@ -60,5 +60,5 @@ done
 PATH=$save_PATH
 export PATH
 diff output-file my--output--file-o
-test ! -f ./--file-o
-test ! -f input
+test ! -e ./--file-o
+test ! -e input

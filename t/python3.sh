@@ -17,7 +17,7 @@
 # Make sure we install built python files.
 
 required=python
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >>configure.ac <<EOF
 AM_PATH_PYTHON
@@ -36,14 +36,12 @@ $ACLOCAL
 $AUTOCONF
 $AUTOMAKE --add-missing
 
-mkdir inst
-inst=`pwd`/inst
 mkdir build
 cd build
-../configure --prefix="$inst"
+../configure --prefix="$(pwd)/inst"
 $MAKE install
-test -f "$inst/my/one.py"
-test -f "$inst/my/one.pyc"
-test -f "$inst/my/one.pyo"
+test -f inst/my/one.py
+test -f inst/my/one.pyc
+test -f inst/my/one.pyo
 
 :

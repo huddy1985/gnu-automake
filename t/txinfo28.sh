@@ -20,7 +20,7 @@
 # Report from Ralf Corsepius.
 
 required='makeinfo tex texi2dvi-o'
-. ./defs || Exit 1
+. ./defs || exit 1
 
 # This setting, when honored by GNU ls, used to cause an infinite loop
 # in mdate-sh.
@@ -82,7 +82,7 @@ cd build
 $MAKE
 # main.info should be rebuilt in the current directory.
 test -f main.info
-test ! -f ../main.info
+test ! -e ../main.info
 $MAKE dvi
 test -f main.dvi
 

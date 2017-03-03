@@ -1,3 +1,1453 @@
+2012-07-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	release: stable release 1.12.2
+
+	* configure.ac (AC_INIT): Bump version number to 1.12.2.
+	* m4/amversion.m4: Likewise (auto-updated by "./bootstrap").
+
+2012-07-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'distcheck-vulnerability-CVE-2012-3386' into maint
+
+	* distcheck-vulnerability-CVE-2012-3386:
+	  distcheck: never make part of $(distdir) world-writable
+
+2012-07-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	distcheck: never make part of $(distdir) world-writable
+
+	This fixes a locally-exploitable security vulnerability (CVE-2012-3386).
+
+	In the 'distcheck' rule, we used to make the just-extracted (from
+	the distribution tarball) $(distdir) directory and all its files and
+	subdirectories read-only; then, in order to create the '_inst' and
+	'_build' subdirectories in there (used by the rest of the recipe) we
+	made the top-level $(distdir) *world-writable* for an instant (the
+	time to create those two directories) before making it read-only
+	again.
+
+	Making that directory world-writable (albeit only briefly) introduced a
+	locally exploitable race condition for those who run "make distcheck" with
+	a non-restrictive umask (e.g., 022) in a directory that is accessible by
+	others.  A successful exploit would result in arbitrary code execution
+	with the privileges of the user running "make distcheck" -- game over.
+	Jim Meyering wrote a proof-of-concept script showing that such exploit is
+	easily implemented.
+
+	This issue is similar to the CVE-2009-4029 vulnerability:
+	<http://lists.gnu.org/archive/html/automake/2009-12/msg00012.html>
+
+	* lib/am/distdir.am (distcheck): Don't make $(distdir) world-writable,
+	not even for an instant; make it user-writable instead, which is enough.
+
+	Helped-By: Jim Meyering <jim@meyering.net>
+
+2012-07-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	compat: automake should substitute @mkdir_p@, for backward compatibility
+
+	That has been unwittingly broken by commit v1.12-19-g7a1eb9f of 2012-04-28,
+	"AM_PROG_MKDIR_P: deprecate, to be removed in Automake 1.13". We thought it
+	wasn't a big deal, but Jim Meyering reported that @mkdir_p@ is used in
+	gettext's Makefile.in.in template:
+	<http://lists.gnu.org/archive/html/automake/2012-07/msg00014.html>
+
+	* lib/am/header-vars.am (mkdir_p): Don't define.
+	* m4/init.m4 (AM_INIT_AUTOMAKE): AC_SUBST 'mkdir_p' with $(MKDIR_P).
+	* t/mkdir_p.sh, t/mkdirp-deprecation.sh: Enhance.
+	* NEWS: Update.
+
+2012-07-08  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	fixup: t/README: it's ./runtest, not ./t/ax/runtest
+
+	* t/README (Supported shells): Here. And remove an extra empty line.
+
+2012-07-07  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: move 'runtest' into the top-level directory
+
+	Move our wrapper script 'runtest' (meant to allow the execution of
+	Automake test cases from the command line) from the 't/ax/' directory
+	to the top-level one.  This makes the script easier to find and to
+	invoke.  Much more importantly, our DejaGNU-checking test cases won't
+	try anymore to use that script instead of the 'runtest' program provided
+	by DejaGNU (that happened because '$(srcdir)/t/ax/' is automatically
+	added early to the $PATH variable in our test cases), which was causing
+	spurious SKIPs.
+
+	* t/ax/runtest.in: Move ...
+	* runtest.in: ... here.
+	* Makefile.am, t/README, .gitignore: Adjust.
+
+2012-07-06  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	cosmetics: rename t/ax/test-runner => t/ax/runtest
+
+	The latter is shorter and clearer.  Better to do the rename early,
+	before other developers or contributors begin to get used to the
+	'test-runner' name.
+
+	* t/ax/test-runner.in: Rename ...
+	* t/ax/runtest.in: ... like this.
+	* Makefile.am, t/README, .gitignore: Adjust.
+
+2012-07-06  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	fixup: another "make recheck" failure with BSD make
+
+	* t/parallel-tests-log-override-recheck.sh: Here, add a proper $sleep
+	before calling "make recheck".  This should ideally have been done
+	in the earlier commit 'v1.12.1-100-g19d84bc', but it somehow slipped
+	through the cracks.
+	* t/test-metadata-recheck.sh: Likewise.
+
+2012-07-06  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	test runner: work correctly in VPATH setups
+
+	Due to a "feature" of AC_CONFIG_FILES, because 't/ax/test-runner.in'
+	is in a subdirectory, the '@srcdir@' value that is AC_SUBST'd in it
+	gets tweaked to contain as much '..' components as are the directory
+	components of 't/ax/test-runner'.  Because our build system operates
+	in a non-recursive setup, this substitution is wrong; for example,
+	the final 't/ax/test-runner' build in a VPATH builds where the source
+	directory is ".." contains the line:
+
+	    : ${srcdir='../../../t/ax'}
+
+	instead of the expected (and correct):
+
+	    : ${srcdir='../t/ax'}
+
+	We solve the issue by building 't/ax/test-runner' with a Makefile
+	recipe instead of config.status substitutions; this is already done
+	for other testsuite-related files, like 'defs-static'.
+
+	* configure.ac (AC_CONFIG_FILES): Don't build 't/ax/test-runner'
+	anymore.
+	* Makefile.am (t/ax/test-runner): New rule.
+	(EXTRA_DIST): Add 't/ax/test-runner.in'.
+	(CLEANFILES, noinst_SCRIPTS): Add 't/ax/test-runner'.
+
+2012-07-06  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'fix-pr11806' into maint
+
+	* fix-pr11806:
+	  lisp: better support of VPATH builds
+
+2012-07-06  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests init: don't automatically re-execute tests with a POSIX shell
+
+	I've unwittingly broken support for that feature *again* in some of
+	my recent testsuite tweaking.  In this case, the re-execution code
+	works correctly when the tests are executed with a POSIX shells, but
+	breaks when they are invoked by an old-style Bourne shells (e.g.,
+	/bin/sh on Solaris).
+
+	It's time to face it: that feature is too much brittle, and too seldom
+	used (because the Makefile takes care of running the tests with the
+	correct shell anyway, so that a breakage is only experienced when
+	running the tests by hand).  It just don't remain working for long, not
+	when we often touch the testsuite setup (which we are going to do again
+	when we'll try to move part of our testsuite framework to Gnulib, or a
+	similar project).
+
+	So, instead of trying to be extra-smart and automatically re-execute the
+	tests with the correct shell, we now offer a simple wrapper script that
+	the user can employ to run the test scripts with the proper shell.  And
+	while we are at it, we write this wrapper to also deal with TAP tests in
+	a better way, running them through the prove(1) utility, so that their
+	results are correctly recognized and reported.
+
+	* t/ax/test-runner.in: New file; the wrapper script we were talking about.
+	* configure.ac (AC_CONFIG_FILES): Process it into 't/ax/test-runner'.
+	* .gitignore: Add 't/ax/test-runner'.
+	* defs: Remove code for automatic re-execution of the scripts with the
+	correct shell.  This file now just a very thin layer around 'defs-static'
+	and 't/ax/test-init.sh'.
+	* t/README: Adjust, and remove or fix some imprecise or outdated text in
+	the process (like "... test scripts are written with portability in mind,
+	so that they should run with any decent Bourne-compatible shell ..." ).
+	* Makefile.am (AM_TESTS_ENVIRONMENT): No need to export 'AM_TESTS_REEXEC'
+	to "no" anymore.
+	* t/self-check-explicit-skips.sh: Likewise.
+	* t/self-check-exit.tap: Likewise.
+	* t/self-check-me.tap: Likewise.
+	* t/self-check-dir.tap: Likewise.
+	* t/self-check-reexec.tap: Remove as obsolete.
+	* t/list-of-tests.mk: Adjust.
+
+2012-07-06  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	yacc tests: fix spurious failure with parallel make
+
+	* t/yacc-deleted-headers.sh: Here, by adding a missing dependency
+	in the Makefile.am.  Revealed by a failure with Sun Distributed make
+	run on Solaris 10 in parallel mode.
+
+2012-07-06  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: ignore minor 'recheck' regression for BSD make
+
+	It turns out that, with NetBSD 5.1 make and FreeBSD 9 make, running
+	"make recheck" two times in a row quickly fails to correctly re-run
+	the failed tests in the second run.
+
+	That issue has been introduced likely introduced in commit
+	'v1.12.1-95-gd5443e4' of 20102-07-01, "parallel-tests: reimplement
+	fix for bug#11791".
+
+	Anyway, the use case that has been broken is not realistic (who is
+	going to run "make recheck" two times in one second, without modifying
+	any of the tests or the tested programs in the meantime?), so we believe
+	the best fix is to simply work around the issue in the affected test
+	cases, rather than risking to slow down or uglify the 'recheck' rule.
+
+	* t/parallel-tests9.sh: Enhance a little.
+	* t/tap-recheck.sh: Adjust adding proper '$sleep' calls were required.
+	* t/parallel-tests-log-override-recheck.sh: Likewise.
+	* t/test-driver-custom-multitest-recheck.sh: Likewise.
+	* t/test-driver-custom-multitest-recheck2.sh: Likewise.
+
+2012-07-06  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: don't clutter the top-level dir with temporary test directories
+
+	* t/self-check-me.tap: Be sure to initialize '$am_create_testdir' to "no"
+	in all the shell invocations sourcing './defs'.  Otherwise, when running
+	the testsuite with 'keep_testdirs=yes', the following temporary director
+	are left cluttering the top-level directory:
+
+	  ./012.dir
+	  ./abc..dir
+	  ./a.b.c.dir
+	  ./foo.dir
+	  ./foo.bar.dir
+	  ./foo-bar-.dir
+	  ./_foo__bar.dir
+
+2012-07-06  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: avoid spurious failures when @MKDIR_P@ points to "install-sh -d"
+
+	* t/self-check-cleanup.tap: Several checks in this test were failing on
+	NetBSD 5.1.  That happened because on that system, '@MKDIR_P@' expands to
+	an "install-sh -d" invocation that references the $(builddir), and the
+	code trying to duplicate some of the Automake testsuite infrastructure
+	in the test subdirectory of this self test wasn't smart enough to cater
+	to that situation.  Granted, we could tweak the test case once more to
+	fix this Yet Another Spurious Failure, but at this point it has become
+	clear that the extra coverage offered by this test is not worth all the
+	hassle.  Just remove the test.  Since the testsuite is regularly run on
+	several systems and with different setups, most issues with the testsuite
+	framework will reveal themselves anyway; no actual need to unit-test them
+	in our testsuite, if that's too tricky.
+	* t/list-of-tests.mk: Adjust.
+
+2012-07-06  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	compat: automake should define $(mkdir_p), for backward compatibility
+
+	That has been unwittingly broken by commit 'v1.12-19-g7a1eb9f'
+	of 2012-04-28, "AM_PROG_MKDIR_P: deprecate, to be removed in
+	Automake 1.13".
+
+	Report from Benoit Sigoure and Diego Elio Pattenò:
+	<http://lists.gnu.org/archive/html/automake/2012-07/msg00001.html>
+
+	* lib/am/header-vars.am (mkdir_p): Define as an alias for $(MKDIR_P).
+	* t/list-of-tests.mk (XFAIL_TESTS): Remove 't/mkdir_p.sh'.
+	* NEWS: Update.
+
+2012-07-06  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	coverage: test that AM_PROG_MKDIR_P and $(mkdir_p) still works
+
+	They are deprecated, but should continue to work in the 1.12.x
+	release series.  Report from Benoit Sigoure and Diego Elio Pattenò:
+	<http://lists.gnu.org/archive/html/automake/2012-07/msg00001.html>
+
+	* t/mkdirp-deprecation.sh: Enhance.
+	* t/mkdir_p.sh: New test, check that AM_INIT_AUTOMAKE still defines
+	the $(mkdir_p) make variable.  Currently xfailing.
+	* t/list-of-tests.mk (handwritten_TESTS, XFAIL_TESTS): Add the new
+	test.
+
+2012-07-06  Jack Kelly  <jack@jackkelly.name>  (tiny change)
+	    Stefano Lattarini  <stefano.lattarini@gnu.org>
+
+	lisp: better support of VPATH builds
+
+	Fixes automake bug#11806.
+
+	* lib/am/lisp.am: Pass the value of '$(abs_srcdir)' to the
+	elisp-compile script in the environment.
+	* lib/elisp-comp: Add the vale of '$abs_srcdir' to the emacs
+	load-path.
+	* t/lisp-pr11806.sh: New test.
+	* t/list-of-tests.mk: Add it.
+
+	Reported-by: Makoto Fujiwara <makoto@ki.nu>
+
+2012-07-03  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: fixlets and updates
+
+	* NEWS: Here.  In particular, report the change in 'missing'
+	semantics.
+
+2012-07-01  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: don't trust the exit status of "make -k" for non-GNU makes
+
+	* t/parallel-tests-recheck-pr11791.sh: Here.  At least some versions
+	of FreeBSD make botch it up, returning success when failure should be
+	returned.
+
+2012-07-01  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	parallel-tests: reimplement fix for bug#11791
+
+	* lib/am/check.am: Here.  The new implementation is shorter, slightly
+	more efficient (requiring less forks), less brittle in the face of
+	signals or unexpected interruptions in the make process, and should
+	also be easier to merge in the 'ng/master' branch (as of now, due to
+	the difficulties in merging our previous version of the fix in the
+	'ng/master' codebase, Automake-NG still lacks a fix for bug#11791).
+
+2012-07-01  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests setup: unset CDPATH
+
+	So that our test scripts can safely chdir around using relative
+	paths as well, without having to worry abut possible CDPATH
+	interferences.
+
+	* defs-static.in: unset CDPATH.
+	* t/ax/tests-init.sh: Remove a now-unneeded workaround.
+
+2012-07-01  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests setup: more namespace safeness
+
+	* t/ax/tests-init.sh ($testSubDir): Rename ...
+	($am_test_subdir): ... to this, throughout the file.
+
+2012-07-01  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests setup: remove an unused variable
+
+	* defs-static.in ($testprefix): This one.
+
+2012-07-01  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests setup: less hard-coding of the test subdirectory
+
+	* t/ax/tests-init.sh: Make the code creating the temporary
+	test subdirectory smart enough to automatically create it
+	in the same subdirectory of the test that is being run.
+	* defs-static.in ($MKDIR_P, $am_rel_srcdir): New variables,
+	AC_SUBST'd from @MKDIR_P@ and @srcdir@ respectively, and
+	used in the new 'tests-init.sh' code.
+
+2012-06-30  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	parallel-tests: silence an overly verbose recipe
+
+	*  lib/am/check.am (check-TESTS): Here, the part of the recipe
+	removing the stale '.log' and '.trs' files.
+
+2012-06-30  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fix some uses of 'Exit', where 'exit' should now be used instead
+
+	* t/parallel-tests-recheck-pr11791.sh: Here.
+
+2012-06-30  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maintcheck: test scripts should be executable, check for that
+
+	* syntax-checks.mk (sc_tests_executable): Here, in this new check.
+	(syntax_check_rules): Add it.
+	* Makefile.am (dist-hook): Drop, no need to make test cases executable
+	anymore.
+
+2012-06-30  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'recheck-fix' into maint
+
+	* recheck-fix:
+	  parallel-tests: recipes for "check" and "recheck" are separated again
+
+2012-06-30  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	parallel-tests: recipes for "check" and "recheck" are separated again
+
+	* lib/am/check.am: Here.  They have distinctly diverged recently, and
+	the reduction in code duplication obtained keeping their recipes united
+	is not anymore worth the extra complications.
+
+2012-06-30  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'recheck-fix' into maint
+
+	* recheck-fix:
+	  parallel-tests: "recheck" behaves better in case of compilation failures
+	  scripts: quote 'like this', not `like this'
+
+2012-06-30  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fix a spurious failure
+
+	* t/parallel-tests-dry-run-2.sh: Here.
+
+2012-06-30  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	configure: fix detection of POSIX shell to work in a VPATH build
+
+	* configure.ac: When checking whether "test -e" works, use 'config.log',
+	not 'configure', as the witness file, because the latter does not exist
+	in the current directory during a VPATH build.
+
+2012-06-29  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: prefer "test ! -e FILE" to check that a file doesn't exist
+
+	Once, for the sake of (at least) Solaris 10 /bin/sh, we had to use
+	"test ! -f FILE" or "test ! -r FILE" or "test ! -d FILE" instead,
+	because the that shell's 'test' built-in didn't grok the '-e' option.
+
+	Note however that we still can't use "test ! -e" in the Makefile recipes
+	used in the test cases; that is because those recipes are run with the
+	shell detected by 'configure', and Autoconf-generated configure scripts
+	do no guarantee to find or provide a POSIX-compatible shell.
+
+	* Several tests: Adjust.
+	* t/yacc-clean-cxx: Adjust, and remove a couple of useless commands.
+	* t/parallel-tests-dry-run-2.sh: Adjust, and add invocation to
+	"make -n" forgotten in previous versions of the test.
+	* t/txinfo26.sh: Adjust, and don't bother to skip the test when it's
+	run in a directory whose absolute path contain whitespace: that setup
+	is not supported anyway.
+	* t/maken3.sh: Adjust, and fix a typo that could cause a minor false
+	negative.
+	* t/test-trs-recover2.sh: Prefer using 'skip_' with a suitable error
+	message over a bare 'exit 77'.
+
+2012-06-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	configure: move a misplaced "section" comment
+
+	* configure.ac (Create output files): This, move it towards the end
+	of the script.
+
+2012-06-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	configure: clump check for ${var%...} and ${var#...} expansion together
+
+	And together with those for the ${var%%...} and ${var##...} expansions.
+	After all, it is basically impossible to find a shell that support one
+	of them but not the others.
+
+	Suggestion by Eric Blake.
+
+	* configure.ac: Here.
+
+2012-06-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	cosmetics: improve wording of a couple of configure messages
+
+	* configure.ac: Fix a couple of messages so that the configure
+	output changes from this:
+
+	    checking whether /bin/sh "set -e" preserves exit traps... yes
+	    checking whether /bin/sh "set -x" corrupts stderr... no
+
+	to this:
+
+	    checking whether /bin/sh preserves exit traps with "set -e"... yes
+	    checking whether /bin/sh corrupts stderr with "set -x"... no
+
+2012-06-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	configure: the testsuite shell must support 'test -e' and 'test ! -e'
+
+	* configure.ac: Require that the shell that is to be selected to run
+	the testsuite understands "set -e" and "set ! -e".
+
+2012-06-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: remove stale workarounds for Solaris /bin/sh
+
+	Our testsuite cannot be run with that shell anymore (as it is
+	not POSIX-compliant).
+
+	* t/tap-more.sh: Remove outdated workarounds for Solaris /bin/sh.
+	* t/self-check-exit.tap: Likewise.
+	* t/ansi2knr-no-more.sh: Likewise.
+	* t/add-missing.tap: Likewise.
+	* t/dist-auxfile.sh: Likewise.
+	* t/test-driver-custom-multitest-recheck2.sh:  Likewise.
+	* t/ax/test-init.sh: Remove obsolete references to Solaris
+	/bin/sh.
+	* t/confh5.sh: Likewise.
+	* t/uninstall-fail.sh: Likewise.  And update comments about
+	quirks of Solaris /bin/ksh and /usr/xpg4/bin/sh.
+
+2012-06-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests init: don't bother allowing '$me' to be overridable
+
+	We once used that feature in our wrapper tests; but now (and probably
+	even since commit 'v1.11-1308-g375f23d' of 2011-09-08, "testsuite:
+	revamp generation of autogenerated tests") it is not needed anymore.
+	By removing it we can simplify our growingly complex testsuite framework
+	a little.
+
+	* t/ax/test-inist.sh ($me): Do not initialize it here (and only if not
+	already set), instead ...
+	* defs-static.in ($me): ... initialize it here unconditionally.
+	Do not check anymore that $me doesn't come from the environment: that
+	wouldn't cause any problem now.
+	Now that '$me' is defined early, prefer it over 'argv0' in early error
+	messages, both here ...
+	* defs: ... and here.
+	* Makefile.am (AM_TESTS_ENVIRONMENT): Do not bother "nullifying" $me
+	anymore.
+	* t/self-check-env-sanitize.tap: Adjust.
+	* t/self-check-me.tap: Likewise.
+
+2012-06-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests init: typofixes in comments
+
+2012-06-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: one test was not executable, make it so
+
+	* t/subdir-order.sh: This test.
+
+2012-06-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	readme: fix typo in t/README: s/$((...)/$((...))/
+
+2012-06-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: don't skip if $(abs_builddir) or $(abs_srcdir) contain whitespace
+
+	We used to explicitly skip libtool and gettext tests if the absolute
+	path of the builddir or of the srcdir which Automake was configured
+	with contained any whitespace (or other metacharacters).
+
+	But several other tests would spuriously fail in such an unholy setup.
+	To be precise, it would cause 61 'FAIL's and 42 'ERROR's in the whole
+	Automake testsuite.
+
+	The fact that, as of today, nobody has reported any failure of this kind
+	means that (thankfully) nobody is building automake with $(abs_srcdir)
+	or $(abs_builddir) mangled by whitespace.  So, instead of trying to cater
+	to such a broken setup consistently, we just drop the extra check in the
+	libtool/gettext tests.
+
+	In case someone will ever reports a failure due to extra whitespace in
+	either $(abs_srcdir) or or $(abs_builddir), we will simply enhance our
+	'configure.ac' to bail out flatly and loudly at such a setup.
+
+	* t/ax/test-init.sh: Simplify accordingly.
+
+2012-06-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: avoid spurious maintainer-check failures
+
+	* t/ax/test-init.sh: Here, by adding extra quoting for two
+	occurrences of the string "perl".
+
+2012-06-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: remove obsolete hacks around maintainer-check false positives
+
+	* gen-testsuite-part, t/test-trs-recover.sh: Here.
+
+2012-06-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'simplify-exit-trap-workaround' into maint
+
+	* simplify-exit-trap-workaround:
+	  tests: simpler workaround for shells losing the exit status in exit trap
+
+	+ Extra non-trivial edits:
+
+	* t/am-missing-prog.sh: Use 'exit, not 'Exit'.
+
+2012-06-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	coverage: tests AM_MISSING_PROG usage
+
+	Now that AM_MISSING_PROG is documented, we want to make sure it
+	works as expected when used in third-party code.
+
+	* t/am-missing-prog.sh: New test.
+	* t/ammissing: Rename ...
+	* t/am-macro-not-found.sh: ... like this, to avoid confusion (this
+	test has nothing to do with the 'missing' script nor with the
+	'AM_MISSING_PROG' macro).
+	* t/list-of-tests.mk: Adjust.
+
+2012-06-28  Eric Blake  <eblake@redhat.com>
+
+	docs: document AM_MISSING_PROG
+
+	Addresses automake bug#11793.
+
+	This macro has been present for a long time, and coreutils has been
+	relying on it despite no documentation, which argues that it is stable
+	enough to be worth documenting.
+
+	Furthermore, since we are hoping to change our preferred invocation
+	from 'missing --run program' to 'missing program' in a future version
+	of automake, we need a way for packages to consistently get the
+	preferred invocation form rather than open-coding a call to 'missing'.
+	In particular, the Autoconf manual would love to recommend this macro
+	when discussing how to integrate an autotest suite with automake.
+
+	* doc/automake.texi (Public Macros): Document AM_MISSING_PROG.
+
+2012-06-27  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fix a spurious failure with Solaris make
+
+	* t/subdir-order.sh: Run make in parallel only if the make implementation
+	truly supports it.
+
+2012-06-27  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	parallel-tests: "recheck" behaves better in case of compilation failures
+
+	With this change, the "recheck" target behaves better in the face of build
+	failures related to previously failed tests.  For example, if a test is a
+	compiled program that must be rerun by "make recheck", and its compilation
+	fails, that test will still be rerun by further "make recheck" invocations.
+	Previously, its '.log' and '.trs' would have both been lost, so that the
+	test would have not been re-run.
+
+	This change fixes automake bug#11791.
+
+	* NEWS: Update.
+	* lib/am/check.am (recheck, check-TESTS): Adjust to cater to scenario
+	described above.
+	* t/parallel-tests-recheck-pr11791.sh: New test.
+	* t/list-of-tests.mk: Add it.
+
+2012-06-27  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	scripts: quote 'like this', not `like this'
+
+	* lib/test-driver.sh: Here.
+
+2012-06-25  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: simpler workaround for shells losing the exit status in exit trap
+
+	Now that we can assume our tests are run by a decent POSIX shell, we
+	can simplify our workaround aimed at having the exit status propagated
+	correctly to the code in the exit trap.  Unfortunately, we cannot
+	dispense with such a workaround altogether, because it's still required
+	by some shells we need to support (at least Solaris 10 /bin/ksh and
+	/usr/xpg4/bin/sh).
+
+	For more information about the need of that workaround, see the entry
+	about 'trap' in the section "Limitations of Shell Builtins" in the
+	Autoconf manual:
+	<http://www.gnu.org/software/autoconf/manual/autoconf.html#trap>
+
+	The new workaround has been tested successfully with the following
+	shells:
+
+	  - Bash 4.1
+	  - Bash 3.2
+	  - Bash 3.0
+	  - Bash 2.05b
+	  - dash 0.5.5.1
+	  - dash 0.5.2
+	  - AT&T Ksh 93u (from official Debian package)
+	  - MirBSD Korn Shell 40.2 (from official Debian package)
+	  - Solaris 9, 10 and 11 /bin/ksh
+	  - Solaris 9, 10 and 11 /usr/xpg4/bin/sh
+	  - NetBSD 5.1 /bin/sh
+	  - NetBSD 5.1 /bin/ksh
+
+	* t/ax/test-init.sh (Exit): Rename ...
+	(_am_exit): ... like this.
+	(exit): New alias for '_am_exit'.  We cannot simply redefine 'exit'
+	as a shell function, because some shells (dash 0.5.5.1, Solaris 10
+	/bin/ksh and /usr/xpg4/bin/sh) do not allow it.
+	(_am_exit, trap): Add extra escaping for 'exit' calls, to ensure we
+	really invoke the 'exit' builtin and not our alias with the same
+	name.
+	* configure.ac: Check that the shell selected to run our testsuite
+	supports aliases named like shell builtins.
+	* t/REAMDE: Adjust.
+	* All tests: Adjust, by simply using 'exit' instead of 'Exit'.
+	* t/self-check-explicit-skips.sh: Adjust: the first usage of 'exit'
+	after it has been redefined as an alias must be on a new line w.r.t.
+	that where the alias is defined, in order for the redefinition to be
+	honored.
+	* syntax-checks.mk (sc_tests_Exit_not_exit): Delete.
+	(sc_tests_exit_not_Exit): New.
+	(syntax_check_rules): Adjust.
+	(sc_tests_automake_fails): Simplify the recipe a little.
+	* Several tests: Remove now useless spurious quoting once required
+	to placate the 'sc_tests_Exit_not_exit' maintainer check.
+	* gen-testsuite-part: Likewise.  Also, avoid uses of 'Exit' in the
+	generated scripts.
+
+2012-06-24  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: avoid several spurious failures on Solaris
+
+	* t/ax/is_newest: Rewrite to be Bourne-compatible, for /bin/sh shells like
+	Solaris' that are not POSIX-conforming.  The script is so small that such
+	a rewrite is easier than going through the hoops that would be required to
+	ensure this script is always executed with a POSIX shell.
+	* t/ax/is: Add a comment stating that this script is to be kept Bourne
+	compatible as well.
+
+2012-06-24  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: avoid a spurious failure on NetBSD
+
+	* t/maken.sh: Do not expect the timestamp of the current directory
+	to be unchanged after a "make -n".
+
+2012-06-23  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fix automatic re-execution of tests with Zsh
+
+	* defs: Use '$argv0' instead of '$0'.  With Zsh not started right
+	away in Bourne-compatibility mode, the latter will be the path not
+	of the test script itself, but of the file it's currently sourcing
+	-- i.e., in our case, './defs'.  This would cause the automatic
+	re-execution code to execute './defs' (basically a no-op) rather
+	than re-run the test correctly.
+
+2012-06-23  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: drop support for older Zsh shells
+
+	* defs-static.in: Here.  The fact that such support has been broken for
+	almost a year (only fixed by today's commit 'v1.12.1-57-gf1e0300'),
+	causing no bug reports from anyone, shows that such support is not truly
+	warranted.  And it will get in the way of future improvements in the
+	handling of the exit trap (because bugs in older Zsh versions will
+	prevent some of our planned improvements).  So just drop it.
+	* t/README: Remove obsolete advice for working around bugs in older
+	versions of Zsh; instead, indicate version 4.3 is the oldest Zsh now
+	supported.
+
+2012-06-23  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: allow AM_TEST_RUNNER_SHELL to be overridden
+
+	* defs-static.in: Here.  This will make it easier for the maintainer
+	to run some self checks (like those in 't/self-check-exit.tap') with
+	different shells, to look for possible portability problems.  Fix a
+	typo (doubled "the") while we are at it.
+
+2012-06-23  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fix setup for older Zsh
+
+	* defs-static.in: After the addition of TAP-based tests and our renaming
+	of "simple" test scripts from 'tests/foo.test' to 't/foo.sh', a test name
+	is valid if it matches the wildcard "*.sh" or "*.tap", not the wildcard
+	"*.test".  Adjust accordingly.
+
+2012-06-23  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: avoid one last `...` command substitution in 'test-init.sh'
+
+	* t/ax/test-init.sh (me): In the definition of this variable.  This
+	also shave off a couple of forks, and the need for a sanity check
+	only required in fringe situations.
+
+2012-06-23  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maintcheck: guard against `...` for command substitution in test cases
+
+	But still allow them in configure.ac, Makefile.am and shell scripts
+	created or used inside test cases itself, because Autoconf (as of
+	version 2.69) does not yet ensure that $CONFIG_SHELL will be set to
+	a proper POSIX shell.
+
+	* syntax-checks.mk (sc_tests_command_subst): New check.
+	(syntax-check_rules): Add it.
+	* t/tap-global-log.sh: Minimal tweakings to avoid triggering the
+	new maintainer check.
+
+2012-06-22  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: more uses of $(...) over `...` for command substitution
+
+	Somehow missed by the previous changes.  No big deal, fix them now.
+
+	* t/ax/depcomp.sh: Here.
+	* t/autodist.sh: And here.
+	* t/autodist-no-duplicate.sh: And here.
+	* t/autodist-subdir.sh: Ad here.
+	* t/remake11.sh t/self-check-me.tap: And here.
+	* t/perf/testsuite-summary.sh: And here.
+	* t/perf/testsuite-recheck.sh: And here.
+
+2012-06-22  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	cosmetics: quote `like this', not 'like this', in a couple of tests
+
+	* t/ansi2knr-no-more.sh: Here.
+	* t/aclocal-verbose-install.sh: And here.
+
+2012-06-22  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	readme: clarify/extend few entries in 't/README'
+
+	* t/README (Writing test cases): Here.
+
+2012-06-22  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	readme: better separation of entries in 't/README'
+
+	* t/README (Writing test cases): Prepend different entries with a '*'
+	character acting like a bullet in a list.  This make different entries
+	better separated, visually-wise.  Minor related reformatting.
+
+2012-06-22  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	readme: subsections "Do" and "Do not" in 't/README' merged
+
+	* t/README (Writing test cases): Merge subsections "Do" and "Do not".
+	The distinction was rather artificial, and more confusing than helpful.
+
+2012-06-22  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: new requirement 'grep-nonprint'
+
+	* t/ax/test-inist.sh ($esc): New, a literal escape character.
+	(grep-nonprint): New requirement, check that the grep implementation
+	available that can handle non-printing characters correctly.
+	* t/color.sh: Use it instead of hand-rolled equivalent, and do not
+	(re)define '$esc' explicitly.
+	* t/color2.sh: Likewise.
+	* t/tap-color.sh: Likewise.
+	* t/vtexi4.sh: Likewise.
+	* t/parallel-tests-no-color-in-log.sh: Likewise.  Also prefer the use
+	of grep over that of $FGREP, because the new requirement only check
+	grep, and ensure we only grep non-printing characters from a pipe, to
+	avoid hitting a BSD grep limitation.
+	* t/parallel-tests-reset-term.sh: Likewise.
+	* t/ax/tap-summary-aux.sh: Use '$esc' instead of hard-coding the
+	literal escape character.
+
+2012-06-22  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	cosmetics: fix description of an expected error message in a test
+
+	* t/vartypo2.sh: Here.  This reflects the change from `this style'
+	of quoting to 'this style'.
+
+2012-06-22  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: assume automake quotes 'like this', not `like this'
+
+	* t/add-missing.tap: Here.  This slightly simplifies and/or enhances
+	some grepping checks on automake diagnostic.
+
+2012-06-22  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: prefer using 'is_newest' over 'ls -t' hacks
+
+	To verify that a file 'new' is newer than the file 'old', it's much
+	cleaner to use "is_newest new old" rather than the more clumsy
+	"ls -t". Adjust several of our tests accordingly.
+
+	* syntax-checks.mk (sc_tests_ls_t): New check, guard against uses
+	of "ls -t" and similar.
+	(syntax_check_rules): Add it.
+	* t/maken.sh: Adjust.
+	* t/autohdr4.sh: Likewise.
+	* t/extradep2.sh: Likewise.
+	* t/lex-depend-cxx.sh: Likewise.
+	* t/extradep.sh: Likewise.
+	* t/yacc-depend2.sh: Likewise.
+	* t/yacc-pr204.sh: Likewise.
+	* t/lex-pr204.sh: Likewise.
+	* t/yacc8.sh: Likewise.
+	* t/acloca13.sh: Likewise.
+	* t/lex-depend.sh: Likewise, and enhance.
+	* t/acloca14.sh: Likewise.
+	* t/aclocal7.sh: Likewise.
+
+2012-06-22  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: implement is_newest as an auxiliary script, not shell function
+
+	This will allow to also use it in the makefile recipes used in our
+	test cases.
+
+	* t/ax/test-init.sh (is_newest): Remove.
+	* t/ax/is_newest: New script.
+	* Makefile.am (EXTRA_DIST): Add it.
+
+2012-06-22  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fix some spurious failures in VPATH setup
+
+	* t/self-check-cleanup.tap: No need to copy the 'ax/t/test-init.sh'
+	file over in our temporary directory.
+	* t/self-check-reexec.tap: Likewise.
+
+2012-06-22  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: work in VPATH setup again
+
+	* defs: Drop overly paranoid sanity checks that was causing all the tests
+	to fail spuriously when run in a VPATH setup, with a message like:
+	"../t/nodef.sh: ./t/ax/test-init.sh: not found in current directory".
+	Those checks looked for invariants that, even if broken, would still
+	cause the test to fail very early and with a pretty clear error message
+	anyway.
+
+2012-06-22  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: automatic re-execution works for non-POSIX shells too
+
+	Some inferior shells are too greedy in parsing their input.  If a
+	non-POSIX Bourne shell (like Solaris 10 /bin/sh) was used to launch
+	one of our test scripts, it would fail unconditionally, because it
+	unexpectedly saw some (by it) unsupported constructs, notwithstanding
+	such constructs being placed *after* the code implementing automatic
+	test re-execution with a better shell.  In conclusion, the shell
+	bailed out like this:
+
+	    $ /bin/sh t/ar.sh
+	    $ t/ar.sh: syntax error at line 257: `is_newest_files=$' unexpected
+
+	By moving all the potentially problematic code in a separate file, to
+	be sourced only after the code for automatic re-execution with a better
+	shell, we ensure that inferior shell cannot see such code by mistake.
+
+	* defs: All code after automatic shell re-execution moved out ...
+	* t/ax/test-init.sh: ... to this new file.
+	* syntax-checks.mk (xdefs): Add it.
+	* Makefile.am (dist_check_DATA): Add it.  Also move in 'defs' from
+	a less explicit 'check_DATA' declaration.
+	(nodist_check_DATA):  Move in 'defs-static' from a less explicit
+	'check_DATA' declaration.
+	(check_DATA): Remove.
+	* t/self-check-sanity.sh: Remove, it was actually too hacky and brittle,
+	sanity-checking situations we don0t actually care about.
+	* t/list-of-tests.mk: Adjust.
+	* t/self-check-explicit-skips.sh: Adjust, and fix a botched heading
+	comments while we are at it.
+	* t/self-check-reexec.tap: Adjust.
+	* t/self-check-cleanup.tap: Likewise.
+
+2012-06-22  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: use more POSIX shell features our test scripts
+
+	Since commit 'v1.12-36-g2d68fd9' of 2012-05-07, "configure: search a
+	sturdy POSIX shell to be used in the testsuite", the shell running
+	our test script is assured to be a POSIX-conforming shell, so we can
+	use the more modern and flexible idioms and features that we couldn't
+	use when we also aimed at compatibility with non-POSIX Bourne shells,
+	like Solaris /bin/sh.
+
+	* t/README: Suggest to use POSIX shell features liberally in test cases,
+	with possible exception of Makefile recipes and configure shell code.
+	* Several tests: Adjust to use more POSIX shell features; e.g., $(...)
+	rather than `...`, $((...)) rather than `expr ...`, "if ! CMD; then ..."
+	instead of "if CMD; then :; else ...", and so on.
+	In several places, when using the 'test' built-in, prefer '-eq' over
+	'=' for numeric comparisons, and prefer "grep -c PATTERN FILE" over
+	"grep PATTERN FILE | wc -l".
+	Throw in other low-hanging easy improvements and fixlets while we are
+	at it.
+	* t/ax/depcomp.sh, t/ax/tap-summary-aux.sh, t/ax/tap-functions.sh,
+	defs, defs-static.in: Likewise.
+
+2012-06-21  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	docs: avoid failures with development version of Texinfo (4.13.90)
+
+	* doc/automake-history.texi: Use '@item' instead of '@itemx' where
+	appropriate.
+
+2012-06-21  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	typofix: s/test derivers/test drivers/ in check.am comments
+
+2012-06-20  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	typofix: s/env/even/ in comments in GNUmakefile
+
+	Spotted by Eric Blake.
+
+2012-06-20  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	bootstrap: overhaul and improve
+
+	This fixes several weaknesses and buglets in the 'bootstrap' convenience
+	target offered in GNUmakefile (and its supporting code).  Refer to the
+	extensive code comments in there for more details.
+
+	* GNUmakefile: Almost completely rewritten.
+
+2012-06-20  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	docs: quote 'like this', not `like this'
+
+	* doc/automake.texi: Fix the reported warnings and informative messages
+	from automake to quote 'like this' rather than as `like this'.  Do the
+	same for comments and some text in our examples.
+
+2012-06-15  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'docs-recursion' into maint
+
+	* docs-recursion:
+	  docs: recursive make considered harmful
+
+2012-06-15  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'silent-custom' into maint
+
+	* silent-custom:
+	  silent: new $(AM_V_P) variable, tell if we're running in silent mode
+	  refactor: silent rules handling (a little)
+	  refactor: &define_verbose_var: accept a third optional argument
+
+2012-06-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: minor reorganization of few tests
+
+	* t/subdir3.sh: Rename ...
+	* t/sourcefile-in-subdir.sh: ... like this.
+	* t/subdir4.sh: Rename ...
+	* t/depcomp-implicit-auxdir.sh: ... like this.
+	* t/subdir6.sh: Rename ...
+	* t/confh-subdir-clean.sh: ... like this.
+	* t/subdir7.sh: Renamed ...
+	* t/dir-named-obj-is-bad.sh: ... like this, and enhance.
+	* t/srcsub.sh, t/srcsub2.sh: Unify ...
+	* t/src-acsubst.sh: ... as this test.
+	* t/list-of-tests.mk: Adjust.
+
+2012-06-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	fixup: adjust t/list-of-tests.mk for renamed/added tests
+
+2012-06-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	subdirs: enhance coverage, tweak and rename few tests
+
+	* t/subdir5.sh: Rename ...
+	* t/subdir-add-pr46.sh: ... like this.
+	* t/subdir8.sh: Rename ...
+	* t/subdir-add2-pr46.sh: ... like this.
+	* t/cond2.sh: Rename ...
+	* t/subdir-cond-err.sh: ... like this.
+	* t/subdir9.sh: Rename ...
+	* t/subdir-with-slash.sh: ... like this; improve heading comments.
+	* t/subcond.sh: Rename ...
+	* t/subdir-cond-gettext.sh: ... like this; improve m4 quoting.
+	* t/subcond2.sh: Rename ...
+	* t/subdir-am-cond.sh: ... like this; adjust heading comments.
+	* t/subcond3.sh: Rename ...
+	* t/subdir-ac-subst.sh: ... like this; adjust heading comments.
+	* t/subdir2.sh: Rename ...
+	* t/subdir-subsub.sh: ... like this; enhance so that it also runs
+	'./configure' and 'make'.
+	* t/subdir-order.sh: New test, check that the $(SUDBIRS) entries
+	are processed in the order they are specified.
+	* doc/automake.texi: Adjust references to tests.
+
+2012-06-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	sync: update files from upstream with "make fetch"
+
+	* lib/config.guess, lib/gitlog-to-changelog, lib/texinfo.tex: Update.
+
+2012-06-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	py-compile: consistently quote 'like this', not `like this'.
+
+	* lib/py-compile (usage_error): Here.
+
+2012-06-12  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	docs: recursive make considered harmful
+
+	In the documentation, we shouldn't confuse "packages using subdirectories"
+	with "packages using recursive make invocations".  A package can have a
+	careful organization in subdirectories, make no (or almost no) use of make
+	recursion (examples of such packages are GNU bison, GNU cppi, and Automake
+	itself).
+
+	In fact, make recursion should be used as seldom as possible, because it
+	makes the build system more brittle and dependency declarations less
+	faithful.  See Peter Miller's article "Recursive Make Considered Harmful"
+	for more a more in-depth discussion:
+
+	    http://miller.emu.id.au/pmiller/books/rmch/
+
+	* doc/automake.texi (Directories): Clarify how a build system based on
+	make recursion does.  Observe that such a system, albeit being very
+	widespread, has its own issues and drawbacks, and that one can have a
+	non-recursive setup also for projects using complex directory layout.
+	(Recursing subdirectories): Speak of "packages that use make recursion"
+	rather than of "packages with subdirectories".
+
+2012-06-12  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'subdirs-simplify' into maint
+
+	* subdirs-simplify:
+	  docs: clean rules are not run in reverse order of build rules anymore
+
+2012-06-12  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	docs: clean rules are not run in reverse order of build rules anymore
+
+	At least since commit 'v1.12.1-12-gec6a135' of 2012-06-10, "subdirs: unify
+	rules for "cleaning" and "normal" recursive targets"
+
+	* doc/automake.texi (Recursing subdirectories): Adjust.
+
+2012-06-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'subdir-objects-pr10697' into maint
+
+	* subdir-objects-pr10697:
+	  maintcheck: fix failures, both real and spurious
+
+2012-06-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maintcheck: fix failures, both real and spurious
+
+	* syntax-checks.mk (sc_rm_minus_f): Whitelist the
+	't/subobj-clean*-pr10697.sh' tests.
+	* t/subobj-clean-pr10697.sh: When redefining PATH,
+	use '$PATH_SEPARATOR', not hard-coded ':'.
+	* t/subobj-clean-lt-pr10697.sh: Likewise.
+
+2012-06-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: merged some testsuite fixlets
+
+	* fix-cxx-libtool-demo:
+	  tests: avoid failure due to libtool quirks in C++ demo test
+
+	* subdir-objects-pr10697:
+	  tests: fix spurious failures due to missing '$sleep'
+
+	* subdirs-simplify:
+	  subdir tests: avoid an use of "make -j4", for portability
+
+2012-06-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	subdir tests: avoid an use of "make -j4", for portability
+
+	Otherwise, a spurious failure with Solaris CCS make can be triggered.
+	The coverage is not actually reduced, since the code path is still
+	covered when one runs the testsuite with AM_TESTSUITE_MAKE="make -jN"
+	(as should be done periodically).
+
+	* t/subdir-distclean.sh : Call simply "make maintainer-check", not
+	"make -j4 maintainer-check".
+
+2012-06-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: avoid failure due to libtool quirks in C++ demo test
+
+	Revealed by failures on NetBSD 5.1.
+
+	* t/cxx-lt-demo.sh: In "make distcheck" invocation, don't define 'CC'
+	to "false", as that value would be exported and passed to the child
+	./configure invocation, and some configure checks generated by libtool
+	autoconf macros can still require a C preprocessor even for packages
+	using only C++, and bail out if it's not found.  The problem was not
+	apparent on Solaris and GNU/Linux because those systems have a
+	'/lib/cpp' program, and configure detected and used that as a fallback
+	C preprocessor.
+
+2012-06-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fix spurious failures due to missing '$sleep'
+
+	Revealed by failures on NetBSD 5.1.
+
+	* t/subobj-clean-pr10697.sh: Call '$sleep' before modifying the
+	files that should trigger an automatic remake.
+	* t/subobj-clean-lt-pr10697.sh: Likewise.
+
+2012-06-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branches 'subdirs-simplify' and 'subdir-objects-pr10697' into maint
+
+	* subdirs-simplify:
+	  subdirs: unify rules for "cleaning" and "normal" recursive targets
+	  tests: add a "demo" test on C support
+
+	* subdir-objects-pr10697:
+	  subdir-objects: improve "make mostlyclean" efficiency and flexibility
+	  tests: look for '.lo' rather than '.o' object when using Libtool with C++
+	  cosmetics: few typofixes in older ChangeLogs, suggested by "codespell.py"
+
+2012-06-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	subdirs: unify rules for "cleaning" and "normal" recursive targets
+
+	Before this change, the recursive invocation of cleaning targets in
+	the $(SUBDIRS) where done in inverse order, i.e., starting from the
+	last $(SUBDIRS) entry and proceeding towards the first.  According
+	to the code comments, this was done ...
+
+	    ... in an attempt to alleviate a problem that can happen when
+	    dependencies are enabled.  In this case, the .P file in one
+	    directory can depend on some automatically generated header
+	    in an earlier directory.  Since the dependencies are required
+	    before any target is examined, make bombs.
+
+	But this comment does not apply anymore to the current implementation
+	of automatic dependency tracking: the '.Po' and '.Plo' files does not
+	depend on any C header or source file, ever!
+
+	So it seems that the distinction between "normal" and "cleaning"
+	recursive targets is a stale leftover of an older implementation of
+	the automatic dependency tracking.  In fact, the Automake History
+	manual seems to confirm this suspect; the section "First Take on
+	Dependency Tracking" reads:
+
+	    Because each .P file was a dependency of Makefile, this meant
+	    that dependency tracking was done eagerly by make.  For instance,
+	    "make clean" would cause all the dependency files to be updated,
+	    and then immediately removed.  This eagerness also caused problems
+	    with some configurations; if a certain source file could not be
+	    compiled on a given architecture for some reason, dependency
+	    tracking would fail, aborting the entire build.
+
+	and the following section "Dependencies As Side Effects" reads:
+
+	    In this approach, the .P files were included using the -include
+	    command, which let us create these files lazily.  This avoided
+	    the "make clean" problem.
+
+	So the distinction between "normal" and "cleaning" recursive targets
+	has likely been obsolete since by then already.  We can thus remove
+	such distinction, thus reducing some complications and duplication in
+	our rules.  Doing so, the whole testsuite still passes (both with GCC
+	and Sun C 5.9), even the test 'c-demo.sh', which, among the other
+	things, exercise the setup described in the obsolete code comment
+	referenced above.
+
+	Finally, note that we still keep '$(RECURSIVE_CLEAN_TARGETS)' and
+	'$(RECURSIVE_TARGETS)' as two distinct variables, to ensure a better
+	backward-compatibility for any user-defined rules that happen to use
+	those variables.
+
+	* NEWS: Update.
+	* lib/am/subdirs.am ($(RECURSIVE_CLEAN_TARGETS), $(CLEAN_TARGETS)):
+	Merge their recipes.
+	* t/subdir-distclean.sh: New test, check that "./configure && make
+	&& make distclean" is actually a no-op, even when conditional SUBDIRS
+	are involved.
+	* t/list-of-tests.mk: Add it.
+
+2012-06-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: add a "demo" test on C support
+
+	Showing and testing non-trivial use of C support, and its interaction
+	with other features.
+
+	* t/c-demo.sh: New test.
+	* t/list-of-tests.mk: Add it.
+
+2012-06-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: look for '.lo' rather than '.o' object when using Libtool with C++
+
+	* t/cxx-lt-demo.sh: ... in this test.
+
+2012-06-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	cosmetics: few typofixes in older ChangeLogs, suggested by "codespell.py"
+
+	The typofixes offered by this patch have been suggested by the
+	"codespell.py" script.  Reference:
+	<http://git.profusion.mobi/cgit.cgi/lucas/codespell/>
+
+	* old/ChangeLog.01, old/ChangeLog.02, old/ChangeLog.03: Fix few typos.
+
+2012-06-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	silent: new $(AM_V_P) variable, tell if we're running in silent mode
+
+	Addresses part of automake bug#8665.
+
+	* automake.in (handle_silent): Define a new make variable '$(AM_V_P)',
+	that expands to a shell conditional that can be used in make recipes to
+	determine whether they are being run in silent mode or not.  The choice
+	of the name derives from the LISP convention of appending the letter
+	'P' to denote a predicate (see also "the '-P' convention" in the Jargon
+	File); we do so for lack of a better convention.
+	* t/automake.texi, NEWS: Document the new variable.
+	* t/silent6.sh: Adjust and extend.  Move out the checks that didn't
+	actually deal with user extension of silent rules ...
+	* t/silent-obsolescent-warns.sh: ... into this test (bound to be
+	removed once 'maint' is merged into the 'master' branch).
+	* t/list-of-tests.mk: Add the new test.
+
+2012-06-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	refactor: silent rules handling (a little)
+
+	* automake.in (handle_languages): Move definition of $(AM_V_GEN)
+	variable ...
+	(define_verbose_tagvar): ... and of '$(AM_V_at)' variable ...
+	(handle_silent): ... in this new subroutine.
+	(generate_makefile): Call it.
+
+2012-06-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	refactor: &define_verbose_var: accept a third optional argument
+
+	This is only required by future changes.
+
+	* automake.in (define_verbose_var): Accept a third optional argument,
+	specifying the value to assign to the given make variable when silent
+	rules are disabled.
+
+2012-06-10  Jim Meyering  <meyering@redhat.com>
+
+	maint: grammar fixes: s/all these/all of these/
+
+	Run this command:
+	  git grep -li '\<all.these\>' \
+	    |xargs perl -pi -e 's/\b([Aa])ll these\b/${1}ll of these/'
+
+2012-06-10  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	subdir-objects: improve "make mostlyclean" efficiency and flexibility
+
+	Fixes automake bug#10697.
+
+	Before this change, the generated Makefile issued one 'rm' invocation
+	for each subdir object file.  Not only was this very inefficient when
+	there were several such files, but it also caused stale object files
+	to be left behind when a source file was renamed or removed.
+
+	* automake.in (handle_single_transform): When a subdir object is seen,
+	update '%compile_clean_files' to clean all the compiled objects in its
+	same subdirectory, and all the libtool compiled objects ('.lo') there
+	as well is that subdir object is a libtool one.
+	* t/subobj-clean-pr10697.sh: New test.
+	* t/subobj-clean-lt-pr10697.sh: Likewise.
+	* t/list-of-tests.mk: Add them.
+	* NEWS: Update.
+
+2012-06-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: look for '.lo' rather than '.o' object when using Libtool with C++
+
+	* t/cxx-lt-demo.sh: ... in this test.
+
+2012-06-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	cosmetics: few typofixes in older ChangeLogs, suggested by "codespell.py"
+
+	The typofixes offered by this patch have been suggested by the
+	"codespell.py" script.  Reference:
+	<http://git.profusion.mobi/cgit.cgi/lucas/codespell/>
+
+	* old/ChangeLog.01, old/ChangeLog.02, old/ChangeLog.03: Fix few typos.
+
+2012-06-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: add basic semantic tests on C++ support
+
+	Strange as it might seem, we were still missing them (yikes).
+
+	* t/cxx-demo.sh: New test.
+	* t/cxx-lt-demo.sh: Likewise (using libtool).
+	* t/list-of-tests.mk: Add them.
+
+2012-06-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: minor tweak to 't/objc-megademo.sh'
+
+	* t/objc-megademo.sh (am_create_testdir): Define to "empty" before
+	including ./defs, because this test doesn't rely on the files usually
+	pre-set by the setup in there.
+
+2012-06-02  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: document deprecation of configure.in
+
+	* NEWS (Warnings and deprecations): We now warn if 'configure.in' is
+	used instead of 'configure.ac' as autoconf input.
+	(Future backward-incompatibilities): Adjust.
+
+2012-06-02  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: put planned backward compatibilities early
+
+	* NEWS (Future backward-incompatibilities): Put them in the news
+	entries for the future 1.12.2 release.
+
+2012-06-01  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	sync: update files from upstream with "make fetch"
+
+	* lib/config.sub, lib/gitlog-to-changelog, lib/texinfo.tex: Update.
+
+2012-06-01  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: deprecate 'configure.in' as autoconf input
+
+	It has been years since that has been deprecated in the documentation,
+	in favour of 'configure.ac':
+
+	    Previous versions of Autoconf promoted the name configure.in, which
+	    is somewhat ambiguous (the tool needed to process this file is not
+	    described by its extension), and introduces a slight confusion with
+	    config.h.in and so on (for which '.in' means "to be processed by
+	    configure"). Using configure.ac is now preferred.
+
+	It's now time to start giving runtime warning about the use of
+	'configure.in', so that support for it can be removed in future
+	versions of autoconf/automake.
+
+	See also, in the Autoconf repository, commit 'v2.69-4-g560f16b' of
+	2012-05-23, "general: deprecate 'configure.in' as autoconf input".
+
+	* lib/Automake/Configure_ac.pm: Issue a warning in the 'obsolete'
+	category if 'configure.in' is detected.  Since this module is synced
+	from Automake, this change is to be backported there (and will be
+	soon).
+	* t/help.sh: Adjust.
+	* t/configure.sh: Adjust and enhance.
+
+2012-06-01  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: post-release minor version bump
+
+	* configure.ac (AC_INIT): Bump version number to 1.12.1a.
+	* m4/amversion.m4: Likewise (automatically regenerated by
+	"make bootstrap").
+
 2012-06-01  Stefano Lattarini  <stefano.lattarini@gmail.com>
 
 	release: stable release 1.12.1

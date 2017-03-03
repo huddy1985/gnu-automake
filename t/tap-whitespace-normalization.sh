@@ -15,12 +15,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # TAP support: whitespace normalization (or lack thereof) in the testsuite
-# progress output on console.  We keep all these checks here in a single
+# progress output on console.  We keep all of these checks here in a single
 # script so that a potential cosmetic change in the output format won't
 # force us to tweak dozens of other tests (hopefully).
 # See also related test 'tap-todo-skip-whitespace.test'.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat > Makefile.am << 'END'
 TEST_LOG_COMPILER = cat

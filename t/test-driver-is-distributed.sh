@@ -19,9 +19,9 @@
 #    defined in a subdir Makefile
 
 am_create_testdir=empty
-. ./defs || Exit 1
+. ./defs || exit 1
 
-ocwd=`pwd` || fatal_ "getting current working directory"
+ocwd=$(pwd) || fatal_ "getting current working directory"
 
 do_check ()
 {

@@ -17,7 +17,7 @@
 # Test to make sure nodist_noinst_HEADERS work.
 # For PR 249.
 
-. ./defs || Exit 1
+. ./defs || exit 1
 
 cat >> configure.ac <<'EOF'
 AC_OUTPUT
@@ -32,7 +32,7 @@ EOF
 $ACLOCAL
 $AUTOCONF
 $AUTOMAKE -a
-./configure --prefix "`pwd`/install"
+./configure --prefix "$(pwd)/install"
 $MAKE install-data
 
 :
