@@ -1,7 +1,7 @@
 This is automake.info, produced by makeinfo version 4.13 from
 /home/stefano/src/am/branches/trunks/doc/automake.texi.
 
-This manual is for GNU Automake (version 1.12, 21 April 2012), a
+This manual is for GNU Automake (version 1.12.1, 1 June 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -32,7 +32,7 @@ File: automake.info,  Node: Top,  Next: Introduction,  Up: (dir)
 GNU Automake
 ************
 
-This manual is for GNU Automake (version 1.12, 21 April 2012), a
+This manual is for GNU Automake (version 1.12.1, 1 June 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -174,6 +174,7 @@ Building Programs and Libraries
 * Yacc and Lex::                Yacc and Lex support
 * C++ Support::                 Compiling C++ sources
 * Objective C Support::         Compiling Objective C sources
+* Objective C++ Support::       Compiling Objective C++ sources
 * Unified Parallel C Support::  Compiling Unified Parallel C sources
 * Assembly Support::            Compiling assembly sources
 * Fortran 77 Support::          Compiling Fortran 77 sources
@@ -1686,10 +1687,10 @@ the strictness level.
 that is similar to strictness but handled differently.  This mode is
 useful for packages that are put into a "Cygnus" style tree (e.g., older
 versions of the GCC and gdb trees).  *Note Cygnus::, for more
-information on this mode.  Please note that this mode is deprecated and
-_will be removed in the future automake versions_; you must avoid its
-use in new packages, and should stop using it in existing packages as
-well.
+information on this mode.  Please note that this mode _is deprecated
+and will be removed in the next major Automake release (1.13)_; you
+must avoid its use in new packages, and should stop using it in
+existing packages as well.
 
 
 File: automake.info,  Node: Uniform,  Next: Length Limitations,  Prev: Strictness,  Up: Generalities
@@ -2214,7 +2215,7 @@ misunderstand this paragraph: `automake' runs `autoconf' to *scan* your
      Causes the generated `Makefile.in's to follow Cygnus rules, instead
      of GNU or Gnits rules.  For more information, see *note Cygnus::.
      Note that _this mode of operation is deprecated, and will be
-     removed_ in a future Automake release.
+     removed_ in the next major Automake release (1.13).
 
 `-f'
 `--force-missing'
@@ -2569,6 +2570,10 @@ their effects are:
 
 `AC_PROG_OBJC'
      This is required if any Objective C source is included.  *Note
+     Particular Program Checks: (autoconf)Particular Programs.
+
+`AC_PROG_OBJCXX'
+     This is required if any Objective C++ source is included.  *Note
      Particular Program Checks: (autoconf)Particular Programs.
 
 `AC_PROG_F77'
@@ -3370,11 +3375,11 @@ File: automake.info,  Node: Public Macros,  Next: Obsolete Macros,  Up: Macros
 
      This macro can also be called in _another, deprecated form_
      (support for which will be _removed in the next major Automake
-     release_): `AM_INIT_AUTOMAKE(PACKAGE, VERSION, [NO-DEFINE])'.  In
-     this form, there are two required arguments: the package and the
-     version number.  This form is obsolete because the PACKAGE and
-     VERSION can be obtained from Autoconf's `AC_INIT' macro (which
-     itself has an old and a new form).
+     release (1.13)_): `AM_INIT_AUTOMAKE(PACKAGE, VERSION,
+     [NO-DEFINE])'.  In this form, there are two required arguments:
+     the package and the version number.  This form is obsolete because
+     the PACKAGE and VERSION can be obtained from Autoconf's `AC_INIT'
+     macro (which itself has an old and a new form).
 
      If your `configure.ac' has:
 
@@ -3991,6 +3996,7 @@ to build programs and libraries.
 * Yacc and Lex::                Yacc and Lex support
 * C++ Support::                 Compiling C++ sources
 * Objective C Support::         Compiling Objective C sources
+* Objective C++ Support::       Compiling Objective C++ sources
 * Unified Parallel C Support::  Compiling Unified Parallel C sources
 * Assembly Support::            Compiling assembly sources
 * Fortran 77 Support::          Compiling Fortran 77 sources
@@ -4958,6 +4964,7 @@ libraries differ.
 `maude_GCJFLAGS'
 `maude_LFLAGS'
 `maude_OBJCFLAGS'
+`maude_OBJCXXFLAGS'
 `maude_RFLAGS'
 `maude_UPCFLAGS'
 `maude_YFLAGS'
@@ -4967,8 +4974,8 @@ libraries differ.
      different flags for each program.  This works for any language
      directly supported by Automake.  These "per-target compilation
      flags" are `_CCASFLAGS', `_CFLAGS', `_CPPFLAGS', `_CXXFLAGS',
-     `_FFLAGS', `_GCJFLAGS', `_LFLAGS', `_OBJCFLAGS', `_RFLAGS',
-     `_UPCFLAGS', and `_YFLAGS'.
+     `_FFLAGS', `_GCJFLAGS', `_LFLAGS', `_OBJCFLAGS', `_OBJCXXFLAGS',
+     `_RFLAGS', `_UPCFLAGS', and `_YFLAGS'.
 
      When using a per-target compilation flag, Automake will choose a
      different name for the intermediate object files.  Ordinarily a
@@ -5430,7 +5437,7 @@ seen:
      The command used to actually link a C++ program.
 
 
-File: automake.info,  Node: Objective C Support,  Next: Unified Parallel C Support,  Prev: C++ Support,  Up: Programs
+File: automake.info,  Node: Objective C Support,  Next: Objective C++ Support,  Prev: C++ Support,  Up: Programs
 
 8.10 Objective C Support
 ========================
@@ -5462,9 +5469,41 @@ file is seen:
      The command used to actually link an Objective C program.
 
 
-File: automake.info,  Node: Unified Parallel C Support,  Next: Assembly Support,  Prev: Objective C Support,  Up: Programs
+File: automake.info,  Node: Objective C++ Support,  Next: Unified Parallel C Support,  Prev: Objective C Support,  Up: Programs
 
-8.11 Unified Parallel C Support
+8.11 Objective C++ Support
+==========================
+
+Automake includes some support for Objective C++.
+
+   Any package including Objective C++ code must define the output
+variable `OBJCXX' in `configure.ac'; the simplest way to do this is to
+use the `AC_PROG_OBJCXX' macro (*note Particular Program Checks:
+(autoconf)Particular Programs.).
+
+   A few additional variables are defined when an Objective C++ source
+file is seen:
+
+`OBJCXX'
+     The name of the Objective C++ compiler.
+
+`OBJCXXFLAGS'
+     Any flags to pass to the Objective C++ compiler.
+
+`AM_OBJCXXFLAGS'
+     The maintainer's variant of `OBJCXXFLAGS'.
+
+`OBJCXXCOMPILE'
+     The command used to actually compile an Objective C++ source file.
+     The file name is appended to form the complete command line.
+
+`OBJCXXLINK'
+     The command used to actually link an Objective C++ program.
+
+
+File: automake.info,  Node: Unified Parallel C Support,  Next: Assembly Support,  Prev: Objective C++ Support,  Up: Programs
+
+8.12 Unified Parallel C Support
 ===============================
 
 Automake includes some support for Unified Parallel C.
@@ -5495,7 +5534,7 @@ source file is seen:
 
 File: automake.info,  Node: Assembly Support,  Next: Fortran 77 Support,  Prev: Unified Parallel C Support,  Up: Programs
 
-8.12 Assembly Support
+8.13 Assembly Support
 =====================
 
 Automake includes some support for assembly code.  There are two forms
@@ -5520,7 +5559,7 @@ as being files containing assembly code.
 
 File: automake.info,  Node: Fortran 77 Support,  Next: Fortran 9x Support,  Prev: Assembly Support,  Up: Programs
 
-8.13 Fortran 77 Support
+8.14 Fortran 77 Support
 =======================
 
 Automake includes full support for Fortran 77.
@@ -5580,7 +5619,7 @@ verbatim from *note Catalogue of Rules: (make)Catalogue of Rules.
 
 File: automake.info,  Node: Preprocessing Fortran 77,  Next: Compiling Fortran 77 Files,  Up: Fortran 77 Support
 
-8.13.1 Preprocessing Fortran 77
+8.14.1 Preprocessing Fortran 77
 -------------------------------
 
 `N.f' is made automatically from `N.F' or `N.r'.  This rule runs just
@@ -5599,7 +5638,7 @@ used is as follows:
 
 File: automake.info,  Node: Compiling Fortran 77 Files,  Next: Mixing Fortran 77 With C and C++,  Prev: Preprocessing Fortran 77,  Up: Fortran 77 Support
 
-8.13.2 Compiling Fortran 77 Files
+8.14.2 Compiling Fortran 77 Files
 ---------------------------------
 
 `N.o' is made automatically from `N.f', `N.F' or `N.r' by running the
@@ -5619,7 +5658,7 @@ Fortran 77 compiler.  The precise command used is as follows:
 
 File: automake.info,  Node: Mixing Fortran 77 With C and C++,  Prev: Compiling Fortran 77 Files,  Up: Fortran 77 Support
 
-8.13.3 Mixing Fortran 77 With C and C++
+8.14.3 Mixing Fortran 77 With C and C++
 ---------------------------------------
 
 Automake currently provides _limited_ support for creating programs and
@@ -5680,7 +5719,7 @@ Software, but it will be in the next major release.
 
 File: automake.info,  Node: How the Linker is Chosen,  Up: Mixing Fortran 77 With C and C++
 
-8.13.3.1 How the Linker is Chosen
+8.14.3.1 How the Linker is Chosen
 .................................
 
 When a program or library mixes several languages, Automake choose the
@@ -5689,17 +5728,19 @@ parentheses are the variables containing the link command.)
 
   1. Native Java (`GCJLINK')
 
-  2. C++ (`CXXLINK')
+  2. Objective C++ (`OBJCXXLINK')
 
-  3. Fortran 77 (`F77LINK')
+  3. C++ (`CXXLINK')
 
-  4. Fortran (`FCLINK')
+  4. Fortran 77 (`F77LINK')
 
-  5. Objective C (`OBJCLINK')
+  5. Fortran (`FCLINK')
 
-  6. Unified Parallel C (`UPCLINK')
+  6. Objective C (`OBJCLINK')
 
-  7. C (`LINK')
+  7. Unified Parallel C (`UPCLINK')
+
+  8. C (`LINK')
 
    For example, if Fortran 77, C and C++ source code is compiled into a
 program, then the C++ linker will be used.  In this case, if the C or
@@ -5721,7 +5762,7 @@ variable according to the language chosen as above.
 
 File: automake.info,  Node: Fortran 9x Support,  Next: Java Support with gcj,  Prev: Fortran 77 Support,  Up: Programs
 
-8.14 Fortran 9x Support
+8.15 Fortran 9x Support
 =======================
 
 Automake includes support for Fortran 9x.
@@ -5759,7 +5800,7 @@ is seen:
 
 File: automake.info,  Node: Compiling Fortran 9x Files,  Up: Fortran 9x Support
 
-8.14.1 Compiling Fortran 9x Files
+8.15.1 Compiling Fortran 9x Files
 ---------------------------------
 
 `FILE.o' is made automatically from `FILE.f90', `FILE.f95', `FILE.f03',
@@ -5782,7 +5823,7 @@ used is as follows:
 
 File: automake.info,  Node: Java Support with gcj,  Next: Vala Support,  Prev: Fortran 9x Support,  Up: Programs
 
-8.15 Compiling Java sources using gcj
+8.16 Compiling Java sources using gcj
 =====================================
 
 Automake includes support for natively compiled Java, using `gcj', the
@@ -5815,7 +5856,7 @@ the `--main=' option.  The easiest way to do this is to use the
 
 File: automake.info,  Node: Vala Support,  Next: Support for Other Languages,  Prev: Java Support with gcj,  Up: Programs
 
-8.16 Vala Support
+8.17 Vala Support
 =================
 
 Automake provides initial support for Vala
@@ -5860,15 +5901,15 @@ file.
 
 File: automake.info,  Node: Support for Other Languages,  Next: Dependencies,  Prev: Vala Support,  Up: Programs
 
-8.17 Support for Other Languages
+8.18 Support for Other Languages
 ================================
 
 Automake currently only includes full support for C, C++ (*note C++
-Support::), Objective C (*note Objective C Support::), Fortran 77
-(*note Fortran 77 Support::), Fortran 9x (*note Fortran 9x Support::),
-and Java (*note Java Support with gcj::).  There is only rudimentary
-support for other languages, support for which will be improved based
-on user demand.
+Support::), Objective C (*note Objective C Support::), Objective C++
+(*note Objective C++ Support::), Fortran 77 (*note Fortran 77
+Support::), Fortran 9x (*note Fortran 9x Support::), and Java (*note
+Java Support with gcj::).  There is only rudimentary support for other
+languages, support for which will be improved based on user demand.
 
    Some limited support for adding your own languages is available via
 the suffix rule handling (*note Suffixes::).
@@ -5876,7 +5917,7 @@ the suffix rule handling (*note Suffixes::).
 
 File: automake.info,  Node: Dependencies,  Next: EXEEXT,  Prev: Support for Other Languages,  Up: Programs
 
-8.18 Automatic dependency tracking
+8.19 Automatic dependency tracking
 ==================================
 
 As a developer it is often painful to continually update the
@@ -5913,7 +5954,7 @@ dependency tracking by configuring with `--disable-dependency-tracking'.
 
 File: automake.info,  Node: EXEEXT,  Prev: Dependencies,  Up: Programs
 
-8.19 Support for executable extensions
+8.20 Support for executable extensions
 ======================================
 
 On some platforms, such as Windows, executables are expected to have an

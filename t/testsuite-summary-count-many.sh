@@ -19,7 +19,6 @@
 # Incidentally, this test also checks that the testsuite summary doesn't
 # give any bug-report address if it's not defined.
 
-am_parallel_tests=yes
 . ./defs || Exit 1
 
 for s in trivial-test-driver extract-testsuite-summary.pl; do
@@ -56,9 +55,7 @@ $PERL -w -e '
   use warnings FATAL => "all";
   use strict;
 
-  # FIXME: we would like this to be 1000 or even 10000, but the current
-  # implementation is too slow to handle that :-(
-  my $base = 5;
+  my $base = 1000;
   my %count = (
     TOTAL => $base * 1000,
     PASS  => $base * 700,

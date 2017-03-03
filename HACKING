@@ -96,7 +96,7 @@
 = Working with git
 
 * To regenerate dependent files created by aclocal and automake,
-  use the 'bootstrap' script.  It uses the code from the source
+  use the 'bootstrap.sh' script.  It uses the code from the source
   tree, so the resulting files (aclocal.m4 and Makefile.in) should
   be the same as you would get if you install this version of
   automake and use it to generate those files.  Be sure to have the
@@ -223,6 +223,10 @@
   running "make fetch".  In case any file in the automake repository
   has been updated, commit and re-run the testsuite.
 
+* Ensure that the copyright notices of the distributed files is up to
+  date.  The maintainer-only target "update-copyright" can help with
+  this.
+
 * Update NEWS.
 
 * Update the version number in configure.ac.
@@ -231,13 +235,13 @@
   distinguish net and repo versions.)
 
 * Run this:
-  ./bootstrap && ./configure && make && make check && make distcheck
+  ./bootstrap.sh && ./configure && make && make check && make distcheck
 
 * Run "make git-tag-release".
-  This will run the maintainer checks, check that the NEWS file is
-  up-to-date, check that the local git repository and working tree
-  are clean and up-to-date, and create a proper signed git tag for
-  the release (based on the contents of $(VERSION)).
+  This will run the maintainer checks, verify that the local git
+  repository and working tree are clean and up-to-date, and create
+  a proper signed git tag for the release (based on the contents
+  of $(VERSION)).
 
 * Run "make git-upload-release".
   This will first verify that you are releasing from a tagged version
@@ -248,7 +252,7 @@
   use "make GNUPLOADFLAGS='--user KEY' git-upload-release".
 
 * Update version number in configure.ac to next alpha number.
-  Re-run ./bootstrap and commit.
+  Re-run ./bootstrap.sh and commit.
 
 * Don't forget to "git push" your changes so they appear in the public
   git tree.

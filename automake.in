@@ -252,9 +252,8 @@ my %standard_prefix =
 
 # Copyright on generated Makefile.ins.
 my $gen_copyright = "\
-# Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-# 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software
-# Foundation, Inc.
+# Copyright (C) 1994-$RELEASE_YEAR Free Software Foundation, Inc.
+
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -759,6 +758,24 @@ register_language ('name' => 'objc',
 		   'ld' => '$(OBJC)',
 		   'pure' => 1,
 		   'extensions' => ['.m']);
+
+# Objective C++.
+register_language ('name' => 'objcxx',
+		   'Name' => 'Objective C++',
+		   'config_vars' => ['OBJCXX'],
+		   'linker' => 'OBJCXXLINK',
+		   'link' => '$(OBJCXXLD) $(AM_OBJCXXFLAGS) $(OBJCXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
+		   'autodep' => 'OBJCXX',
+		   'flags' => ['OBJCXXFLAGS', 'CPPFLAGS'],
+		   'compile' => '$(OBJCXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_OBJCXXFLAGS) $(OBJCXXFLAGS)',
+		   'ccer' => 'OBJCXX',
+		   'compiler' => 'OBJCXXCOMPILE',
+		   'compile_flag' => '-c',
+		   'output_flag' => '-o',
+		   'lder' => 'OBJCXXLD',
+		   'ld' => '$(OBJCXX)',
+		   'pure' => 1,
+		   'extensions' => ['.mm']);
 
 # Unified Parallel C.
 register_language ('name' => 'upc',
@@ -5206,6 +5223,7 @@ sub scan_autoconf_traces ($)
 		AC_REQUIRE_AUX_FILE => 1,
 		AC_SUBST_TRACE => 1,
 		AM_AUTOMAKE_VERSION => 1,
+                AM_PROG_MKDIR_P => 0, # FIXME: to be removed in 1.13
 		AM_CONDITIONAL => 2,
 		AM_GNU_GETTEXT => 0,
 		AM_GNU_GETTEXT_INTL_SUBDIR => 0,
@@ -5364,6 +5382,14 @@ sub scan_autoconf_traces ($)
 
 	  $seen_automake_version = 1;
 	}
+      elsif ($macro eq 'AM_PROG_MKDIR_P') # FIXME: to be removed in 1.13
+	{
+	  msg 'obsolete', $where, <<'EOF';
+The 'AM_PROG_MKDIR_P' macro is deprecated, and will soon be removed.
+You should use the Autoconf-provided 'AC_PROG_MKDIR_P' macro instead,
+and use '$(MKDIR_P)' instead of '$(mkdir_p)'in your Makefile.am files.
+EOF
+	}
       elsif ($macro eq 'AM_CONDITIONAL')
 	{
 	  $configure_cond{$args[1]} = $where;
@@ -5383,6 +5409,10 @@ sub scan_autoconf_traces ($)
 	  $seen_init_automake = $where;
 	  if (defined $args[2])
 	    {
+              msg 'obsolete', $where, <<'EOF';
+AM_INIT_AUTOMAKE: two- and three-arguments forms are deprecated.  For more info, see:
+http://www.gnu.org/software/automake/manual/automake.html#Modernize-AM_INIT_AUTOMAKE-invocation
+EOF
 	      $package_version = $args[2];
 	      $package_version_location = $where;
 	    }
@@ -5570,6 +5600,11 @@ sub check_cygnus
 {
   my $cygnus = option 'cygnus';
   return unless $cygnus;
+
+  # This feature is deprecated, will be removed in the next
+  # Automake major release.
+  msg 'obsolete', $cygnus->get,
+      "support for Cygnus-style trees is deprecated";
 
   set_strictness ('foreign');
   set_option ('no-installinfo', $cygnus);
@@ -5789,6 +5824,12 @@ sub lang_ratfor_rewrite
 
 # Rewrite a single Objective C file.
 sub lang_objc_rewrite
+{
+    return &lang_sub_obj;
+}
+
+# Rewrite a single Objective C++ file.
+sub lang_objcxx_rewrite
 {
     return &lang_sub_obj;
 }
@@ -6057,7 +6098,7 @@ sub resolve_linker
 {
     my (%linkers) = @_;
 
-    foreach my $l (qw(GCJLINK CXXLINK F77LINK FCLINK OBJCLINK UPCLINK))
+    foreach my $l (qw(GCJLINK OBJCXXLINK CXXLINK F77LINK FCLINK OBJCLINK UPCLINK))
     {
 	return $l if defined $linkers{$l};
     }
@@ -6245,13 +6286,14 @@ sub make_conditional_string ($$)
 my %_am_macro_for_cond =
   (
   AMDEP => "one of the compiler tests\n"
-	   . "    AC_PROG_CC, AC_PROG_CXX, AC_PROG_CXX, AC_PROG_OBJC,\n"
+	   . "    AC_PROG_CC, AC_PROG_CXX, AC_PROG_OBJC, AC_PROG_OBJCXX,\n"
 	   . "    AM_PROG_AS, AM_PROG_GCJ, AM_PROG_UPC",
   am__fastdepCC => 'AC_PROG_CC',
   am__fastdepCCAS => 'AM_PROG_AS',
   am__fastdepCXX => 'AC_PROG_CXX',
   am__fastdepGCJ => 'AM_PROG_GCJ',
   am__fastdepOBJC => 'AC_PROG_OBJC',
+  am__fastdepOBJCXX => 'AC_PROG_OBJCXX',
   am__fastdepUPC => 'AM_PROG_UPC'
   );
 
@@ -8315,7 +8357,7 @@ sub version ()
 {
   print <<EOF;
 automake (GNU $PACKAGE) $VERSION
-Copyright (C) 2011 Free Software Foundation, Inc.
+Copyright (C) $RELEASE_YEAR Free Software Foundation, Inc.
 License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl-2.0.html>
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.

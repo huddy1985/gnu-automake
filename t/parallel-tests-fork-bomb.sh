@@ -18,8 +18,12 @@
 #  - If $(TEST_SUITE_LOG) is in $(TEST_LOGS), we get a diagnosed
 #    error, not a make hang or a system freeze.
 
-am_parallel_tests=yes
 . ./defs || Exit 1
+
+# We don't want localized error messages from make, since we'll have
+# to grep them.  See automake bug#11452.
+LANG=C LANGUAGE=C LC_ALL=C
+export LANG LANGUAGE LC_ALL
 
 # The tricky part of this test is to avoid that make hangs or even
 # freezes the system in case infinite recursion (which is the bug we

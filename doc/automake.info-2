@@ -1,7 +1,7 @@
 This is automake.info, produced by makeinfo version 4.13 from
 /home/stefano/src/am/branches/trunks/doc/automake.texi.
 
-This manual is for GNU Automake (version 1.12, 21 April 2012), a
+This manual is for GNU Automake (version 1.12.1, 1 June 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -318,8 +318,8 @@ Using the TAP test protocol::) or custom (*note Custom Test Drivers::).
 Note that you can enable such protocols only when the parallel harness
 is used: they won't work with the serial test harness.  In the rest of
 this section we are going to concentrate mostly on protocol-less tests,
-since  we'll have later a whole section devoted to the use of test
-protocols (again, *note Custom Test Drivers::).
+since we cover test protocols in a later section (again, *note Custom
+Test Drivers::).
 
    When no test protocol is in use, an exit status of 0 from a test
 script will denote a success, an exit status of 77 a skipped test, an
@@ -2223,8 +2223,8 @@ File: automake.info,  Node: Cygnus,  Next: Not Enough,  Prev: Gnits,  Up: Top
 
 _The features described in this section are deprecated; you must not
 use any of them in new code, and should remove their use from older but
-still maintained code: they will be withdrawn in a future Automake
-release._
+still maintained code: they will be withdrawn the next major Automake
+release (1.13)._
 
    Some packages, notably GNU GCC and GNU gdb, used to have a build
 environment originally written at Cygnus Support (subsequently renamed
@@ -3207,8 +3207,8 @@ This section attempts to answer all the above questions.  We will
 mostly discuss `CPPFLAGS' in our examples, but actually the answer
 holds for all the compile flags used in Automake: `CCASFLAGS',
 `CFLAGS', `CPPFLAGS', `CXXFLAGS', `FCFLAGS', `FFLAGS', `GCJFLAGS',
-`LDFLAGS', `LFLAGS', `LIBTOOLFLAGS', `OBJCFLAGS', `RFLAGS', `UPCFLAGS',
-and `YFLAGS'.
+`LDFLAGS', `LFLAGS', `LIBTOOLFLAGS', `OBJCFLAGS', `OBJCXXFLAGS',
+`RFLAGS', `UPCFLAGS', and `YFLAGS'.
 
    `CPPFLAGS', `AM_CPPFLAGS', and `mumble_CPPFLAGS' are three variables
 that can be used to pass flags to the C preprocessor (actually these
@@ -3940,7 +3940,7 @@ bug tracker (http://debbugs.gnu.org/automake).  Be sure to include the
 versions of Autoconf and Automake that you use.  Ideally, post a
 minimal `Makefile.am' and `configure.ac' that reproduces the problem
 you encounter.  If you have encountered test suite failures, please
-attach the `tests/test-suite.log' file.
+attach the `test-suite.log' file.
 
 
 File: automake.info,  Node: Copying This Manual,  Next: Indices,  Prev: FAQ,  Up: Top
@@ -4472,8 +4472,8 @@ B.1 Macro Index
 * AC_CONFIG_LINKS:                       Optional.            (line  55)
 * AC_CONFIG_SUBDIRS:                     Subpackages.         (line   6)
 * AC_DEFUN:                              Extending aclocal.   (line  36)
-* AC_F77_LIBRARY_LDFLAGS:                Optional.            (line  97)
-* AC_FC_SRCEXT:                          Optional.            (line 103)
+* AC_F77_LIBRARY_LDFLAGS:                Optional.            (line 101)
+* AC_FC_SRCEXT:                          Optional.            (line 107)
 * AC_INIT:                               Public Macros.       (line  15)
 * AC_LIBOBJ <1>:                         LIBOBJS.             (line  11)
 * AC_LIBOBJ <2>:                         LTLIBOBJS.           (line   6)
@@ -4485,32 +4485,33 @@ B.1 Macro Index
 * AC_PREREQ:                             Extending aclocal.   (line  36)
 * AC_PROG_CC_C_O:                        Public Macros.       (line  78)
 * AC_PROG_CXX:                           Optional.            (line  85)
-* AC_PROG_F77:                           Optional.            (line  93)
-* AC_PROG_FC:                            Optional.            (line 108)
+* AC_PROG_F77:                           Optional.            (line  97)
+* AC_PROG_FC:                            Optional.            (line 112)
 * AC_PROG_LEX <1>:                       Public Macros.       (line  84)
-* AC_PROG_LEX:                           Optional.            (line 123)
-* AC_PROG_LIBTOOL:                       Optional.            (line 113)
+* AC_PROG_LEX:                           Optional.            (line 127)
+* AC_PROG_LIBTOOL:                       Optional.            (line 117)
 * AC_PROG_OBJC:                          Optional.            (line  89)
+* AC_PROG_OBJCXX:                        Optional.            (line  93)
 * AC_PROG_RANLIB:                        Optional.            (line  81)
-* AC_PROG_YACC:                          Optional.            (line 117)
-* AC_REQUIRE_AUX_FILE:                   Optional.            (line 127)
-* AC_SUBST:                              Optional.            (line 136)
+* AC_PROG_YACC:                          Optional.            (line 121)
+* AC_REQUIRE_AUX_FILE:                   Optional.            (line 131)
+* AC_SUBST:                              Optional.            (line 140)
 * AM_COND_IF <1>:                        Usage of Conditionals.
                                                               (line  66)
-* AM_COND_IF:                            Optional.            (line 152)
+* AM_COND_IF:                            Optional.            (line 156)
 * AM_CONDITIONAL <1>:                    Usage of Conditionals.
                                                               (line   6)
-* AM_CONDITIONAL:                        Optional.            (line 149)
+* AM_CONDITIONAL:                        Optional.            (line 153)
 * AM_CONFIG_HEADER:                      Obsolete Macros.     (line  14)
 * AM_DEP_TRACK:                          Private Macros.      (line  14)
-* AM_GNU_GETTEXT:                        Optional.            (line 158)
-* AM_GNU_GETTEXT_INTL_SUBDIR:            Optional.            (line 164)
+* AM_GNU_GETTEXT:                        Optional.            (line 162)
+* AM_GNU_GETTEXT_INTL_SUBDIR:            Optional.            (line 168)
 * AM_HEADER_TIOCGWINSZ_NEEDS_SYS_IOCTL:  Obsolete Macros.     (line  19)
 * AM_INIT_AUTOMAKE <1>:                  Public Macros.       (line   7)
 * AM_INIT_AUTOMAKE:                      Requirements.        (line   6)
 * AM_MAINTAINER_MODE <1>:                maintainer-mode.     (line  37)
 * AM_MAINTAINER_MODE:                    Rebuilding.          (line   9)
-* AM_MAINTAINER_MODE([DEFAULT-MODE]):    Optional.            (line 169)
+* AM_MAINTAINER_MODE([DEFAULT-MODE]):    Optional.            (line 173)
 * AM_MAKE_INCLUDE:                       Private Macros.      (line  20)
 * AM_OUTPUT_DEPENDENCY_COMMANDS:         Private Macros.      (line  15)
 * AM_PATH_LISPDIR:                       Public Macros.       (line  51)
@@ -4527,12 +4528,12 @@ B.1 Macro Index
 * AM_SANITY_CHECK:                       Private Macros.      (line  30)
 * AM_SET_DEPDIR:                         Private Macros.      (line  13)
 * AM_SILENT_RULES:                       Public Macros.       (line 100)
-* AM_SUBST_NOTMAKE(VAR):                 Optional.            (line 177)
+* AM_SUBST_NOTMAKE(VAR):                 Optional.            (line 181)
 * AM_SYS_POSIX_TERMIOS:                  Obsolete Macros.     (line  40)
 * AM_WITH_DMALLOC:                       Public Macros.       (line 104)
 * m4_include <1>:                        Basics of Distribution.
                                                               (line  14)
-* m4_include:                            Optional.            (line 187)
+* m4_include:                            Optional.            (line 191)
 
 
 File: automake.info,  Node: Variable Index,  Next: General Index,  Prev: Macro Index,  Up: Indices
@@ -4608,6 +4609,8 @@ B.2 Variable Index
 * AM_MAKEINFOFLAGS:                      Texinfo.             (line 109)
 * AM_MAKEINFOHTMLFLAGS:                  Texinfo.             (line 110)
 * AM_OBJCFLAGS:                          Objective C Support. (line  22)
+* AM_OBJCXXFLAGS:                        Objective C++ Support.
+                                                              (line  22)
 * AM_RFLAGS:                             Fortran 77 Support.  (line  28)
 * AM_RUNTESTFLAGS:                       DejaGnu Tests.       (line  24)
 * AM_TESTS_ENVIRONMENT:                  Scripts-based Testsuites.
@@ -4662,7 +4665,7 @@ B.2 Variable Index
 * CXXCOMPILE:                            C++ Support.         (line  25)
 * CXXFLAGS:                              C++ Support.         (line  19)
 * CXXLINK <1>:                           How the Linker is Chosen.
-                                                              (line  12)
+                                                              (line  14)
 * CXXLINK:                               C++ Support.         (line  29)
 * DATA <1>:                              Data.                (line   7)
 * DATA:                                  Uniform.             (line 102)
@@ -4723,13 +4726,13 @@ B.2 Variable Index
 * F77:                                   Fortran 77 Support.  (line  16)
 * F77COMPILE:                            Fortran 77 Support.  (line  31)
 * F77LINK:                               How the Linker is Chosen.
-                                                              (line  14)
+                                                              (line  16)
 * FC:                                    Fortran 9x Support.  (line  16)
 * FCCOMPILE:                             Fortran 9x Support.  (line  25)
 * FCFLAGS:                               Fortran 9x Support.  (line  19)
 * FCLINK <1>:                            Fortran 9x Support.  (line  29)
 * FCLINK:                                How the Linker is Chosen.
-                                                              (line  16)
+                                                              (line  18)
 * FFLAGS:                                Fortran 77 Support.  (line  19)
 * FLIBS:                                 Mixing Fortran 77 With C and C++.
                                                               (line  21)
@@ -4766,7 +4769,7 @@ B.2 Variable Index
 * LIBS:                                  Program Variables.   (line  12)
 * LIBTOOLFLAGS:                          Libtool Flags.       (line   6)
 * LINK <1>:                              How the Linker is Chosen.
-                                                              (line  22)
+                                                              (line  24)
 * LINK:                                  Program Variables.   (line  66)
 * LISP:                                  Uniform.             (line 102)
 * lisp_LISP:                             Emacs Lisp.          (line   6)
@@ -4829,16 +4832,18 @@ B.2 Variable Index
                                                               (line 154)
 * maude_OBJCFLAGS:                       Program and Library Variables.
                                                               (line 178)
-* maude_RFLAGS:                          Program and Library Variables.
+* maude_OBJCXXFLAGS:                     Program and Library Variables.
                                                               (line 179)
+* maude_RFLAGS:                          Program and Library Variables.
+                                                              (line 180)
 * maude_SHORTNAME:                       Program and Library Variables.
-                                                              (line 212)
+                                                              (line 213)
 * maude_SOURCES:                         Program and Library Variables.
                                                               (line  18)
 * maude_UPCFLAGS:                        Program and Library Variables.
-                                                              (line 180)
-* maude_YFLAGS:                          Program and Library Variables.
                                                               (line 181)
+* maude_YFLAGS:                          Program and Library Variables.
+                                                              (line 182)
 * mkdir_p:                               Obsolete Macros.     (line  25)
 * MKDIR_P:                               Obsolete Macros.     (line  25)
 * MOSTLYCLEANFILES:                      Clean.               (line  13)
@@ -4859,8 +4864,18 @@ B.2 Variable Index
 * OBJCCOMPILE:                           Objective C Support. (line  25)
 * OBJCFLAGS:                             Objective C Support. (line  19)
 * OBJCLINK <1>:                          How the Linker is Chosen.
-                                                              (line  18)
+                                                              (line  20)
 * OBJCLINK:                              Objective C Support. (line  29)
+* OBJCXX:                                Objective C++ Support.
+                                                              (line  16)
+* OBJCXXCOMPILE:                         Objective C++ Support.
+                                                              (line  25)
+* OBJCXXFLAGS:                           Objective C++ Support.
+                                                              (line  19)
+* OBJCXXLINK <1>:                        How the Linker is Chosen.
+                                                              (line  12)
+* OBJCXXLINK:                            Objective C++ Support.
+                                                              (line  29)
 * oldinclude_HEADERS:                    Headers.             (line   6)
 * PACKAGE:                               Basics of Distribution.
                                                               (line   6)
@@ -4934,7 +4949,7 @@ B.2 Variable Index
 * UPCFLAGS:                              Unified Parallel C Support.
                                                               (line  18)
 * UPCLINK <1>:                           How the Linker is Chosen.
-                                                              (line  20)
+                                                              (line  22)
 * UPCLINK:                               Unified Parallel C Support.
                                                               (line  28)
 * V:                                     Automake silent-rules Option.
@@ -4952,6 +4967,6 @@ B.2 Variable Index
                                                               (line  35)
 * XZ_OPT:                                The Types of Distributions.
                                                               (line  26)
-* YACC:                                  Optional.            (line 118)
+* YACC:                                  Optional.            (line 122)
 * YFLAGS:                                Yacc and Lex.        (line  37)
 

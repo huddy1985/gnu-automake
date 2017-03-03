@@ -68,22 +68,14 @@ t/check-fd-redirect-w.log: t/check-fd-redirect.sh
 t/check-fd-redirect-w.log: t/check-fd-redirect.log
 t/check-tests-in-builddir-w.log: t/check-tests-in-builddir.sh
 t/check-tests-in-builddir-w.log: t/check-tests-in-builddir.log
-t/check-concurrency-bug9245-w.log: t/check-concurrency-bug9245.sh
-t/check-concurrency-bug9245-w.log: t/check-concurrency-bug9245.log
 t/color-w.log: t/color.sh
 t/color-w.log: t/color.log
 t/color2-w.log: t/color2.sh
 t/color2-w.log: t/color2.log
-t/comment9-w.log: t/comment9.sh
-t/comment9-w.log: t/comment9.log
-t/dejagnu-w.log: t/dejagnu.sh
-t/dejagnu-w.log: t/dejagnu.log
 t/exeext4-w.log: t/exeext4.sh
 t/exeext4-w.log: t/exeext4.log
 t/maken3-w.log: t/maken3.sh
 t/maken3-w.log: t/maken3.log
-t/tests-environment-w.log: t/tests-environment.sh
-t/tests-environment-w.log: t/tests-environment.log
 t/posixsubst-tests-w.log: t/posixsubst-tests.sh
 t/posixsubst-tests-w.log: t/posixsubst-tests.log
 t/tap-ambiguous-directive-w.log: t/tap-ambiguous-directive.sh
@@ -278,14 +270,10 @@ generated_TESTS += t/check-subst-prog-w.sh
 generated_TESTS += t/check-exported-srcdir-w.sh
 generated_TESTS += t/check-fd-redirect-w.sh
 generated_TESTS += t/check-tests-in-builddir-w.sh
-generated_TESTS += t/check-concurrency-bug9245-w.sh
 generated_TESTS += t/color-w.sh
 generated_TESTS += t/color2-w.sh
-generated_TESTS += t/comment9-w.sh
-generated_TESTS += t/dejagnu-w.sh
 generated_TESTS += t/exeext4-w.sh
 generated_TESTS += t/maken3-w.sh
-generated_TESTS += t/tests-environment-w.sh
 generated_TESTS += t/posixsubst-tests-w.sh
 generated_TESTS += t/tap-ambiguous-directive-w.sh
 generated_TESTS += t/tap-autonumber-w.sh
@@ -421,6 +409,7 @@ libtool_macros_TESTS = \
   t/ltlibsrc.sh \
   t/ltorder.sh \
   t/nobase-libtool.sh \
+  t/objc-megademo.sh \
   t/posixsubst-ltlibraries.sh \
   t/pr72.sh \
   t/pr211.sh \
@@ -483,6 +472,7 @@ t/ltlibobjs.log:  t/libtool-macros.log
 t/ltlibsrc.log:  t/libtool-macros.log
 t/ltorder.log:  t/libtool-macros.log
 t/nobase-libtool.log:  t/libtool-macros.log
+t/objc-megademo.log:  t/libtool-macros.log
 t/posixsubst-ltlibraries.log:  t/libtool-macros.log
 t/pr72.log:  t/libtool-macros.log
 t/pr211.log:  t/libtool-macros.log

@@ -29,7 +29,7 @@ plan_ 18 # Two times the number of variable names in $vars.
 vars='
   me
   required
-  am_parallel_tests
+  am_serial_tests
   am_using_tap
   am_create_testdir
   am_tap_implementation
@@ -40,12 +40,12 @@ vars='
 
 do_run ()
 {
-  env "$1=foo" $SHELL -c '. ./defs' foo.test
+  env "$1=foo" $AM_TEST_RUNNER_SHELL -c '. ./defs' foo.test
 }
 
 do_grep ()
 {
-  env "$1=foo" $SHELL -c '. ./defs' foo.test 2>&1 1>&5 \
+  env "$1=foo" $AM_TEST_RUNNER_SHELL -c '. ./defs' foo.test 2>&1 1>&5 \
     | grep "foo\.test:.* variable '$1'.* in the environment.*unsafe"
 }
 

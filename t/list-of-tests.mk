@@ -61,6 +61,11 @@ t/pm/Version2.pl \
 t/pm/Version3.pl \
 t/pm/Wrap.pl
 
+perf_TESTS = \
+t/perf/cond.sh \
+t/perf/testsuite-recheck.sh \
+t/perf/testsuite-summary.sh
+
 # The order here is mostly alphabetical, with the deliberate exception
 # that tests having a high runtime (especially TAP tests that run various
 # checks sequentially) are listed early; this improves performance on
@@ -68,6 +73,7 @@ t/pm/Wrap.pl
 handwritten_TESTS = \
 t/get-sysconf.sh \
 $(perl_TESTS) \
+$(perf_TESTS) \
 t/instspc.tap \
 t/aclocal.sh \
 t/aclocal3.sh \
@@ -117,6 +123,7 @@ t/alpha2.sh \
 t/amhello-cflags.sh \
 t/amhello-cross-compile.sh \
 t/amhello-binpkg.sh \
+t/aminit-moreargs-deprecation.sh \
 t/amassign.sh \
 t/ammissing.sh \
 t/amopt.sh \
@@ -274,7 +281,6 @@ t/cond25.sh \
 t/cond26.sh \
 t/cond27.sh \
 t/cond28.sh \
-t/cond29.sh \
 t/cond30.sh \
 t/cond31.sh \
 t/cond32.sh \
@@ -330,6 +336,7 @@ t/cxxlibobj.sh \
 t/cxxlink.sh \
 t/cxxnoc.sh \
 t/cxxo.sh \
+t/cygnus-deprecation.sh \
 t/cygnus-check-without-all.sh \
 t/cygnus-dependency-tracking.sh \
 t/cygnus-imply-foreign.sh \
@@ -675,6 +682,7 @@ t/missing4.sh \
 t/missing5.sh \
 t/missing6.sh \
 t/missing-auxfile-stops-makefiles-creation.sh \
+t/mkdirp-deprecation.sh \
 t/mkinstall.sh \
 t/mkinst2.sh \
 t/mkinst3.sh \
@@ -701,8 +709,15 @@ t/nolink.sh \
 t/nostdinc.sh \
 t/notrans.sh \
 t/number.sh \
-t/objc.sh \
-t/objc2.sh \
+t/objc-basic.sh \
+t/objc-minidemo.sh \
+t/objc-flags.sh \
+t/objc-deps.sh \
+t/objcxx-basic.sh \
+t/objcxx-minidemo.sh \
+t/objcxx-flags.sh \
+t/objcxx-deps.sh \
+t/objc-megademo.sh \
 t/objext-pr10128.sh \
 t/obsolete.sh \
 t/oldvars.sh \
@@ -932,7 +947,6 @@ t/req.sh \
 t/reqd.sh \
 t/reqd2.sh \
 t/repeated-options.sh \
-t/rst-formatting.sh \
 t/rulepat.sh \
 t/self-check-cleanup.tap \
 t/self-check-configure-help.sh \

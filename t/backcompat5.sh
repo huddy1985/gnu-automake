@@ -19,7 +19,7 @@
 # This script can also serve as mild stress-testing for Automake.
 # See also the similar test 'backcompat6.test'.
 
-am_parallel_tests=no
+am_serial_tests=yes
 am_create_testdir=empty
 . ./defs || Exit 1
 
@@ -94,10 +94,10 @@ END
 
 $ACLOCAL
 $AUTOCONF
-$AUTOMAKE -a
+$AUTOMAKE -a -Wno-obsolete
 test -f install-sh
 for f in $makefiles; do mv -f $f.in $f.sav; done
-$AUTOMAKE
+$AUTOMAKE -Wno-obsolete
 for f in $makefiles; do diff $f.sav $f.in; done
 
 ./configure

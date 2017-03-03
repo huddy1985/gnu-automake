@@ -67,7 +67,7 @@ TAGS_FILES = $(AUTOMAKESOURCES)
 
 EXTRA_DIST += \
   $(AUTOMAKESOURCES) \
-  bootstrap \
+  bootstrap.sh \
   GNUmakefile \
   syntax-checks.mk \
   HACKING
@@ -315,8 +315,8 @@ EXTRA_DIST += m4/amversion.in
 ##  Testsuite.  ##
 ## ------------ ##
 
-# Run the tests with the shell detected at configure time.
-LOG_COMPILER = $(SHELL)
+# Run the tests with a proper shell detected at configure time.
+LOG_COMPILER = $(AM_TEST_RUNNER_SHELL)
 
 TEST_EXTENSIONS = .pl .sh .tap
 SH_LOG_COMPILER = $(LOG_COMPILER)
@@ -328,7 +328,7 @@ TAP_LOG_DRIVER = AM_TAP_AWK='$(AWK)' $(SHELL) $(srcdir)/lib/tap-driver.sh
 
 AM_TAP_LOG_DRIVER_FLAGS = --merge
 
-EXTRA_DIST += t/ax/is
+EXTRA_DIST += t/README t/ax/is
 
 TESTS = ## Will be updated later.
 
@@ -339,7 +339,7 @@ AM_TESTS_ENVIRONMENT = \
     me \
     required \
     am_using_tap \
-    am_parallel_tests \
+    am_serial_tests \
     am_test_prefer_config_shell \
     am_original_AUTOMAKE \
     am_original_ACLOCAL \
@@ -379,11 +379,11 @@ $(srcdir)/t/testsuite-part.am:
 	$(AM_V_at)mv -f t/testsuite-part.tmp $@
 EXTRA_DIST += gen-testsuite-part
 
-$(generated_TESTS) $(srcdir)/t/testsuite-part.am: \
-  $(srcdir)/gen-testsuite-part \
-  t/list-of-tests.mk \
-  Makefile.am \
-  $(handwritten_TESTS)
+## The dependecies declared here are not truly complete, but such
+## completeness would cause more issues than it would solve.  See
+## automake bug#11347.
+$(generated_TESTS): $(srcdir)/gen-testsuite-part
+$(srcdir)/t/testsuite-part.am: $(srcdir)/gen-testsuite-part Makefile.am
 
 # Static dependencies valid for each test case.
 check_SCRIPTS = t/wrap/aclocal-$(APIVERSION) t/wrap/automake-$(APIVERSION)
@@ -419,7 +419,7 @@ check-local: check-no-repeated-test-name
 .PHONY: check-no-repeated-test-name
 
 ## Checking the list of tests.
-test_subdirs = t t/pm
+test_subdirs = t t/pm t/perf
 include $(srcdir)/t/CheckListOfTests.am
 
 # Run the testsuite with the installed aclocal and automake.
@@ -697,9 +697,6 @@ git-tag-release: maintainer-check
 	esac; \
 	$(determine_release_type); \
 	$(git_must_have_clean_workdir); \
-## Make sure the NEWS file is up-to-date.
-	sed 1q $(srcdir)/NEWS | grep '$(VERSION)' >/dev/null \
-	  || fatal "NEWS not updated"; \
 ## If all was successful, tag the release in the local repository.
 	$$run $(GIT) tag -s "v$(VERSION)" -m "$$release_type $(VERSION)"
 
@@ -742,7 +739,7 @@ autodiffs:
 	       && $(am__cd) tmp \
 	       && $(GIT) checkout -q "$$rev" \
 	       && echo "$@: bootstrapping $$rev" \
-	       && $(SHELL) ./bootstrap \
+	       && $(SHELL) ./bootstrap.sh \
 	       && echo "$@: copying files from $$rev" \
 	       && makefile_ins=`find . -name Makefile.in` \
 	       && (tar cf - configure aclocal.m4 $$makefile_ins) | \
@@ -860,7 +857,12 @@ update_copyright_env = \
 
 .PHONY: update-copyright
 update-copyright:
-	$(AM_V_GEN)excluded_re=`echo $(FETCHFILES) \
+	$(AM_V_GEN)set -e; \
+	current_year=`date +%Y` && test -n "$$current_year" \
+	  || { echo "$@: cannot get current year" >&2; exit 1; }; \
+	sed -i "/^RELEASE_YEAR=/s/=.*$$/=$$current_year/" \
+	  bootstrap.sh configure.ac; \
+	excluded_re=`echo $(FETCHFILES) \
 	  | sed -e 's|^|lib/|' -e 's| | lib/|g' -e 's, ,|,g'`; \
 	$(GIT) ls-files \
 	  | grep -Ev '^(lib/)?(COPYING|INSTALL)$$' \

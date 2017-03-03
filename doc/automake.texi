@@ -220,6 +220,7 @@ Building Programs and Libraries
 * Yacc and Lex::                Yacc and Lex support
 * C++ Support::                 Compiling C++ sources
 * Objective C Support::         Compiling Objective C sources
+* Objective C++ Support::       Compiling Objective C++ sources
 * Unified Parallel C Support::  Compiling Unified Parallel C sources
 * Assembly Support::            Compiling assembly sources
 * Fortran 77 Support::          Compiling Fortran 77 sources
@@ -1958,9 +1959,9 @@ Automake also has a special (and @emph{today deprecated}) ``cygnus'' mode
 that is similar to strictness but handled differently.  This mode is
 useful for packages that are put into a ``Cygnus'' style tree (e.g., older
 versions of the GCC and gdb trees).  @xref{Cygnus}, for more information
-on this mode.  Please note that this mode is deprecated and @emph{will be
-removed in the future automake versions}; you must avoid its use in new
-packages, and should stop using it in existing packages as well.
+on this mode.  Please note that this mode @emph{is deprecated and will be
+removed in the next major Automake release (1.13)}; you must avoid its use
+in new packages, and should stop using it in existing packages as well.
 
 
 @node Uniform
@@ -2604,7 +2605,7 @@ copied.  The default is to make a symbolic link.
 Causes the generated @file{Makefile.in}s to follow Cygnus rules, instead
 of GNU or Gnits rules.  For more information, see @ref{Cygnus}.
 Note that @emph{this mode of operation is deprecated, and will be removed}
-in a future Automake release.
+in the next major Automake release (1.13).
 
 @item -f
 @opindex -f
@@ -3025,6 +3026,10 @@ Programs, , Particular Program Checks, autoconf, The Autoconf Manual}.
 
 @item AC_PROG_OBJC
 This is required if any Objective C source is included.  @xref{Particular
+Programs, , Particular Program Checks, autoconf, The Autoconf Manual}.
+
+@item AC_PROG_OBJCXX
+This is required if any Objective C++ source is included.  @xref{Particular
 Programs, , Particular Program Checks, autoconf, The Autoconf Manual}.
 
 @item AC_PROG_F77
@@ -3941,13 +3946,14 @@ each option were listed in @code{AUTOMAKE_OPTIONS} (@pxref{Options}).
 
 @acindex AC_INIT
 This macro can also be called in @emph{another, deprecated form} (support
-for which will be @emph{removed in the next major Automake release}):
+for which will be @emph{removed in the next major Automake release (1.13)}):
 @code{AM_INIT_AUTOMAKE(PACKAGE, VERSION, [NO-DEFINE])}.  In this form,
 there are two required arguments: the package and the version number.
 This form is obsolete because the @var{package} and @var{version} can
 be obtained from Autoconf's @code{AC_INIT} macro (which itself has an
 old and a new form).
 
+@anchor{Modernize AM_INIT_AUTOMAKE invocation}
 If your @file{configure.ac} has:
 
 @example
@@ -4670,6 +4676,7 @@ to build programs and libraries.
 * Yacc and Lex::                Yacc and Lex support
 * C++ Support::                 Compiling C++ sources
 * Objective C Support::         Compiling Objective C sources
+* Objective C++ Support::       Compiling Objective C++ sources
 * Unified Parallel C Support::  Compiling Unified Parallel C sources
 * Assembly Support::            Compiling assembly sources
 * Fortran 77 Support::          Compiling Fortran 77 sources
@@ -5787,6 +5794,7 @@ they apply.
 @itemx maude_GCJFLAGS
 @itemx maude_LFLAGS
 @itemx maude_OBJCFLAGS
+@itemx maude_OBJCXXFLAGS
 @itemx maude_RFLAGS
 @itemx maude_UPCFLAGS
 @itemx maude_YFLAGS
@@ -5804,6 +5812,7 @@ Automake.  These @dfn{per-target compilation flags} are
 @samp{_GCJFLAGS},
 @samp{_LFLAGS},
 @samp{_OBJCFLAGS},
+@samp{_OBJCXXFLAGS},
 @samp{_RFLAGS},
 @samp{_UPCFLAGS}, and
 @samp{_YFLAGS}.
@@ -6380,6 +6389,41 @@ The command used to actually link an Objective C program.
 @end vtable
 
 
+@node Objective C++ Support
+@section Objective C++ Support
+
+@cindex Objective C++ support
+@cindex Support for Objective C++
+
+Automake includes some support for Objective C++.
+
+Any package including Objective C++ code must define the output variable
+@code{OBJCXX} in @file{configure.ac}; the simplest way to do this is to use
+the @code{AC_PROG_OBJCXX} macro (@pxref{Particular Programs, , Particular
+Program Checks, autoconf, The Autoconf Manual}).
+
+A few additional variables are defined when an Objective C++ source file
+is seen:
+
+@vtable @code
+@item OBJCXX
+The name of the Objective C++ compiler.
+
+@item OBJCXXFLAGS
+Any flags to pass to the Objective C++ compiler.
+
+@item AM_OBJCXXFLAGS
+The maintainer's variant of @code{OBJCXXFLAGS}.
+
+@item OBJCXXCOMPILE
+The command used to actually compile an Objective C++ source file.  The
+file name is appended to form the complete command line.
+
+@item OBJCXXLINK
+The command used to actually link an Objective C++ program.
+@end vtable
+
+
 @node Unified Parallel C Support
 @section Unified Parallel C Support
 
@@ -6645,6 +6689,9 @@ parentheses are the variables containing the link command.)
 @vindex GCJLINK
 Native Java (@code{GCJLINK})
 @item
+@vindex OBJCXXLINK
+Objective C++ (@code{OBJCXXLINK})
+@item
 @vindex CXXLINK
 C++ (@code{CXXLINK})
 @item
@@ -6854,7 +6901,9 @@ source file.
 @section Support for Other Languages
 
 Automake currently only includes full support for C, C++ (@pxref{C++
-Support}), Objective C (@pxref{Objective C Support}), Fortran 77
+Support}), Objective C (@pxref{Objective C Support}),
+Objective C++ (@pxref{Objective C++ Support}),
+Fortran 77
 (@pxref{Fortran 77 Support}), Fortran 9x (@pxref{Fortran 9x Support}),
 and Java (@pxref{Java Support with gcj}).  There is only rudimentary
 support for other languages, support for which will be improved based
@@ -8789,9 +8838,8 @@ more complex test protocols, either standard (@pxref{Using the TAP test
 protocol}) or custom (@pxref{Custom Test Drivers}).  Note that you can
 enable such protocols only when the parallel harness is used: they won't
 work with the serial test harness.  In the rest of this section we are
-going to concentrate mostly on protocol-less tests, since  we'll have later
-a whole section devoted to the use of test protocols (again, @pxref{Custom
-Test Drivers}).
+going to concentrate mostly on protocol-less tests, since we cover
+test protocols in a later section (again, @pxref{Custom Test Drivers}).
 
 @cindex Exit status 77, special interpretation
 @cindex Exit status 99, special interpretation
@@ -11026,8 +11074,8 @@ The file @file{THANKS} is required.
 
 @emph{The features described in this section are deprecated; you must
 not use any of them in new code, and should remove their use from older
-but still maintained code: they will be withdrawn in a future Automake
-release.}
+but still maintained code: they will be withdrawn the next major Automake
+release (1.13).}
 
 Some packages, notably GNU GCC and GNU gdb, used to have a build
 environment originally written at Cygnus Support (subsequently renamed
@@ -12194,6 +12242,7 @@ flags, not appended.
 @cindex @code{AM_LFLAGS} and @code{LFLAGS}
 @cindex @code{AM_LIBTOOLFLAGS} and @code{LIBTOOLFLAGS}
 @cindex @code{AM_OBJCFLAGS} and @code{OBJCFLAGS}
+@cindex @code{AM_OBJCXXFLAGS} and @code{OBJXXCFLAGS}
 @cindex @code{AM_RFLAGS} and @code{RFLAGS}
 @cindex @code{AM_UPCFLAGS} and @code{UPCFLAGS}
 @cindex @code{AM_YFLAGS} and @code{YFLAGS}
@@ -12208,6 +12257,7 @@ flags, not appended.
 @cindex @code{LFLAGS} and @code{AM_LFLAGS}
 @cindex @code{LIBTOOLFLAGS} and @code{AM_LIBTOOLFLAGS}
 @cindex @code{OBJCFLAGS} and @code{AM_OBJCFLAGS}
+@cindex @code{OBJCXXFLAGS} and @code{AM_OBJCXXFLAGS}
 @cindex @code{RFLAGS} and @code{AM_RFLAGS}
 @cindex @code{UPCFLAGS} and @code{AM_UPCFLAGS}
 @cindex @code{YFLAGS} and @code{AM_YFLAGS}
@@ -12217,8 +12267,8 @@ mostly discuss @code{CPPFLAGS} in our examples, but actually the
 answer holds for all the compile flags used in Automake:
 @code{CCASFLAGS}, @code{CFLAGS}, @code{CPPFLAGS}, @code{CXXFLAGS},
 @code{FCFLAGS}, @code{FFLAGS}, @code{GCJFLAGS}, @code{LDFLAGS},
-@code{LFLAGS}, @code{LIBTOOLFLAGS}, @code{OBJCFLAGS}, @code{RFLAGS},
-@code{UPCFLAGS}, and @code{YFLAGS}.
+@code{LFLAGS}, @code{LIBTOOLFLAGS}, @code{OBJCFLAGS}, @code{OBJCXXFLAGS},
+@code{RFLAGS}, @code{UPCFLAGS}, and @code{YFLAGS}.
 
 @code{CPPFLAGS}, @code{AM_CPPFLAGS}, and @code{mumble_CPPFLAGS} are
 three variables that can be used to pass flags to the C preprocessor
@@ -13051,7 +13101,7 @@ bug in the @uref{http://debbugs.gnu.org/@/automake, bug tracker}.  Be
 sure to include the versions of Autoconf and Automake that you use.
 Ideally, post a minimal @file{Makefile.am} and @file{configure.ac} that
 reproduces the problem you encounter.  If you have encountered test
-suite failures, please attach the @file{tests/test-suite.log} file.
+suite failures, please attach the @file{test-suite.log} file.
 
 @c ========================================================== Appendices
 
@@ -13124,6 +13174,7 @@ suite failures, please attach the @file{tests/test-suite.log} file.
 @c  LocalWords:  subsubsection OBJEXT esac lib LTLIBRARIES liblob LIBADD AR ar
 @c  LocalWords:  ARFLAGS cru ing maude libgettext lo LTLIBOBJS rpath SGI PRE yy
 @c  LocalWords:  libmaude CCLD CXXFLAGS FFLAGS LFLAGS OBJCFLAGS RFLAGS DEFS cc
+@c  LocalWords:  OBJCXXFLAGS
 @c  LocalWords:  SHORTNAME vtable srcdir nostdinc basename yxx cxx ll lxx gdb
 @c  LocalWords:  lexers yymaxdepth maxdepth yyparse yylex yyerror yylval lval
 @c  LocalWords:  yychar yydebug yypact yyr yydef def yychk chk yypgo pgo yyact

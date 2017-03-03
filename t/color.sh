@@ -17,10 +17,8 @@
 # Test Automake TESTS color output, by forcing it.
 # Keep this in sync with the sister test 'color2.test'.
 
+# For gen-testsuite-part: ==> try-with-serial-tests <==
 . ./defs || Exit 1
-
-TERM=ansi
-export TERM
 
 esc=''
 # Escape '[' for grep, below.
@@ -88,10 +86,10 @@ test_color ()
   cat stdout | grep "^${red}XPASS${std}: .*xpass"
   # The old serial testsuite driver doesn't distinguish between failures
   # and hard errors.
-  if test x"$am_parallel_tests" = x"yes"; then
-    cat stdout | grep "^${mgn}ERROR${std}: .*error"
-  else
+  if test x"$am_serial_tests" = x"yes"; then
     cat stdout | grep "^${red}FAIL${std}: .*error"
+  else
+    cat stdout | grep "^${mgn}ERROR${std}: .*error"
   fi
   :
 }
@@ -102,7 +100,7 @@ test_no_color ()
   # print the whole failing recipe on standard output, we should content
   # ourselves with a laxer check, to avoid false positives.
   # Keep this in sync with lib/am/check.am:$(am__color_tests).
-  if $FGREP '= Xalways || test -t 1 ' stdout; then
+  if $FGREP '= Xalways; then' stdout; then
     # Extra verbose make, resort to laxer checks.
     # Note that we also want to check that the testsuite summary is
     # not unduly colorized.
@@ -141,11 +139,14 @@ for vpath in false :; do
 
   $srcdir/configure
 
-  AM_COLOR_TESTS=always $MAKE -e check >stdout && { cat stdout; Exit 1; }
+  # Forced colorization should take place also with non-ANSI terminals;
+  # hence the "TERM=dumb" definition.
+  TERM=dumb AM_COLOR_TESTS=always $MAKE -e check >stdout \
+    && { cat stdout; Exit 1; }
   cat stdout
   test_color
 
-  $MAKE -e check >stdout && { cat stdout; Exit 1; }
+  TERM=ansi $MAKE -e check >stdout && { cat stdout; Exit 1; }
   cat stdout
   test_no_color
 
