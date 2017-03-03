@@ -1,0 +1,451 @@
+# Makefile.in generated automatically by automake 1.0 from Makefile.am
+
+# Copyright (C) 1994, 1995, 1996 Free Software Foundation, Inc.
+# This Makefile.in is free software; the Free Software Foundation
+# gives unlimited permission to copy, distribute and modify it.
+
+
+SHELL = /bin/sh
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+infodir = @infodir@
+mandir = @mandir@
+includedir = @includedir@
+oldincludedir = /usr/include
+
+pkgdatadir = $(datadir)/@PACKAGE@
+pkglibdir = $(libdir)/@PACKAGE@
+pkgincludedir = $(includedir)/@PACKAGE@
+
+top_builddir = .
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+transform = @program_transform_name@
+
+AUTOMAKE_OPTIONS = gnits
+MAINT_CHARSET = latin1
+PERL = @PERL@
+
+SUBDIRS = tests
+
+bin_SCRIPTS = automake
+info_TEXINFOS = automake.texi
+# SUBDIRS = intl po
+# CONFIG_HEADER = config.h
+
+pkgdata_DATA = clean-kr.am clean.am compile-kr.am compile-vars.am \
+compile.am data.am dejagnu.am depend.am dist-vars.am footer.am \
+header.am header-vars.am kr-vars.am libraries.am library.am \
+mans-vars.am program.am programs.am remake-hdr.am remake-subd.am \
+remake.am scripts.am subdirs.am tags.am tags-subd.am tags-clean.am \
+texi-version.am texinfos-vars.am texinfos.am libraries-clean.am \
+programs-clean.am data-clean.am COPYING INSTALL texinfo.tex ansi2knr.c \
+ansi2knr.1 aclocal.m4
+
+pkgdata_SCRIPTS = config.guess config.sub install-sh mdate-sh mkinstalldirs
+
+CLEANFILES = automake
+
+# The following requires a fixed version of the Emacs 19.30 etags.
+ETAGS_ARGS = automake.in --lang=none \
+ --regex='/^@node[ \t]+\([^,]+\)/\1/' automake.texi
+TAGS_DEPENDENCIES = automake.in automake.texi
+ACLOCAL = aclocal.m4
+mkinstalldirs = $(top_srcdir)/mkinstalldirs
+SCRIPTS = $(bin_SCRIPTS) $(pkgdata_SCRIPTS)
+
+
+MAKEINFO = makeinfo
+TEXI2DVI = texi2dvi
+INFOS = automake.info*
+INFO_DEPS = automake.info
+DVIS = automake.dvi
+TEXINFOS = automake.texi
+
+DATA = $(pkgdata_DATA)
+
+DIST_COMMON = README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
+Makefile.in NEWS README THANKS TODO aclocal.m4 automake.in config.guess \
+config.sub configure configure.in install-sh mdate-sh mkinstalldirs \
+stamp-vti texinfo.tex version.texi
+
+
+PACKAGE = @PACKAGE@
+VERSION = @VERSION@
+
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(BUILT_SOURCES) $(HEADERS) \
+	$(TEXINFOS) $(INFOS) $(MANS) $(EXTRA_DIST) $(DATA)
+DEP_DISTFILES = $(DIST_COMMON) $(SOURCES) $(BUILT_SOURCES) $(HEADERS) \
+	$(TEXINFOS) $(INFO_DEPS) $(MANS) $(EXTRA_DIST) $(DATA)
+
+TAR = tar
+default: all
+
+
+$(srcdir)/Makefile.in: Makefile.am configure.in
+	cd $(srcdir) && automake Makefile
+
+# For an explanation of the following Makefile rules, see node
+# `Automatic Remaking' in GNU Autoconf documentation.
+Makefile: Makefile.in config.status
+	CONFIG_FILES=$@ CONFIG_HEADERS= ./config.status
+config.status: configure
+	./config.status --recheck
+$(srcdir)/configure: configure.in $(ACLOCAL) $(CONFIGURE_DEPENDENCIES)
+	cd $(srcdir) && autoconf
+automake: $(top_builddir)/config.status automake.in
+	cd $(top_builddir) && CONFIG_FILES=$@ CONFIG_HEADERS= ./config.status
+
+install-binSCRIPTS: $(bin_SCRIPTS)
+	$(mkinstalldirs) $(bindir)
+	list="$(bin_SCRIPTS)"; for p in $$list; do \
+	  if test -f $$p; then \
+	    $(INSTALL_SCRIPT) $$p $(bindir)/`echo $$p|sed '$(transform)'`; \
+	  else if test -f $(srcdir)/$$p; then \
+	    $(INSTALL_SCRIPT) $(srcdir)/$$p \
+	      $(bindir)/`echo $$p|sed '$(transform)'`; \
+	  else :; fi; fi; \
+	done
+
+uninstall-binSCRIPTS:
+	list="$(bin_SCRIPTS)"; for p in $$list; do \
+	  rm -f $(bindir)/`echo $$p|sed '$(transform)'`; \
+	done
+
+install-pkgdataSCRIPTS: $(pkgdata_SCRIPTS)
+	$(mkinstalldirs) $(pkgdatadir)
+	list="$(pkgdata_SCRIPTS)"; for p in $$list; do \
+	  if test -f $$p; then \
+	    $(INSTALL_SCRIPT) $$p $(pkgdatadir)/`echo $$p|sed '$(transform)'`; \
+	  else if test -f $(srcdir)/$$p; then \
+	    $(INSTALL_SCRIPT) $(srcdir)/$$p \
+	      $(pkgdatadir)/`echo $$p|sed '$(transform)'`; \
+	  else :; fi; fi; \
+	done
+
+uninstall-pkgdataSCRIPTS:
+	list="$(pkgdata_SCRIPTS)"; for p in $$list; do \
+	  rm -f $(pkgdatadir)/`echo $$p|sed '$(transform)'`; \
+	done
+
+version.texi: stamp-vti
+
+stamp-vti: automake.texi $(top_srcdir)/configure.in
+	echo "@set UPDATED `cd $(srcdir) \
+	  && $(SHELL) ./mdate-sh automake.texi`" > vti.tmp
+	echo "@set EDITION $(VERSION)" >> vti.tmp
+	echo "@set VERSION $(VERSION)" >> vti.tmp
+	if cmp -s vti.tmp $(srcdir)/version.texi; then \
+	  rm vti.tmp;			\
+	else					\
+	  mv vti.tmp $(srcdir)/version.texi; \
+	fi
+	echo timestamp > $(srcdir)/stamp-vti
+
+mostlyclean-vti:
+	rm -f vti.tmp
+
+clean-vti:
+
+distclean-vti:
+
+maintainer-clean-vti:
+	rm -f stamp-vti version.texi
+
+automake.info: automake.texi version.texi
+
+
+.texi.info:
+	$(MAKEINFO) -I$(srcdir) $< -o $(srcdir)/$@
+
+.texi.dvi:
+	TEXINPUTS=$(srcdir):$$TEXINPUTS $(TEXI2DVI) $<
+
+install-info: $(INFO_DEPS)
+	$(mkinstalldirs) $(infodir)
+	for file in $(INFO_DEPS); do		\
+	  for ifile in `cd $(srcdir) && echo $$file*`; do \
+	    $(INSTALL_DATA) $(srcdir)/$$ifile $(infodir)/$$ifile; \
+	  done;					\
+	done
+
+uninstall-info:
+	cd $(srcdir) && for file in *.info*; do	\
+	  rm -f $(infodir)/$$file; \
+	done
+
+mostlyclean-info:
+	rm -f automake.aux automake.cp automake.cps automake.dvi automake.fn \
+	  automake.fns automake.ky automake.log automake.pg \
+	  automake.toc automake.tp automake.vr automake.op
+
+clean-info:
+
+distclean-info:
+
+maintainer-clean-info:
+	rm -f $(INFOS)
+
+install-pkgdataDATA: $(pkgdata_DATA)
+	$(mkinstalldirs) $(pkgdatadir)
+	list="$(pkgdata_DATA)"; for p in $$list; do \
+	  if test -f $(srcdir)/$$p; then \
+	    $(INSTALL_DATA) $(srcdir)/$$p $(pkgdatadir)/$$p; \
+	  else if test -f $$p; then \
+	    $(INSTALL_DATA) $$p $(pkgdatadir)/$$p; \
+	  fi; fi; \
+	done
+
+uninstall-pkgdataDATA:
+	list="$(pkgdata_DATA)"; for p in $$list; do \
+	  rm -f $(pkgdatadir)/$$p; \
+	done
+
+# This directory's subdirectories are mostly independent; you can cd
+# into them and run `make' without going through this Makefile.
+# To change the values of `make' variables: instead of editing Makefiles,
+# (1) if the variable is set in `config.status', edit `config.status'
+#     (which will cause the Makefiles to be regenerated when you run `make');
+# (2) otherwise, pass the desired values on the `make' command line.
+
+@SET_MAKE@
+
+all-recursive install-data-recursive install-exec-recursive \
+installdirs-recursive install-recursive uninstall-recursive \
+check-recursive installcheck-recursive info-recursive dvi-recursive \
+mostlyclean-recursive clean-recursive distclean-recursive \
+maintainer-clean-recursive:
+	for subdir in $(SUBDIRS); do		\
+	  target=`echo $@ | sed s/-recursive//`; \
+	  echo making $$target in $$subdir;	\
+	  (cd $$subdir && $(MAKE) $$target)	\
+	   || case "$(MFLAGS)" in *k*) fail=yes;; *) exit 1;; esac; \
+	done && test -z "$$fail"
+
+tags: TAGS
+
+tags-recursive:
+	list="$(SUBDIRS)"; for subdir in $$list; do \
+	  (cd $$subdir && $(MAKE) tags); \
+	done
+
+TAGS: tags-recursive $(HEADERS) $(SOURCES) $(CONFIG_HEADER) \
+		$(TAGS_DEPENDENCIES)
+	tags=; \
+	here=`pwd`; \
+	for subdir in $(SUBDIRS); do \
+	  test -f $$subdir/TAGS && { \
+	    tags="$$tags -i $$here/$$subdir/TAGS"; \
+	  } \
+	done; \
+	test -z "$(ETAGS_ARGS)$(CONFIG_HEADER)$(SOURCES)$(HEADERS)$$tags" \
+	  || etags $(ETAGS_ARGS) $$tags $(CONFIG_HEADER) $(SOURCES) $(HEADERS)
+
+mostlyclean-tags:
+
+clean-tags:
+
+distclean-tags:
+	rm -f TAGS ID
+
+maintainer-clean-tags:
+
+distdir = $(PACKAGE)-$(VERSION)
+# This target untars the dist file and tries a VPATH configuration.  Then
+# it guarantees that the distribution is self-contained by making another
+# tarfile.
+distcheck: dist
+	rm -rf $(distdir)
+	$(TAR) zxf $(distdir).tar.gz
+	mkdir $(distdir)/=build
+	mkdir $(distdir)/=inst
+	dc_install_base=`cd $(distdir)/=inst && pwd`; \
+	cd $(distdir)/=build \
+	  && ../configure --srcdir=.. --prefix=$$dc_install_base \
+	  && $(MAKE) \
+	  && $(MAKE) check \
+	  && $(MAKE) install \
+	  && $(MAKE) installcheck \
+	  && $(MAKE) dist
+	rm -rf $(distdir)
+	@echo "========================"; \
+	echo "$(distdir).tar.gz is ready for distribution"; \
+	echo "========================"
+dist: distdir
+	chmod -R a+r $(distdir)
+	$(TAR) chozf $(distdir).tar.gz $(distdir)
+	rm -rf $(distdir)
+distdir: $(DEP_DISTFILES)
+	@if sed 15q $(srcdir)/NEWS | grep -e "$(VERSION)" > /dev/null; then :; else \
+	  echo "NEWS not updated; not releasing" 1>&2; \
+	  exit 1;				\
+	fi
+	rm -rf $(distdir)
+	mkdir $(distdir)
+	chmod 777 $(distdir)
+	@for file in `cd $(srcdir) && echo $(DISTFILES)`; do \
+	  test -f $(distdir)/$$file \
+	  || ln $(srcdir)/$$file $(distdir)/$$file 2> /dev/null \
+	  || cp -p $(srcdir)/$$file $(distdir)/$$file; \
+	done
+	for subdir in $(SUBDIRS); do		\
+	  test -d $(distdir)/$$subdir		\
+	  || mkdir $(distdir)/$$subdir		\
+	  || exit 1;				\
+	  chmod 777 $(distdir)/$$subdir;	\
+	  (cd $$subdir && $(MAKE) distdir=../$(distdir)/$$subdir distdir) \
+	    || exit 1; \
+	done
+info: $(INFO_DEPS) info-recursive
+
+dvi: $(DVIS) dvi-recursive
+
+check: check-recursive
+
+installcheck: installcheck-recursive installcheck-local
+
+all-am: $(INFO_DEPS) $(SCRIPTS) $(DATA) Makefile
+
+install-exec-am: install-binSCRIPTS
+
+install-data-am: install-info install-pkgdataSCRIPTS install-pkgdataDATA
+
+uninstall-am: uninstall-binSCRIPTS uninstall-pkgdataSCRIPTS uninstall-info uninstall-pkgdataDATA
+
+install-exec: install-exec-recursive install-exec-am
+
+install-data: install-data-recursive install-data-am
+
+install: install-recursive install-exec-am install-data-am
+	@:
+
+uninstall: uninstall-recursive uninstall-am
+
+all: all-recursive all-am
+
+install-strip:
+	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' install
+installdirs: installdirs-recursive
+	$(mkinstalldirs)  $(bindir) $(pkgdatadir) $(infodir) $(pkgdatadir)
+
+
+mostlyclean-generic:
+	test -z "$(MOSTLYCLEANFILES)" || rm -f $(MOSTLYCLEANFILES)
+
+clean-generic:
+	test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
+
+distclean-generic:
+	rm -f Makefile $(DISTCLEANFILES)
+	rm -f config.cache config.log $(CONFIG_HEADER) stamp-h
+
+maintainer-clean-generic:
+	test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
+	test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
+mostlyclean-am:  mostlyclean-vti mostlyclean-info mostlyclean-tags \
+		mostlyclean-generic
+
+clean-am:  clean-vti clean-info clean-tags clean-generic mostlyclean-am 
+
+distclean-am:  distclean-vti distclean-info distclean-tags \
+		distclean-generic clean-am 
+
+maintainer-clean-am:  maintainer-clean-vti maintainer-clean-info \
+		maintainer-clean-tags maintainer-clean-generic \
+		distclean-am 
+
+mostlyclean:  mostlyclean-am mostlyclean-recursive
+
+clean:  clean-am clean-recursive
+
+distclean:  distclean-am distclean-recursive
+	rm -f config.status
+
+maintainer-clean:  maintainer-clean-am maintainer-clean-recursive
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+	rm -f config.status
+
+.PHONY: default uninstall-binSCRIPTS install-binSCRIPTS \
+uninstall-pkgdataSCRIPTS install-pkgdataSCRIPTS mostlyclean-vti \
+distclean-vti clean-vti maintainer-clean-vti install-info \
+uninstall-info mostlyclean-info distclean-info clean-info \
+maintainer-clean-info uninstall-pkgdataDATA install-pkgdataDATA \
+install-data-recursive uninstall-data-recursive install-exec-recursive \
+uninstall-exec-recursive installdirs-recursive uninstalldirs-recursive \
+all-recursive check-recursive installcheck-recursive info-recursive \
+dvi-recursive mostlyclean-recursive distclean-recursive clean-recursive \
+maintainer-clean-recursive tags tags-recursive mostlyclean-tags \
+distclean-tags clean-tags maintainer-clean-tags distdir info dvi check \
+installcheck-local installcheck all-am install-exec-am install-data-am \
+uninstall-am install-exec install-data install uninstall all \
+installdirs mostlyclean-generic distclean-generic clean-generic \
+maintainer-clean-generic clean mostlyclean distclean maintainer-clean
+
+
+# Check to make sure some installed files are executable.
+installcheck-local:
+	$(PERL) -e "exit ! -x '$(pkgdatadir)/config.guess';"
+	$(PERL) -e "exit ! -x '$(pkgdatadir)/config.sub';"
+	$(PERL) -e "exit ! -x '$(pkgdatadir)/install-sh';"
+	$(PERL) -e "exit ! -x '$(pkgdatadir)/mdate-sh';"
+	$(PERL) -e "exit ! -x '$(pkgdatadir)/mkinstalldirs';"
+
+# Some simple checks:
+# * syntax check with perl4 and perl5.
+# * make sure the scripts don't use 'true'
+# * expect no instances of '${...}'
+# These are only really guaranteed to work on my machine.
+maintainer-check: automake
+	$(PERL) -c -w automake
+	@if grep '^[^#].*true' $(srcdir)/[a-z]*.am; then \
+	  echo "can't use 'true' in GNU Makefile" 1>&2; \
+	  exit 1;				\
+	else :; fi
+	@if test `fgrep '$${' $(srcdir)/[a-z]*.am | wc -l` -ne 0; then \
+	  echo "found too many uses of '\$${'" 1>&2; \
+	  exit 1;				\
+	fi
+	if $(SHELL) -c 'perl4.036 -v' >/dev/null 2>&1; then \
+	  perl4.036 -c -w automake; \
+	else :; fi
+	$(MAKE) check
+
+# Tag before making distribution.  Also, don't make a distribution if
+# checks fail.  Also, make sure the NEWS file is up-to-date.
+cvs-dist: maintainer-check
+	@if sed 1q $(srcdir)/NEWS | grep -e "$(VERSION)" > /dev/null; then :; else \
+	  echo "NEWS not updated; not releasing" 1>&2; \
+	  exit 1;				\
+	fi
+	cvs -q tag `echo "Release-$(VERSION)" | sed 's/\./-/g'`
+	$(MAKE) dist
+
+cvs-diff:
+	thisver=`echo "Release-$(VERSION)" | sed 's/\./-/g'`; \
+	prevno=`echo "$(VERSION)" - 0.01 | bc | sed 's/^\./0./'`; \
+	prevver=Release-`echo $$prevno | sed 's/\./-/g'`; \
+	cvs -f rdiff -c -r $$prevver -r $$thisver $(PACKAGE) \
+	    > $(PACKAGE)-$$prevno-$(VERSION).diff
+.SUFFIXES:
+.SUFFIXES: .texi .info .dvi
+
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:

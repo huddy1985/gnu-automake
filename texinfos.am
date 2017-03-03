@@ -1,0 +1,48 @@
+## automake - create Makefile.in from Makefile.am
+## Copyright (C) 1994, 1995, 1996 Free Software Foundation, Inc.
+
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2, or (at your option)
+## any later version.
+
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+## 02111-1307, USA.
+.texi.info:
+## FIXME is this right?  We make sure the output file goes into srcdir.
+	$(MAKEINFO) -I$(srcdir) $< -o $(srcdir)/$@
+
+.texi.dvi:
+	TEXINPUTS=$(srcdir):$$TEXINPUTS $(TEXI2DVI) $<
+
+## Look in both . and srcdir because the info pages might have been
+## rebuilt in the build directory.  Can't cd to srcdir; that might
+## break a possible install-sh reference.
+install-info: $(INFO_DEPS)
+	$(mkinstalldirs) $(infodir)
+	for file in $(INFO_DEPS); do		\
+## We use these strange circumlocutions because we want the "ifile" to
+## be relative, for the install.
+	  for ifile in `cd $(srcdir) && echo $$file*`; do \
+	    $(INSTALL_DATA) $(srcdir)/$$ifile $(infodir)/$$ifile; \
+	  done;					\
+## We need the 'else' because in some broken versions of sh 'if' will
+## return false if the test fails.  We use ':' because the GNU
+## standards prohibit us from using 'true'.
+## FIXME no one has install-info, so for now we just comment it out.
+##	  if $(SHELL) -c 'install-info --version' >/dev/null 2>&1; then \
+##	    install-info --dir-file=$(infodir)/dir $$d/$$file; \
+##	  else :; fi;				\
+	done
+
+uninstall-info:
+	cd $(srcdir) && for file in *.info*; do	\
+	  rm -f $(infodir)/$$file; \
+	done

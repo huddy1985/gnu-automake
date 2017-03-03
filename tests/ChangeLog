@@ -1,0 +1,148 @@
+Thu May 23 09:58:48 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* fpinst2.test: New file.
+
+	* fpinstall.test: New file.
+
+Wed May 22 09:45:52 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* outdir.test: New file.
+
+Sat May 18 10:51:37 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* insh2.test: New file.
+
+Fri May 17 17:32:35 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* number.test: New file.
+
+	* defs, many .test files: Define PACKAGE and VERSION in
+	configure.in.
+
+	* package.test: New file.
+
+	* backsl.test: New file.
+
+Thu May 16 09:15:57 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* subdir.test: New file.
+
+Tue May 14 10:17:17 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* mdate2.test: New file, from report by Jim Meyering.
+
+	* canon3.test: New file.
+
+	* auxdir.test: New file.
+
+	* mkinstall.test: New file.
+
+	* extra.test: Reversed sense of test.
+
+Fri Apr 26 15:15:01 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* instman.test: New file.
+
+Thu Apr 25 17:12:30 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* noinst.test: New file
+
+	* exdir.test: Quoting change from Gord Matzigkeit.
+
+	* extra.test (EXTRA_PROGRAMS): New file.
+
+Tue Apr  9 22:55:07 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* target.test: New file.
+
+Wed Apr  3 15:10:54 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* canon2.test: New file
+
+	* insh.test: New file.
+
+Wed Mar 27 23:31:51 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* rulepat.test: New file.
+
+Sat Mar 16 08:37:36 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* empty.test: New file.
+
+Fri Mar 15 17:55:13 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* installsh.test: New file.
+
+Tue Mar  5 16:22:46 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* badprog.test: Rewrote.
+
+	* canon.test: New file.
+
+Mon Mar  4 21:08:37 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* exdir.test: New file.
+
+Fri Mar  1 17:23:53 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* depend.test: New file.
+
+	* badprog.test: New file.
+
+	* defs (AUTOMAKE): Pass --foreign.
+
+Thu Feb 29 20:23:42 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	More tests:
+	* prefix.test: New file.
+	* spelling.test: New file
+	* confincl.test: New file.
+	* Makefile.am (TESTS): Updated.
+
+Wed Feb 28 11:57:02 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* acoutqnl.test: New file.
+	* Makefile.am (TESTS): Include it.
+
+Tue Feb 27 10:52:58 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* Makefile.am (DIST_OTHER): Include "defs".
+
+	* defs (AUTOMAKE): Never relative to $srcdir.
+
+Mon Feb 26 23:14:08 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* libobj.test: Put AC_PROG_RANLIB in configure.in
+
+Mon Feb 19 08:22:22 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* proginst.test: New file.
+
+Tue Feb 13 18:54:39 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* libobj.test: New file.
+
+Mon Feb 12 17:05:48 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* acouttbs.test: New file.
+
+	* Makefile.am (DIST_OTHER): New variable.
+
+	* acoutnoq.test: New file.
+
+Sun Feb 11 16:39:14 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* checkall.test: Delay a little.
+
+	* Makefile.am (check-local): Print name of failing test.
+
+Sat Feb 10 17:08:39 1996  Tom Tromey  <tromey@creche.cygnus.com>
+
+	* checkall.test: New file.
+
+	* instexec.test: New file.
+
+	* mdate.test, vtexi.test, acoutput.test: New files.
+
+	* Started.
+
