@@ -1872,21 +1872,21 @@ sub process_option_list
 
   foreach (@list)
     {
-      $options{$_} = 1;
+      $options{$_} = $where;
       if ($_ eq 'gnits' || $_ eq 'gnu' || $_ eq 'foreign')
 	{
 	  &set_strictness ($_);
 	}
       elsif ($_ eq 'cygnus')
 	{
-	  $cygnus_mode = 1;
+	  $cygnus_mode = $where;
 	}
       elsif (/^(.*\/)?ansi2knr$/)
 	{
 	  # An option like "../lib/ansi2knr" is allowed.  With no
 	  # path prefix, we assume the required programs are in this
 	  # directory.  We save the actual option for later.
-	  $options{'ansi2knr'} = $_;
+	  $options{'ansi2knr'} = [$_, $where];
 	}
       elsif ($_ eq 'no-installman' || $_ eq 'no-installinfo'
 	     || $_ eq 'dist-shar' || $_ eq 'dist-zip'
@@ -3176,29 +3176,30 @@ sub handle_compile ()
     # Check for automatic de-ANSI-fication.
     if (defined $options{'ansi2knr'})
       {
-	require_variables_for_macro ('AUTOMAKE_OPTIONS',
-				     "option `ansi2knr' is used",
-				     "ANSI2KNR", "U");
+	my ($ansi2knr_filename, $ansi2knr_where) = @{$options{'ansi2knr'}};
+	my $ansi2knr_dir = '';
+
+	require_variables ($ansi2knr_where, "option `ansi2knr' is used",
+			   'TRUE', "ANSI2KNR", "U");
 
 	# topdir is where ansi2knr should be.
-	if ($options{'ansi2knr'} eq 'ansi2knr')
+	if ($ansi2knr_filename eq 'ansi2knr')
 	  {
 	    # Only require ansi2knr files if they should appear in
 	    # this directory.
-	    require_file_with_macro ('TRUE', 'AUTOMAKE_OPTIONS', FOREIGN,
-				     'ansi2knr.c', 'ansi2knr.1');
+	    require_file ($ansi2knr_where, FOREIGN,
+			  'ansi2knr.c', 'ansi2knr.1');
 
 	    # ansi2knr needs to be built before subdirs, so unshift it.
 	    unshift (@all, '$(ANSI2KNR)');
 	  }
-
-	my $ansi2knr_dir = '';
-	$ansi2knr_dir = dirname ($options{'ansi2knr'})
-	  if $options{'ansi2knr'} ne 'ansi2knr';
+	else
+	  {
+	    $ansi2knr_dir = dirname ($ansi2knr_filename);
+	  }
 
 	$output_rules .= &file_contents ('ansi2knr',
 					 ('ANSI2KNR-DIR' => $ansi2knr_dir));
-
     }
 }
 
@@ -5182,8 +5183,7 @@ sub handle_minor_options
 	    {
 	      # This means we have an alpha release.  See
 	      # GNITS_VERSION_PATTERN for details.
-	      require_file_with_macro ('TRUE', 'AUTOMAKE_OPTIONS',
-				       FOREIGN, 'README-alpha');
+	      push_dist_common ('README-alpha');
 	    }
 	}
     }
@@ -5258,27 +5258,30 @@ sub scan_autoconf_traces ($)
 {
   my ($filename) = @_;
 
-  my @traced = qw(AC_CANONICAL_HOST
-		  AC_CANONICAL_SYSTEM
-		  AC_CONFIG_AUX_DIR
-		  AC_CONFIG_FILES
-		  AC_CONFIG_HEADERS
-		  AC_INIT
-		  AC_LIBSOURCE
-		  AC_SUBST
-		  AM_AUTOMAKE_VERSION
-		  AM_CONDITIONAL
-		  AM_GNU_GETTEXT
-		  AM_INIT_AUTOMAKE
-		  AM_MAINTAINER_MODE
-		  AM_PROG_CC_C_O);
+  my %traced = (
+		AC_CANONICAL_HOST => 0,
+		AC_CANONICAL_SYSTEM => 0,
+		AC_CONFIG_AUX_DIR => 1,
+		AC_CONFIG_FILES => 1,
+		AC_CONFIG_HEADERS => 1,
+		AC_INIT => 0,
+		AC_LIBSOURCE => 1,
+		AC_SUBST => 1,
+		AM_AUTOMAKE_VERSION => 1,
+		AM_CONDITIONAL => 2,
+		AM_GNU_GETTEXT => 0,
+		AM_INIT_AUTOMAKE => 0,
+		AM_MAINTAINER_MODE => 0,
+		AM_PROG_CC_C_O => 0,
+		);
 
   my $traces = ($ENV{AUTOCONF} || 'autoconf') . " ";
 
   # Use a separator unlikely to be used, not `:', the default, which
   # has a precise meaning for AC_CONFIG_FILES and so on.
   $traces .= join (' ',
-		   map { "--trace=$_" . ':\$f:\$l::\$n::\${::}%' } @traced);
+		   map { "--trace=$_" . ':\$f:\$l::\$n::\${::}%' }
+		   (keys %traced));
 
   my $tracefh = new Automake::XFile ("$traces $filename |");
   verb "reading $traces";
@@ -5288,6 +5291,16 @@ sub scan_autoconf_traces ($)
       chomp;
       my ($here, @args) = split /::/;
       my $macro = $args[0];
+
+      prog_error ("unrequested trace `$macro'")
+	unless exists $traced{$macro};
+
+      # Skip and diagnose malformed calls.
+      if ($#args < $traced{$macro})
+	{
+	  msg ('syntax', $here, "not enough arguments for $macro");
+	  next;
+	}
 
       # Alphabetical ordering please.
       if ($macro eq 'AC_CANONICAL_HOST')
@@ -5465,8 +5478,8 @@ sub check_cygnus
   return unless $cygnus_mode;
 
   &set_strictness ('foreign');
-  $options{'no-installinfo'} = 1;
-  $options{'no-dependencies'} = 1;
+  $options{'no-installinfo'} = $cygnus_mode;
+  $options{'no-dependencies'} = $cygnus_mode;
   $use_dependencies = 0;
 
   err_ac "`AM_MAINTAINER_MODE' required when --cygnus specified"
@@ -5492,8 +5505,8 @@ sub check_gnu_standards
 
   for my $opt ('no-installman', 'no-installinfo')
     {
-      msg_var ('error-gnu', 'AUTOMAKE_OPTIONS',
-	       "option `$opt' disallowed by GNU standards")
+      msg ('error-gnu', $options{$opt},
+	   "option `$opt' disallowed by GNU standards")
 	if (defined $options{$opt});
     }
 }
@@ -6420,7 +6433,7 @@ sub macro_define ($$$$$$)
 
   # NEWS-OS 4.2R complains if a Makefile variable begins with `_'.
   msg ('portability', $where,
-       "$var: variable names starting with `_' are not portable")
+       "$var: Make variable names starting with `_' are not portable")
     if $var =~ /^_/;
 
   # `:='-style assignments are not acknowledged by POSIX.  Moreover it

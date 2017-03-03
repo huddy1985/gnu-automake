@@ -1,17 +1,17 @@
-This is automake.info, produced by makeinfo version 4.5.90 from
+This is automake.info, produced by makeinfo version 4.5.93 from
 automake.texi.
 
-INFO-DIR-SECTION GNU programming tools
+INFO-DIR-SECTION Software development
 START-INFO-DIR-ENTRY
-* automake: (automake).		Making Makefile.in's
+* automake: (automake).		Making Makefile.in's.
 END-INFO-DIR-ENTRY
 
 INFO-DIR-SECTION Individual utilities
 START-INFO-DIR-ENTRY
-* aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
+* aclocal: (automake)Invoking aclocal.          Generating aclocal.m4.
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.7.5
+   This file documents GNU automake 1.7.6
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Free
 Software Foundation, Inc.
@@ -38,7 +38,7 @@ GNU Automake
 
 This file documents the GNU Automake package.  Automake is a program
 which creates GNU standards-compliant Makefiles from template files.
-This edition documents version 1.7.5.
+This edition documents version 1.7.6.
 
 * Menu:
 
@@ -922,6 +922,9 @@ their effects are:
      (relative to the top source directory) that provides any one of
      the helper scripts.  *Note Finding `configure' Input:
      (autoconf)Input.
+
+     Required files from `AC_CONFIG_AUX_DIR' are automatically
+     distributed, even if there is no `Makefile.am' in this directory.
 
 `AC_CANONICAL_HOST'
      Automake will ensure that `config.guess' and `config.sub' exist.
@@ -3662,10 +3665,12 @@ was first formulated by Franc,ois Pinard:
 
    * Otherwise, if `make' built it, then `clean' should delete it.
 
-   * If `configure' built it, then `distclean' should delete it
+   * If `configure' built it, then `distclean' should delete it.
 
-   * If the maintainer built it, then `maintainer-clean' should delete
-     it.
+   * If the maintainer built it (for instance, a `.info' file), then
+     `maintainer-clean' should delete it.  However `maintainer-clean'
+     should not delete anything that needs to exist in order to run
+     `./configure && make'.
 
    We recommend that you follow this same set of heuristics in your
 `Makefile.am'.
@@ -3696,6 +3701,8 @@ the target of a `Makefile.am' rule).  This list is printed by `automake
 --help'.  Also, files which are read by `configure' (i.e. the source
 files corresponding to the files specified in various Autoconf macros
 such as `AC_CONFIG_FILES' and siblings) are automatically distributed.
+Helper scripts installed with `automake --add-missing' are also
+distributed.
 
    Still, sometimes there are files which must be distributed, but which
 are not covered in the automatic rules.  These files should be listed in
@@ -4556,7 +4563,7 @@ install the maintainer tools required to rebuild them.  Other generated
 files like Lex scanners, Yacc parsers, or Info documentation, are
 usually distributed on similar grounds.
 
-   Automake output rules in `Makefile's to rebuild these files.  For
+   Automake outputs rules in `Makefile's to rebuild these files.  For
 instance `make' will run `autoconf' to rebuild `configure' whenever
 `configure.in' is changed.  This makes development safer by ensuring a
 `configure' is never out-of-date with respect to `configure.in'.
@@ -4746,7 +4753,7 @@ maintainer tools explicitly.
 rules conditionally.  Some developers use this feature to disable rules
 that need exotic tools that users may not have available.
 
-   Several years ago François Pinard pointed out several arguments
+   Several years ago Franc,ois Pinard pointed out several arguments
 against `AM_MAINTAINER_MODE'.  Most of them relate to insecurity.  By
 removing dependencies you get non-dependable builds: change to sources
 files can have no effect on generated files and this can be very
@@ -4759,7 +4766,7 @@ nothing happens and the user doesn't notice it (this is what happens
 when rebuild rules are disabled by `AM_MAINTAINER_MODE').
 
    Jim Meyering, the inventor of the `AM_MAINTAINER_MODE' macro was
-swayed by François's arguments, and got rid of `AM_MAINTAINER_MODE' in
+swayed by Franc,ois's arguments, and got rid of `AM_MAINTAINER_MODE' in
 all of his packages.
 
    Still many people continue to use `AM_MAINTAINER_MODE', because it
@@ -5626,105 +5633,105 @@ General Index
 
 
 Tag Table:
-Node: Top1156
-Node: Introduction3022
-Ref: Introduction-Footnote-14485
-Ref: Introduction-Footnote-24634
-Node: Generalities4835
-Node: General Operation5439
-Node: Strictness8114
-Node: Uniform9850
-Node: Canonicalization13665
-Node: User Variables14690
-Node: Auxiliary Programs15924
-Node: Examples18263
-Node: Complete18587
-Node: Hello20585
-Node: true23407
-Node: Invoking Automake26154
-Node: configure32641
-Node: Requirements33685
-Node: Optional34613
-Node: Invoking aclocal39814
-Node: aclocal options41423
-Node: Macro search path42395
-Node: Macros46562
-Node: Public macros47042
-Node: Private macros53961
-Node: Extending aclocal55353
-Node: Top level56383
-Ref: Top level-Footnote-161759
-Node: Alternative61901
-Ref: Alternative-Footnote-163269
-Node: Rebuilding63394
-Node: Programs64159
-Node: A Program65200
-Node: Program Sources65930
-Node: Linking67896
-Node: Conditional Sources70192
-Node: Conditional Programs72919
-Node: A Library74723
-Node: A Shared Library75992
-Node: Program and Library Variables78130
-Ref: Program and Library Variables-Footnote-187162
-Node: LIBOBJS87245
-Node: Program variables87904
-Node: Yacc and Lex90218
-Node: C++ Support95153
-Node: Assembly Support95984
-Node: Fortran 77 Support96756
-Ref: Fortran 77 Support-Footnote-198335
-Node: Preprocessing Fortran 7798538
-Node: Compiling Fortran 77 Files99128
-Node: Mixing Fortran 77 With C and C++99687
-Ref: Mixing Fortran 77 With C and C++-Footnote-1102048
-Node: How the Linker is Chosen102351
-Node: Fortran 77 and Autoconf104896
-Node: Java Support105311
-Node: Support for Other Languages106513
-Node: ANSI107066
-Node: Dependencies109491
-Ref: Dependencies-Footnote-1111210
-Node: EXEEXT111376
-Node: Other objects113569
-Node: Scripts114158
-Node: Headers115242
-Ref: Headers-Footnote-1115943
-Node: Data116176
-Node: Sources116825
-Node: Built sources example119589
-Node: Other GNU Tools126015
-Node: Emacs Lisp126500
-Node: gettext127750
-Node: Libtool128247
-Node: Java128492
-Node: Python130121
-Node: Documentation133292
-Node: Texinfo133590
-Node: Man pages137256
-Node: Install139543
-Node: Clean143909
-Node: Dist145103
-Node: Tests152421
-Node: Options156024
-Node: Miscellaneous162271
-Node: Tags162658
-Node: Suffixes164667
-Node: Multilibs166219
-Node: Include166844
-Node: Conditionals167732
-Node: Gnits170435
-Node: Cygnus172294
-Node: Extending174113
-Node: Distributing176776
-Node: API versioning177406
-Node: FAQ180037
-Node: CVS180651
-Node: maintainer-mode187379
-Node: wildcards190993
-Node: distcleancheck194242
-Node: renamed objects198927
-Node: Macro and Variable Index200430
-Node: General Index210671
+Node: Top1157
+Node: Introduction3023
+Ref: Introduction-Footnote-14486
+Ref: Introduction-Footnote-24635
+Node: Generalities4836
+Node: General Operation5440
+Node: Strictness8115
+Node: Uniform9851
+Node: Canonicalization13666
+Node: User Variables14691
+Node: Auxiliary Programs15925
+Node: Examples18264
+Node: Complete18588
+Node: Hello20586
+Node: true23408
+Node: Invoking Automake26155
+Node: configure32642
+Node: Requirements33686
+Node: Optional34614
+Node: Invoking aclocal39950
+Node: aclocal options41559
+Node: Macro search path42531
+Node: Macros46698
+Node: Public macros47178
+Node: Private macros54097
+Node: Extending aclocal55489
+Node: Top level56519
+Ref: Top level-Footnote-161895
+Node: Alternative62037
+Ref: Alternative-Footnote-163405
+Node: Rebuilding63530
+Node: Programs64295
+Node: A Program65336
+Node: Program Sources66066
+Node: Linking68032
+Node: Conditional Sources70328
+Node: Conditional Programs73055
+Node: A Library74859
+Node: A Shared Library76128
+Node: Program and Library Variables78266
+Ref: Program and Library Variables-Footnote-187298
+Node: LIBOBJS87381
+Node: Program variables88040
+Node: Yacc and Lex90354
+Node: C++ Support95289
+Node: Assembly Support96120
+Node: Fortran 77 Support96892
+Ref: Fortran 77 Support-Footnote-198471
+Node: Preprocessing Fortran 7798674
+Node: Compiling Fortran 77 Files99264
+Node: Mixing Fortran 77 With C and C++99823
+Ref: Mixing Fortran 77 With C and C++-Footnote-1102184
+Node: How the Linker is Chosen102487
+Node: Fortran 77 and Autoconf105032
+Node: Java Support105447
+Node: Support for Other Languages106649
+Node: ANSI107202
+Node: Dependencies109627
+Ref: Dependencies-Footnote-1111346
+Node: EXEEXT111512
+Node: Other objects113705
+Node: Scripts114294
+Node: Headers115378
+Ref: Headers-Footnote-1116079
+Node: Data116312
+Node: Sources116961
+Node: Built sources example119725
+Node: Other GNU Tools126151
+Node: Emacs Lisp126636
+Node: gettext127886
+Node: Libtool128383
+Node: Java128628
+Node: Python130257
+Node: Documentation133428
+Node: Texinfo133726
+Node: Man pages137392
+Node: Install139679
+Node: Clean144045
+Node: Dist145395
+Node: Tests152790
+Node: Options156393
+Node: Miscellaneous162640
+Node: Tags163027
+Node: Suffixes165036
+Node: Multilibs166588
+Node: Include167213
+Node: Conditionals168101
+Node: Gnits170804
+Node: Cygnus172663
+Node: Extending174482
+Node: Distributing177145
+Node: API versioning177775
+Node: FAQ180406
+Node: CVS181020
+Node: maintainer-mode187749
+Node: wildcards191365
+Node: distcleancheck194614
+Node: renamed objects199299
+Node: Macro and Variable Index200802
+Node: General Index211043
 
 End Tag Table

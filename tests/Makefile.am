@@ -7,8 +7,6 @@ acinclude.test \
 aclibobj.test \
 aclocal.test \
 aclocal2.test \
-aclocal.test \
-aclocal2.test \
 aclocal3.test \
 aclocal4.test \
 acoutnoq.test \
@@ -21,11 +19,13 @@ acsubst.test \
 acsubst2.test \
 all.test \
 alpha.test \
+alpha2.test \
 amassign.test \
 ammissing.test \
 ansi.test \
 ansi2.test \
 ansi3.test \
+ansi3b.test \
 ansi4.test \
 ansi5.test \
 ansi6.test \
@@ -113,6 +113,7 @@ conf2.test \
 confdeps.test \
 confdist.test \
 conff.test \
+conff2.test \
 confh.test \
 confh4.test \
 config.test \
@@ -202,6 +203,7 @@ getopt.test \
 gettext.test \
 gettext2.test \
 gnuwarn.test \
+gnuwarn2.test \
 gnits.test \
 gnits2.test \
 gnits3.test \
@@ -298,7 +300,6 @@ output2.test \
 output3.test \
 output4.test \
 output5.test \
-package.test \
 parse.test \
 percent.test \
 percent2.test \
@@ -367,7 +368,6 @@ spell.test \
 spell2.test \
 spell3.test \
 spelling.test \
-stamph.test \
 stamph2.test \
 stdlib.test \
 strip.test \
