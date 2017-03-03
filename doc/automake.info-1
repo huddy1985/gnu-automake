@@ -3,7 +3,7 @@ automake.texi.
 
 
 
-   This manual is for GNU Automake (version 1.8.3, 15 February 2004), a
+   This manual is for GNU Automake (version 1.8.4, 25 April 2004), a
 program which creates GNU standards-compliant Makefiles from template
 files.
 
@@ -40,7 +40,7 @@ GNU Automake
 
 
 
-   This manual is for GNU Automake (version 1.8.3, 15 February 2004), a
+   This manual is for GNU Automake (version 1.8.4, 25 April 2004), a
 program which creates GNU standards-compliant Makefiles from template
 files.
 
@@ -807,11 +807,11 @@ and `-o'.  The simplest fix for this is to introduce a bogus dependency
 feature is used (*note ANSI::).  Supporting de-ANSI-fication requires a
 little more work:
 
-     true._o: true._c false.o
-             $(COMPILE) -DEXIT_CODE=0 -c true.c
+     true_.o: true_.c false_.o
+             $(COMPILE) -DEXIT_CODE=0 -c true_.c
      
-     false._o: true._c
-             $(COMPILE) -DEXIT_CODE=1 -c true.c && mv true._o false.o
+     false_.o: true_.c
+             $(COMPILE) -DEXIT_CODE=1 -c true_.c && mv true_.o false_.o
 
    As it turns out, there is also a much easier way to do this same
 task.  Some of the above techniques are useful enough that we've kept
@@ -2855,7 +2855,7 @@ reasons.)
 and `sub/libc++.a' will be built from `sub/libc++.c'.  (In older
 versions `sub/libc++.a' would be built from `sub_libc___a.c', i.e., the
 default source was the canonized name of the target, with `.c' appended.
-Be believe the new behavior is more sensible, but for backward
+We believe the new behavior is more sensible, but for backward
 compatibility automake will use the old name if a file or a rule with
 that name exist.)
 
@@ -3606,25 +3606,42 @@ File: automake.info,  Node: Headers,  Next: Data,  Prev: Scripts,  Up: Other obj
 Header files
 ============
 
-Header files are specified by the `HEADERS' family of variables.
-Generally header files are not installed, so the `noinst_HEADERS'
-variable will be the most used.  (1)
+Header files that must be installed are specified by the `HEADERS'
+family of variables.  Headers can be installed in `includedir',
+`oldincludedir', `pkgincludedir' or any other directory you may have
+defined (*note Uniform::).  For instance
 
-   All header files must be listed somewhere; missing ones will not
-appear in the distribution.  Often it is clearest to list uninstalled
-headers with the rest of the sources for a program.  *Note A Program::.
-Headers listed in a `_SOURCES' variable need not be listed in any
-`_HEADERS' variable.
+     include_HEADERS = foo.h bar/bar.h
 
-   Headers can be installed in `includedir', `oldincludedir', or
-`pkgincludedir'.
+will install the two files as `$(includedir)/foo.h' and
+`$(includedir)/bar.h'.
 
-   ---------- Footnotes ----------
+   The `nobase_' prefix is also supported,
 
-   (1) However, for the case of a non-installed header file that is
-actually used by a particular program, we recommend listing it in the
-program's `_SOURCES' variable instead of in `noinst_HEADERS'.  We
-believe this is more clear.
+     nobase_include_HEADERS = foo.h bar/bar.h
+
+will install the two files as `$(includedir)/foo.h' and
+`$(includedir)/bar/bar.h' (*note Alternative::).
+
+   Usually, only header files that accompany installed libraries need to
+be installed.  Headers used by programs or convenience libraries are
+not installed.  The `noinst_HEADERS' variable can be used for such
+headers.  However when the header actually belongs to one convenient
+library or program, we recommend listing it in the program's or
+library's `_SOURCES' variable (*note Program Sources::) instead of in
+`noinst_HEADERS'.  This is clearer for the `Makefile.am' reader.
+`noinst_HEADERS' would be the right variable to use in a directory
+containing only headers and no associated library or program.
+
+   All header files must be listed somewhere; in a `_SOURCES' variable
+or in a `_HEADERS' variable.  Missing ones will not appear in the
+distribution.
+
+   For header files that are built and must not be distributed, use the
+`nodist_' prefix as in `nodist_include_HEADERS' or
+`nodist_prog_SOURCES'.  If these generated headers are needed during
+the build, you must also ensure they exist before they are used, see
+*Note Sources::.
 
 
 File: automake.info,  Node: Data,  Next: Sources,  Prev: Headers,  Up: Other objects
@@ -6893,7 +6910,6 @@ Macro and Variable Index
 * FLINK:                                 Fortran 77 Support.
 * GCJFLAGS:                              Java Support.
 * GTAGS_ARGS:                            Tags.
-* HEADERS <1>:                           Headers.
 * HEADERS:                               Uniform.
 * host_alias:                            Optional.
 * host_triplet:                          Optional.

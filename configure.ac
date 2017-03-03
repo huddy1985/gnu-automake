@@ -24,7 +24,7 @@ dnl (abs_top_builddir is used in tests/automake.in).  Note that
 dnl this is a requirement for the Automake package itself.
 dnl Automake users can still use Autoconf 2.58.
 AC_PREREQ(2.58a)
-AC_INIT([GNU Automake], [1.8.3], [bug-automake@gnu.org])
+AC_INIT([GNU Automake], [1.8.4], [bug-automake@gnu.org])
 
 AC_CONFIG_SRCDIR(automake.in)
 AC_CONFIG_AUX_DIR(lib)
@@ -54,8 +54,8 @@ AC_SUBST(pkgvdatadir)
 
 # $AUTOMAKE and $ACLOCAL are always run after a `cd $top_srcdir',
 # hence `.' is really what we want for perllibdir, libdir, and acdir.
-ACLOCAL="perllibdir=`pwd`/lib:./lib `pwd`/aclocal --acdir=m4"
-AUTOMAKE="perllibdir=`pwd`/lib:./lib `pwd`/automake --libdir=lib"
+ACLOCAL="perllibdir=`pwd`\"/lib$PATH_SEPARATOR./lib\" `pwd`/aclocal --acdir=m4"
+AUTOMAKE="perllibdir=`pwd`\"/lib$PATH_SEPARATOR./lib\" `pwd`/automake --libdir=lib"
 
 AC_PATH_PROG(PERL, perl)
 if test -z "$PERL"; then

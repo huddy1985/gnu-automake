@@ -1,5 +1,5 @@
-#! /bin/sh
-# Copyright (C) 2002, 2003, 2004  Free Software Foundation, Inc.
+#!/bin/sh
+# Copyright (C) 2004  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -18,36 +18,32 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# Make sure that Java rules doesn't attempt to run javac when there is
-# no classes to compile.
-# Report from Braden McDaniel.
+# Regression test for an internal error when @LIBOBJS@ is used in
+# a variable that is not defined in the same conditions as the _LDADD
+# that uses it.
+# Report from Bill Davidson
 
-. ./defs || exit 1
+required=gcc
+. ./defs
 
 set -e
 
-cat >> configure.in << 'END'
-AM_CONDITIONAL(WITH_JDK, false)
+cat >>configure.in <<'EOF'
+AC_PROG_CC
+AC_LIBSOURCE([bar.c])
+AM_CONDITIONAL([CASE], :)
 AC_OUTPUT
-END
+EOF
 
-cat > Makefile.am << 'END'
-JAVAC = false
-JAVAROOT = $(top_builddir)/java
+: >bar.c
 
-JAVA_FILES = MyClass1.java
-
-if WITH_JDK
-noinst_JAVA = $(JAVA_FILES)
+cat >>Makefile.am <<'EOF'
+COMMON_LIBS = @LIBOBJS@
+bin_PROGRAMS = foo
+if ! CASE
+foo_LDADD = $(COMMON_LIBS)
 endif
-
-EXTRA_DIST = $(JAVA_FILES)
-END
-
-: >MyClass1.java
+EOF
 
 $ACLOCAL
-$AUTOCONF
 $AUTOMAKE
-./configure
-$MAKE

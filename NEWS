@@ -1,3 +1,46 @@
+Known issue not fixed in 1.8.4:
+
+  Historically Automake has always tried to generate V7 format
+  tarballs during `make dist'.  This format is quite antiquated, but
+  is portable.  It supports filenames with up to 99 characters.  When
+  given longer filenames some tar implementations will diagnose the
+  problem while other will generate broken or non-V7 tarballs.  For
+  instance GNU tar 1.13.25 will produce an archive with GNU
+  extensions, while the latest GNU tar beta (1.13.93) will silently
+  truncate filenames.
+
+  Automake 1.9 will have options to select newer tar formats, and
+  diagnose long filenames.  In the meantime we recommand that people
+  who cannot avoid long filenames in their packages stick to GNU tar
+  1.13.25.
+
+Bugs fixed in 1.8.4:
+
+* Long standing bugs:
+
+  - Fix AM_PATH_PYTHON to correctly display $PYTHON when it has been
+    overridden by the user.
+
+  - Honor PATH_SEPARATOR in various places of the Automake package, for
+    the sake of OS/2.
+
+  - Adjust dependency tracking mode detection to ICC 8.0's new output.
+    (PR/416)
+
+  - Fix install-sh so it can install the `mv' binary... using `mv'.
+
+  - Fix tru64 dependency tracking for libtool objects.
+
+  - Work around Exuberant Ctags when creating a TAGS files in a directory
+    without files to scan but with subdirectories to include.
+
+* Bugs introduced by 1.8:
+
+  - Fix an "internal error" when @LIBOBJS@ is used in a variable that is
+    not defined in the same conditions as the _LDADD that uses it.
+
+  - Do not warn when JAVAROOT is overridden, this is legitimate.
+
 Bugs fixed in 1.8.3:
 
 * Long standing bugs:

@@ -32,7 +32,7 @@ package Language;
 BEGIN
 {
   my $perllibdir = $ENV{'perllibdir'} || '@datadir@/@PACKAGE@-@APIVERSION@';
-  unshift @INC, (split ':', $perllibdir);
+  unshift @INC, (split '@PATH_SEPARATOR@', $perllibdir);
 
   # Override SHELL.  This is required on DJGPP so that system() uses
   # bash, not COMMAND.COM which doesn't quote arguments properly.
@@ -1922,13 +1922,13 @@ sub handle_lib_objects
 	 }
        elsif ($val =~ /^\@(LT)?LIBOBJS\@$/)
 	 {
-	   handle_LIBOBJS ($subvar, $full_cond, $1);
+	   handle_LIBOBJS ($subvar, $cond, $1);
 	   $seen_libobjs = 1;
 	   return $val;
 	 }
        elsif ($val =~ /^\@(LT)?ALLOCA\@$/)
 	 {
-	   handle_ALLOCA ($subvar, $full_cond, $1);
+	   handle_ALLOCA ($subvar, $cond, $1);
 	   return $val;
 	 }
        else
@@ -2822,11 +2822,11 @@ sub handle_texinfo_helper ($)
       #       because `make dist' always pick files in the build tree
       #       first.
       # However it turned out the be a bad idea for several reasons:
-      #   * Tru64, OpenBSD, and FreeBSD (not NetBSD) Make do behave
+      #   * Tru64, OpenBSD, and FreeBSD (not NetBSD) Make do not behave
       #     like GNU Make on point (1) above.  These implementations
       #     of Make would always rebuild .info files in the build
       #     tree, even if such files were up to date in the source
-      #     tree.  Consequently, it was impossible the perform a VPATH
+      #     tree.  Consequently, it was impossible to perform a VPATH
       #     build of a package containing Texinfo files using these
       #     Make implementations.
       #     (Refer to the Autoconf Manual, section "Limitation of
@@ -2839,7 +2839,7 @@ sub handle_texinfo_helper ($)
       #     build tree can be annoying during development because
       #     - if the files is kept under CVS, you really want it
       #       to be updated in the source tree
-      #     - it os confusing that `make distclean' does not erase
+      #     - it is confusing that `make distclean' does not erase
       #       all files in the build tree.
       #
       # Consequently, starting with Automake 1.8, .info files are
