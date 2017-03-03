@@ -1,3 +1,73 @@
+2004-09-19  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.ac, NEWS: Bump version to 1.9.2.
+
+	* tests/compile.test: Fix rm usage.
+
+	* INSTALL, lib/INSTALL, lib/config.sub, lib/config.guess,
+	lib/texinfo.tex: New upstream versions.
+
+	* doc/automake.texi (Timeline): New node.  Thanks to Karl and Tom
+	for their comments on a preliminary version of this, Akim for
+	digging out some old mails, and Jason Molenda for sending the note
+	about Automake in Alias to Tom.
+	(Releases): Rename `ac' to `acl', suggested by Akim.
+
+2004-09-15  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (Releases): New node.
+
+	* doc/automake.texi (Dependencies): Link to Dependency Tracking
+	Evolution.
+	(Dependency Tracking Evolution): Link to GNU make, Sources (for
+	BUILT_SOURCES), and update the paragraph about the "plan" to
+	inline dependency tracking with gcc3.
+
+	* doc/automake.texi (History): New node.
+	(Dependency Tracking Evolution): New node, filled with a Texinfo
+	version of Tom Tromey's ``Dependency Tracking in Automake''
+	document, initially published on the Automake homepage on
+	2001-06-29.
+
+2004-09-10  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/compile, lib/elisp-comp, lib/install-sh, lib/ylwrap: Use $ret
+	instead of $status which is read-only in Zsh.
+
+2004-09-10  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+	    Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/compile: Preserve spaces in arguments (for example
+	-DPACKAGE_STRING="foo 0.1").
+	* tests/compile.test: New file.
+	* tests/Makefile.am (TESTS): Add compile.test.
+
+2004-09-07  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (handle_clean): Sort rm commands output for
+	mostlyclean-generic, clean-generic, distclean-generic, and
+	maintainer-clean-generic.
+	Report from Bob Friesenhahn.
+
+2004-09-07  Andreas Schwab  <schwab@suse.de>
+
+	* automake.in ($PATH_PATTERN): Add `+'.
+
+2004-09-07  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/missing3.test: New file (check for Paolo's change below).
+	* tests/Makefile.am (TESTS): Add missing3.test.
+
+2004-09-07  Paolo Bonzini  <bonzini@gnu.org>
+
+	* missing: Handle all command line options together.  Add a
+	separate case statement to detect failed runs, and fail
+	silently there if --help or --version is passed to the program.
+
+2004-08-12  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.ac, NEWS: Bump version to 1.9.1a.
+
 2004-08-11  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* configure.ac, NEWS: Bump version to 1.9.1.

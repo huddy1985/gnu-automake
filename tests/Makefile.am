@@ -93,6 +93,7 @@ comment4.test \
 comment5.test \
 comment6.test \
 comment7.test \
+compile.test \
 compile_f90_c_cxx.test \
 compile_f_c_cxx.test \
 cond.test \
@@ -332,6 +333,7 @@ mdate3.test \
 mdate4.test \
 missing.test \
 missing2.test \
+missing3.test \
 mkinst2.test \
 mkinstall.test \
 multlib.test \
