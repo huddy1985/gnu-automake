@@ -1,9 +1,8 @@
 This is automake.info, produced by makeinfo version 5.1 from
 automake.texi.
 
-This manual is for GNU Automake (version 1.13.4, 14 June 2013), a
-program that creates GNU standards-compliant Makefiles from template
-files.
+This manual is for GNU Automake (version 1.14, 20 June 2013), a program
+that creates GNU standards-compliant Makefiles from template files.
 
    Copyright (C) 1995-2013 Free Software Foundation, Inc.
 
@@ -31,9 +30,8 @@ File: automake.info,  Node: Top,  Next: Introduction,  Up: (dir)
 GNU Automake
 ************
 
-This manual is for GNU Automake (version 1.13.4, 14 June 2013), a
-program that creates GNU standards-compliant Makefiles from template
-files.
+This manual is for GNU Automake (version 1.14, 20 June 2013), a program
+that creates GNU standards-compliant Makefiles from template files.
 
    Copyright (C) 1995-2013 Free Software Foundation, Inc.
 
@@ -1282,6 +1280,7 @@ follows:
      ~/amhello % autoreconf --install
      configure.ac: installing './install-sh'
      configure.ac: installing './missing'
+     configure.ac: installing './compile'
      src/Makefile.am: installing './depcomp'
 
    At this point the build system is complete.
@@ -3328,10 +3327,11 @@ File: automake.info,  Node: Public Macros,  Next: Obsolete Macros,  Up: Macros
      set 'CCAS', and will also set 'CCASFLAGS' if required.
 
 'AM_PROG_CC_C_O'
-     This is like 'AC_PROG_CC_C_O', but it generates its results in the
-     manner required by Automake.  You must use this instead of
-     'AC_PROG_CC_C_O' when you need this functionality, that is, when
-     using per-target flags or subdir-objects with C sources.
+     This is an obsolescent macro that checks that the C compiler
+     supports the '-c' and '-o' options together.  Note that, since
+     Automake 1.14, the 'AC_PROG_CC' is rewritten to implement such
+     checks itself, and thus the explicit use of 'AM_PROG_CC_C_O' should
+     no longer be required.
 
 'AM_PROG_LEX'
      Like 'AC_PROG_LEX' (*note Particular Program Checks:
@@ -4890,9 +4890,7 @@ libraries differ.
      file like 'sample.c' will be compiled to produce 'sample.o'.
      However, if the program's '_CFLAGS' variable is set, then the
      object file will be named, for instance, 'maude-sample.o'.  (See
-     also *note Renamed Objects::.)  The use of per-target compilation
-     flags with C sources requires that the macro 'AM_PROG_CC_C_O' be
-     called from 'configure.ac'.
+     also *note Renamed Objects::).
 
      In compilations with per-target flags, the ordinary 'AM_' form of
      the flags variable is _not_ automatically included in the
@@ -5243,7 +5241,7 @@ latter is a user variable and the former is intended for the
 rebuild rule for distributed Yacc and Lex sources are only used when
 'maintainer-mode' is enabled, or when the files have been erased.
 
-   When 'lex' or 'yacc' sources are used, 'automake -i' automatically
+   When 'lex' or 'yacc' sources are used, 'automake -a' automatically
 installs an auxiliary program called 'ylwrap' in your package (*note
 Auxiliary Programs::).  This program is used by the build rules to
 rename the output of these tools, and makes it possible to include
@@ -6597,6 +6595,11 @@ by 'make install' (unless you use 'no-installinfo', see below).
 Furthermore, '.info' files are automatically distributed so that Texinfo
 is not a prerequisite for installing your package.
 
+   It is worth noting that, contrary to what happens with the other
+formats, the generated '.info' files are by default placed in 'srcdir'
+rather than in the 'builddir'.  This can be changed with the
+'info-in-builddir' option.
+
    Other documentation formats can be built on request by 'make dvi',
 'make ps', 'make pdf' and 'make html', and they can be installed with
 'make install-dvi', 'make install-ps', 'make install-pdf' and 'make
@@ -7055,7 +7058,9 @@ the 'EXTRA_DIST' variable.  You can mention files from subdirectories in
 entire directory will be recursively copied into the distribution.
 Please note that this will also copy _everything_ in the directory,
 including, e.g., Subversion's '.svn' private directories or CVS/RCS
-version control files.  We recommend against using this feature.
+version control files; thus we recommend against using this feature
+as-is.  However, you can use the 'dist-hook' feature to ameliorate the
+problem; *note The dist Hook::.
 
    If you define 'SUBDIRS', Automake will recursively include the
 subdirectories in the distribution.  If 'SUBDIRS' is defined

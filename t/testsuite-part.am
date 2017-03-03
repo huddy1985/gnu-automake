@@ -374,6 +374,7 @@ libtool_macros_TESTS = \
   t/ar-lib6b.sh \
   t/canon6.sh \
   t/canon7.sh \
+  t/ccnoco-lt.sh \
   t/cxx-lt-demo.sh \
   t/depcomp8b.sh \
   t/extra-deps-lt.sh \
@@ -437,6 +438,7 @@ t/ar-lib6a.log:  t/libtool-macros.log
 t/ar-lib6b.log:  t/libtool-macros.log
 t/canon6.log:  t/libtool-macros.log
 t/canon7.log:  t/libtool-macros.log
+t/ccnoco-lt.log:  t/libtool-macros.log
 t/cxx-lt-demo.log:  t/libtool-macros.log
 t/depcomp8b.log:  t/libtool-macros.log
 t/extra-deps-lt.log:  t/libtool-macros.log
@@ -721,14 +723,18 @@ t/testsuite-summary-count-many.log: t/ax/extract-testsuite-summary.pl
 
 ## Added by deps-extracting key 'gettext_macros'.
 gettext_macros_TESTS = \
-  t/gettext.sh \
-  t/gettext2.sh \
-  t/gettext3.sh \
+  t/gettext-basics.sh \
+  t/gettext-config-rpath.sh \
+  t/gettext-external-pr338.sh \
+  t/gettext-intl-subdir.sh \
+  t/gettext-pr381.sh \
   t/subdir-cond-gettext.sh
 EXTRA_DIST += 
-t/gettext.log:  t/gettext-macros.log
-t/gettext2.log:  t/gettext-macros.log
-t/gettext3.log:  t/gettext-macros.log
+t/gettext-basics.log:  t/gettext-macros.log
+t/gettext-config-rpath.log:  t/gettext-macros.log
+t/gettext-external-pr338.log:  t/gettext-macros.log
+t/gettext-intl-subdir.log:  t/gettext-macros.log
+t/gettext-pr381.log:  t/gettext-macros.log
 t/subdir-cond-gettext.log:  t/gettext-macros.log
 
 ## Added by deps-extracting key 'use_trivial_test_driver'.

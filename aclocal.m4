@@ -1,4 +1,4 @@
-# generated automatically by aclocal 1.13.4 -*- Autoconf -*-
+# generated automatically by aclocal 1.14 -*- Autoconf -*-
 
 # Copyright (C) 1996-2013 Free Software Foundation, Inc.
 
@@ -28,6 +28,7 @@ m4_include([m4/install-sh.m4])
 m4_include([m4/lead-dot.m4])
 m4_include([m4/missing.m4])
 m4_include([m4/options.m4])
+m4_include([m4/prog-cc-c-o.m4])
 m4_include([m4/runlog.m4])
 m4_include([m4/sanity.m4])
 m4_include([m4/silent.m4])
