@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 1996, 1997, 2001, 2002  Free Software Foundation, Inc.
+# Copyright (C) 1996, 1997, 2001, 2002, 2003  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -14,13 +14,17 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with autoconf; see the file COPYING.  If not, write to
+# along with Automake; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
 # Test to make sure no-installman suppresses man dir creation.
 
 . ./defs || exit 1
+
+set -e
+
+echo AC_OUTPUT >> configure.in
 
 cat > Makefile.am << 'END'
 AUTOMAKE_OPTIONS = no-installman
@@ -29,14 +33,10 @@ END
 
 : > foo.1
 
-cat > mkinstalldirs << 'END'
-echo "$@"
-END
+$ACLOCAL
+$AUTOCONF
+$AUTOMAKE
+./configure --prefix `pwd`/sub
 
-chmod +x mkinstalldirs
-
-$ACLOCAL || exit 1
-$AUTOMAKE || exit 1
-
-($MAKE -s -f Makefile.in installdirs | grep man) && exit 1
-exit 0
+$MAKE installdirs
+test ! -d sub/man

@@ -2,7 +2,7 @@
 
 ## Makefile for Automake lib.
 
-## Copyright 2001 Free Software Foundation, Inc.
+## Copyright (C) 2001, 2003 Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -21,7 +21,8 @@
 
 SUBDIRS = Automake am
 
-dist_pkgvdata_DATA = COPYING INSTALL texinfo.tex ansi2knr.c ansi2knr.1
+dist_pkgvdata_DATA = COPYING INSTALL texinfo.tex ansi2knr.c ansi2knr.1 \
+  config-ml.in
 
 ## These must all be executable when installed.  However, if we use
 ## _SCRIPTS, then the program transform will be applied, which is not
@@ -29,7 +30,7 @@ dist_pkgvdata_DATA = COPYING INSTALL texinfo.tex ansi2knr.c ansi2knr.1
 scriptdir = $(pkgvdatadir)
 dist_script_DATA = config.guess config.sub install-sh mdate-sh missing \
   mkinstalldirs elisp-comp ylwrap acinstall depcomp compile py-compile \
-  config-ml.in symlink-tree
+  symlink-tree
 
 install-data-hook:
 	@$(POST_INSTALL)

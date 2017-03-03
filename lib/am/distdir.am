@@ -19,15 +19,10 @@
 ## DIST_COMMON comes first so that README can be the very first file.
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 
-top_distdir = %TOP_DISTDIR%
 if %?TOPDIR_P%
-## Avoid unsightly `./'.
-?DISTDIR?distdir = $(PACKAGE)-$(VERSION)
-else !%?TOPDIR_P%
-?DISTDIR?distdir = $(top_distdir)/$(PACKAGE)-$(VERSION)
-endif !%?TOPDIR_P%
+distdir = $(PACKAGE)-$(VERSION)
+top_distdir = $(distdir)
 
-if %?TOPDIR_P%
 am__remove_distdir = \
   { test ! -d $(distdir) \
     || { find $(distdir) -type d ! -perm -200 -exec chmod u+w {} ';' \
@@ -59,7 +54,7 @@ if %?TOPDIR_P%
 endif %?TOPDIR_P%
 ##
 ##
-?DISTDIRS?	$(mkinstalldirs) %DISTDIRS%
+?DISTDIRS?	$(mkdir_p) %DISTDIRS%
 ##
 ##
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
@@ -111,7 +106,7 @@ endif %?TOPDIR_P%
 	  dir=`echo "$$file" | sed -e 's,/[^/]*$$,,'`; \
 	  if test "$$dir" != "$$file" && test "$$dir" != "."; then \
 	    dir="/$$dir"; \
-	    $(mkinstalldirs) "$(distdir)$$dir"; \
+	    $(mkdir_p) "$(distdir)$$dir"; \
 	  else \
 	    dir=''; \
 	  fi; \
@@ -157,13 +152,13 @@ endif %?TOPDIR_P%
 if %?SUBDIRS%
 	list='$(%DIST_SUBDIR_NAME%)'; for subdir in $$list; do \
 	  if test "$$subdir" = .; then :; else \
-	    test -d $(distdir)/$$subdir \
-	    || mkdir $(distdir)/$$subdir \
+	    test -d "$(distdir)/$$subdir" \
+	    || mkdir "$(distdir)/$$subdir" \
 	    || exit 1; \
 	    (cd $$subdir && \
 	      $(MAKE) $(AM_MAKEFLAGS) \
-	        top_distdir="$(top_distdir)" \
-	        distdir=../$(distdir)/$$subdir \
+	        top_distdir="../$(top_distdir)" \
+	        distdir="../$(distdir)/$$subdir" \
 	        distdir) \
 	      || exit 1; \
 	  fi; \
@@ -215,46 +210,47 @@ endif %?TOPDIR_P%
 ## Note that we don't use GNU tar's `-z' option.  One reason (but not
 ## the only reason) is that some versions of tar (e.g., OSF1)
 ## interpret `-z' differently.
+##
+## The -o option of GNU tar used to exclude empty directories.  This
+## behavior was fixed in tar 1.12 (released on 1997-04-25).  But older
+## versions of tar are still used (for instance NetBSD 1.6.1 ships
+## with tar 1.11.2).  We do not do anything specific w.r.t. this
+## incompatibility since packages where empty directories need to be
+## present in the archive are really unusual.
 
 if %?TOPDIR_P%
 
+?GZIP?DIST_ARCHIVES += $(distdir).tar.gz
 GZIP_ENV = --best
 .PHONY: dist-gzip
 dist-gzip: distdir
 	$(AMTAR) chof - $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
 	$(am__remove_distdir)
 
-if  %?BZIP2%
+?BZIP2?DIST_ARCHIVES += $(distdir).tar.bz2
 .PHONY: dist-bzip2
 dist-bzip2: distdir
 	$(AMTAR) chof - $(distdir) | bzip2 -9 -c >$(distdir).tar.bz2
 	$(am__remove_distdir)
-endif  %?BZIP2%
 
-
-if  %?COMPRESS%
+?COMPRESS?DIST_ARCHIVES += $(distdir).tar.Z
 .PHONY: dist-tarZ
 dist-tarZ: distdir
 	$(AMTAR) chof - $(distdir) | compress -c >$(distdir).tar.Z
 	$(am__remove_distdir)
-endif  %?COMPRESS%
 
-
-if  %?SHAR%
+?SHAR?DIST_ARCHIVES += $(distdir).shar.gz
 .PHONY: dist-shar
 dist-shar: distdir
 	shar $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).shar.gz
 	$(am__remove_distdir)
-endif  %?SHAR%
 
-
-if  %?ZIP%
+?ZIP?DIST_ARCHIVES += $(distdir).zip
 .PHONY: dist-zip
 dist-zip: distdir
 	-rm -f $(distdir).zip
 	zip -rq $(distdir).zip $(distdir)
 	$(am__remove_distdir)
-endif  %?ZIP%
 
 endif %?TOPDIR_P%
 
@@ -271,7 +267,7 @@ if %?TOPDIR_P%
 
 .PHONY: dist dist-all
 dist dist-all: distdir
-	$(AMTAR) chof - $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
+?GZIP?	$(AMTAR) chof - $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
 ?BZIP2?	$(AMTAR) chof - $(distdir) | bzip2 -9 -c >$(distdir).tar.bz2
 ?COMPRESS?	$(AMTAR) chof - $(distdir) | compress -c >$(distdir).tar.Z
 ?SHAR?	shar $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).shar.gz
@@ -293,8 +289,18 @@ if %?TOPDIR_P%
 # tarfile.
 .PHONY: distcheck
 distcheck: dist
-	$(am__remove_distdir)
-	GZIP=$(GZIP_ENV) gunzip -c $(distdir).tar.gz | $(AMTAR) xf -
+	case '$(DIST_ARCHIVES)' in \
+	*.tar.gz*) \
+	  GZIP=$(GZIP_ENV) gunzip -c $(distdir).tar.gz | $(AMTAR) xf - ;;\
+	*.tar.bz2*) \
+	  bunzip2 -c $(distdir).tar.bz2 | $(AMTAR) xf - ;;\
+	*.tar.Z*) \
+	  uncompress -c $(distdir).tar.Z | $(AMTAR) xf - ;;\
+	*.shar.gz*) \
+	  GZIP=$(GZIP_ENV) gunzip -c $(distdir).tar.gz | unshar ;;\
+	*.zip*) \
+	  unzip $(distdir).zip ;;\
+	esac
 ## Make the new source tree read-only.  Distributions ought to work in
 ## this case.  However, make the top-level directory writable so we
 ## can make our new subdirs.
@@ -338,21 +344,21 @@ distcheck: dist
 	  && ({ \
 ## Build the directory, so we can cd into it even if `make install'
 ## didn't create it.
-	       (cd ../.. && $(mkinstalldirs) "$$dc_destdir") \
+	       (cd ../.. && $(mkdir_p) "$$dc_destdir") \
 	       && $(MAKE) $(AM_MAKEFLAGS) DESTDIR="$$dc_destdir" install \
 	       && $(MAKE) $(AM_MAKEFLAGS) DESTDIR="$$dc_destdir" uninstall \
 	       && $(MAKE) $(AM_MAKEFLAGS) DESTDIR="$$dc_destdir" \
 	            distuninstallcheck_dir="$$dc_destdir" distuninstallcheck; \
 	      } || { rm -rf "$$dc_destdir"; exit 1; }) \
 	  && rm -rf "$$dc_destdir" \
-	  && $(MAKE) $(AM_MAKEFLAGS) dist-gzip \
-## Make sure to remove the dist file we created in the test build
-## directory.
-	  && rm -f $(distdir).tar.gz \
+	  && $(MAKE) $(AM_MAKEFLAGS) dist \
+## Make sure to remove the dists we created in the test build directory.
+	  && rm -rf $(DIST_ARCHIVES) \
 	  && $(MAKE) $(AM_MAKEFLAGS) distcleancheck
 	$(am__remove_distdir)
-	@echo "$(distdir).tar.gz is ready for distribution" | \
-	  sed 'h;s/./=/g;p;x;p;x'
+	@(echo "$(distdir) archives ready for distribution: "; \
+	  list='$(DIST_ARCHIVES)'; for i in $$list; do echo $$i; done) | \
+	  sed -e '1{h;s/./=/g;p;x;}' -e '$${p;x;}'
 
 ## Define distuninstallcheck_listfiles and distuninstallcheck separately
 ## from distcheck, so that they can be overridden by the user.

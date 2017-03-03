@@ -1,14 +1,21 @@
 ## Process this file with automake to create Makefile.in
 
-XFAIL_TESTS = subdir5.test auxdir2.test cond17.test
+XFAIL_TESTS = auxdir2.test cond17.test txinfo5.test
 
 TESTS =	\
-acinclude.test \
 aclibobj.test \
 aclocal.test \
-aclocal2.test \
 aclocal3.test \
 aclocal4.test \
+aclocal5.test \
+aclocal6.test \
+aclocal7.test \
+aclocal8.test \
+aclocal9.test \
+acloca10.test \
+acloca11.test \
+acloca12.test \
+acloca13.test \
 acoutnoq.test \
 acoutpt.test \
 acoutpt2.test \
@@ -18,6 +25,8 @@ acsilent.test \
 acsubst.test \
 acsubst2.test \
 all.test \
+alloca.test \
+alloca2.test \
 alpha.test \
 alpha2.test \
 amassign.test \
@@ -37,6 +46,8 @@ ar.test \
 asm.test \
 autohdr.test \
 autohdr2.test \
+autohdr3.test \
+autohdr4.test \
 auxdir.test \
 auxdir2.test \
 backsl.test \
@@ -86,7 +97,6 @@ cond8.test \
 cond9.test \
 cond10.test \
 cond11.test \
-cond12.test \
 cond13.test \
 cond14.test \
 cond15.test \
@@ -103,6 +113,10 @@ cond25.test \
 cond26.test \
 cond27.test \
 cond28.test \
+cond29.test \
+cond30.test \
+cond31.test \
+cond32.test \
 condd.test \
 condinc.test \
 condinc2.test \
@@ -111,13 +125,16 @@ condman.test \
 condman2.test \
 conf2.test \
 confdeps.test \
-confdist.test \
 conff.test \
 conff2.test \
 confh.test \
 confh4.test \
+confh5.test \
 config.test \
 confincl.test \
+conflnk.test \
+conflnk2.test \
+conflnk3.test \
 confsub.test \
 confvar.test \
 confvar2.test \
@@ -142,7 +159,6 @@ dejagnu4.test \
 dejagnu5.test \
 dejagnu6.test \
 dejagnu7.test \
-depacl.test \
 depacl2.test \
 depcomp.test \
 depcomp2.test \
@@ -158,16 +174,16 @@ destdir.test \
 dirforbid.test \
 dirlist.test \
 discover.test \
-distcom.test \
 distcom2.test \
 distcom3.test \
+distcom4.test \
+distcom5.test \
 distcom6.test \
 distdir.test \
 distname.test \
 dollar.test \
 double.test \
 dup2.test \
-dup3.test \
 else.test \
 empty.test \
 empty2.test \
@@ -179,6 +195,7 @@ exdir2.test \
 exeext.test \
 exeext2.test \
 exeext3.test \
+exeext4.test \
 exsource.test \
 ext.test \
 ext2.test \
@@ -203,17 +220,18 @@ gcj5.test \
 getopt.test \
 gettext.test \
 gettext2.test \
+gnumake.test \
 gnuwarn.test \
 gnuwarn2.test \
 gnits.test \
 gnits2.test \
 gnits3.test \
 header.test \
+help.test \
 implicit.test \
 include.test \
 include2.test \
 info.test \
-insh.test \
 insh2.test \
 install2.test \
 installdir.test \
@@ -250,12 +268,15 @@ libobj12.test \
 libobj13.test \
 library.test \
 library2.test \
+library3.test \
 libtool.test \
 libtool2.test \
 libtool3.test \
 libtool4.test \
 libtool5.test \
 libtool6.test \
+libtool7.test \
+license.test \
 link_c_cxx.test	\
 link_dist.test \
 link_fc.test \
@@ -266,14 +287,18 @@ lisp.test \
 lisp2.test \
 lisp3.test \
 lisp4.test \
+lisp5.test \
 listval.test \
+location.test \
 ltcond.test \
 ltcond2.test \
 ltconv.test \
 ltdeps.test \
 ltlibobjs.test \
+ltlibsrc.test \
 maintclean.test \
 make.test \
+makej.test \
 makevars.test \
 man.test \
 man2.test \
@@ -282,6 +307,8 @@ mdate.test \
 mdate2.test \
 mdate3.test \
 mdate4.test \
+missing.test \
+missing2.test \
 mkinst2.test \
 mkinstall.test \
 multlib.test \
@@ -292,6 +319,9 @@ nodep.test \
 nodepcomp.test \
 nodist.test \
 nodist2.test \
+nodist3.test \
+nogzip.test \
+nogzip2.test \
 noinst.test \
 noinstdir.test \
 nolink.test \
@@ -305,6 +335,12 @@ output2.test \
 output3.test \
 output4.test \
 output5.test \
+output6.test \
+output7.test \
+output8.test \
+output9.test \
+output10.test \
+overrid.test \
 parse.test \
 percent.test \
 percent2.test \
@@ -346,13 +382,19 @@ proginst.test \
 python.test \
 python2.test \
 python3.test \
-ranlib.test \
+python4.test \
+python5.test \
+python6.test \
+python7.test \
+python8.test \
+python9.test \
 recurs.test \
 recurs2.test \
 remake.test \
 remake2.test \
 remake3.test \
 remake4.test \
+remake5.test \
 req.test \
 reqd.test \
 reqd2.test \
@@ -374,6 +416,7 @@ spell.test \
 spell2.test \
 spell3.test \
 spelling.test \
+spy.test \
 stamph2.test \
 stdlib.test \
 stdlib2.test \
@@ -385,6 +428,7 @@ subdir4.test \
 subdir5.test \
 subdir6.test \
 subdir7.test \
+subdir8.test \
 subdirbuiltsources.test \
 subcond.test \
 subcond2.test \
@@ -400,8 +444,11 @@ subobj8.test \
 subobj9.test \
 subobjname.test \
 subpkg.test \
+subpkg2.test \
 subst.test \
+subst2.test \
 substref.test \
+substre2.test \
 substtarg.test \
 suffix.test \
 suffix2.test \
@@ -420,7 +467,6 @@ symlink3.test \
 syntax.test \
 tags.test \
 tagsub.test \
-target.test \
 target-cflags.test \
 targetclash.test \
 txinfo.test \
@@ -438,7 +484,15 @@ txinfo16.test \
 txinfo17.test \
 txinfo18.test \
 txinfo19.test \
+txinfo20.test \
+txinfo21.test \
 txinfo22.test \
+txinfo23.test \
+txinfo24.test \
+txinfo25.test \
+txinfo26.test \
+txinfo27.test \
+txinfo28.test \
 transform.test \
 unused.test \
 vars.test \
@@ -448,8 +502,8 @@ version.test \
 version2.test \
 version3.test \
 version4.test \
-version5.test \
 version6.test \
+version7.test \
 vpath.test \
 vtexi.test \
 vtexi2.test \
@@ -470,8 +524,8 @@ yaccvpath.test
 
 EXTRA_DIST = ChangeLog-old $(TESTS)
 
-# Each test case depends on defs.
-check_SCRIPTS = defs
+# Each test case depends on defs, aclocal, and automake.
+check_SCRIPTS = defs aclocal-$(APIVERSION) automake-$(APIVERSION)
 
 distclean-local:
 	-rm -rf testSubDir

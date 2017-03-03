@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 1999, 2000, 2001, 2002  Free Software Foundation, Inc.
+# Copyright (C) 1999, 2000, 2001, 2002, 2003  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -14,13 +14,15 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with autoconf; see the file COPYING.  If not, write to
+# along with Automake; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
 # Test for bug reported in PR 2.
 
 . ./defs || exit 1
+
+set -e
 
 cat > configure.in << 'END'
 AC_INIT
@@ -33,9 +35,9 @@ END
 mkdir templ
 : > templ/README.foo.in
 
-$ACLOCAL || exit 1
-$AUTOMAKE || exit 1
+$ACLOCAL
+$AUTOMAKE
 
-# Look for mkinstalldirs invocation for the templ directory.
+# Look for mkdir_p invocation for the templ directory.
 # We use the `[^/]' to avoid matching `templ/README.foo.in'.
-$EGREP 'mkinstalldirs.*templ([^/]|$)' Makefile.in
+$EGREP 'mkdir_p.*templ([^/]|$)' Makefile.in

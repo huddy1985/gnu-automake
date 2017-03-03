@@ -2,7 +2,7 @@
 
 # serial 2
 
-# Copyright 2001 Free Software Foundation, Inc.
+# Copyright (C) 2001, 2003 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@
 AC_DEFUN([AM_PROG_AS],
 [# By default we simply use the C compiler to build assembly code.
 AC_REQUIRE([AC_PROG_CC])
-: ${CCAS='$(CC)'}
-# Set ASFLAGS if not already set.
-: ${CCASFLAGS='$(CFLAGS)'}
-AC_SUBST(CCAS)
-AC_SUBST(CCASFLAGS)])
+test "${CCAS+set}" = set || CCAS=$CC
+test "${CCASFLAGS+set}" = set || CCASFLAGS=$CFLAGS
+AC_ARG_VAR([CCAS],      [Assembler compiler command (defaults to CC)])
+AC_ARG_VAR([CCASFLAGS], [Assembler compiler flags (defaults to CFLAGS)])
+])

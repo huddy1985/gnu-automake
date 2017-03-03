@@ -2,7 +2,7 @@
 
 ## Makefile for Automake m4.
 
-## Copyright 1996, 1997, 1998, 1999, 2001, 2002, 2003
+## Copyright (C) 1996, 1997, 1998, 1999, 2001, 2002, 2003
 ## Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,7 @@
 m4datadir = $(datadir)/aclocal-$(APIVERSION)
 
 dist_m4data_DATA = \
+$(top_srcdir)/m4/amversion.m4 \
 as.m4 \
 auxdir.m4 \
 ccstdc.m4 \
@@ -41,6 +42,7 @@ maintainer.m4 \
 make.m4 \
 minuso.m4 \
 missing.m4 \
+mkdirp.m4 \
 multi.m4 \
 obsol-gt.m4 \
 obsol-lt.m4 \
@@ -53,6 +55,19 @@ runlog.m4 \
 sanity.m4 \
 strip.m4
 
-nodist_m4data_DATA = amversion.m4
-DISTCLEANFILES = amversion.m4
-EXTRA_DIST = dirlist
+EXTRA_DIST = dirlist amversion.in
+
+# We build amversion.m4 here, instead of from config.status,
+# because config.status is rerun each time one of configure's
+# dependencies change and amversion.m4 happens to be a configure
+# dependency.  configure and amversion.m4 would be rebuilt in
+# loop otherwise.
+# Use `$(top_srcdir)/m4' for the benefit of non-GNU makes: this is
+# how amversion.m4 appears in our dependencies.
+$(top_srcdir)/m4/amversion.m4: $(srcdir)/amversion.in
+	sed -e 's,[@]VERSION[@],$(VERSION),g' \
+	    -e 's,[@]APIVERSION[@],$(APIVERSION),g' \
+	    -e "s,[@]configure_input[@],Generated from amversion.in; do not edit by hand.,g" \
+	    $(srcdir)/amversion.in > $@t
+	chmod -w $@t
+	mv -f $@t $@

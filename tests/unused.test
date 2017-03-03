@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 1998, 2002  Free Software Foundation, Inc.
+# Copyright (C) 1998, 2002, 2003  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with autoconf; see the file COPYING.  If not, write to
+# along with Automake; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
@@ -28,9 +28,9 @@ MACRO_1_2_3
 END
 
 cat > acinclude.m4 << 'END'
-AC_DEFUN(MACRO_1, echo 1)
-AC_DEFUN(MACRO_1_2, echo 12)
-AC_DEFUN(MACRO_1_2_3, echo 123)
+AC_DEFUN([MACRO_1], echo 1)
+AC_DEFUN([MACRO_1_2], echo 12)
+AC_DEFUN([MACRO_1_2_3], echo 123)
 END
 
 $ACLOCAL 2> output || exit 1

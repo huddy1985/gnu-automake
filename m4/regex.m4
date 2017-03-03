@@ -2,7 +2,8 @@
 ## Check if --with-regex was given.  ##
 ## --------------------------------- ##
 
-# Copyright 1996, 1998, 1999, 2000, 2001, 2002  Free Software Foundation, Inc.
+# Copyright (C) 1996, 1998, 1999, 2000, 2001, 2002, 2003
+# Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,8 +20,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-# serial 4
-AC_PREREQ(2.50)
+# serial 5
 
 # AM_WITH_REGEX
 # -------------
@@ -38,20 +38,21 @@ AC_PREREQ(2.50)
 # FIXME: This macro seems quite obsolete now since rx doesn't seem to
 # be maintained, while regex is.
 AC_DEFUN([AM_WITH_REGEX],
-[AC_LIBSOURCES([rx.h, rx.c, regex.c, regex.h])dnl
+[AC_PREREQ(2.50)dnl
+AC_LIBSOURCES([rx.h, rx.c, regex.c, regex.h])dnl
 AC_MSG_CHECKING([which of GNU rx or gawk's regex is wanted])
 AC_ARG_WITH(regex,
 [  --without-regex         use GNU rx in lieu of gawk's regex for matching],
-            [test "$withval" = yes && am_with_regex=1],
-            [am_with_regex=1])
+	    [test "$withval" = yes && am_with_regex=1],
+	    [am_with_regex=1])
 if test -n "$am_with_regex"; then
   AC_MSG_RESULT(regex)
   AC_DEFINE(WITH_REGEX, 1, [Define if using GNU regex])
   AC_CACHE_CHECK([for GNU regex in libc], am_cv_gnu_regex,
     [AC_TRY_LINK([],
-                 [extern int re_max_failures; re_max_failures = 1],
+		 [extern int re_max_failures; re_max_failures = 1],
 		 [am_cv_gnu_regex=yes],
-                 [am_cv_gnu_regex=no])])
+		 [am_cv_gnu_regex=no])])
   if test $am_cv_gnu_regex = no; then
     AC_LIBOBJ([regex])
   fi

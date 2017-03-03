@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2002  Free Software Foundation, Inc.
+# Copyright (C) 2002, 2003  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with autoconf; see the file COPYING.  If not, write to
+# along with Automake; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
@@ -40,7 +40,9 @@ var = foo
 EOF
 
 $ACLOCAL
-$AUTOMAKE && exit 1
+AUTOMAKE_fails
+grep '^Makefile.am:5: blank line following trailing backslash' stderr
+
 
 ## Here is a second test because head comments are
 ## handled differently in Automake 1.5.
@@ -55,7 +57,22 @@ all-local:
 var = foo
 EOF
 
-$AUTOMAKE && exit 1
+AUTOMAKE_fails
+grep '^Makefile.am:2: blank line following trailing backslash' stderr
+
+
+## Make sure we print an 'included' stack on errors.
+
+echo 'include Makefile.inc'> Makefile.am
+cat > Makefile.inc << 'EOF'
+# a comment with backslash \
+
+EOF
+
+AUTOMAKE_fails
+grep '^Makefile.inc:2: blank line following trailing backslash' stderr
+grep '^Makefile.am:1: .*included from here' stderr
+
 
 ## Make sure backslashes are still allowed within a comment.
 ## This usually happens when commenting out a Makefile rule.

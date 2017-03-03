@@ -24,7 +24,6 @@
 
 if %?LOCAL-TEXIS%
 if ! %?CYGNUS%
-MAKEINFO = @MAKEINFO@
 TEXI2DVI = texi2dvi
 
 else %?CYGNUS%
@@ -45,6 +44,8 @@ TEXI2DVI = `if test -f $(top_srcdir)/../texinfo/util/texi2dvi; then \
 endif %?CYGNUS%
 
 TEXI2PDF = $(TEXI2DVI) --pdf --batch
+MAKEINFOHTML = $(MAKEINFO) --html
+AM_MAKEINFOHTMLFLAGS = $(AM_MAKEINFOFLAGS)
 endif %?LOCAL-TEXIS%
 
 
@@ -59,28 +60,33 @@ DVIPS = dvips
 	$(DVIPS) -o $@ $<
 endif %?LOCAL-TEXIS%
 
-.PHONY: info info-am dvi dvi-am pdf pdf-am
+.PHONY: dvi dvi-am html html-am info info-am pdf pdf-am ps ps-am
 if %?SUBDIRS%
-RECURSIVE_TARGETS += info-recursive dvi-recursive pdf-recursive ps-recursive
-.PHONY info: info-recursive
-.PHONY dvi: dvi-recursive
-.PHONY pdf: pdf-recursive
-.PHONY ps: ps-recursive
+RECURSIVE_TARGETS += dvi-recursive html-recursive info-recursive
+RECURSIVE_TARGETS += pdf-recursive ps-recursive
+dvi: dvi-recursive
+html: html-recursive
+info: info-recursive
+pdf: pdf-recursive
+ps: ps-recursive
 else !%?SUBDIRS%
-info: info-am
 dvi: dvi-am
+html: html-am
+info: info-am
 pdf: pdf-am
 ps: ps-am
 endif !%?SUBDIRS%
 
 if %?LOCAL-TEXIS%
-info-am: $(INFO_DEPS)
 dvi-am: $(DVIS)
+html-am: $(HTMLS)
+info-am: $(INFO_DEPS)
 pdf-am: $(PDFS)
 ps-am: $(PSS)
 else ! %?LOCAL-TEXIS%
-info-am:
 dvi-am:
+html-am:
+info-am:
 pdf-am:
 ps-am:
 endif ! %?LOCAL-TEXIS%
@@ -104,22 +110,27 @@ if %?LOCAL-TEXIS%
 am__installdirs += $(DESTDIR)$(infodir)
 install-data-am: install-info-am
 endif %?LOCAL-TEXIS%
+endif %?INSTALL-INFO%
+.PHONY: install-info
 if %?SUBDIRS%
 RECURSIVE_TARGETS += install-info-recursive
-.PHONY install-info: install-info-recursive
+install-info: install-info-recursive
 else !%?SUBDIRS%
 install-info: install-info-am
 endif !%?SUBDIRS%
-endif %?INSTALL-INFO%
 
 .PHONY: install-info-am
-
 if %?LOCAL-TEXIS%
 install-info-am: $(INFO_DEPS)
 	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(infodir)
-	@list='$(INFO_DEPS)'; \
+	$(mkdir_p) $(DESTDIR)$(infodir)
+	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
+	list='$(INFO_DEPS)'; \
 	for file in $$list; do \
+## Strip possible $(srcdir) prefix.
+	  case $$file in \
+	    $(srcdir)/*) file=`echo "$$file" | sed "s|^$$srcdirstrip/||"`;; \
+	  esac; \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 ## 8+3 filesystems cannot deal with foo.info-N filenames: they all
 ## conflict.  DJGPP comes with a tool, DJTAR, that will rename these
@@ -179,7 +190,7 @@ endif ! %?LOCAL-TEXIS%
 ## -------------- ##
 
 ?SUBDIRS?RECURSIVE_TARGETS += uninstall-info-recursive
-?SUBDIRS?.PHONY uninstall-info: uninstall-info-recursive
+?SUBDIRS?uninstall-info: uninstall-info-recursive
 ?INSTALL-INFO?uninstall-am: uninstall-info-am
 
 .PHONY: uninstall-info-am
@@ -218,8 +229,13 @@ endif ! %?LOCAL-TEXIS%
 if %?LOCAL-TEXIS%
 .PHONY: dist-info
 dist-info: $(INFO_DEPS)
+	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	list='$(INFO_DEPS)'; \
 	for base in $$list; do \
+## Strip possible $(srcdir) prefix.
+	  case $$base in \
+	    $(srcdir)/*) base=`echo "$$base" | sed "s|^$$srcdirstrip/||"`;; \
+	  esac; \
 	  if test -f $$base; then d=.; else d=$(srcdir); fi; \
 	  for file in $$d/$$base*; do \
 ## Strip leading '$$d/'.
@@ -239,13 +255,14 @@ endif %?LOCAL-TEXIS%
 ## `clean-info' is a target that users can use.
 
 if %?LOCAL-TEXIS%
+.PHONY mostlyclean-am: mostlyclean-aminfo
 .PHONY: mostlyclean-aminfo
-mostlyclean-am: mostlyclean-aminfo
 mostlyclean-aminfo:
-	-rm -f %TEXICLEAN%
+## Use `-rf', not just `-f', because %TEXICLEAN% also contains
+## any directory created by `makeinfo --html'.
+	-rm -rf %TEXICLEAN%
 
-.PHONY: maintainer-clean-aminfo
-maintainer-clean-am: maintainer-clean-aminfo
+.PHONY maintainer-clean-am: maintainer-clean-aminfo
 maintainer-clean-aminfo:
 	@list='$(INFO_DEPS)'; for i in $$list; do \
 ## .iNN files are DJGPP-style info files.

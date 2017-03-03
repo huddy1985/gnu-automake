@@ -22,22 +22,16 @@
 
 ## We need `.' in SUBDIRS because we want `check' to build `.' before
 ## tests.
-SUBDIRS = . m4 lib tests
+SUBDIRS = . doc m4 lib tests
 
 bin_SCRIPTS = automake aclocal
-info_TEXINFOS = automake.texi
 
 CLEANFILES = $(bin_SCRIPTS)
 AUTOMAKESOURCES = automake.in aclocal.in
 
 TAGS_FILES = $(AUTOMAKESOURCES)
 
-# The following requires a fixed version of the Emacs 19.30 etags.
-ETAGS_ARGS = --lang=none \
- --regex='/^@node[ \t]+\([^,]+\)/\1/' $(srcdir)/automake.texi
-TAGS_DEPENDENCIES = automake.texi
-
-EXTRA_DIST = ChangeLog.96 ChangeLog.98 ChangeLog.00 ChangeLog.01 \
+EXTRA_DIST = ChangeLog.96 ChangeLog.98 ChangeLog.00 ChangeLog.01 ChangeLog.02 \
   $(AUTOMAKESOURCES)
 
 ## Make versioned links.  We only run the transform on the root name;
@@ -64,26 +58,37 @@ uninstall-hook:
 ## We can't use configure to do the substitution here; we must do it
 ## by hand.  We use a funny notation here to avoid configure
 ## substitutions in our text.
-do_subst = sed -e 's,[@]datadir[@],$(datadir),g' -e 's,[@]PERL[@],$(PERL),g' \
-	    -e 's,[@]configure_input[@],@configure_input@,g' \
-	    -e 's,[@]PACKAGE[@],$(PACKAGE),g' \
-	    -e 's,[@]VERSION[@],$(VERSION),g' \
-	    -e 's,[@]APIVERSION[@],$(APIVERSION),g' \
-	    -e 's,[@]SHELL[@],$(SHELL),g'
+do_subst = sed \
+  -e 's,[@]APIVERSION[@],$(APIVERSION),g' \
+  -e 's,[@]PACKAGE[@],$(PACKAGE),g' \
+  -e 's,[@]PERL[@],$(PERL),g' \
+  -e 's,[@]SHELL[@],$(SHELL),g' \
+  -e 's,[@]VERSION[@],$(VERSION),g' \
+  -e 's,[@]configure_input[@],Generated from $@.in; do not edit by hand.,g' \
+  -e 's,[@]datadir[@],$(datadir),g'
 
+## These files depend on Makefile so they are rebuilt if $(VERSION),
+## $(datadir) or other do_subst'ituted variables change.
+## Use chmod -w to prevent people from editing the wrong file by accident.
 automake: automake.in Makefile
-	$(do_subst) < $(srcdir)/automake.in > automake
-	chmod +x automake
+	rm -f $@ $@.tmp
+	$(do_subst) $(srcdir)/automake.in >$@.tmp
+	chmod +x $@.tmp
+	chmod -w $@.tmp
+	mv -f $@.tmp $@
 
 aclocal: aclocal.in Makefile
-	$(do_subst) < $(srcdir)/aclocal.in > aclocal
-	chmod +x aclocal
+	rm -f $@ $@.tmp
+	$(do_subst) $(srcdir)/aclocal.in >$@.tmp
+	chmod +x $@.tmp
+	chmod -w $@.tmp
+	mv -f $@.tmp $@
 
 ## The master location for INSTALL is lib/INSTALL.
 ## This is where `make fetch' will install new versions.
 ## Make sure we also update this copy.
 INSTALL: lib/INSTALL
-	cp lib/INSTALL $@
+	cp $(srcdir)/lib/INSTALL $@
 
 ################################################################
 ##
@@ -95,16 +100,16 @@ INSTALL: lib/INSTALL
 # guaranteed to work on my machine.
 maintainer-check: automake aclocal
 ## This check avoids accidental configure substitutions in the source.
-## There are exactly 8 lines that should be modified.  This works out
-## to 28 lines of diffs.
-	@if test `diff $(srcdir)/automake.in automake | wc -l` -ne 28; then \
+## There are exactly 5 lines that should be modified.  This works out
+## to 20 lines of diffs.
+	@if test `diff $(srcdir)/automake.in automake | wc -l` -ne 20; then \
 	  echo "found too many diffs between automake.in and automake"; 1>&2; \
 	  diff -c $(srcdir)/automake.in automake; \
 	  exit 1; \
 	fi
 ## Syntax check with default Perl (on my machine, Perl 5).
-	perllibdir=$(srcdir)/lib $(PERL) -c -w automake
-	perllibdir=$(srcdir)/lib $(PERL) -c -w aclocal
+	perllibdir=./lib:$(srcdir)/lib $(PERL) -c -w automake
+	perllibdir=./lib:$(srcdir)/lib $(PERL) -c -w aclocal
 ## expect no instances of '${...}'.  However, $${...} is ok, since that
 ## is a shell construct, not a Makefile construct.
 	@if grep -F '$${' $(srcdir)/lib/am/[a-z]*.am | \
@@ -113,9 +118,8 @@ maintainer-check: automake aclocal
 	  exit 1;				\
 	else :; fi
 ## Make sure `rm' is called with `-f'.
-	@if grep -E '\<rm ([^-]|\-[^f ]*\>)' \
-	          $(srcdir)/lib/am/[a-z]*.am $(srcdir)/tests/*.test | \
-	      grep -v '##'; then \
+	@if grep -v '^#' $(srcdir)/lib/am/[a-z]*.am $(srcdir)/tests/*.test | \
+	    grep -E '\<rm ([^-]|\-[^f ]*\>)'; then \
 	  echo "Suspicious 'rm' invocation." 1>&2; \
 	  exit 1;				\
 	else :; fi
@@ -159,22 +163,12 @@ maintainer-check: automake aclocal
 	  echo "Don't use \`local' with parens: use several \`local' above." >&2; \
 	  exit 1; \
 	fi
-## Up to now we manage to limit to 1 use of local, but for `local $_;'.
-	@locals=`grep -v '^[ \t]*local \$$_;' $(srcdir)/automake.in | \
-	        grep -c '^[ \t]*local [^*]'`; \
-	case $$locals in \
-	  [0] ) \
-	    echo "Wow, congrats!  There are no \`local' now!." >&2; \
-	    echo "Please update Makefile.am (maintainer-check)." >&2; \
-	    exit 1; \
-	  ;; \
-	  1 ) ;; \
-	  * ) \
-	    echo "Too many \`local'!  Are you sure you need $$locals of them?" >&2; \
-	    echo "Up to now 1 was enough." >&2; \
-	    exit 1; \
-	  ;; \
-	esac
+## Allow only `local $_' in Automake.
+	@if grep -v '^[ \t]*local \$$_;' $(srcdir)/automake.in | \
+	        grep '^[ \t]*local [^*]'; then \
+	  echo "Please avoid \`local'." 1>&2; \
+	  exit 1; \
+	fi
 ## Don't let AMDEP_TRUE substitution appear in automake.in.
 	@if grep '@AMDEP''_TRUE@' $(srcdir)/automake.in; then \
 	  echo "Don't put AMDEP_TRUE substitution in automake.in" 1>&2; \
@@ -196,8 +190,13 @@ maintainer-check: automake aclocal
 	  exit 1; \
 	fi
 ## Tests should never call automake directly.
-	@if grep -v '^#' $(srcdir)/tests/*.test | grep ':[	]*automake'; then \
+	@if grep -v '^#' $(srcdir)/tests/*.test | grep -E ':[	]*automake([^:]|$$)'; then \
 	  echo 'Do not run "automake" in the above tests.  Use "$$AUTOMAKE" instead.' 1>&2;  \
+	  exit 1; \
+	fi
+## Use AUTOMAKE_fails when appropriate
+	@if grep -v '^#' $(srcdir)/tests/*.test | grep '\$$AUTOMAKE.*&&.*exit'; then \
+	  echo 'Use AUTOMAKE_fails + grep to catch automake failures in the above tests.' 1>&2;  \
 	  exit 1; \
 	fi
 ## Tests should never call aclocal directly.
@@ -246,26 +245,34 @@ maintainer-check: automake aclocal
 	fi
 ## Try to make sure all @...@ substitutions are covered by our
 ## substitution rule.
-	@if test `grep -E '@[A-Za-z_0-9]+@' aclocal | wc -l` -ne 0; then \
+	@if test `grep -E '^[^#]*@[A-Za-z_0-9]+@' aclocal | wc -l` -ne 0; then \
 	  echo "Unresolved @...@ substitution in aclocal" 1>&2; \
 	  exit 1; \
 	fi
-## In automake there are a few valid ones.
-	@if test `grep -E '@[A-Za-z_0-9]+@' automake | wc -l` -ne 4; then \
-	  echo "Unresolved @...@ substitution in aclocal" 1>&2; \
+	@if test `grep -E '^[^#]*@[A-Za-z_0-9]+@' automake | wc -l` -ne 0; then \
+	  echo "Unresolved @...@ substitution in automake" 1>&2; \
 	  exit 1; \
 	fi
 
 
-# Tag before making distribution.  Also, don't make a distribution if
-# checks fail.  Also, make sure the NEWS file is up-to-date.
-cvs-dist: maintainer-check distcheck
+cvs-dist: maintainer-check
+## Make sure clcommit exists (we use it at the end of cvs-dist).
+	@if (clcommit --version)>/dev/null 2>/dev/null; then :; else \
+	  echo "Get clcommit from module cvs-utils on Savannah."; \
+	  exit 1; \
+	fi
+## Make sure the NEWS file is up-to-date.
 	@if sed 1q $(srcdir)/NEWS | grep -e "$(VERSION)" > /dev/null; then :; else \
 	  echo "NEWS not updated; not releasing" 1>&2; \
 	  exit 1;				\
 	fi
-	cd $(srcdir) && cvs -q tag `echo "Release-$(VERSION)" | sed 's/\./-/g'`
-	$(MAKE) dist
+## Build the distribution
+	$(MAKE) distcheck
+## Finally, if anything was successful, commit the last changes and tag
+## the release in the repository.  We don't use RCS keywords so it's OK
+## to distribute the files before they were committed.
+	cd $(srcdir) && clcommit && \
+	  cvs -q tag -c `echo "Release-$(VERSION)" | sed 's/\./-/g'`
 
 cvs-diff:
 	thisver=`echo "Release-$(VERSION)" | sed 's/\./-/g'`; \
@@ -288,12 +295,11 @@ path-check: distdir
 
 ## Program to use to fetch files.
 WGET = wget
+WGETSGO = $(WGET) http://savannah.gnu.org/cgi-bin/viewcvs/~checkout~
 
 ## Files that we fetch and which we compare against.
 ## FIXME should be a lot more here
 FETCHFILES = \
-Automake/Struct.pm \
-Automake/XFile.pm \
 INSTALL \
 config-ml.in \
 config.guess \
@@ -304,19 +310,15 @@ texinfo.tex
 ## Fetch the latest versions of files we care about.
 fetch:
 	rm -rf Fetchdir > /dev/null 2>&1
-	mkdir Fetchdir; mkdir Fetchdir/Automake
+	mkdir Fetchdir
 ## If a get fails then that is a problem.
 	(cd Fetchdir && \
-	$(WGET) ftp://ftp.gnu.org/gnu/config/config.guess; \
-	$(WGET) ftp://ftp.gnu.org/gnu/config/config.sub; \
-	$(WGET) ftp://ftp.gnu.org/gnu/texinfo/texinfo.tex; \
-	$(WGET) http://savannah.gnu.org/cgi-bin/viewcvs/~checkout~/autoconf/autoconf/lib/Autom4te/Struct.pm?content-type=text/plain -O Automake/Struct.pm; \
-	$(WGET) http://savannah.gnu.org/cgi-bin/viewcvs/~checkout~/autoconf/autoconf/lib/Autom4te/XFile.pm?content-type=text/plain -O Automake/XFile.pm; \
-	$(WGET) http://savannah.gnu.org/cgi-bin/viewcvs/~checkout~/autoconf/autoconf/INSTALL?content-type=text/plain -O INSTALL; \
-	$(WGET) http://savannah.gnu.org/cgi-bin/viewcvs/~checkout~/gcc/gcc/config-ml.in; \
-	$(WGET) http://savannah.gnu.org/cgi-bin/viewcvs/~checkout~/gcc/gcc/symlink-tree)
-	perl -pi -e 's/Autom4te::/Automake::/g' \
-	  Fetchdir/Automake/Struct.pm Fetchdir/Automake/XFile.pm
+	$(WGETSGO)/config/config/config.guess; \
+	$(WGETSGO)/config/config/config.sub; \
+	$(WGETSGO)/texinfo/texinfo/doc/texinfo.tex; \
+	$(WGETSGO)/autoconf/autoconf/INSTALL; \
+	$(WGETSGO)/gcc/gcc/config-ml.in; \
+	$(WGETSGO)/gcc/gcc/symlink-tree)
 ## Don't exit after test because we want to give as many errors as
 ## possible.
 	@stat=0; for file in $(FETCHFILES); do \

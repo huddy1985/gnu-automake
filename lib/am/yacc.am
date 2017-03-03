@@ -19,9 +19,13 @@
 ?GENERIC?%EXT%%DERIVED-EXT%:
 ?!GENERIC?%OBJ%: %SOURCE%
 if %?MORE-THAN-ONE%
-	$(SHELL) $(YLWRAP) `test -f '%SOURCE%' || echo '$(srcdir)/'`%SOURCE% y.tab.c %OBJ% y.tab.h %BASE%.h y.output %BASE%.output -- %COMPILE%
+?GENERIC?	$(SHELL) $(YLWRAP) %SOURCE% y.tab.c %OBJ% y.tab.h %BASE%.h y.output %BASE%.output -- %COMPILE%
+## For non-suffix rules, we must emulate a VPATH search on %SOURCE%.
+?!GENERIC?	$(SHELL) $(YLWRAP) `test -f '%SOURCE%' || echo '$(srcdir)/'`%SOURCE% y.tab.c %OBJ% y.tab.h %BASE%.h y.output %BASE%.output -- %COMPILE%
 else !%?MORE-THAN-ONE%
-	%COMPILE% `test -f '%SOURCE%' || echo '$(srcdir)/'`%SOURCE%
+?GENERIC?	%COMPILE% %SOURCE%
+## For non-suffix rules, we must emulate a VPATH search on %SOURCE%.
+?!GENERIC?	%COMPILE% `test -f '%SOURCE%' || echo '$(srcdir)/'`%SOURCE%
 ## Edit out Bison multiple inclusion guards.  It may be BISON_Y_TAB_H,
 ## or Y_TAB_H depending upon the version, that's why the regexp is
 ## so loose.

@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with autoconf; see the file COPYING.  If not, write to
+# along with Automake; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
@@ -50,14 +50,12 @@ FOO = -module
 END
 
 $ACLOCAL
-$AUTOMAKE --add-missing --gnu 2>stderr && exit 1
-cat stderr
+AUTOMAKE_fails --add-missing --gnu
 grep 'nonstandard.la.*not a standard libtool library name' stderr
 
 # We will use -Wno-gnu to disable the warning about setting LDFLAGS.
 # Make sure nonstandard names are diagnosed anyway.
-$AUTOMAKE --add-missing --gnu -Wno-gnu 2>stderr && exit 1
-cat stderr
+AUTOMAKE_fails --add-missing --gnu -Wno-gnu
 grep 'nonstandard.la.*not a standard libtool library name' stderr
 
 # Make sure nonstandard_la_LDFLAGS is read even if LDFLAGS is used.
@@ -79,7 +77,7 @@ cat >Makefile.inc <<'EOF'
 nonstandard_la_LDFLAGS = -lfoo
 AM_LDFLAGS = -module
 EOF
-$AUTOMAKE && exit 1
+AUTOMAKE_fails
 
 echo 'AM_LDFLAGS = -module' > Makefile.inc
 $AUTOMAKE

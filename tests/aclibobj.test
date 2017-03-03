@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2001, 2002  Free Software Foundation, Inc.
+# Copyright (C) 2001, 2002, 2003  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with autoconf; see the file COPYING.  If not, write to
+# along with Automake; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
@@ -22,12 +22,10 @@
 
 . ./defs || exit 1
 
-cat > X << 'END'
-AC_INIT
-AM_INIT_AUTOMAKE(nonesuch, nonesuch)
+cat >> configure.in << 'END'
 AC_PROG_CC
 AC_PROG_RANLIB
-AC_OUTPUT(Makefile)
+AC_OUTPUT
 END
 
 cat > Makefile.am << 'END'
@@ -43,7 +41,7 @@ $ACLOCAL
 
 set -e
 
-cp X configure.in
+cp configure.in X
 echo 'AC_LIBSOURCE(maude.c)' >> configure.in
 $AUTOMAKE
 

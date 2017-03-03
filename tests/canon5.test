@@ -14,14 +14,16 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with autoconf; see the file COPYING.  If not, write to
+# along with Automake; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
 # Test to make sure that we allow variable names starting in
-# non-letters.
+# non-letters.  Whatever that might mean.
 
 . ./defs || exit 1
+
+set -e
 
 echo AC_PROG_CC >> configure.in
 
@@ -30,7 +32,7 @@ bin_PROGRAMS = 123test
 123test_SOURCES = 123.c
 END
 
-$ACLOCAL || exit 1
+$ACLOCAL
 $AUTOMAKE || exit 1
 
 cat > Makefile.am << 'END'
@@ -38,18 +40,19 @@ bin_PROGRAMS = _foo
 _foo_SOURCES = foo.c
 END
 
-$AUTOMAKE || exit 1
+$AUTOMAKE
 
 cat > Makefile.am << 'END'
 bin_PROGRAMS = ,foo
 ,foo_SOURCES = foo.c
 END
 
-$AUTOMAKE && exit 1
+AUTOMAKE_fails
+grep 'Makefile.am:2:.*_foo_SOURCES' stderr
 
 cat > Makefile.am << 'END'
 bin_PROGRAMS = ,foo
 _foo_SOURCES = foo.c
 END
 
-$AUTOMAKE
+$AUTOMAKE -Wno-portability

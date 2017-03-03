@@ -1,3 +1,287 @@
+New in 1.8:
+
+* Meta-News
+
+  - The NEWS file is more verbose.
+
+* Requirements
+
+  - Autoconf 2.58 or greater is required.
+
+* New features
+
+  - Default source file names in the absence of a _SOURCES declaration
+    are made by removing any target extension before appending `.c', so
+    to make the libtool module `foo.la' from `foo.c', you only need to
+    do this:
+
+	lib_LTLIBRARIES = foo.la
+	foo_la_LDFLAGS  = -module
+
+    For backward compatibility, foo_la.c will be used instead of
+    foo.c if this file exists or is the explicit target of a rule.
+    However -Wobsolete will warn about this deprecated naming.
+
+  - AR's `cru' flags are now set in a global ARFLAGS variable instead
+    of being hard-coded in each $(AR) invocation, so they can be
+    substituted from configure.ac.  This has been requested by people
+    dealing with non-POSIX ar implementations.
+
+  - New warning option: -Woverride.  This will warn about any user
+    target or variable definitions which override Automake
+    definitions.
+
+  - Texinfo rules back up and restore info files when makeinfo fails.
+
+  - Texinfo rules now support the `html' target.
+    Running this requires Texinfo 4.0 or greater.
+
+    `html' is a new recursive target, so if your package mixes
+    hand-crafted `Makefile.in's with Automake-generated
+    `Makefile.in's, you should adjust the former to support (or
+    ignore) this target so that `make html' recurses successfully.  If
+    you had a custom `html' rule in your `Makefile.am', it's better to
+    rename it as `html-local', otherwise your rule will override
+    Automake's new rule (you can check that by running `automake
+    -Woverride') and that will stop the recursion to subdirectories.
+
+    Last but not least, this `html' rule is declared PHONY, even when
+    overridden.  Fortunately, it appears that few packages use a
+    non-PHONY `html' rule.
+
+  - Any file which is m4_included from configure.ac will appear as a
+    configure and Makefile.in dependency, and will be automatically
+    distributed.
+
+  - The rules for rebuilding Makefiles and Makefile.ins will now
+    rebuild all Makefiles and all Makefile.ins at once when one of
+    configure's dependencies has changed.  This is considerably faster
+    than previous implementations, where config.status and automake
+    were run separately in each directory (this still happens when you
+    change a Makefile.am locally, without touching configure.ac or
+    friends).  Doing this also solves a longstanding issue: these
+    rebuild rules failed to work when adding new directories to the
+    tree, forcing you to run automake manually.
+
+  - For similar reasons, the rules to rebuild configure,
+    config.status, and aclocal.m4 are now defined in all directories.
+    Note that if you were using the CONFIG_STATUS_DEPENDENCIES and
+    CONFIGURE_DEPENDENCIES (formerly undocumented) variables, you
+    should better define them in all directories.  This is easily done
+    using an AC_SUBST (make sure you prefix these dependencies with
+    $(top_srcdir) since this variable will appear at different
+    levels of the build tree).
+
+  - aclocal will now use `m4_include' instead of copying local m4
+    files into aclocal.m4.  (Local m4 files are those you ship with
+    your project, other files will be copied as usual.)
+
+    Because m4_included files are automatically distributed, it means
+    for most projects there is no point in EXTRA_DISTing the list of
+    m4 files which are used.  (You can probably get rid of
+    m4/Makefile.am if you had one.)
+
+  - aclocal will avoid touching aclocal.m4 when possible, so that
+    Autom4te's cache isn't needlessly invalidated.  This behavior can
+    be switched off with the new `--force' option.
+
+  - aclocal now uses Autoconf's --trace to detect macros which are
+    actually used and will no longer include unused macros simply
+    because they where mentioned.  This was often the case for macros
+    called conditionally.
+
+  - New options no-dist and no-dist-gzip.
+
+  - compile, depcomp, elisp-comp, install-sh, mdate-sh, mkinstalldirs,
+    py-compile, and ylwrap, now all understand --version and --help.
+
+  - Automake will now recognize AC_CONFIG_LINKS so far as removing created
+    links as part of the distclean target and including source files in
+    distributions.
+
+  - AM_PATH_PYTHON now supports ACTION-IF-FOUND and ACTION-IF-NOT-FOUND
+    argument.  The latter can be used to override the default behavior
+    (which is to abort).
+
+  - Automake will exit with $? = 63 on version mismatch.  (So does
+    Autoconf 2.58)  missing knows this, and in this case it will
+    emulate the tools as if they were absent.  Because older versions
+    of Automake and Autoconf did not use this exit code, this change
+    will only be useful in projects generated with future versions of
+    these tools.
+
+  - When using AC_CONFIG_FILES with multiple input files, Automake
+    generates the first ".in" input file for which a ".am" exists.
+    (Former versions would try to use only the first input file.)
+
+  - lisp_DATA is now allowed.  If you are using the empty ELCFILES
+    idiom to disable byte-compilation of lisp_LISP files, it is
+    recommended that you switch to using lisp_DATA.  Note that
+    this is not strictly equivalent: lisp_DATA will install elisp
+    files even if emacs is not installed, while *_LISP do not
+    install anything unless emacs is found.
+
+  - Makefiles will prefer `mkdir -p' over mkinstalldirs if it is
+    available.  This selection is achieved through the Makefile
+    variable $(mkdir_p) that is set by AM_INIT_AUTOMAKE to either
+    `mkdir -m 0755 -p --', `$(mkinstalldirs) -m 0755', or
+    `$(install_sh) -m 0755 -d'.
+
+* Obsolete features
+
+  - Because `mkdir -p' is available on most platforms, and we can use
+    `install-sh -d' when it is not, the use of the mkinstalldirs
+    script is being phased out.  `automake --add-missing' no longer
+    installs it, and if you remove mkinstalldirs from your package,
+    automake will define $(mkinstalldirs) as an alias for $(mkdir_p).
+
+    Gettext 1.12.1 still requires mkinstalldirs.  Fortunately
+    gettextize and autopoint will install it when needed.  Automake
+    will continue to define the $(mkinstalldirs) and to distribute
+    mkinstalldirs when this script is in the source tree.
+
+  - AM_PROG_CC_STDC is now empty.  The content of this macro was
+    merged in AC_PROG_CC.  If your code uses $am_cv_prog_cc_stdc, you
+    should adjust it to use $ac_cv_prog_cc_stdc instead.  (This
+    renaming should be safe, even if you have to support several,
+    versions of Automake, because AC_PROG_CC defines this variable
+    since Autoconf 2.54.)
+
+  - Some users where using the undocumented ACLOCAL_M4_SOURCES
+    variable to override the aclocal.m4 dependencies computed
+    (inaccurately) by older versions of Automake.  Because Automake
+    now tracks configure's m4 dependencies accurately (see m4_include
+    above), the use of ACLOCAL_M4_SOURCES should be considered
+    obsolete and will be flagged as such when running `automake
+    -Wobsolete'.
+
+* Bug fixes
+
+  - Defining programs conditionally using Automake conditionals no
+    longer leads to a combinatorial explosion.  The following
+    construct used to be troublesome when used with dozens of
+    conditions.
+
+      bin_PROGRAMS = a
+      if COND1
+        bin_PROGRAMS += a1
+      endif
+      if COND2
+        bin_PROGRAMS += a2
+      endif
+      if COND3
+        bin_PROGRAMS += a3
+      endif
+      ...
+
+    Likewise for _SOURCES, _LDADD, and _LIBADD variables.
+
+  - Due to implementation constraints, previous versions of Automake
+    proscribed multiple conditional definitions of some variables
+    like bin_PROGRAMS:
+
+      if COND1
+        bin_PROGRAMS = a1
+      endif
+      if COND2
+        bin_PROGRAMS = a2
+      endif
+
+    All _PROGRAMS, _LDADD, and _LIBADD variables were affected.
+    This restriction has been lifted, and these variables now
+    support multiple conditional definitions as do other variables.
+
+  - Cleanup the definitions of $(distdir) and $(top_distdir).
+    $(top_distdir) now points to the root of the distribution
+    directory created during `make dist', as it did in Automake 1.4,
+    not to the root of the build tree as it did in intervening
+    versions.  Furthermore these two variables are now only defined in
+    the top level Makefile, and passed to sub-directories when running
+    `make dist'.
+
+  - The --no-force option now correctly checks the Makefile.in's
+    dependencies before deciding not to update it.
+
+  - Do not assume that make files are called Makefile in cleaning rules.
+
+  - Update .info files in the source tree, not in the build tree.  This
+    is what the GNU Coding Standard recommend.  Only Automake 1.7.x
+    used to update these files in the build tree (previous versions did
+    it in the source tree too), and it caused several problems, varying
+    from mere annoyance to portability issues.
+
+  - COPYING, COPYING.LIB, and COPYING.LESSER are no longer overwritten
+    when --add-missing and --force-missing are used.  For backward
+    compatibility --add-missing will continue to install COPYING (in
+    `gnu' strictness) when none of these three files exist, but this
+    use is deprecated: you should better choose a license yourself and
+    install it once for all in your source tree (and in your code
+    management system).
+
+  - Fix ylwrap so that it does not overwrite header files that haven't
+    changed, as the inline rule already does.
+
+  - User-defined rules override automake-defined rules for the same
+    targets, even when rules do not have commands.  This is not new
+    (and was documented), however some of the automake-generated
+    rules have escaped this principle in former Automake versions.
+    Rules for the following targets are affected by this fix:
+
+       clean, clean-am, dist-all, distclean, distclean-am, dvi, dvi-am,
+       info, info-am, install-data-am, install-exec-am, install-info,
+       install-info-am, install-man, installcheck-am, maintainer-clean,
+       maintainer-clean-am, mostlyclean, mostlyclean-am, pdf, pdf-am,
+       ps, ps-am, uninstall-am, uninstall-info, uninstall-man
+
+    Practically it means that an attempt to supplement the dependencies
+    of some target, as in
+
+       clean: my-clean-rule
+
+    will now *silently override* the automake definition of the
+    rule for this target.  Running `automake -Woverride' will diagnose
+    all such overriding definitions.
+
+    It should be noted that almost all these targets support a *-local
+    variant that is meant to supplement the automake-defined rule
+    (See node `Extending' in the manual).  The above rule should
+    be rewritten as
+
+      clean-local: my-clean-rule
+
+    These *-local targets have been documented since at least
+    Automake 1.2, so you should not fear the change if you have
+    to support multiple automake versions.
+
+* Miscellaneous
+
+  - The Automake manual is now distributed under the terms of the GNU FDL.
+
+  - Targets dist-gzip, dist-bzip2, dist-tarZ, dist-zip are always defined.
+
+  - core dumps are no longer removed by the cleaning rules.  There are
+    at least three reasons for this:
+      1. These files should not be created by any build step,
+	 so their removal do not fit any of the cleaning rules.
+	 Actually, they may be precious to the developer.
+      2. If such file is created during a build, then it's clearly a
+         bug Automake should not hide.  Not removing the file will
+         cause `make distcheck' to complain about its presence.
+      3. Operating systems have different naming conventions for
+         core dump files.  A core file on one system might be a
+	 completely legitimate data file on another system.
+
+  - RUNTESTFLAGS, CTAGSFLAGS, ETAGSFLAGS, JAVACFLAGS are no longer
+    defined by Automake.  This means that any definition in the
+    environment will be used, unless overridden in the Makefile.am or
+    on the command line.  The old behavior, where these variables were
+    defined empty in each Makefile, can be obtained by AC_SUBSTing or
+    AC_ARG_VARing each variable from configure.ac.
+
+  - CONFIGURE_DEPENDENCIES and CONFIG_STATUS_DEPENDENCIES are now
+    documented.  (The is not a new feature, these variables have
+    been there since at least Automake 1.4.)
+
 Bugs fixed in 1.7.9:
 * Fix install-strip to work with nobase_ binaries.
 * Fix renaming of #line directives in ylwrap.
@@ -183,6 +467,33 @@ New in 1.7:
   removes all installed files has been moved in a separate target,
   distuninstallcheck, so it can be overridden easily.
 * Many bug fixes.
+
+New in 1.6.3:
+* Support for AM_INIT_GETTEXT([external])
+* Bug fixes, including:
+  - Fix Automake's own `make install' so it works even if `ln' doesn't.
+  - nobase_ programs and scripts honor --program-transform correctly.
+  - Erase configure.lineno during `make distclean'.
+  - Erase YACC and LEX outputs during `make maintainer-clean'.
+
+New in 1.6.2:
+* Many bug fixes, including:
+  - Requiring the current version works.
+  - Fix "$@" portability issues (for Zsh).
+  - Fix output of dummy dependency files in presence of post-processed
+    Makefile.in's.
+  - Don't compute dependencies in background to avoid races with libtool.
+  - Fix handling of _OBJECTS variables for targets sharing source variables.
+  - Check dependency mode for Java when AM_PROG_GCJ is used.
+
+New in 1.6.1:
+* automake --output-dir is deprecated
+* Many bug fixes, including:
+  - Don't choke on AM_LDFLAGS definitions.
+  - Clean libtool objects from subdirectories.
+  - Allow configure variables with reserved suffix and unknown prefix
+    (e.g. AC_SUBST(mumble_LDFLAGS) when 'mumble' is not a target).
+  - Fix the definition of AUTOMAKE and ACLOCAL in configure.
 
 New in 1.6:
 * Autoconf 2.52 is required.
@@ -430,8 +741,8 @@ New in 0.20:
 
 -----
 
-Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001 Free Software
-Foundation, Inc.
+Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+Free Software Foundation, Inc.
 
 This file is part of GNU Automake.
 
@@ -446,6 +757,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with autoconf; see the file COPYING.  If not, write to
+along with GNU Automake; see the file COPYING.  If not, write to
 the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.

@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2002  Free Software Foundation, Inc.
+# Copyright (C) 2002, 2003  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with autoconf; see the file COPYING.  If not, write to
+# along with Automake; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
@@ -25,10 +25,18 @@ required=gcc
 
 set -e
 
+mkdir m4
+
+cat >m4/foo.m4 <<'EOF'
+AC_DEFUN([FOO],[
+  AC_PROG_CC
+  AC_OUTPUT
+])
+EOF
+
 cat >>configure.in <<'END'
 AC_CONFIG_SUBDIRS([lib])
-AC_PROG_CC
-AC_OUTPUT
+FOO
 END
 
 cat >Makefile.am <<'EOF'
@@ -36,6 +44,16 @@ SUBDIRS = lib
 # Yes, This program is named LDADD.  So what?
 bin_PROGRAMS = LDADD
 LDADD_LDADD = lib/liblib.a
+
+# It's ok to override distdir.
+distdir = subpack-1
+
+# Make sure $(distdir) and $(top_distdir) work as expected.
+dist-hook:
+	test -f $(distdir)/LDADD.c
+	test -f $(top_distdir)/LDADD.c
+
+ACLOCAL_AMFLAGS = -I m4
 EOF
 
 cat >LDADD.c <<'EOF'
@@ -54,15 +72,22 @@ mkdir lib/src
 cat >lib/configure.ac <<'EOF'
 AC_INIT([lib], [2.3])
 AM_INIT_AUTOMAKE
-AC_PROG_CC
 AC_PROG_RANLIB
 AC_CONFIG_FILES([Makefile])
-AC_OUTPUT
+FOO
 EOF
 
 cat >lib/Makefile.am <<'EOF'
 noinst_LIBRARIES = liblib.a
 liblib_a_SOURCES = src/x.c
+
+dist-hook:
+	test ! -f $(distdir)/LDADD.c
+	test -f $(top_distdir)/LDADD.c
+	test -f $(distdir)/src/x.c
+	test ! -f $(top_distdir)/src/x.c
+
+ACLOCAL_AMFLAGS = -I ../m4
 EOF
 
 cat >lib/src/x.c <<'EOF'
@@ -72,15 +97,18 @@ int lib ()
 }
 EOF
 
-$ACLOCAL
+$ACLOCAL -I m4
 $AUTOCONF
-$AUTOMAKE
+$AUTOMAKE -Wno-override
 
 cd lib
-$ACLOCAL
+$ACLOCAL -I ../m4
+$FGREP 'm4_include([../m4/foo.m4])' aclocal.m4
 $AUTOCONF
-$AUTOMAKE
+$AUTOMAKE -Wno-override
 cd ..
 
 ./configure
 $MAKE distcheck
+test ! -d subpack-1		# make sure distcheck cleans up after itself
+test -f subpack-1.tar.gz
