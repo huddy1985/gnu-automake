@@ -5,12 +5,8 @@
 . $srcdir/defs || exit 1
 
 cat > configure.in << 'END'
+AC_INIT
 AM_INIT_AUTOMAKE(nonesuch, nonesuch)
-PACKAGE=nonesuch
-VERSION=nonesuch
-AC_ARG_PROGRAM
-AC_PROG_MAKE_SET
-AC_PROG_INSTALL
 AC_OUTPUT(README.foo:templ/README.foo.in Makefile)
 END
 
@@ -19,6 +15,7 @@ END
 mkdir templ
 : > templ/README.foo.in
 
+$ACLOCAL || exit 1
 $AUTOMAKE || exit 1
 
 # Look for mkinstalldirs invocation for the templ directory.

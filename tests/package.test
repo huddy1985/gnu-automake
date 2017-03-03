@@ -5,9 +5,6 @@
 . $srcdir/defs || exit 1
 
 cat > configure.in << 'END'
-AC_ARG_PROGRAM
-AC_PROG_MAKE_SET
-AC_PROG_INSTALL
 AC_OUTPUT(Makefile)
 END
 
@@ -15,5 +12,6 @@ cat > Makefile.am << 'END'
 pkgdata_DATA =
 END
 
+$ACLOCAL || exit 1
 $AUTOMAKE && exit 1
 exit 0

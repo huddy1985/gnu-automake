@@ -8,12 +8,8 @@
 mkdir zot
 
 cat > configure.in << 'END'
+AC_INIT
 AM_INIT_AUTOMAKE(nonesuch, nonesuch)
-PACKAGE=nonesuch
-VERSION=nonesuch
-AC_ARG_PROGRAM
-AC_PROG_MAKE_SET
-AC_PROG_INSTALL
 AC_OUTPUT(Makefile zot/Makefile)
 END
 
@@ -25,4 +21,5 @@ cat > zot/Makefile.am << 'END'
 pkgdata_DATA =
 END
 
+$ACLOCAL || exit 1
 $AUTOMAKE

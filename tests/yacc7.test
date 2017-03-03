@@ -6,13 +6,10 @@
 . $srcdir/defs || exit 1
 
 $needs_gnu_make
-$needs_autoconf
 
 cat > configure.in << 'END'
 AC_INIT
 AM_INIT_AUTOMAKE(nonesuch, nonesuch)
-AC_PROG_INSTALL
-AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_PROG_YACC
 AC_OUTPUT(Makefile)
@@ -37,6 +34,6 @@ $AUTOCONF || exit 1
 
 $MAKE foo.h || exit 1
 
-test -e foo.h || exit 1
+test -f foo.h || exit 1
 
 exit 0

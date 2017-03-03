@@ -1,5 +1,7 @@
 ## Process this file with automake to create Makefile.in
 
+XFAIL_TESTS = condd.test subdir5.test auxdir2.test cond17.test
+
 TESTS =	\
 acinclude.test \
 aclibobj.test \
@@ -22,8 +24,12 @@ ansi2.test \
 ansi3.test \
 ansi4.test \
 ansi5.test \
+ansi6.test \
+ansi7.test \
+ar.test \
 asm.test \
 auxdir.test \
+auxdir2.test \
 backsl.test \
 backsl2.test \
 badline.test \
@@ -50,6 +56,8 @@ colon7.test \
 comment.test \
 comment2.test \
 comment3.test \
+comment4.test \
+comment5.test \
 compile_f_c_cxx.test \
 cond.test \
 cond2.test \
@@ -67,9 +75,11 @@ cond13.test \
 cond14.test \
 cond15.test \
 cond16.test \
+cond17.test \
 cond18.test \
 cond19.test \
 cond20.test \
+condd.test \
 condincl.test \
 condincl2.test \
 condlib.test \
@@ -79,8 +89,6 @@ conf2.test \
 confdeps.test \
 confdist.test \
 confh.test \
-confh2.test \
-confh3.test \
 confh4.test \
 config.test \
 confincl.test \
@@ -111,9 +119,12 @@ depend.test \
 depend2.test \
 depend3.test \
 depend4.test \
+dirforbid.test \
 dirname.test \
 discover.test \
 distcommon.test \
+distcommon2.test \
+distcommon3.test \
 distdir.test \
 distname.test \
 double.test \
@@ -134,6 +145,8 @@ ext.test \
 extra.test \
 extra3.test \
 extra4.test \
+extra5.test \
+extra6.test \
 flibs.test \
 fnoc.test \
 fo.test	\
@@ -151,8 +164,8 @@ include.test \
 info.test \
 insh.test \
 insh2.test \
-install.test \
 install2.test \
+installdir.test \
 installsh.test \
 instdata.test \
 instdata2.test \
@@ -165,13 +178,13 @@ interp2.test \
 java.test \
 javaprim.test \
 javasubst.test \
-listval.test \
 ldadd.test \
 ldflags.test \
 lex.test \
 lex2.test \
 lex3.test \
 lex4.test \
+lex5.test \
 libobj.test \
 libobj2.test \
 libobj3.test \
@@ -182,6 +195,7 @@ libobj7.test \
 libobj8.test \
 libobj9.test \
 libobj10.test \
+libobj11.test \
 library.test \
 libtool.test \
 libtool2.test \
@@ -192,6 +206,7 @@ link_f_c_cxx.test \
 link_f_cxx.test	\
 link_f_only.test \
 lisp.test \
+listval.test \
 ltdeps.test \
 ltlibobjs.test \
 make.test \
@@ -204,16 +219,19 @@ mdate3.test \
 mdate4.test \
 mkinst2.test \
 mkinstall.test \
+nobase.test \
+nodefine.test \
+nodefine2.test \
 nodep.test \
 nodepcomp.test \
 nodist.test \
+nodist2.test \
 noinst.test \
 noinstdir.test \
 nolink.test \
 nostdinc.test \
 number.test \
 obsolete.test \
-obsolete2.test \
 order.test \
 outdir.test \
 output.test \
@@ -236,6 +254,19 @@ pr2.test \
 pr9.test \
 pr72.test \
 pr87.test \
+pr204.test \
+pr211.test \
+pr220.test \
+pr224.test \
+pr229.test \
+pr243.test \
+pr266.test \
+pr279.test \
+pr279-2.test \
+pr287.test \
+pr300-lib.test \
+pr300-ltlib.test \
+pr300-prog.test \
 prefix.test \
 primary.test \
 primary2.test \
@@ -253,6 +284,7 @@ scripts.test \
 seenc.test \
 sinclude.test \
 sourcesub.test \
+sourcesub2.test \
 space.test \
 specflags.test \
 specflags2.test	\
@@ -264,10 +296,12 @@ spelling.test \
 stamph.test \
 stamph2.test \
 stdlib.test \
+strip.test \
 subdir.test \
 subdir2.test \
 subdir3.test \
 subdir4.test \
+subdir5.test \
 subdirbuiltsources.test \
 subdircond.test \
 subobj.test \
@@ -284,6 +318,10 @@ substtarg.test \
 suffix.test \
 suffix2.test \
 suffix3.test \
+suffix4.test \
+suffix5.test \
+suffix6.test \
+suffix7.test \
 symlink.test \
 symlink2.test \
 symlink3.test \
@@ -322,6 +360,7 @@ yacc4.test \
 yacc5.test \
 yacc6.test \
 yacc7.test \
+yacc8.test \
 yaccpp.test \
 yaccvpath.test
 

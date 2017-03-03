@@ -1,10 +1,46 @@
+New in 1.6:
+* Autoconf 2.52 is required.
+* `dist' generates all the archive flavors, as did `dist-all'.
+* `dist-gzip' generates the Gzip tar file only.
+* Combining Automake Makefile conditionals no longer lead to a combinatorial
+  explosion.  Makefile.in's keep a reasonable size.
+* AM_FUNC_ERROR_AT_LINE, AM_FUNC_STRTOD, AM_FUNC_OBSTACK, AM_PTRDIFF_T
+  are no longer shipped, since Autoconf 2.52 provides them (both as AM_
+  and AC_).
+* `#line' of Lex and Yacc files are properly set.
+* EXTRA_DIST can contain generated directories.
+* Support for dot-less extensions in suffix rules.
+* The part of the distcheck target that checks whether distclean actually
+  cleans all built files has been moved in a separate target, distcleancheck,
+  so it can be overridden easily.
+* `make distcheck' will pass additional options defined in
+  $(DISTCHECK_CONFIGURE_FLAGS) to configure.
+* Fixed CDPATH portability problems, in particular for MacOS X.
+* Fixed handling of nobase_ targets.
+* Fixed support of implicit rules leading to .lo objects.
+* Fixed late inclusion of --add-missing files (e.g. depcomp) in DIST_COMMON
+* Added uninstall-hook target
+* `AC_INIT AM_INIT_AUTOMAKE(tarname,version)' is an obsolete construct.
+  You can now use `AC_INIT(pkgname,version) AM_INIT_AUTOMAKE' instead.
+  (Note that "pkgname" is not "tarname", see the manual for details.)
+  It is also possible to pass a list of global Automake options as
+  first argument to this new form of AM_INIT_AUTOMAKE.
+* Compiler-based assembler is now called `CCAS'; people expected `AS'
+  to be a real assembler.
+* AM_INIT_AUTOMAKE will set STRIP itself when it needs it.  Adding
+  AC_CHECK_TOOL([STRIP], [strip]) manually is no longer required.
+* aclocal and automake are also installed with the version number
+  appended, and some of the install directory names have changed.
+  This lets you have multiple versions installed simultaneously.
+* Support for parsers and lexers in subdirectories.
+
 New in 1.5:
 * Support for `configure.ac'.
 * Support for `else COND', `endif COND' and negated conditions `!COND'.
 * `make dist-all' is much faster.
 * Allows '@' AC_SUBSTs in macro names.
 * Faster AM_INIT_AUTOMAKE (requires update of `missing' script)
-* User-side dependency tracking.  Developers no longer need GNU make or gcc
+* User-side dependency tracking.  Developers no longer need GNU make
 * Python support
 * Uses DIST_SUBDIRS in some situations when SUBDIRS is conditional
 * Most files are correctly handled if they appear in subdirs
@@ -203,3 +239,25 @@ New in 0.20:
 * No longer uses double-colon rules
 * Bug fixes
 * Changes in advance of internationalization
+
+-----
+
+Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001 Free Software
+Foundation, Inc.
+
+This file is part of GNU Automake.
+
+GNU Automake is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GNU Automake is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with autoconf; see the file COPYING.  If not, write to
+the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+Boston, MA 02111-1307, USA.

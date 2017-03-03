@@ -22,22 +22,30 @@
 ## ------------ ##
 
 if %?INSTALL%
-_am_installdirs += $(DESTDIR)$(%DIR%dir)
+_am_installdirs += $(DESTDIR)$(%NDIR%dir)
+?BASE?%DIR%PYTHON_INSTALL = $(INSTALL_DATA)
+?!BASE?%DIR%PYTHON_INSTALL = $(install_sh_DATA)
 ?EXEC?.PHONY install-exec-am: install-%DIR%PYTHON
 ?!EXEC?.PHONY install-data-am: install-%DIR%PYTHON
 install-%DIR%PYTHON: $(%DIR%_PYTHON)
 	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(%DIR%dir)
-	@list='$(%DIR%_PYTHON)'; for p in $$list; do\
+	$(mkinstalldirs) $(DESTDIR)$(%NDIR%dir)
+	@list='$(%DIR%_PYTHON)'; dlist=''; for p in $$list; do\
 	  if test -f $(srcdir)/$$p; then \
+## Compute basename of source file.  Unless this is a nobase_ target, we
+## want to install 'python/foo.py' as '$(DESTDIR)$(%NDIR%dir)/foo.yo',
+## not '$(DESTDIR)$(%NDIR%dir)/python/foo.yo'.
+?BASE?	    d=`echo "$$p" | sed -e 's,^.*/,,'`; \
+?!BASE?	    d="$$p"; \
+	    dlist="$$dlist $$d"; \
 ## Don't perform translation, since script name is important.
-	    echo " $(INSTALL_PROGRAM) $(srcdir)/$$p $(DESTDIR)$(%DIR%dir)/$$p"; \
-	    $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(%DIR%dir)/$$p; \
+	    echo " $(%DIR%PYTHON_INSTALL) $(srcdir)/$$p $(DESTDIR)$(%NDIR%dir)/$$d"; \
+	    $(%DIR%PYTHON_INSTALL) $(srcdir)/$$p $(DESTDIR)$(%NDIR%dir)/$$d; \
 	  else :; fi; \
-	done
+	done; \
 ## Byte-compile must be done at install time, since file times are
 ## encoded in the actual files.
-	@PYTHON=$(PYTHON) $(py_compile) --basedir $(DESTDIR)$(%DIR%dir) $(%DIR%_PYTHON)
+	PYTHON=$(PYTHON) $(py_compile) --basedir $(DESTDIR)$(%NDIR%dir) $$dlist
 endif %?INSTALL%
 
 
@@ -50,11 +58,13 @@ if %?INSTALL%
 uninstall-%DIR%PYTHON:
 	@$(NORMAL_UNINSTALL)
 	list='$(%DIR%_PYTHON)'; for p in $$list; do \
-	  rm -f $(DESTDIR)$(%DIR%dir)/$$p; \
+?BASE?	  d=`echo "$$p" | sed -e 's,^.*/,,'`; \
+?!BASE?	  d="$$p"; \
+	  rm -f $(DESTDIR)$(%NDIR%dir)/$$d; \
 ## This is to remove the .pyc and .pyo byte compiled versions (a bit
 ## of a hack).
-	  rm -f $(DESTDIR)$(%DIR%dir)/$${p}c; \
-	  rm -f $(DESTDIR)$(%DIR%dir)/$${p}o; \
+	  rm -f $(DESTDIR)$(%NDIR%dir)/$${d}c; \
+	  rm -f $(DESTDIR)$(%NDIR%dir)/$${d}o; \
 	done
 endif %?INSTALL%
 
@@ -63,10 +73,8 @@ endif %?INSTALL%
 ## Cleaning.  ##
 ## ---------- ##
 
-.PHONY clean-am: clean-python
-clean-python:
-	-test -z "$(PYCFILES)$(PYOFILES)" || rm -f $(PYCFILES) $(PYOFILES)
-
+## There is nothing to clean here since files are
+## byte-compiled when (and where) they are installed.
 
 ## -------------- ##
 ## Distributing.  ##

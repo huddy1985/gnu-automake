@@ -1,4 +1,4 @@
-# -*- ksh -*-
+# -*- shell-script -*-
 # Defines for Automake testing environment.
 # Tom Tromey <tromey@cygnus.com>
 
@@ -9,6 +9,21 @@ test -f $srcdir/defs || {
 }
 
 me=`echo "$0" | sed -e 's,.*[\\/],,;s/\.test$//'`
+
+# See how redirections should work.  User can set VERBOSE to see all
+# output.
+test -z "$VERBOSE" && {
+   exec > /dev/null 2>&1
+}
+
+if test -n "$required"
+then
+  for tool in $required
+  do
+    echo "$me: running $tool --version"
+    ( $tool --version ) || exit 77
+  done
+fi
 
 # Always use an absolute srcdir.  Otherwise symlinks made in subdirs
 # of the test dir just won't work.
@@ -34,20 +49,16 @@ cd ./testSubDir
 
 # Build appropriate environment in test directory.  Eg create
 # configure.in, touch all necessary files, etc.
-cat > configure.in << 'END'
-AC_INIT
-AM_INIT_AUTOMAKE(nonesuch, nonesuch)
-AC_ARG_PROGRAM
+# Don't use AC_OUTPUT, but AC_CONFIG_FILES so that appending
+# still produces a valid configure.ac.  But then, tests running
+# config.status really need to append AC_OUTPUT.
+cat > configure.in << END
+AC_INIT($me, 1.0)
+AM_INIT_AUTOMAKE
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
-AC_OUTPUT(Makefile)
+AC_CONFIG_FILES(Makefile)
 END
-
-# See how redirections should work.  User can set VERBOSE to see all
-# output.
-test -z "$VERBOSE" && {
-   exec > /dev/null 2>&1
-}
 
 # User can set PERL to change the perl interpreter used.
 test -z "$PERL" && PERL=perl
@@ -71,13 +82,6 @@ fi
 
 # User can set which tools from Autoconf to use.
 test -z "$AUTOCONF" && AUTOCONF=autoconf
-if ($AUTOCONF --version) >/dev/null 2>&1; then
-  has_autoconf=:
-  needs_autoconf=:
-else
-  has_autoconf=false
-  needs_autoconf='exit 77'
-fi
 
 
 echo "=== Running test $0"
@@ -92,5 +96,39 @@ if test -z "$AUTOMAKE"; then
 fi
 
 # See how aclocal should be run.
-test -z "$ACLOCAL" \
-   && ACLOCAL="$PERL ../../aclocal --acdir=$srcdir/../m4"
+if test -z "$ACLOCAL"; then
+   perllibdir=$srcdir/../lib
+   export perllibdir
+   # Most of the files are in $srcdir/../m4.  However amversion.m4 is
+   # generated in ../m4, so we include that directory in the search
+   # path too.
+   ACLOCAL="$PERL ../../aclocal -I `pwd`/../../m4 --acdir=$srcdir/../m4"
+fi
+
+# We might need extra macros, e.g., from Libtool or Gettext.
+# Find them on the system.
+# Use `-I $srcdir/../m4' in addition to `--acdir', because the
+# other `-I' directories added for libtool and gettext might contain
+# files from an old version of Automake that we don't want to use.
+aclocaldir=`(aclocal --print-ac-dir) 2>/dev/null`
+case $required in
+  *libtool* )
+    test -f "$aclocaldir/libtool.m4" || exit 77
+    ACLOCAL="$ACLOCAL -I $srcdir/../m4 -I $aclocaldir"
+    ;;
+  *gettext* )
+    test -f "$aclocaldir/gettext.m4" || exit 77
+    ACLOCAL="$ACLOCAL -I $srcdir/../m4 -I $aclocaldir"
+    ;;
+esac
+
+# Export AUTOMAKE and ACLOCAL so that rebuild rules in Makefiles
+# generated for the tests do not use the installed tools.
+export AUTOMAKE ACLOCAL
+
+# Turn on shell traces when VERBOSE=x.
+if test "x$VERBOSE" = xx; then
+  set -x
+else
+  :
+fi

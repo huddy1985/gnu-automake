@@ -1,4 +1,21 @@
-# serial 2
+# Copyright 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+
+# serial 3
 
 # AM_ENABLE_MULTILIB([MAKEFILE], [REL-TO-TOP-SRCDIR])
 # ---------------------------------------------------
@@ -33,8 +50,8 @@ AC_OUTPUT_COMMANDS([
 # Only add multilib support code if we just rebuilt the top-level
 # Makefile.
 case " $CONFIG_FILES " in
- *" ifelse([$1],,Makefile,[$1]) "*)
-   ac_file=ifelse([$1],,Makefile,[$1]) . ${multi_basedir}/config-ml.in
+ *" ]m4_default([$1],Makefile)[ "*)
+   ac_file=]m4_default([$1],Makefile)[ . ${multi_basedir}/config-ml.in
    ;;
 esac],
                    [

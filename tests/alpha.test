@@ -4,8 +4,10 @@
 # Jim Meyering.
 . $srcdir/defs || exit 1
 
-cat >> configure.in << 'END'
+cat > configure.in << 'END'
+AC_INIT
 AM_INIT_AUTOMAKE(zardoz, 1.5e)
+AC_CONFIG_FILES(Makefile)
 END
 
 cat > Makefile.am << 'END'
@@ -23,6 +25,7 @@ END
 : > ChangeLog
 : > THANKS
 
+$ACLOCAL || exit 1
 $AUTOMAKE || exit 1
 
 grep README-alpha Makefile.in

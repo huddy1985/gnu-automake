@@ -6,14 +6,10 @@
 . $srcdir/defs || exit 1
 
 cat > configure.in << 'END'
+AC_INIT
 AM_INIT_AUTOMAKE(nonesuch, nonesuch)
-PACKAGE=nonesuch
-VERSION=nonesuch
 AC_PROG_CC
-AC_ARG_PROGRAM
-AC_PROG_MAKE_SET
 AC_PROG_RANLIB
-AC_PROG_INSTALL
 LIBOBJS="$LIBOBJS foo.o"
 AC_OUTPUT(Makefile)
 END

@@ -3,15 +3,19 @@ It would not be what it is today without the invaluable help of these
 people:
 
 Adam J. Richter		adam@yggdrasil.com
+Adrian Bunk		bunk@fs.tum.de
 Akim Demaille		akim@freefriends.org
+Alan Modra		amodra@bigpond.net.au
 Alex Hornby		alex@anvil.co.uk
-Alexandre Duret-Lutz	duret_g@epita.fr
+Alexander Mai		st002279@hrzpub.tu-darmstadt.de
 Alexander V. Lukyanov	lav@yars.free.net
+Alexandre Duret-Lutz	duret_g@epita.fr
 Alexey Mahotkin		alexm@hsys.msk.ru
 Andreas Schwab		schwab@lamothe.informatik.uni-dortmund.de
 Andrew Cagney		cagney@tpgi.com.au
 Andris Pavenis		pavenis@lanet.lv
 Anthony Green		green@cygnus.com
+Arkadiusz Miskiewicz	misiek@pld.ORG.PL
 Assar Westerlund	assar@sics.se
 Axel Belinfante		Axel.Belinfante@cs.utwente.nl
 Bernard Urban		Bernard.Urban@meteo.fr
@@ -24,16 +28,20 @@ Brian Ford		ford@vss.fsi.com
 Brian Jones		cbj@nortel.net
 Bruno Haible		haible@ilog.fr
 Chris Provenzano	proven@io.proven.org
+Christian Cornelssen	ccorn@cs.tu-berlin.de
 danbp			danpb@nospam.postmaster.co.uk
 Dave Brolley		brolley@redhat.com
 Dave Morrison		dave@bnl.gov
 David A. Swierczek	swiercze@mr.med.ge.com
 David Zaroski		cz253@cleveland.Freenet.Edu
+Dean Povey		dpovey@wedgetail.com
 Derek R. Price		derek.price@openavenue.com
 Dieter Baron		dillo@stieltjes.smc.univie.ac.at
+Dmitry Mikhin		dmitrym@acres.com.au
 Doug Evans		devans@cygnus.com
 Eleftherios Gkioulekas	lf@amath.washington.edu
 Elrond			Elrond@Wunder-Nett.org
+Enrico Scholz		enrico.scholz@informatik.tu-chemnitz.de
 Erez Zadok		ezk@cs.columbia.edu
 Eric Magnien		emagnien@club-internet.fr
 Erick Branderhorst	branderh@iaehv.nl
@@ -48,13 +56,16 @@ Glenn Amerine		glenn@pie.mhsc.org
 Gord Matzigkeit		gord@gnu.ai.mit.edu
 Gordon Sadler		gbsadler1@lcisp.com
 Greg A. Woods		woods@most.weird.com
+Guido Draheim		guidod@gmx.de
 H.J. Lu			hjl@lucon.org
 Harlan Stenn		Harlan.Stenn@pfcs.com
 Henrik Frystyk Nielsen	frystyk@w3.org
 Ian Lance Taylor	ian@cygnus.com
 Inoue			inoue@ainet.or.jp
 James Henstridge	james@daa.com.au
+James Youngman		jay@gnu.org
 Janos Farkas		chexum@shadow.banki.hu
+Jared Davis		abiword@aiksaurus.com
 Jason Molenda		crash@cygnus.co.jp
 Jeff Bailey		Jbailey@phn.ca
 Jeff Garzik		jgarzik@pobox.com
@@ -92,10 +103,13 @@ Mark Elbrecht		snowball3@bigfoot.com
 Mark Galassi		rosalia@nis.lanl.gov
 Markku Rossi		mtr@ngs.fi
 Markus F.X.J. Oberhumer	k3040e4@wildsau.idv-edu.uni-linz.ac.at
+Martin Frydl		martin@idoox.com
+Mathias Doreille	doreille@smr.ch
 Matt Leach		mleach@cygnus.com
 Matthew D. Langston	langston@SLAC.Stanford.EDU
 Matthias Clasen		clasen@mathematik.uni-freiburg.de
 Maxim Sinev		good@goods.ru
+Merijn de Jonge		M.de.Jonge@cwi.nl
 Michael Brantley	Michael-Brantley@deshaw.com
 Michel de Ruiter	mdruiter@cs.vu.nl
 Miles Bader		miles@ccs.mt.nec.co.jp
@@ -110,7 +124,9 @@ Nicolas Joly		njoly@pasteur.fr
 Noah Friedman		friedman@gnu.ai.mit.edu
 Nyul Laszlo		nyul@sol.cc.u-szeged.hu
 OKUJI Yoshinori		okuji@kuicr.kyoto-u.ac.jp
+Olivier Louchart-Fletcher olivier@zipworld.com.au
 Olly Betts		olly@muscat.co.uk
+Patrick Welche		prlw1@newn.cam.ac.uk
 Paul Berrevoets		paul@swi.com
 Paul D. Smith		psmith@BayNetworks.COM
 Paul Eggert 		eggert@twinsun.com
@@ -135,6 +151,8 @@ Robert Bihlmeyer	robbe@orcus.priv.at
 Robert Boehne		rboehne@ricardo-us.com
 Robert Collins		robert.collins@itdomain.com.au
 Rusty Ballinger		rusty@rlyeh.engr.sgi.com
+Ryan T. Sammartino	ryants@shaw.ca
+Sergey Vlasov		vsu@mivlgu.murom.ru
 Seth Alves		alves@hungry.com
 Shuhei Amakawa		<sa264@cam.ac.uk>
 Shigio Yamaguchi	shigio@tamacom.com
@@ -152,3 +170,4 @@ Tim Van Holder		tim.van.holder@pandora.be
 Ulrich Drepper		drepper@gnu.ai.mit.edu
 Vadim Zeitlin		Vadim.zeitlin@dptmaths.ens-cachan.fr
 Werner Koch		wk@isil.d.shuttle.de
+Yann Droneaud		ydroneaud@meuh.eu.org

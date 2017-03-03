@@ -5,6 +5,7 @@
 . $srcdir/defs || exit 1
 
 cat > configure.in << 'END'
+AC_INIT
 AM_INIT_AUTOMAKE(nonesuch, nonesuch)
 AM_CONDITIONAL(TEST, true)
 AC_OUTPUT(Makefile)
@@ -21,5 +22,6 @@ END
 
 mkdir dir1
 
+$ACLOCAL || exit 1
 $AUTOMAKE && exit 1
 exit 0

@@ -39,7 +39,6 @@ int main ()
 }
 END
 
-$needs_autoconf
 gcc -v || exit 77
 
 cat > Mycomp << 'END'
@@ -58,6 +57,10 @@ chmod +x Mycomp
 
 set -e
 
+
+# Ignore user CFLAGS.
+CFLAGS=
+export CFLAGS
 
 for conf in configure.1 configure.3; do
    cp $conf configure.in

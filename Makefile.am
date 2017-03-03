@@ -1,6 +1,23 @@
 ## Process this file with automake to create Makefile.in
 
-AUTOMAKE_OPTIONS = 1.4 dist-bzip2
+## Makefile for Automake.
+
+## Copyright 1995, 1996, 1997, 1998, 1999, 2001 Free Software Foundation, Inc.
+
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2, or (at your option)
+## any later version.
+
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+## 02111-1307, USA.
 
 ## We need `.' in SUBDIRS because we want `check' to build `.' before
 ## tests.
@@ -18,6 +35,26 @@ ETAGS_ARGS = --lang=none \
 TAGS_DEPENDENCIES = automake.texi
 
 EXTRA_DIST = ChangeLog.1996 ChangeLog.1998 ChangeLog.2000
+
+## Make versioned links.  We only run the transform on the root name;
+## then we make a versioned link with the transformed base name.  This
+## seemed like the most reasonable approach.
+install-exec-hook:
+	@$(POST_INSTALL)
+	@for p in $(bin_SCRIPTS); do \
+	  f="`echo $$p|sed '$(transform)'`"; \
+	  fv="$$f-$(APIVERSION)"; \
+	  rm -f $(DESTDIR)$(bindir)/$$fv; \
+	  echo " ln $(DESTDIR)$(bindir)/$$f $(DESTDIR)$(bindir)/$$fv"; \
+	  ln $(DESTDIR)$(bindir)/$$f $(DESTDIR)$(bindir)/$$fv; \
+	done
+
+uninstall-hook:
+	@for p in $(bin_SCRIPTS); do \
+	  f="`echo $$p|sed '$(transform)'`"; \
+	  fv="$$f-$(APIVERSION)"; \
+	  rm -f $(DESTDIR)$(bindir)/$$fv; \
+	done
 
 ################################################################
 ##
@@ -71,10 +108,10 @@ maintainer-check: automake aclocal
 	  echo "Found bad split in the lines above." 1>&2; \
 	  exit 1; \
 	fi
-## Look for cd within backquotes without CDPATH=:
+## Look for cd within backquotes
 	@if grep -n '^[^#]*` *cd ' $(srcdir)/automake.in \
-	      $(srcdir)/lib/am/*.am $(srcdir)/m4/*.m4; then \
-	  echo "Consider setting CDPATH in the lines above" 1>&2; \
+	      $(srcdir)/lib/am/*.am; then \
+	  echo "Consider using $$$$(am__cd) in the line above." 1>&2; \
 	  exit 1; \
 	fi
 ## Using @_ in a scalar context is most probably a programming error.
@@ -87,8 +124,9 @@ maintainer-check: automake aclocal
 	  echo "Don't use \`local' with parens: use several \`local' above." >&2; \
 	  exit 1; \
 	fi
-## Up to now we manage to limit to 1 use of local.
-	@locals=`grep -c '^[ \t]*local [^*]' $(srcdir)/automake.in`; \
+## Up to now we manage to limit to 1 use of local, but for `local $_;'.
+	@locals=`grep -v '^[ \t]*local \$$_;' $(srcdir)/automake.in | \
+	        grep -c '^[ \t]*local [^*]'`; \
 	case $$locals in \
 	  [0] ) \
 	    echo "Wow, congrats!  There are no \`local' now!." >&2; \
@@ -142,24 +180,30 @@ WGET = wget
 
 ## Files that we fetch and which we compare against.
 ## FIXME should be a lot more here
-## Sadly we can't fetch ansi2knr.1 from the same location :-(
-FETCHFILES = config.guess config.sub ansi2knr.c
+FETCHFILES = config.guess config.sub texinfo.tex Automake/XFile.pm
 
 ## Fetch the latest versions of files we care about.
 fetch:
 	rm -rf Fetchdir > /dev/null 2>&1
-	mkdir Fetchdir
+	mkdir Fetchdir; mkdir Fetchdir/Automake
 ## If a get fails then that is a problem.
 	(cd Fetchdir && \
 	$(WGET) ftp://ftp.gnu.org/gnu/config/config.guess; \
 	$(WGET) ftp://ftp.gnu.org/gnu/config/config.sub; \
-	$(WGET) ftp://ftp.cs.wisc.edu/ghost/ansi2knr.c)
+	$(WGET) ftp://ftp.gnu.org/gnu/texinfo/texinfo.tex; \
+	$(WGET) http://savannah.gnu.org/cgi-bin/viewcvs/~checkout~/autoconf/autoconf/lib/Autom4te/XFile.pm?content-type=text/plain -O Automake/XFile.pm)
+	perl -pi -e 's/Autom4te::/Automake::/g' Fetchdir/Automake/XFile.pm
 ## Don't exit after test because we want to give as many errors as
 ## possible.
 	@stat=0; for file in $(FETCHFILES); do \
-	  if diff $(srcdir)/lib/$$file Fetchdir/$$file > /dev/null 2>&1; then :; \
+	  if diff -u $(srcdir)/lib/$$file Fetchdir/$$file \
+	          >>Fetchdir/update.patch 2>/dev/null; then :; \
 	  else \
 	    stat=1; \
-	    echo "install Fetchdir/$$file into srcdir and commit"; \
+	    echo "Updating $(srcdir)/lib/$$file..."; \
+	    cp Fetchdir/$$file $(srcdir)/lib/$$file; \
 	  fi; \
-	done; exit $$stat
+	done; \
+	test $$stat = 1 && \
+	  echo "See Fetchdir/update.patch for a log of the changes."; \
+	exit $$stat

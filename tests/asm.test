@@ -4,16 +4,6 @@
 
 . $srcdir/defs || exit 1
 
-cat > configure.in << 'END'
-AC_INIT
-AM_INIT_AUTOMAKE(nonesuch, nonesuch)
-AC_ARG_PROGRAM
-AC_PROG_INSTALL
-AC_PROG_MAKE_SET
-AC_SUBST(ASFLAGS)
-AC_OUTPUT(Makefile)
-END
-
 cat > Makefile.am << 'END'
 noinst_PROGRAMS = maude
 maude_SOURCES = maude.s
@@ -21,53 +11,71 @@ END
 
 : > maude.s
 
-# Should fail because we need cc and as.
+# Should fail because we need CC and CCAS.
 echo 1
-$AUTOMAKE && exit 1
-
 cat > configure.in << 'END'
 AC_INIT
 AM_INIT_AUTOMAKE(nonesuch, nonesuch)
-AC_ARG_PROGRAM
-AC_PROG_INSTALL
-AC_PROG_MAKE_SET
-AC_PROG_CC
-AC_SUBST(ASFLAGS)
+AC_SUBST(CCASFLAGS)
 AC_OUTPUT(Makefile)
 END
 
-# We still need as.
+$ACLOCAL || exit 1
+$AUTOMAKE && exit 1
+
+# We still need CCAS.
 echo 2
-$AUTOMAKE && exit 1
-
 cat > configure.in << 'END'
 AC_INIT
 AM_INIT_AUTOMAKE(nonesuch, nonesuch)
-AC_ARG_PROGRAM
-AC_PROG_INSTALL
-AC_PROG_MAKE_SET
-AS='$(CC)'
-AC_SUBST(AS)
 AC_PROG_CC
+AC_SUBST(CCASFLAGS)
 AC_OUTPUT(Makefile)
 END
 
-# We need ASFLAGS.
+$ACLOCAL || exit 1
+$AUTOMAKE && exit 1
+
+# We need CCASFLAGS.
 echo 3
-$AUTOMAKE && exit 1
-
 cat > configure.in << 'END'
 AC_INIT
 AM_INIT_AUTOMAKE(nonesuch, nonesuch)
-AC_ARG_PROGRAM
-AC_PROG_INSTALL
-AC_PROG_MAKE_SET
-AS='$(CC)'
-AC_SUBST(AS)
+CCAS='$(CC)'
+AC_SUBST(CCAS)
 AC_PROG_CC
-AC_SUBST(ASFLAGS)
 AC_OUTPUT(Makefile)
 END
 
+$ACLOCAL || exit 1
+$AUTOMAKE && exit 1
+
+# We have every needed, expect a success.
 echo 4
-$AUTOMAKE
+cat > configure.in << 'END'
+AC_INIT
+AM_INIT_AUTOMAKE(nonesuch, nonesuch)
+CCAS='$(CC)'
+AC_SUBST(CCAS)
+AC_PROG_CC
+AC_SUBST(CCASFLAGS)
+AC_OUTPUT(Makefile)
+END
+
+$ACLOCAL  || exit 1
+$AUTOMAKE || exit 1
+
+
+# We have every needed, expect a success.
+echo 5
+cat > configure.in << 'END'
+AC_INIT
+AM_INIT_AUTOMAKE(nonesuch, nonesuch)
+AM_PROG_AS
+AC_OUTPUT(Makefile)
+END
+
+$ACLOCAL  || exit 1
+$AUTOMAKE || exit 1
+
+exit 0

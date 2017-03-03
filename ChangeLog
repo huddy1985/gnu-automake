@@ -1,16 +1,1815 @@
-2001-08-22  Tom Tromey  <tromey@redhat.com>
+2002-03-05  Tom Tromey  <tromey@redhat.com>
 
-	* configure.in: Released 1.5.
+	* configure.in: Released 1.6.
+
+2002-03-05  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	Fix for PR automake/300:
+	* tests/pr300-lib.test, tests/pr300-ltlib.test,
+	tests/pr300-prog.test: New files.
+	* tests/Makefile.am (TESTS): Add them.
+	* automake.in (handle_ltlibraries): Strip nobase_ prefix to
+	compute	the directory.
+	* lib/am/header-vars.am (install_sh_PROGRAM): New variable.
+	* lib/am/libs.am (%DIR%LIBRARIES_INSTALL): New variable.
+	(install-%DIR%LIBRARIES): Use it.  Honor nobase_.
+	(uninstall-%DIR%LIBRARIES): Honor nobase_.
+	* lib/am/ltlibs.am (%DIR%LTLIBRARIES_INSTALL): New variable.
+	(install-%DIR%LTLIBRARIES): Use it.  Honor nobase_.
+	(uninstall-%DIR%LTLIBRARIES): Honor nobase_.
+	* lib/am/progs.am (%DIR%PROGRAMS_INSTALL): New variable.
+	(install-%DIR%PROGRAMS): Use it.  Honor nobase_.
+	(uninstall-%DIR%PROGRAMS): Honor nobase_.
+	See also the fix for nobase.test on 2001-11-09.
+
+2002-03-05  Tom Tromey  <tromey@redhat.com>
+
+	* lib/config.sub, lib/config.guess, lib/texinfo.tex: Updated.
+
+2002-03-05  Pavel Roskin  <proski@gnu.org>
+
+	* tests/yacc8.test: Add a command between "test" and "cd" to
+	work around a bug in bash-2.05.
+
+2002-03-05  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	Fix for PR automake/294:
+	* tests/dirforbid.test: New file.
+	* tests/Makefile.am (TESTS): Add it.
+	* automake.in (standard_prefix): New hash.
+	(am_primary_prefixes): Forbid standard_prefixes which are not
+	explicitely allowed.
+	* automake.texi (Uniform): Remove FIXME.
+
+2002-03-05  Jim Meyering  <meyering@lucent.com>
+
+	* automake.in (@common_files): Add config.rpath.
+
+2002-03-05  Kevin Ryde  <user42@zip.com.au>
+
+	For PR automake/297:
+	* lex.m4 (AM_PROG_LEX): Don't set LEX=${am_missing_run}flex until
+	after AC_PROG_LEX, since it will try to run it and fail (in autoconf
+	2.52 at least).
+
+2002-02-25  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (scan_one_autoconf_file): Declare
+	LEX_OUTPUT_ROOT and LEXLIB as configure variables when
+	AM_PROG_LEX or AC_PROG_LEX are seen.  This allows to ...
+	* lib/am/lex.am: ... remove the LEX_OUTPUT_ROOT and LEXLIB
+	definitions.  Search %SOURCE% in $(srcdir).  Use s||| instead
+	of s/// in the sed invocation, to support filenames containing
+	slashes.
+	* lib/am/yacc.am: Search %SOURCE% in $(srcdir).  Use s||| too.
+	* tests/lex5.test, tests/yacc8.test: New files.
+	* tests/Makefile.am (TESTS): Add them.
+
+2002-02-23  Per Bothner  <per@bothner.com>
+
+	* m4/depout.m4 (_AM_OUTPUT_DEPENDENCY_COMMANDS): Set `dirpart' to
+	`.' in else branch.
+
+2002-02-22  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* tests/make.test: Revert the grep logic to work around a bug
+	in NetBSD sh (see NetBSD Problem Report #11542).
+	Reported by Patrick Welche.
+
+2002-02-20  Tim Van Holder  <tim.van.holder@pandora.be>
+
+	* m4/lispdir.m4: Redirect /dev/null to stdin when running $EMACS
+	to try and prevent a non-lisp emacs from starting in interactive
+	mode.
+	* automake.texi: Document this change.
+
+2002-02-19  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.texi (Macros): Split into ...
+	(Public Macros, Private Macros): ... these.
+
+2002-02-19  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* tests/insthook.test: Use sed instead of "tail +X".
+
+2002-02-18  Paul Eggert  <eggert@twinsun.com>
+
+	* lib/depcomp: Don't use "tail +3"; it's not portable to
+	POSIX 1003.1-2001 hosts.
+
+2002-02-18  Jim Meyering  <meyering@lucent.com>
+
+	* tests/cond12.test: Use sed 1q, not `head -n 1'.
+	The latter is not portable to some old systems.
+	* m4/depout.m4: Don't use `head -1'; it's no longer portable.
+	Use `sed 1q' instead.
+	* tests/insthook.test: Likewise.
+
+2002-02-17  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (handle_lib_objects_cond): Tell the user to put
+	global linker flags in AM_LDFLAGS, not LDFLAGS.
+
+	* automake.texi (General Operation): AC_SUBST'ed variables
+	override Automake's variables.
+	(Uniform): More words and @refs.
+	(Auxiliary Programs) <config.sub, config.guess>: Add URL.
+	(etags): More explanations about the first example.
+	(Invoking Automake): Mention autoreconf.  More @refs.
+	(Requirements): Mention AC_CONFIG_FILES.
+	(Optional): AC_CHECK_TOOL will no longer install config.sub and
+	config.guess.  Mention AC_LIBOBJ, AC_LIBSOURCE, and AC_LIBSOURCES.
+	(Invoking aclocal): aclocal no longer warn about duplicates.
+	(Macros) <AM_INIT_AUTOMAKE>: More explanations.
+	(Extending aclocal): Suggest using the output of
+	`aclocal --print-ac-dir` to install third-party macros.
+	(Alternative): Specify ordering of dist_, nodist_, and nobase_
+	prefixes.
+	(A Program): Mention scripts.  The global LDADD variable is not
+	meant to hold link flags, suggest using AM_LDFLAGS instead.
+	(Program and Library Variables) <maude_LIBADD, maude_LDADD>:
+	_LIBADD and _LDADD are subject to the same restriction wrt to
+	link flags.
+	(Program and Library Variables) <maude_DEPENDECIES>: Is also
+	derived from maude_LIBADD.
+	(Program variables): Define AM_LDFLAGS.
+	(Dependencies): Passing the no-dependencies option to
+	AM_INIT_AUTOMAKE is prefered.
+	(Scripts): Explain why automake is magically cleaned.
+	Mention noinst_SCRIPTS and check_SCRIPTS.
+	(Data): Use dist_ in Automake's example.
+	(Dist): Reference AM_INIT_AUTOMAKE for PACKAGE and VERSION.
+	Mention AC_CONFIG_FILES instead of AC_OUTPUT.
+
+2002-02-14  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* Makefile.am (FETCHFILES): Add Automake/XFile.pm.
+	(fetch): Fetch XFile.pm.  Update the files in $(srcdir) instead
+	of asking the maintainer to do it manually.
+	* lib/config.guess, lib/config.sub, lib/texinfo.tex,
+	Automake/XFile.pm: New upstream versions.
+
+2002-02-02  Tom Tromey  <tromey@redhat.com>
+
+	* automake.texi (Macros): Warn about upgrading.
+
+2002-02-01  Tom Tromey  <tromey@redhat.com>
+
+	Change per GNU coding standards:
+	* aclocal.in (parse_arguments): Only mention most recent year in
+	copyright output.
+	* automake.in (version): Only mention most recent year.
+
+2002-01-30  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.texi (API versioning): New Node.
+	(Extending): Use $(DESTDIR) in examples.
+
+2002-01-28  Akim Demaille  <akim@epita.fr>
+
+	* m4/lispdir.m4 (AM_PATH_LISPDIR): Serial 5.
+	Respect the --help layout.
+
+2002-01-27  Tom Tromey  <tromey@redhat.com>
+
+	* configure.in: Bumped to 1.5e.
+
+	* lib/am/yacc.am: Use `rm -f'.
+
+	* configure.in: Released 1.5d.
+
+	* lib/config.guess: New version from FSF.
+
+	* Makefile.am (uninstall-hook): New target.
+
+2002-01-24  Akim Demaille  <akim@epita.fr>
+
+	* lib/install-sh: Update, from Autoconf.
+
+2002-01-24  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (scan_one_autoconf_file): Don't treat AC_CHECK_TOOL
+	as AC_CANONICAL_HOST (the former does not require the latter since
+	Autoconf 2.50).
+	* m4/strip.m4 (AM_PROG_INSTALL_STRIP): Check for strip.
+	* automake.texi (Requirements): Do not require STRIP to be
+	defined by the user.
+
+2002-01-23  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* lib/am/depend.am (distclean-depend): Erase %DEPDIRS%, not $(DEPDIRS).
+	* automake.in (handle_languages): Compute and substitute %DEPDIRS%.
+	* tests/pr224.test: Make sure .deps subdirectories are
+	erased by distclean.
+
+2002-01-22  Tom Tromey  <tromey@redhat.com>
+
+	* m4/gcj.m4 (AM_PROG_GCJ): Don't invoke dependency code if
+	no-dependencies option is set.
+	* m4/init.m4 (AM_INIT_AUTOMAKE): Don't invoke dependency code if
+	no-dependencies option is set.  Don't call AM_DEP_TRACK or
+	AM_SET_DEPDIR.
+
+2002-01-22  Pavel Roskin  <proski@gnu.org>
+
+	* tests/asm.test: Use CCAS and CCASFLAGS instead of AS and
+	ASFLAGS.
+
+2002-01-22  Akim Demaille  <akim@epita.fr>
+
+	* Makefile.am (FETCHFILES): Remove ansi2knr.c, add texinfo.tex.
+	(fetch): Adjust.
+
+2002-01-21  Tom Tromey  <tromey@redhat.com>
+
+	* Makefile.am (fetch): Don't fetch ansi2knr.
+
+	* automake.texi (Macros): Updated for new variable names.
+	(Program and Library Variables): Likewise.
+	(Assembly Support): Likewise.
+	* m4/as.m4: Use CCAS and CCASFLAGS.
+	* automake.in (asm): Use CCAS and CCASFLAGS.
+
+2002-01-21  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&parse_arguments): Use a more GNUish error message
+	on wrong options.
+
+2002-01-20  Tom Tromey  <tromey@redhat.com>
+
+	Fix for PR automake/231:
+	* m4/gcj.m4 (AM_PROG_GCJ): Use _AM_DEPENDENCIES(GCJ).
+	* m4/depend.m4: Document `GCJ'.
+
+	For PR automake/224:
+	* tests/Makefile.am (TESTS): Added pr224.test.
+	* tests/pr224.test: New file.
+	* lib/depcomp: Fixed computation of depfile.
+	* lib/am/depend2.am: Use %DEPBASE%, not $(DEPDIR).
+	* automake.in (handle_single_transform_list): Only reject `..'
+	component for Java.  Put dependencies in directory near object.
+	(handle_languages): Set DEPBASE.  Handle de-ansi-fication.
+
+2002-01-20  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* tests/defs: Export AUTOMAKE and ACLOCAL.
+
+2002-01-19  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	Fix for PR automake/204:
+	* tests/pr204.test: New file.
+	* tests/Makefile.am (TESTS): Add it.
+	* automake.in (handle_single_transform_list): Don't distribute
+	sources derived from non-distributed sources.
+
+2002-01-18  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	Fix for PR automake/229:
+	* tests/pr229.test: New file.
+	* tests/Makefile.am (TESTS): Add it.
+	* automake.in (scan_one_autoconf_file): Recognize AC_CYGWIN,
+	AC_EMXOS2, and AC_MINGW32.
+
+2002-01-18  Tom Tromey  <tromey@redhat.com>
+
+	* tests/cond7.test: Fix test bug exposed by copyright update.
+
+	For PR automake/288:
+	* automake.in (lang_c_rewrite): Don't prepend directory to base if
+	directory is `.'.  Also, properly compute de_ansi_files entry in
+	subdir-objects case
+	* tests/Makefile.am (TESTS): Added ansi7.test.
+	* tests/ansi7.test: New file.
+
+	* aclocal.in (parse_arguments): Added 2002.
+	(write_aclocal): Likewise.
+	(parse_arguments): Updated my email address.
+	* automake.in (gen_copyright): Added 2002.
+	(version): Likewise.  Also, changed my email address.
+
+	* configure.in (APIVERSION): Refined definition.
+
+2002-01-18  Tom Tromey  <tromey@redhat.com>
+
+	* missing: Updated.
+	* lib/missing: Accept versioned aclocal.
+	* m4/init.m4 (AM_INIT_AUTOMAKE): Look for versioned aclocal.
+
+2002-01-17  Pavel Roskin  <proski@gnu.org>
+
+	* m4/Makefile.am (m4datadir): Use APIVERSION.
+
+2002-01-16  Tom Tromey  <tromey@redhat.com>
+
+	* Makefile.am (install-exec-hook): Use APIVERSION.
+	* m4/init.m4 (AM_INIT_AUTOMAKE): Use am__api_version.
+	* m4/amversion.in (AM_AUTOMAKE_VERSION): Set am__api_version from
+	APIVERSION.
+	* automake.in (perllibdir): Use APIVERSION.
+	(libdir): Likewise.
+	* aclocal.in (perllibdir): Use APIVERSION.
+	(APIVERSION): New global.
+	(parse_arguments): Use APIVERSION.
+	* configure.in (APIVERSION): New subst.
+	(pkgvdatadir): Use APIVERSION.
+
+2002-01-15  Tom Tromey  <tromey@redhat.com>
+
+	* missing: Updated.
+	* lib/missing: Match against `automake*' to pick up versioned
+	automake.
+	* m4/init.m4 (AM_INIT_AUTOMAKE): Use versioned automake name.
+	* m4/amversion.in (AM_AUTOMAKE_VERSION): Set am__version
+	variable.
+	* lib/am/Makefile.am (amdir): Use pkgvdatadir.
+	* lib/Makefile.am (dist_pkgvdata_DATA): Renamed to use
+	pkgvdatadir.
+	(scriptdir): Use pkgvdatadir.
+	(installcheck-local): Likewise.
+	* lib/Automake/Makefile.am (perllibdir): Use pkgvdatadir.
+	* automake.in (perllibdir): Added VERSION.
+	(libdir): Likewise.
+	* aclocal.in (parse_arguments): Search versioned directory.  Don't
+	push unversioned directory unless it exists.
+	(perllibdir): Added VERSION.
+	(default_acdir): New global.
+	* m4/Makefile.am (m4datadir): Added $(VERSION).
+	* Makefile.am (install-exec-hook): New target.
+	* configure.in (ACLOCAL): Search build directory.
+	(pkgvdatadir): New subst.
+
+2002-01-15  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* lib/config.sub, lib/config.guess: New versions from FSF.
+
+2002-01-13  Tom Tromey  <tromey@redhat.com>
+
+	For PR automake/288:
+	* automake.in (lang_c_rewrite): Set value for de_ansi_files entry
+	to directory.
+	(lang_c_finish): Likewise.  Also, use directory information from
+	de_ansi_files.
+
+2002-01-13  Kevin Ryde  <user42@zip.com.au>
+
+	For PR automake/288:
+	* tests/Makefile.am (TESTS): Added ansi6.test.
+	* tests/ansi6.test: New file.
+
+2002-01-13  Tom Tromey  <tromey@redhat.com>
+
+	For PR automake/287:
+	* lib/am/distdir.am (distdir): Use `$$list' trick when looping
+	over subdirs.
+	* tests/Makefile.am (TESTS): Added pr287.test.
+	* tests/pr287.test: New file.
+
+2002-01-13  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* lib/am/distdir.am (distdir): Handle subdirectories.
+	* tests/extra6.test: New file.
+	* tests/Makefile.am (TESTS): Add it.
+
+2002-01-13  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* tests/extra2.test: Run $ACLOCAL.
+
+2002-01-12  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* m4/init.m4 (AM_INIT_AUTOMAKE): Set PACKAGE and VERSION from
+	AM_INIT_AUTOMAKE arguments when using the old-style call.
+	Use AC_PACKAGE_TARNAME and AC_PACKAGE_VERSION in the new form only.
+	Suggested by Pavel Roskin.
+
+2002-01-12  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* test/nodefine.test, test/nodefine2.test: Check that no-define
+	works, not the contrary...
+	* m4/options.m4 (_AM_IF_OPTIONS): Use m4_ifset.
+	* m4/init.m4 (AM_INIT_AUTOMAKE): A third argument implies no-define,
+	not the contrary.
+
+2002-01-12  Jim Meyering  <meyering@lucent.com>
+
+	* automake.in (scan_one_autoconf_file): Unquote AC_LIBOBJ argument.
+	* tests/libobj11.test: New file.
+	* tests/Makefile.am (TESTS): Add libobj11.test.
+
+2002-01-09  Ryan T. Sammartino  <ryants@shaw.ca>
+
+	* lib/depcomp (msvisualcpp): Strip -Gm, -Gi, and -ZI options.
+
+2002-01-09  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (file_contents_internal): Introduce two variables,
+	$is_rule and $discard_rules to track rules spanning across multiple
+	paragraphs.  This fixes a very nasty bug reported by Dmitry Mikhin
+	where only the first paragraph of such a multi-paragraph rule was
+	discarded; but it leaves many similar latent bugs (see the FIXMEs).
+
+2002-01-09  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* tests/dup3.test: Remove all -I from $ACLOCAL before using it.
+	* tests/error.test: Use some macro names which are not defined by
+	Automake itself.
+
+2002-01-09  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.texi (Complete, Macros, Options): Document the new style
+	AM_INIT_AUTOMAKE.  Remove AM_AUTOMAKE_OPTIONS documentaion.
+	* m4/init.m4 (AM_INIT_AUTOMAKE): Get PACKAGE and VERSION from
+	AC_INIT if they are available there.  Support a	new call form
+	where the only argument is an optional space-separated list of
+	Automake options.
+	* m4/options.m4 (AM_AUTOMAKE_OPTIONS): Remove.
+	(_AM_MANGLE_OPTION, _AM_SET_OPTION, _AM_SET_OPTIONS,
+	_AM_IF_OPTION): New functions.
+	* automake.in (AC_INIT_PATTERN): New variable.
+	(global_options_line): Remove, use $seen_init_automake instead.
+	(scan_one_autoconf_file, scan_autoconf_traces): Set $package_version
+	from AC_INIT if available.  Support the new style AM_INIT_AUTOMAKE.
+	Remove the AM_AUTOMAKE_OPTIONS handling.
+	* configure.in: Modernize.
+	* tests/defs (configure.in): Modernize.  One third of the tests
+	still overwrite the default configure.in and use an old
+	AM_INIT_AUTOMAKE call, 	so that makes testing for both.
+	* tests/nodefine.test, tests/nodefine2.test: New files.
+	* tests/Makefile.am (TESTS): Add them.
+
+2002-01-08  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* automake.in (define_configure_variable): Propagate line numbers.
+
+2002-01-08  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* m4/python.m4 (_AM_PYTHON_INTERPRETER_LIST): Add python2.2.
+
+2002-01-07  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* configure.in: Run the Autoconf test in a subdirectory, then
+	erase this directory.
+
+2002-01-07  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* configure.in (AUTOMAKE): Create m4/amversion.m4.
+	* m4/amversion.in: New file.
+	* m4/Makefile.am (m4data_DATA, EXTRA_DIST): Replace by ...
+	(dist_m4data_DATA): ... this.
+	(nodist_m4data_DATA, DISTCLEANFILES): Add amversion.m4.
+	* m4/init.m4 (AM_INIT_AUTOMAKE): Require
+	AM_SET_CURRENT_AUTOMAKE_VERSION.
+	* automake.in (seen_automake_version): New variable.
+	(scan_autoconf_traces, scan_one_autoconf_file,
+	scan_autoconf_files): Scan for AM_AUTOMAKE_VERSION and complain
+	when the version used in aclocal.m4 differs from Automake's.
+	* tests/defs (ACLOCAL): Look in ../m4 too.
+	* tests/installsh.test (ACLOCAL): Likewise.
+	* tests/installdir.test (installdirs-local): Run $ACLOCAL.
+
+2002-01-06  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* automake.in (handle_languages): Emit an automake
+        internal variable 'am__depfiles_maybe'.
+	* lib/am/configure.am (%MAKEFILE%): Use am__depfiles_maybe.
+
+	* lib/am/configure.am (%MAKEFILE%): Pass `depfiles' to
+	config.status.
+
+2002-01-06  Tom Tromey  <tromey@redhat.com>
+
+	* automake.texi (Tags): Document new variables.
+	* lib/am/tags.am (ETAGS): New macro.
+	(ETAGSFLAGS): Likewise.
+	(TAGS): Use them.
+
+2002-01-04  Tom Tromey  <tromey@redhat.com>
+
+	* configure.in (ACLOCAL): Set perllibdir.  From Nicolas Joly.
+
+2002-01-04  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (read_am_file): Thinko in "comment following
+	trailing backslash" detection.
+	* tests/comment5.test: Test for this too.
+
+2002-01-02  Tom Tromey  <tromey@redhat.com>
+
+	* automake.texi (Extending): Added index for uninstall-hook.
+
+2002-01-02  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	Fix for PR automake/278:
+	* m4/python.m4 (AM_PYTHON_CHECK_VERSION): Use `sys.hexversion' to cope
+	with versions such as '2.2c1'.  Also, use `int' instead of the
+	obsoleted `string.atoi'.
+	Reported by Enrico Scholz.
+
+2001-01-02  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	Fix for PR automake/280:
+	* automake.in (read_am_file): Warn about trailing backslashes
+	in comments.
+	* tests/comment5.test: New file.
+	* tests/Makefile.am (TESTS): Add comment5.test.
+	Reported by Enrico Scholz.
+
+2002-01-02  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* tests/comment4.test: New file.
+	* tests/Makefile.am (TESTS): Add comment4.test.
+
+	Fix for comment4.test:
+	* automake.in (read_am_file): Output leading comments only when
+	encountering white lines.
+
+2002-01-01  Tom Tromey  <tromey@redhat.com>
+
+	For PR automake/234:
+	* tests/Makefile.am (TESTS): Added strip.test.
+	* tests/strip.test: New file.
+
+	* automake.texi (Extending): Mention uninstall-hook.
+	(Install): Likewise.
+	* automake.in (handle_factored_dependencies): Allow
+	uninstall-hook.
+
+2002-01-01  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* lib/am/install.am (install-strip): Set INSTALL_STRIP_FLAG=-s,
+	it is needed by install-%DIR%LTLIBRARIES in ltlib.am.
+	This fixes a bug introduced on 2001-01-28.
+	Reported by Jared Davis.
+
+2001-12-31  Tom Tromey  <tromey@redhat.com>
+
+	* automake.texi (Extending): Document installcheck-local.  Added
+	installdirs-local index entry.
+	(Tests): Document installcheck-local.
+
+	* automake.in (handle_single_transform_list): Indentation fix.
+
+2001-12-31  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (common_files): Add COPYING.DOC.
+	Suggested by Karl Berry.
+
+2001-12-30  Tom Tromey  <tromey@redhat.com>
+
+	* automake.in (define_configure_variable): Define a user macro,
+	not an automake macro.
+	* tests/Makefile.am (TESTS): Added ar.test.
+	* tests/ar.test: New file.
+
+	For PR automake/211:
+	* automake.in (object_compilation_map): New global.
+	(initialize_per_input): Initialize it.
+	(COMPILE_LIBTOOL): New constant.
+	(COMPILE_ORDINARY): Likewise.
+	* tests/Makefile.am (TESTS): Added pr211.test.
+	* tests/pr211.test: New file.
+
+	For PR automake/215:
+	* configure.in: Use AM_AUTOMAKE_OPTIONS.
+	* Makefile.am (AUTOMAKE_OPTIONS): Removed.
+	* automake.texi (Macros): Document AM_AUTOMAKE_OPTIONS.
+	(Options): Mention AM_AUTOMAKE_OPTIONS.
+	* automake.in (global_options): New global.
+	(global_options_line): Likewise.
+	(scan_autoconf_traces): Trace AM_AUTOMAKE_OPTIONS.
+	(scan_one_autoconf_file): Likewise.
+	(process_option_list): New function.
+	(handle_options): Use it.  Also, handle global options.
+	* m4/Makefile.am (m4data_DATA): Added options.m4.
+	* m4/options.m4: New file.
+
+	* lib/am/install.am (?SUBDIRS?installdirs-am): Handle
+	installdirs-local.
+	(?!SUBDIRS?installdirs): Likewise.
+	* automake.in (handle_installdirs): Handle installdirs-local.
+	* automake.texi (Extending): Mention installdirs.
+	* tests/Makefile.am (TESTS): Added installdir.test.
+	* tests/installdir.test: New file.
+
+2001-12-30  Akim Demaille  <akim@epita.fr>
+
+	* lib/am/yacc.am: Also rename the possible y.output file.
+	Remove the trailing y.tab.h.
+
+2001-12-30  Paolo Bonzini  <bonzini@gnu.org>
+
+	* automake.texi (Install): Remove mention of nonexistent
+	uninstall-hook.
+
+2001-12-30  Alan Modra  <amodra@bigpond.net.au>
+
+	* automake.in (generate_makefile): Unlink output file before
+	opening so that any hard links are not changed.
+
+2001-12-30  Tom Tromey  <tromey@redhat.com>
+
+	* tests/pr220.test: Use `required' to pick up gcc.
+
+	For PR automake/243:
+	* m4/depout.m4 (_AM_OUTPUT_DEPENDENCY_COMMANDS): Strip everything
+	after `:'.
+	* tests/Makefile.am (TESTS): Added pr243.test.
+	* tests/pr243.test: New file.
+
+	For PR automake/220:
+	* tests/Makefile.am (TESTS): Added pr220.test.
+	* tests/pr220.test: New file.
+	* m4/cond.m4 (AM_CONDITIONAL): Cause creation of config.status to
+	fail if conditional was never run.
+
+	For PR automake/260:
+	* lib/depcomp (tru64): Correctly handle libtool case.
+	From doreille@smr.ch.
+
+2001-12-30  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* lib/am/distdir.am (distcleancheck_listfiles): Unquote.
+	Reported by Yann Droneaud.
+
+2001-12-29  Tom Tromey  <tromey@redhat.com>
+
+	For PR automake/266:
+	* tests/Makefile.am (TESTS): Added pr266.test.
+	* tests/pr266.test: New file.
+	* m4/depout.m4 (_AM_OUTPUT_DEPENDENCY_COMMANDS): Handle
+	non-standard name for makefile.
+
+	For PR automake/279:
+	* automake.in (conditional_ambiguous_p): New sub.
+	(handle_lib_objects_cond): Use it.
+	(check_ambiguous_conditional): Use it.
+	* tests/Makefile.am (TESTS): Added pr279.test, pr279-2.test.
+	* tests/pr279.test: New file.
+	* tests/pr279-2.test: New file.
+
+2001-12-26  Tom Tromey  <tromey@redhat.com>
+
+	For PR automake/249:
+	* tests/Makefile.am (TESTS): Added nodist2.test.
+	* tests/nodist2.test: New file
+
+2001-12-26  Ralf Corsepius <corsepiu@faw.uni-ulm.de>
+
+	* m4/multi.m4: Fix quoting in AC_OUTPUT_COMMANDS.
+
+2001-12-26  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* configure.in: Test for Autoconf >= 2.52.
+	* tests/defs (needs_autoconf, has_autoconf): Delete definition.
+	* tests/ansi3.test, tests/ansi5.test, tests/ccnoco.test,
+	tests/cond4.test, tests/cond9.test, tests/cond16.test,
+	tests/cond18.test, tests/cond19.test, tests/cond20.test,
+	tests/confsub.test, tests/depcomp2.test, tests/depdist.test,
+	tests/depend2.test, tests/dirname.test, tests/distname.test,
+	tests/extra5.test, tests/install2.test, tests/lex3.test,
+	tests/make.test, tests/nobase.test, tests/pr9.test,
+	tests/pr87.test, tests/stamph2.test, tests/subdir5.test,
+	tests/subdirbuiltsources.test, tests/subobj3.test,
+	tests/subobj5.test, tests/subobj6.test, tests/substref.test,
+	tests/target-cflags.test, tests/yacc4.test, tests/yacc7.test,
+	tests/yaccvpath.test: Do not use $needs_autoconf.
+
+2001-12-14  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* configure.in: Bump version to 1.5c.
+
+2001-12-14  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* configure.in: Bump version to 1.5b.
+
+	* lib/config.sub, lib/config.guess: New versions from FSF.
+
+	* lib/am/lex.am, lib/am/yacc.am: Use `rm -f', not `rm'.
+
+2001-12-12  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (check_gnu_standards, check_gnits_standards): Pass
+	"$am_file.am" as WHERE argument to require_file.
+
+2001-12-12  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* m4/python.m4 (AM_PATH_PYTHON): Check all known Python interpreters
+	in loop until we find one the satisfies the user supplied version.
+	Add python2 to the list of known interpreters.  Don't use
+	changequote.  Cache the calculation of PYTHON_VERSION and
+	PYTHON_PLATFORM.
+	(AM_PYTHON_CHECK_VERSION): New function, extracted from
+	AM_PATH_PYTHON and modernized.
+	* m4/runlog.m4: New file.
+	* m4/Makefile.am (m4data_DATA): Add it.
+
+2001-12-06  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* tests/confsub.test, tests/depdist.test, tests/extra5.test,
+	tests/nobase.test, tests/stamph2.test,
+	tests/subdirbuiltsources.test: Require Autoconf.
+
+2001-12-05  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.texi (Dist): Document $(DISTCHECK_CONFIGURE_FLAGS).
+	* lib/am/distdir.am (distcheck): Honnor $(DISTCHECK_CONFIGURE_FLAGS).
+	Suggested by Merijn de Jonge.
+
+2001-12-05  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* lib/am/tags.am (ID): Search $(LISP) files in $(srcdir),
+	like other ID dependencies.
+	Suggested by Christian Cornelssen.
+
+2001-12-05  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (handle_dist): Distribute common files which
+	do not exist but are target of a Makefile rule.
+	* automake.texi (Dist): Update.
+	* test/builtcommon3.test: New file.
+	* test/Makefile.am (TESTS): Add distcommon3.test.
+
+2001-12-04  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (macro_define): Fix misuse of chomp introduced on
+	2001-11-28.
+
+2001-11-28  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (append_comments): New.  Extracted from
+	read_am_file.  Match '\n' with a regexp, don't use substr (the
+	perlport man page says '\n' is not always one byte wide).
+	(read_am_file):  Use it.  Always chomp $_.
+	(file_contents_internal):  Use append_comments.
+	(macro_define): Don't treat the trailing '\n' with substr, use
+	a regexp or chomp.
+
+2001-11-28  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* tests/defs: Turn on shell traces when VERBOSE=x.
+
+2001-11-26  Tom Tromey  <tromey@redhat.com>
+
+	* automake.texi (Assembly Support): Mention .s and .S as only
+	suffixes.
+
+2001-11-26  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* tests/subdirbuiltsources.test: Set -e after sourcing defs, not
+	before.
+
+2001-11-26  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* tests/lex3.test: Require GNU Make.
+
+2001-11-26  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* tests/defs (ACLOCAL): Add -I $srcdir/../m4 before any other
+	directory.
+
+2001-11-26  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* lib/am/tags.am (TAGS): Search %CONFIG% and $(LISP) files
+	in $(srcdir), like other TAGS dependencies.
+	Suggested by Christian Cornelssen.
+
+2001-11-26  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&macro_define): Use $where when reporting an error,
+	not the place where the macro was first defined since (i) if this
+	is the first definition, then obviously it was not defined before,
+	and (ii) anyway, the error is with the new definition, not the
+	first.
+
+2001-11-26  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* lib/am/distdir.am (distcheck): Call distcleancheck.
+	(distcleancheck_listfiles, distcleancheck): New, extracted from
+	distcheck.
+	* automake.texi (Checking the distribution): Document
+	distcleancheck_listfiles and distcleancheck.
+
+2001-11-25  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (scan_one_autoconf_file): Parenthesize qw// in
+	foreach invocation, otherwise Perl5.005_03 complains about a
+	syntax error.  Reported by Yann Droneaud.
+
+2001-11-19  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (scan_texinfo_file): Suppress FIXME about strange
+	map behavior.
+
+2001-11-19  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* tests/defs (aclocaldir): Check for existence of libtool.m4 and
+	gettext.m4 if required.
+
+2001-11-16  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (define_objects_from_sources,
+	handle_lib_objects_cond, value_to_list): Use quotemeta instead of
+	the equivalant substitution.
+
+2001-11-16  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (SUFFIX_RULE_PATTERN): Add '_(){}$@' to the
+	set of accepted characters in extensions.
+	(rule_define): Convert '.o' and '.obj' into '$(OBJEXT)' for
+	internall use.
+	* tests/suffix6.test: Ensure that `.o' is handled like `.$(OBJEXT)'.
+
+2001-11-16  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.texi (Suffixes): Don't require SUFFIXES, but document
+	its use for the "extreme" cases.
+
+2001-11-16  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (rule_define): Use $KNOWN_EXTENSIONS_PATTERN
+	to match suffix rules for known extensions, or call
+	accept_extensions on suffixe rules for unknown extensions.
+	(var_SUFFIXES_trigger): New function.
+	(macro_define): Call var_VAR_trigger when $VAR is updated.
+	* tests/suffix6.test, tests/suffix7.test: New files.
+	* tests/Makefile.am (TESTS): Add suffix6.test and suffix7.test.
+
+2001-11-16  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (KNOWN_EXTENSIONS_PATTERN, known_extensions_list):
+	New variables.
+	(handle_single_transform_list, lang_yacc_target_hook): Use
+	KNOWN_EXTENSIONS_PATTERN.
+	(accept_extension): New function.
+	(register_language): Call it.
+
+2001-11-16  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	At every place where an "$extension" is used, include the leading
+	dot in the extension, don't hardcode it when building the filename.
+	That will make any support for a dot-less extension easier to add.
+
+	* automake.in (SUFFIX_RULE_PATTERN): Include extension dots in
+	backref groups.
+	("main"): Prepend a '.' to the supported extensions of all
+	languages (e.g. 'c' becomes '.c').
+	(handle_languages, handle_single_transform_list,
+	handle_lib_objects_cond, handle_headers, derive_suffix,
+	rule_define): Do not add a dot
+	before extensions, and include dots in matching groups.
+	* lib/am/depend2.am (.%EXT%.o, .%EXT%.obj, .%EXT%.lo): Rename as ...
+	(%EXT%.o, %EXT%.obj, %EXT%.lo): ... these.
+	* lib/am/lex.am (.%EXT%.%DERIVED-EXT%): Rename as ...
+	(%EXT%%DERIVED-EXT%): ... this.
+	* lib/am/yacc.am: Likewise.
+
+2001-11-12  Akim Demaille  <akim@epita.fr>
+
+	* m4/make.m4 (AM_MAKE_INCLUDE): Serial 2.
+	Use `"#"' and `"\""', which
+	Autoconf mode prefers over `'#'' and `'"''.
+	* m4/missing.m4 (AM_MISSING_HAS_RUN): Serial 3.
+	Rely on AC_MSG 2.50's quotation.
+
+2001-11-09  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (scan_texinfo_file): Typo from 2001-11-05.
+
+2001-11-09  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* lib/am/distdir.am (distdir): Also look for directory in build
+	directory first. (See 2001-05-14.)
+	* tests/Makefile.am (TESTS): Add extra5.test.
+	* tests/extra5.test: New file.
+	From Dean Povey.
+
+2001-11-09  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	Fix for distcommon2.test:
+	* automake.in (automake_needs_to_reprocess_all_files): New
+	variable.
+	("main"): Process all Makefiles a second time if
+	$automake_needs_to_reprocess_all_files is set.
+	(maybe_push_required_file): Return 1 or 0 whether the file is
+	pushed or not.
+	(require_file_internal): Set $automake_needs_to_reprocess_all_files
+	if an added file can't be pushed.
+
+	* test/distcommon2.test: New file.
+	* test/Makefile.am (TESTS): Add distcommon2.test.
+	From Pavel Roskin.
+
+2001-11-09  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (exec_dir_p): Remove.  Replace by...
+	(EXEC_DIR_PATTERN):... this.
+	(am_install_var): Adjust to use EXEC_DIR_PATTERN.
+
+2001-11-09  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	Fix for nobase.test:
+	* lib/am/header-vars.am (install_sh_DATA): New.
+	* lib/am/data.am (install-%DIR%%PRIMARY%): Declare and use
+	%DIR%%PRIMARY%_INSTALL, and set it to $(install_sh_DATA) instead
+	of $(INSTALL_DATA) for nobase_ targets.
+	* lib/am/lisp.am (install-%DIR%LISP): Likewise.
+	* lib/am/python.am (install-%DIR%PYTHON): Likewise.
+	* tests/nobase.test (configure.in): Append AC_OUTPUT.
+	* tests/Makefile.am (XFAIL_TESTS): Remove nobase.test.
+
+2001-11-08  Akim Demaille  <akim@epita.fr>
+
+	* automake.texi: Remove references to stamp-h.in, which no longer
+	exists.
+	* tests/stamph2.test: Formatting change.
+
+2001-11-08  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* tests/suffix3.test: Check for foo.$(OBJEXT) in Makefile.in.
+	Don't use -Wno-error.
+
+2001-11-08  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* tests/suffix4.test ($AUTOMAKE): Don't use -Wno-error.
+	* tests/suffix5.test ($AUTOMAKE): Likewise.
+
+2001-11-07  Akim Demaille  <akim@epita.fr>
+
+	* m4/init.m4 (AM_INIT_AUTOMAKE): Don't escape quotes in
+	AC_MSG_ERROR.
+	Reported by Jim Meyering.
+
+2001-11-07  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* lib/am/distdir.am (am__remove_distdir): Define in topdir only.
+
+2001-11-05  Paul Eggert  <eggert@twinsun.com>
+
+	* lib/am/distdir.am (am__remove_distdir):
+	New macro.  Do not change permission of non-directories.
+	Change only user permission, as there's no point to changing group
+	or other permission.
+	(distdir, dist, dist-bzip2, dist-tarZ, dist-shar, dist-zip, dist-all,
+	 distcheck): Use it.
+
+2001-11-05  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* lib/am/python.am: Cleanup the cleaning section.
+	* automake.texi (Python): Remove documentation for PYCFILES
+	and PYOFILES.  Update the first paragraphes.
+
+2001-11-05  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (FOREIGN, GNU, GNITS, AC_CANONICAL_HOST,
+	AC_CANONICAL_SYSTEM, MOSTLY_CLEAN, DIST_CLEAN): Define as constants.
+	Adjust usage everywhere.
+
+2001-11-05  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (libtool_files, libtool_sometimes, common_files,
+	common_sometimes, config_aux_path): Use qw to simplify definition.
+	(scan_texinfo_file) <clean_suffixes, predefined_index,
+	hidden_index>: Likewise.
+	(scan_autoconf_traces) <traced>: Likewise.
+	(scan_one_autoconf_file, check_gnu_standards, resolve_linker):
+	Likewise.
+
+2001-11-05  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (handle_single_transform_list): Pass $nonansi_obj to
+	derive_suffix.  Don't use an hardcoded 'o' for object extensions.
+	(derive_suffix): Accept $OBJ as a second argument, don't
+	hardcode 'o'.
+	* tests/suffix5.test: New test.
+	* tests/Makefile.am (TESTS): Add suffix5.test.
+	Reported by Arkadiusz Miskiewicz <misiek@pld.ORG.PL>.
+
+2001-11-05  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (handle_single_transform_list): Don't call
+	$lang->target_hook for undefinied langages.
+	* tests/suffix4.test: New test.
+	* tests/Makefile.am (TESTS): Add suffix4.test.
+	Reported by Dmitry Mikhin <dmitrym@acres.com.au>.
+
+2001-11-05  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (@common_sometimes, &handle_configure): No longer
+	use stamp-hin.
+	* lib/am/remake-hdr.am: Adjust.
+	* tests/confh.test: There is no stamp.hin.
+
+2001-11-01  Akim Demaille  <akim@epita.fr>
+
+	* lib/am/lex.am, lib/am/yacc.am: Use the output file name in
+	`#line' and multiple inclusion guards.
+	* lib/ylwrap: Remove debugging code.
+	(input_dir, input_rx): Move where used.
+	Use the output file name in `#line'.
+
+2001-10-31  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (transform): Update documentation.
+
+2001-10-31  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* m4/gcj.m4 (AM_PROG_GCJ): Define GCJFLAGS if unset.
+	Reported by Olivier Louchart-Fletcher <olivier@zipworld.com.au>.
+
+2001-10-30  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&create): Reinstall.
+
+2001-10-30  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&append_exeext): Use macro_delete.
+
+2001-10-30  Akim Demaille  <akim@epita.fr>
+
+	* automake.in ($verbose): Remove, inherited from
+	Automake::General.
+	(&variable_delete): Rename as...
+	(&macro_delete): this, for consistency.
+	(&variable_assert): New.
+	(&variable_value_as_list, &variable_value_as_list_recursive_worker):
+	Use it.
+
+2001-10-29  Akim Demaille  <akim@epita.fr>
+
+	* m4/lispdir.m4 (AM_PATH_LISPDIR): Use AC_RUN_LOG to avoid
+	cluttering configure's stdout.
+
+2001-10-28  Akim Demaille  <akim@epita.fr>
+
+	* automake.in: Various formatting changes.
+	(create): Remove, unused.
+
+2001-10-28  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&append_exeext): New.
+	(&am_primary_prefixes): Use it.
+
+2001-10-28  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (am_primary_prefixes): Now, in accordance with its
+	comment, return the list of prefixes actually used, not all the
+	possible prefixes for a primary.
+	(&handle_libraries, &handle_ltlibraries, &handle_java)
+	(&am_install_var): Adjust.
+	* Makefile.am (maintainer-check): Allow `local $_;'.
+
+2001-10-28  Akim Demaille  <akim@epita.fr>
+
+	* automake.in: Various formatting changes.
+	(&variable_defined): Second argument is optional.
+
+2001-10-28  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&am_primary_prefixes): Now returns a list, not a
+	hash.
+	(&handle_libraries, &handle_ltlibraries, &handle_java)
+	(&am_install_var): Adjust.
+
+2001-10-28  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (@libtoolize_files, @libtoolize_sometimes): Rename
+	as...
+	(@libtool_files, @libtool_sometimes): these.
+	($libtool_location): Remove, completely replaced by $seen_libtool.
+	(&require_file_internal): Do not run libtoolize, that's
+	autoreconf's job.
+
+2001-10-28  Akim Demaille  <akim@epita.fr>
+
+	* tests/acoutnoq.test, tests/acoutput.test, tests/acoutqnl.test,
+	* tests/acouttbs.test, tests/auxdir.test, tests/colon.test,
+	* tests/colon2.test, tests/colon3.test, tests/colon4.test,
+	* tests/colon5.test, tests/colon6.test, tests/colon7.test,
+	* tests/conf2.test, tests/config.test, tests/depcomp.test,
+	* tests/depcomp2.test, tests/discover.test, tests/fpinst2.test,
+	* tests/fpinstall.test, tests/ldadd.test, tests/libobj7.test,
+	* tests/libobj8.test, tests/output.test, tests/output2.test,
+	* tests/output3.test, tests/output4.test, tests/output5.test,
+	* tests/pr2.test, tests/remake.test, tests/remake2.test,
+	* tests/remake3.test, tests/scripts.test, tests/stamph.test,
+	* tests/subdir.test, tests/subdir2.test, tests/subdir4.test,
+	* tests/tagsub.test, tests/texinfo8.test: Remove PACKAGE and VERSION
+	assignments.
+
+2001-10-28  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&scan_autoconf_traces): Use eq for equality.
+	Anchor regexps.
+	Remove dead comment.
+	(&initialize_per_input): Don't initialize several times the same
+	vars.
+
+2001-10-28  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (scan_one_autoconf_file): When using %generalize, be
+	sure to replace only words.  AC_FUNC_OBSTACK was matching
+	M4_AC_FUNC_OBSTACK.
+
+2001-10-26  Akim Demaille  <akim@epita.fr>
+
+	* tests/stamph2.test: Strengthen.
+	* tests/confh2.test, tests/confh3.test: Remove.
+	These are bad tests: they don't check the effects, but some
+	internal details in Makefile.
+	And they are covered by stamph2.test.
+
+2001-10-26  Akim Demaille  <akim@epita.fr>
+
+	Now that stamp-h's are created by config.status, we don't need to
+	handle them in Makefile's.
+
+	* lib/am/remake-hdr.am (%STAMP%): Just run config.status.
+	* m4/header.m4 (_AM_STAMP): New.
+	(_AM_CONFIG_HEADER): Use it.
+
+2001-10-26  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&generate_makefile, &handle_texinfo_helper)
+	(&handle_man_pages, &handle_dist, &handle_configure, &handle_all)
+	(&define_pretty_variable, &read_am_file, &file_contents_internal)
+	(&am_install_var, &push_dist_common, &unquote_m4_arg): Simplify
+	`join (' ', @list)' into `"@list"'.
+
+2001-10-26  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (@config_fullnames, @config_names): Remove.
+	(@config_headers): Now contains the actual spec used in
+	AC_CONFIG_HEADERS.
+	(&split_config_file_spec): New.
+	(&handle_tags, &handle_configure, &handle_all, &scan_autoconf_traces)
+	(&scan_one_autoconf_file): Adjust.
+	(&scan_one_autoconf_file): Pff, don't think _AM_CONFIG_HEADER is
+	AM_CONFIG_HEADER.
+
+2001-10-26  Akim Demaille  <akim@epita.fr>
+
+	* m4/header.m4 (_AM_CONFIG_HEADER): New.
+	(AM_CONFIG_HEADER): Use it.
+
+2001-10-26  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&handle_configure): Use the config.status 2.50
+	invocation syntax for config files and headers.
+	autoheader needs the name of the file to create, not from what it
+	must be created, hence CONFIG_HEADER_FULL is $one_name, not
+	$one_fullname.
+	* lib/am/configure.am, lib/am/remake-hdr.am: Likewise.
+	* tests/confsub.test (SUBDIRS): Adjust to the new config.status
+	invocation.
+	Strengthen: Use the non-default config.hin source.
+	Strengthen: Make sure config.h is properly updated when config.hin
+	is changed.
+
+2001-10-26  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&handle_configure): Seeing Automake files in
+	@other_input_files is a programming error, not merely something to
+	ignore.
+	Factor slightly the code.
+
+2001-10-26  Akim Demaille  <akim@epita.fr>
+
+	* automake.in ($canonical_location): New.
+	Use it.
+	(&require_config_file, $line_error): Remove.
+
+2001-10-24  Akim Demaille  <akim@epita.fr>
+
+	* automake.in: Use &verbose.
+	(&generate_makefile, &scan_texinfo_file, &scan_aclocal_m4): Use
+	Automake::XFile.
+
+2001-10-25  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* lib/am/python.am (install-%DIR%PYTHON, uninstall-%DIR%PYTHON):
+	Have the basename step optional and use %NDIR% instead of %DIR% in
+	filenames in order to support 'nobase_'.
+
+2001-10-24  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (handle_languages, handle_single_transform_list,
+	lang_c_rewrite): Use require_conf_file instead of
+	require_config_file to require depcomp or compile from
+	Makefile.am.  (This is a part of my patch of 2001-10-15 which got
+	mistakenly reverted.)
+
+2001-10-24  Akim Demaille  <akim@epita.fr>
+
+	* tests/confh.test: Since 2001-10-20 Kevin Ryde, stamp-h is
+	stamp-h1.
+
+2001-10-24  Akim Demaille  <akim@epita.fr>
+
+	Since the ansi2knr patch from 2001-10-20 Kevin Ryde, `$U' can
+	appear in Makefile.in in the clean rule.
+
+	* tests/cxxansi.test: Adjust.
+
+2001-10-24  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&am_print_error, &am_file_error, &am_macro_error)
+	(&am_target_error, &am_line_error, &am_conf_error, &am_file_warning):
+	Rename as...
+	(&print_error, &file_error, &macro_error, &target_error, &line_error)
+	(&conf_error, &file_warning): these.
+	(&file_warning): Fix the prototype and argument handling.
+	(&am_line_warning): Remove, unused.
+
+	Also, repair the misapplication of previous patches.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* automake.in ($ac_output_location): Replace with...
+	($ac_config_files_location): this.
+	(&scan_autoconf_traces): We don't need $file and $line, $here is
+	enough.
+	(&scan_one_autoconf_file): Use `$in_ac_output' to store the macro
+	name (AC_OUTPUT or AC_CONFIG_FILES) for error messages.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&require_file_with_macro): Use &require_file.
+	(&read_am_file): Move the definition of $here at its proper place.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* automake.in ($libtool_line, $seen_pythondir): Replace with...
+	($libtool_location, $pythondir_location): these.
+	(&require_conf_file_with_line, &require_conf_file_with_line):
+	Remove, unused.
+	(&require_file): Don't forget $where.
+	(&require_conf_file): Ahem...  Fix the name.
+	(&require_config_file): Invoke &require_conf_file, not yourself.
+	(&am_line_error): Fix the default am_file_error invocation.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* automake.in ($seen_lispdir): Replace with...
+	($am_lispdir_location): this.
+	(&require_conf_file): New.
+	(&require_config_file, &require_conf_file_with_line,
+	(&require_conf_file_with_conf_line): Use it.
+	(&require_conf_file_with_macro): New.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* automake.in ($config_header_line, $ac_output_line)
+	($ac_gettext_line, $package_version_line): Replace with...
+	($config_header_location, $ac_output_location)
+	($ac_gettext_location, $package_version_location): these.
+	(&require_file_with_conf_line, &require_file_with_line): Remove,
+	no longer used.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&require_file_internal): Instead of $file and $line,
+	take $where as first argument.
+	Adjust all callers.
+	(&require_file_with_macro): New.
+	Use it where internal black magic was used to recover the location
+	of a macro definition.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&read_am_file): Define and use `$here'.
+	Avoid using am_line_error.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&am_target_error): New.
+	Use it where appropriate instead of...
+	(&am_line_error): this.
+	Using it for a target is a croak error.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&am_macro_error): New.
+	Use it where appropriate instead of...
+	(&am_line_error): this.
+	Using it for a macro is a croak error.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* tests/asm.test: s/AC_PROG_AS/AM_PROG_AS/.
+	AC_OUTPUT a Makefile.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (%var_line): Rename as...
+	(%var_location): this.
+	Use it consistently as the location where the macro is defined,
+	file and line when possible, otherwise just file.
+	(&read_am_file): Rules have their own location tracking, don't
+	pollute %var_location.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (am_line_error): Clarify.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&am_print_error): Set $exit_status since all your
+	users do.
+	(&am_error, &am_file_error, &am_line_error, &am_conf_error):
+	Don't.
+	(&am_conf_line_error, &am_conf_line_warning): Remove.
+	Adjust callers to use &am_file_error and...
+	(&am_file_warning): new.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* m4/regex.m4: Use AC_LIBOBJ.
+	Require 2.50, and use AC_LIBSOURCES freely.
+	* tests/asm.tests: Formatting changes.
+	Exercise AM_PROG_AS.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* tests/install.test: This test is an empty shell, do not run
+	automake.
+	* tests/Makefile.am (TESTS): Don't run it.
+	* tests/defs (ACLOCAL): When using gettext, pass in the installed
+	aclocaldir.
+	* tests/subdircond.test (SUBDIRS): AM_GNU_GETTEXT needs automake
+	--add--missing.
+	* tests/obsolete2.test: Remove, merged into...
+	* tests/obsolete.test: here.
+	Both aclocal and automake should complain.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (scan_autoconf_traces): Don't recognize AC_SUBSTs
+	for symbols which cannot be Make macro names.
+	(scan_one_autoconf_file): `$here' is new.
+	Use it consistently instead of `1' to remember a token was seen.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* tests/subdircond.test: Requires gettext.
+	* tests/libobj.test, tests/libobj10.test, tests/libobj2.test,
+	* tests/libobj6.test, tests/libobj9.test, tests/libtool.test,
+	* tests/libtool2.test, tests/ltdeps.test, tests/ltlibobjs.test,
+	* tests/nolink.test, tests/obsolete.test, tests/pr72.test,
+	* tests/sinclude.test, tests/subdircond.test, tests/subobj4.test:
+	Produce valid configure.in, use aclocal appropriately, declare
+	when libtool is required.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* m4/lex.m4: Don't run AC_DECL_YYTEXT, Autoconf does.
+	* automake.texi (Macros, Yacc and Lex): Adjust.
+	* automake.in ($seen_decl_yytext): Rename as...
+	($seen_prog_lex): this.
+	(&scan_autoconf_traces): Add AC_PROG_LEX support.
+	(&scan_one_autoconf_file, &lang_lex_finish): Adjust.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&scan_autoconf_traces): Add support for
+	AM_PATH_LISPDIR and AM_PATH_PYTHON.
+
+2001-10-21  Akim Demaille  <akim@epita.fr>
+
+	* tests/defs (ACLOCAL): Point to the installed aclocaldir is
+	libtool is required.
+	* tests/lex.test: Run AC_INIT once.
+	* tests/ldflags.test, tests/listval.test, tests/suffix2.test:
+	Libtool is required.
+	* tests/header.test: Built a correct configure.in.
+	* tests/defun2.test (configure.in): Be a bit respectful with
+	Autoconf, close the macro invocations.
+	* tests/confdeps.test: Even when not using aclocal, aclocal.m4
+	must be correct.
+
+	* automake.in (scan_autoconf_traces): Add support for
+	AC_CANONICAL_HOST, AC_CANONICAL_SYSTEM, A[CM]_PROG_LIBTOOL,
+	AM_CONFIG_HEADER, AM_MAINTAINER_MODE.
+	* tests/condincl.test (target): Better pattern, to avoid matching
+	the definition of `target_alias' which is now properly discovered
+	as an AC_SUBST by traces.
+	* cond4.test: Better grep pattern: After all, why shouldn't
+	TWO_FALSE be AC_SUBST properly.
+	* tests/installsh.test (AUTOMAKE, ACLOCAL): Adjust.
+
+2001-10-20  Kevin Ryde <user42@zip.com.au>
+
+	* lib/am/ansi2knr.am (mostlyclean-kr): Only rm *_.c when
+	actually using ansi2knr.
+
+	* automake.in (handle_configure): Always put a number on $stamp_name,
+	to match AM_CONFIG_HEADER.
+
+2001-10-20  Tom Tromey  <tromey@redhat.com>
+
+	* tests/Makefile.am (TESTS): Added condd.test.
+	(XFAIL_TESTS): Added condd.test.
+	* tests/condd.test: New file.
+
+2001-10-20  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&scan_autoconf_traces): Add support for
+	AM_C_PROTOTYPES, AM_GNU_GETTEXT, AM_PROG_CC_C_O, and
+	AC_CONFIG_AUX_DIR.
+	* tests/alpha.test (configure.in): Automake wants a Makefile.
+
+2001-10-20  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (scan_autoconf_traces): Use an unlikely to be used
+	separator between trace arguments, in particular not `:' as it is
+	within AC_CONFIG_FILES's $1.
+
+2001-10-20  Akim Demaille  <akim@epita.fr>
+
+	* tests/alpha.test (configure.in): Create, don't append.  A single
+	AC_INIT is enough.
+
+2001-10-20  Akim Demaille  <akim@epita.fr>
+
+	* tests/acoutnoq.test, tests/acoutput.test, tests/acoutput2.test,
+	* tests/acoutqnl.test, tests/acouttbs.test, tests/all.test,
+	* tests/alpha.test, tests/ansi.test, tests/asm.test,
+	* tests/auxdir.test, tests/auxdir2.test, tests/backsl2.test,
+	* tests/badline.test, tests/block.test, tests/canon2.test,
+	* tests/check.test, tests/checkall.test, tests/clean.test,
+	* tests/colneq.test, tests/colneq2.test, tests/colon.test,
+	* tests/colon2.test, tests/colon3.test, tests/colon4.test,
+	* tests/colon5.test, tests/colon6.test, tests/colon7.test,
+	* tests/comment.test, tests/comment3.test, tests/cond.test,
+	* tests/cond2.test, tests/cond6.test, tests/cond7.test,
+	* tests/condincl.test, tests/condincl2.test, tests/condman.test,
+	* tests/condman2.test, tests/confdist.test, tests/confh.test,
+	* tests/confh2.test, tests/confh3.test, tests/confvar.test,
+	* tests/confvar2.test, tests/copy.test, tests/ctarget1.test,
+	* tests/cxxcpp.test, tests/dash.test, tests/dejagnu.test,
+	* tests/dejagnu2.test, tests/distcommon.test, tests/distdir.test,
+	* tests/else.test, tests/empty.test, tests/exdir.test,
+	* tests/exdir2.test, tests/extra3.test, tests/extra4.test,
+	* tests/flibs.test, tests/fnoc.test, tests/fo.test,
+	* tests/fonly.test, tests/fortdep.test, tests/fpinst2.test,
+	* tests/fpinstall.test, tests/gcj2.test, tests/gnits.test,
+	* tests/include.test, tests/info.test, tests/insh.test,
+	* tests/insh2.test, tests/install.test, tests/installsh.test,
+	* tests/instdata.test, tests/instdata2.test, tests/instexec.test,
+	* tests/insthook.test, tests/instman.test, tests/instman2.test,
+	* tests/java.test, tests/javaprim.test, tests/javasubst.test,
+	* tests/libobj3.test, tests/link_f_only.test, tests/lisp.test,
+	* tests/man.test, tests/mclean.test, tests/mdate.test,
+	* tests/mdate2.test, tests/mdate3.test, tests/mdate4.test,
+	* tests/mkinst2.test, tests/mkinstall.test, tests/nodepcomp.test,
+	* tests/noinst.test, tests/obsolete.test, tests/obsolete2.test,
+	* tests/outdir.test, tests/output.test, tests/output2.test,
+	* tests/output3.test, tests/output4.test, tests/output5.test,
+	* tests/package.test, tests/pluseq.test, tests/pluseq2.test,
+	* tests/pluseq3.test, tests/pluseq5.test, tests/pluseq6.test,
+	* tests/pluseq8.test, tests/ppf77.test, tests/pr2.test,
+	* tests/primary.test, tests/proginst.test, tests/python.test,
+	* tests/remake.test, tests/remake2.test, tests/remake3.test,
+	* tests/rulepat.test, tests/scripts.test, tests/seenc.test,
+	* tests/sinclude.test, tests/spell.test, tests/spell3.test,
+	* tests/spelling.test, tests/stamph.test, tests/subdir.test,
+	* tests/subdir2.test, tests/subdircond.test, tests/subst.test,
+	* tests/symlink.test, tests/symlink2.test, tests/symlink3.test,
+	* tests/syntax.test, tests/tags.test, tests/tagsub.test,
+	* tests/texinfo.test, tests/texinfo10.test, tests/texinfo2.test,
+	* tests/texinfo3.test, tests/texinfo4.test, tests/texinfo5.test,
+	* tests/texinfo6.test, tests/texinfo7.test, tests/texinfo8.test,
+	* tests/texinfo9.test, tests/vars.test, tests/vartar.test,
+	* tests/version.test, tests/version2.test, tests/version3.test,
+	* tests/version4.test, tests/vpath.test, tests/vtexi.test,
+	* tests/vtexi2.test, tests/werror.test: Run aclocal before automake.
+
+2001-10-20  Akim Demaille  <akim@epita.fr>
+
+	* tests/acoutnoq.test, tests/acoutput.test, tests/acoutqnl.test,
+	* tests/acouttbs.test, tests/asm.test, tests/colon.test,
+	* tests/colon2.test, tests/colon3.test, tests/colon4.test,
+	* tests/colon5.test, tests/colon6.test, tests/colon7.test,
+	* tests/conf2.test, tests/confh.test, tests/confh2.test,
+	* tests/confh3.test, tests/confh4.test, tests/config.test,
+	* tests/confsub.test, tests/depend3.test, tests/discover.test,
+	* tests/fpinst2.test, tests/fpinstall.test, tests/gnits.test,
+	* tests/header.test, tests/ldadd.test, tests/ldflags.test,
+	* tests/libobj.test, tests/libobj10.test, tests/libobj2.test,
+	* tests/libobj6.test, tests/libobj7.test, tests/libobj8.test,
+	* tests/libobj9.test, tests/mdate4.test, tests/obsolete.test,
+	* tests/output.test, tests/output2.test, tests/output3.test,
+	* tests/output4.test, tests/output5.test, tests/package.test,
+	* tests/parse.test, tests/pr2.test, tests/remake.test,
+	* tests/remake2.test, tests/remake3.test, tests/scripts.test,
+	* tests/stamph.test, tests/subdir.test, tests/subdir2.test,
+	* tests/subdir4.test, tests/subdirbuiltsources.test,
+	* tests/subobj4.test, tests/tagsub.test, tests/texinfo8.test,
+	* tests/yacc5.test, tests/yacc6.test, tests/yacc7.test: Remove
+	AC_ARG_PROGRAM, AC_PROG_INSTALL and AC_PROG_MAKE_SET invocation
+	since AM_INIT_AUTOMAKE requires them.
+
+2001-10-20  Akim Demaille  <akim@epita.fr>
+
+	* tests/defs (configure.in): Use credible AM_INIT_AUTOMAKE
+	arguments.
+	Don't run AC_ARG_PROGRAM another time, it is required by
+	AM_INIT_AUTOMAKE.
+	* tests/aclocal.test: Work on the default configure.in
+	* tests/config.test (configure.in): Don't AC_ARG_PROGRAM.
+	First AM_INIT_AUTOMAKE, then AM_CONFIG_HEADER.
+
+	Be realistic in testing: AC_INIT is required for Autoconf.
+	Broken so called optimized tests break trace handling.
+
+	* tests/aclibobj.test, tests/aclocal.test, tests/acoutnoq.test,
+	* tests/acoutput.test, tests/acoutput2.test, tests/acoutqnl.test,
+	* tests/acouttbs.test, tests/acsilent.test, tests/alpha.test,
+	* tests/colon.test, tests/colon2.test, tests/colon3.test,
+	* tests/colon4.test, tests/colon5.test, tests/colon6.test,
+	* tests/colon7.test, tests/cond.test, tests/cond2.test,
+	* tests/cond3.test, tests/cond5.test, tests/conf2.test,
+	* tests/confh.test, tests/confh2.test, tests/confh3.test,
+	* tests/confh4.test, tests/config.test, tests/confsub.test,
+	* tests/ctarget1.test, tests/depcomp.test, tests/depend3.test,
+	* tests/distcommon.test, tests/dup3.test, tests/fpinst2.test,
+	* tests/fpinstall.test, tests/header.test, tests/ldflags.test,
+	* tests/libobj.test, tests/libobj10.test, tests/libobj2.test,
+	* tests/libobj6.test, tests/libobj7.test, tests/libobj8.test,
+	* tests/libobj9.test, tests/output.test, tests/output2.test,
+	* tests/output3.test, tests/output4.test, tests/parse.test,
+	* tests/pr2.test, tests/recurs.test, tests/recurs2.test,
+	* tests/remake.test, tests/remake2.test, tests/remake3.test,
+	* tests/req.test, tests/scripts.test, tests/subdir.test,
+	* tests/subdir2.test, tests/subdir4.test, tests/subobj4.test,
+	* tests/tagsub.test, tests/texinfo8.test, tests/version.test,
+	* tests/version2.test: Add AC_INIT in `configure.in'.
+
+2001-10-20  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&scan_autoconf_traces): Add support for
+	AM_INIT_AUTOMAKE, AM_CONDITIONAL.
+	Let @args have a more natural M4 correspondence: $1 is args[1], no
+	args[0] etc.
+	(&scan_autoconf_files): Using autoconf traces is no longer a
+	complement of the previous ad hoc scheme: use either.
+
+2001-10-20  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&scan_one_autoconf_file): `%generalize' is new, and
+	factors dedicated $libsources assignments.
+
+2001-10-20  Akim Demaille  <akim@epita.fr>
+
+	* m4/error.m4, m4/obstack.m4, m4/ptrdiff.m4, m4/strtod.m4:
+	Remove, since Autoconf 2.52 has them.
+	* automake.in, aclocal.in, automake.texi: Adjust.
+
+2001-10-19  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&read_main_am_file): s/generated automatically/
+	generated/.
+	Insert @configure_input@, since 2.50 no longer output this
+	automatically for Makefiles.
+
+2001-10-19  Kevin Ryde <user42@zip.com.au>
+
+	* lib/am/check.am (check-TESTS): Add an "else true" to work with
+	Ultrix 4.5 /bin/sh when $(TESTS) is empty.
+
+2001-10-16  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* tests/Makefile.am (TESTS, XFAIL_TESTS): Add nobase.test.
+	* tests/nobase.test: New file.  Based on a bug report
+	from Martin Frydl <martin@idoox.com>.
+
+2001-10-16  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (am_install_var): Don't strip nobase_ from $X, do
+	this with $nodir_name only.  Use $nodir_name where appropriate.
+
+2001-10-15  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (handle_languages, handle_single_transform_list,
+	lang_c_rewrite): Use require_conf_file instead of
+	require_config_file to require depcomp or compile from Makefile.am.
+	(require_aux_file_with_line): New function, adapted from
+	require_conf_gile_with_line.
+	(require_conf_file_with_line, require_conf_file_with_conf_line):
+	Simplify using require_aux_file_with_line.
+	(require_config_file): Simplify using require_conf_file_with_conf_line.
+	(require_conf_file): New function.
+
+2001-10-15  Akim Demaille  <akim@epita.fr>
+
+	* m4/depend.m4 (AM_DEP_TRACK): Use AC_SUBST([AMDEPBACKSLASH])
+	normally, what is wrong is that automake outputs a variable
+	definition for it, hence...
+	* automake.in (scan_one_autoconf_file): don't.
+
+	* m4/depout.m4 (_AM_OUTPUT_DEPENDENCY_COMMANDS): New, extracted
+	from...
+	(AM_OUTPUT_DEPENDENCY_COMMANDS): here.  Adjust.
+	Use AC_CONFIG_COMMANDS.
+	(_AM_OUTPUT_DEPENDENCY_COMMANDS): Use AS_DIRNAME and AS_MKDIR_P.
+
+2001-10-15  Akim Demaille  <akim@epita.fr>
+
+	* m4/header.m4 (AM_CONFIG_HEADER): Don't use m4_patsubst.
+
+2001-10-15  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (&variable_conditions): Be deterministic and Perl
+	version independent: sort the result.
+	(&variable_output, &variable_pretty_output): Sort all the @conds,
+	not only when defaulted.
+	* tests/cond3.test: Adjust.
+
+2001-10-15  Akim Demaille  <akim@epita.fr>
+
+	* automake.in: Formatting changes.
+
+2001-10-15  Akim Demaille  <akim@epita.fr>
+
+	* aclocal.in: Use Automake::General and Automake::XFile.
+	Use find_configure_ac.
+	Output the Emacs tags for Autoconf mode selection.
+
+2001-10-10  Akim Demaille  <akim@epita.fr>
+
+	* lib/COPYING, COPYING, lib/config.guess, lib/config.sub: Update
+	from master copies.
+
+2001-10-09  Akim Demaille  <akim@epita.fr>
+
+	Do not use Autoconf internals.
+
+	* tests/dirname.test: Don't use AC_PLAIN_SCRIPT.
+	* m4/header.m4 (_AM_DIRNAME): Use regexp and patsubst, not
+	m4_regexp and m4_patsubst, since the latter are reserved for ERE
+	macro in GNU M4 1.5.
+
+2001-10-08  Akim Demaille  <akim@epita.fr>
+
+	* m4/cond.m4 (AM_CONDITIONAL): Don't use m4_match as Autoconf
+	changed its name.
+
+2001-10-05  Akim Demaille  <akim@epita.fr>
+
+	* automake.in (scan_autoconf_files): Use find_configure_ac from
+	General.
+
+2001-10-02  Akim Demaille  <akim@epita.fr>
+
+	* lib/Automake/Struct.pm: Update from Autoconf.
+	* lib/Automake/General.pm, lib/Automake/XFile.pm: New, from CVS
+	Autoconf.
+	* automake.in: Use them.
+	(&uniq, $me): Remove, as they are provided by Automake::General.
+
+2001-10-02  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* Makefile.am (maintainer-check): Don't check for 'cd' calls in m4.
+	* lib/am/tags.am (GTAGS): Use $(am__cd) instead of 'CDPATH=: && cd'.
+	* lib/am/dejagnu.am (check-DEJAGNU): Likewise.
+	* lib/am/distdir.am (distcheck): Likewise.
+	* lib/am/texinfos.am (install-info-am, dist-info): Rewrite without
+	using cd so we don't have to fiddle with CDPATH.
+	* lib/am/header-vars.am (am__cd): Define so as to support Zsh and
+	DOSish path separator.
+
+2001-10-02  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* lib/am/python.am (install-%DIR%PYTHON,
+	uninstall-%DIR%PYTHON): Strip path of source file.
+	(clean-python): Comment out.
+
+2001-10-02  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (handle_python): Use require_conf_file_with_conf_line
+	instead of require_file_with_conf_line, so that elisp-comp and
+	py-compile are installed in the aux-directory.
+	(handle_emacs_lisp): Likewise.  Define elisp_comp.
+	* lib/am/lisp.am (.el.elc): Use elisp_comp.
+
+2001-10-01  Akim Demaille  <akim@epita.fr>
+
+	* lib/am/distdir.am (distcheck): Report the trailing files.
+	Run `dist-gzip', not `dist', as it may leave other distribution
+	flavors.
+
+2001-09-29  Paul Eggert  <eggert@twinsun.com>
+
+	* lib/mkinstalldirs: Use "mkdir -p" if it works, as that fixes
+	bugs when making file names with unusual characters.  Quote chmod
+	arg "$dirmode", in case it contains white space.
+
+	Incorporate the following change from autoconf mkinstalldirs:
+
+	1999-04-10  Ben Elliston  <bje@cygnus.com>
+
+	Add `-m' flag to specify the mode of a newly created
+	directory.  Add command line usage and `-h', `--help' options.
+	Contributed by Jeff Garzik.
+
+2001-09-27  Akim Demaille  <akim@epita.fr>
+
+	* m4/cond.m4, m4/init.m4, m4/header.m4: Remove Autoconf 2.13 code.
+
+2001-09-27  Akim Demaille  <akim@epita.fr>
+
+	* lib/am/distdir.am (dist): Rename as...
+	(dist-gzip): this.
+	(dist): Additional name for dist-all.
+	* automake.texi (Options, Dist): Adjust.
+
+2001-09-25  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* aclocal.in (obsolete_macros): Update AM_EXEEXT message.
+	* automake.in (obsolete_macros): Likewise.
+	(seen_objext): Remove (unused).
+	(scan_one_autoconf_file): Don't handle AC_OBJEXT.
+	* lib/am/header-vars.am (EXEEXT, OBJEXT,
+	PATH_SEPARATOR): New variables.
+	* tests/obsolete2.test: Use AM_FUNC_FNMATCH instead of AM_EXEEXT.
+
+2001-09-23  Tim Van Holder  <tim.van.holder@pandora.be>
+
+	* m4/auxdir.m4, m4/init.m4: Require autoconf 2.50 and rely on it to
+	neutralize CDPATH for us.
+	* m4/init.m4: Don't substitute EXEEXT or OBJEXT anymore.
+	* lib/am/texibuild.am: Use $(PATH_SEPARATOR), not ':' to build
+	TEXINPUTS.
+
+2001-09-22  Akim Demaille  <akim@epita.fr>
+
+	* configure.in, NEWS: Bump to 1.5a.
+	Require 2.52.
+
+2001-09-22   Paul Eggert  <eggert@twinsun.com>
+
+	* ChangeLog, ChangeLog.1996, ChangeLog.1998, ChangeLog.2000,
+	Makefile.am, NEWS, README, TODO, configure.in, lib/Makefile.am,
+	lib/acinstall, lib/am/Makefile.am, m4/Makefile.am, m4/as.m4,
+	m4/auxdir.m4, m4/ccstdc.m4, m4/cond.m4, m4/depend.m4,
+	m4/depout.m4, m4/dmalloc.m4, m4/error.m4, m4/gcj.m4, m4/header.m4,
+	m4/init.m4, m4/install-sh.m4, m4/lex.m4, m4/lispdir.m4,
+	m4/maintainer.m4, m4/make.m4, m4/minuso.m4, m4/missing.m4,
+	m4/multi.m4, m4/obstack.m4, m4/protos.m4, m4/ptrdiff.m4,
+	m4/python.m4, m4/regex.m4, m4/sanity.m4, m4/strip.m4,
+	m4/termios.m4, m4/winsz.m4: Add copyright notice.
+
+	* INSTALL, lib/INSTALL: Upgrade to latest autoconf version,
+	which has a copyright notice.
+
+	* m4/strtod.m4: Correct the dates on the copyright notice.
+
+2001-09-17  Akim Demaille  <akim@epita.fr>
+
+	* lib/missing (autom4te): New.
+	(aclocal, autoconf, automake, autoheader, help2man): Propagate
+	actual failures.
+
+2001-08-27  Tom Tromey  <tromey@redhat.com>
+
+	* automake.texi (A Shared Library): Clarify installation
+	requirement.
+	(Install): Typo.  From Adrian Bunk.
+
+2001-08-27  Tom Tromey  <tromey@redhat.com>
+
+	* automake.texi (Macros): Typo fix.
+	From Christian Cornelssen
+
+2001-08-27  Tom Tromey  <tromey@redhat.com>
+
+	* tests/ansi3.test, tests/ansi5.test, tests/ccnoco.test,
+	tests/cond4.test, tests/cond16.test, tests/cond18.test,
+	tests/cond19.test, tests/depcomp2.test, tests/depend2.test,
+	tests/lex3.test, tests/pr87.test, tests/subobj3.test,
+	tests/substref.test: Clear CFLAGS.
+
+	* automake.texi (Yacc and Lex): Mention lex, not yacc.
+	From Alexey Mahotkin.
+
+2001-08-27  Tom Tromey  <tromey@redhat.com>
+
+	* tests/yacc7.test: Use test -f, not test -e.
+
+2001-08-27  Adrian Bunk  <bunk@fs.tum.de>
+
+	* automake.texi (etags): Typo fix.
+
+2001-08-27  Guido Draheim <guidod@gmx.de>
+
+	* automake.in : restrict ansi2knr option to be a filepath
+
+2001-08-23  Richard Boulton <richard@tartarus.org>
+
+	* tests/yacc7.test: Actually add this file: was accidentally omitted.
+
+2001-08-22  Tom Tromey  <tromey@redhat.com>
 
 	* automake.texi (Conditionals): Mention that conditionals must
 	always be invoked.  For PR automake/220.
-
-	* lib/config.guess, lib/config.sub: New versions from FSF.
-
-	* tests/Makefile.am (XFAIL_TESTS): Removed.
-	(TESTS): Removed xfail tests.
-	* tests/subdir5.test, tests/auxdir2.test, tests/cond17.test:
-	Removed.
 
 2001-08-22  Richard Boulton <richard@tartarus.org>
 	    Tom Tromey  <tromey@redhat.com>
@@ -30,13 +1829,40 @@
 
 	* automake.texi (Dist): Mention dist-all.
 
+2001-08-18  Tom Tromey  <tromey@redhat.com>
+
+	* tests/cond3.test: Use portable sed expression.
+	From Richard Boulton.
+
+2001-08-13  Richard Boulton <richard@tartarus.org>
+
+	* automake.in (handle_source_transform): Call
+	define_objects_from_sources() instead of calling
+	variable_value_as_list(), handle_single_transform_list() and
+	define_pretty_variable() directly.
+	(handle_single_transform_list): Add $topparent parameter, used for
+	error messages.  Improved error message.
+	(define_objects_from_sources): New function.
+	(subobjname): New function.
+	(variable_conditions_recursive): New name for variable conditions.
+	(variable_value_as_list_recursive): New name for variable_value_as_list.
+	(variable_value_as_list_worker): Renamed to ...
+	(variable_value_as_list_recursive_worker): ... this.
+	(variable_conditions_sub): Renamed to ...
+	(variable_conditions_recursive_sub): ... this.
+	(variable_conditions): Rewritten: now doesn't recurse subvariables.
+	(variable_value_as_list): Rewritten: now doesn't recurse subvariables.
+	(substfroms): New global.
+	(substtos): New global.
+	(substnums): New global.
+	* tests/cond3.test: Update to work with new method of defining _OBJECTS.
+	* tests/cond4.test: Update to work with new method of defining _OBJECTS.
+	* tests/sourcesub2.test: New test.
+	* tests/Makefile.am (TEST): Added sourcesub2.test.
+
 2001-08-11  Tom Tromey  <tromey@redhat.com>
 
-	* configure.in: Upped to version 1.4m.
-
-	* configure.in: Released 1.4l.
-
-	* lib/config.guess, lib/config.sub: New versions from FSF.
+	* configure.in: Upped to 1.4s.
 
 2001-08-09  Richard Boulton <richard@tartarus.org>
 
@@ -59,7 +1885,7 @@
 	* tests/defs: Unset the MFLAGS, MAKEFLAGS and MAKELEVEL
 	environment variables.
 	* tests/cond16.test: Use '$MAKE -s', and avoid GNU make
-	dependency. 
+	dependency.
 	* tests/substref.test: Likewise.
 
 2001-08-08  Richard Boulton <richard@tartarus.org>
@@ -718,7 +2544,7 @@
 
 	* lib/am/configure.am ($(top_builddir)/config.status): Added
 	$(top_builddir) prefix to work around problems with some vendor
-	makes.  From Nicholas Joly.
+	makes.  From Nicolas Joly.
 
 	* automake.in (yacc_lex_finish_helper): Find ylwrap in
 	top_srcdir.  From Tim Van Holder.
@@ -3644,3 +5470,24 @@
 	* header-vars.am (INSTALL_HEADER): New macro.
 
 	* automake.texi (Rebuilding): New node.
+
+-----
+
+Copyright 2001 Free Software Foundation, Inc.
+
+This file is part of GNU Automake.
+
+GNU Automake is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GNU Automake is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with autoconf; see the file COPYING.  If not, write to
+the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+Boston, MA 02111-1307, USA.

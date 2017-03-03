@@ -5,12 +5,8 @@
 . $srcdir/defs || exit 1
 
 cat > configure.in << 'END'
+AC_INIT
 AM_INIT_AUTOMAKE(nonesuch, nonesuch)
-PACKAGE=nonesuch
-VERSION=nonesuch
-AC_ARG_PROGRAM
-AC_PROG_MAKE_SET
-AC_PROG_INSTALL
 AC_OUTPUT(tests/Makefile tests/defs)
 END
 
@@ -18,6 +14,7 @@ mkdir tests
 : > tests/defs.in
 : > tests/Makefile.am
 
+$ACLOCAL || exit 1
 $AUTOMAKE || exit 1
 
 grep tests/defs.in tests/Makefile.in && exit 1

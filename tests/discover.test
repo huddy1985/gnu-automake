@@ -5,12 +5,7 @@
 . $srcdir/defs || exit 1
 
 cat > configure.in << 'END'
-PACKAGE=nonesuch
-VERSION=nonesuch
-AC_ARG_PROGRAM
-AC_PROG_INSTALL
 AC_PROG_RANLIB
-AC_PROG_MAKE_SET
 AC_PROG_CC
 LIBOBJS="$LIBOBJS fsusage.o"
 AC_OUTPUT(Makefile)

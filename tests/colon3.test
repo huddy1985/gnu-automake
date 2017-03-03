@@ -6,12 +6,8 @@
 . $srcdir/defs || exit 1
 
 cat > configure.in << 'END'
+AC_INIT
 AM_INIT_AUTOMAKE(nonesuch, nonesuch)
-PACKAGE=nonesuch
-VERSION=nonesuch
-AC_ARG_PROGRAM
-AC_PROG_INSTALL
-AC_PROG_MAKE_SET
 AC_OUTPUT(Makefile:zardoz.in:two.in:three.in)
 END
 
@@ -19,6 +15,7 @@ END
 : > two.in
 : > three.in
 
+$ACLOCAL || exit 1
 $AUTOMAKE || exit 1
 
 # We actually check several things here.

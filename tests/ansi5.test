@@ -48,8 +48,6 @@ main (int argc, char *argv[])
 }
 END
 
-$needs_autoconf
-
 (gcc -v) > /dev/null 2>&1 || exit 77
 
 set -e
@@ -57,6 +55,9 @@ set -e
 $ACLOCAL
 $AUTOCONF
 $AUTOMAKE -a
+# Ignore user CFLAGS.
+CFLAGS=
+export CFLAGS
 CC=gcc ./configure
 
 # This is ugly!  If we set U at make time then the "wrong" file gets

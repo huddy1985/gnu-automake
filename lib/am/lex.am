@@ -1,5 +1,5 @@
 ## automake - create Makefile.in from Makefile.am
-## Copyright 2001 Free Software Foundation, Inc.
+## Copyright 2001  Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@
 ## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-LEX_OUTPUT_ROOT = @LEX_OUTPUT_ROOT@
-LEXLIB = @LEXLIB@
-
-?GENERIC?.%EXT%.%DERIVED-EXT%:
+?GENERIC?%EXT%%DERIVED-EXT%:
 ?!GENERIC?%OBJ%: %SOURCE%
 if %?MORE-THAN-ONE%
-	$(SHELL) $(YLWRAP) %SOURCE% $(LEX_OUTPUT_ROOT).c %OBJ% -- %COMPILE%
+	$(SHELL) $(YLWRAP) `test -f %SOURCE% || echo '$(srcdir)/'`%SOURCE% $(LEX_OUTPUT_ROOT).c %OBJ% -- %COMPILE%
 else !%?MORE-THAN-ONE%
-	%COMPILE% %SOURCE% && mv $(LEX_OUTPUT_ROOT).c %OBJ%
+	%COMPILE% `test -f %SOURCE% || echo '$(srcdir)/'`%SOURCE%
+## Edit out `#line' or `#' directives.
+	sed '/^#/ s|$(LEX_OUTPUT_ROOT)\.c|%OBJ%|' $(LEX_OUTPUT_ROOT).c >%OBJ%
+	rm -f $(LEX_OUTPUT_ROOT).c
 endif !%?MORE-THAN-ONE%

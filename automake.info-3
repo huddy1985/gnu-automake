@@ -11,10 +11,10 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.5
+   This file documents GNU automake 1.6
 
-   Copyright 1995, 1996, 1997, 1998, 1999, 2000 Free Software
-Foundation, Inc.
+   Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free
+Software Foundation, Inc.
 
    Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -29,6 +29,178 @@ permission notice identical to this one.
 manual into another language, under the above conditions for modified
 versions, except that this permission notice may be stated in a
 translation approved by the Foundation.
+
+
+File: automake.info,  Node: Other objects,  Next: Other GNU Tools,  Prev: Programs,  Up: Top
+
+Other Derived Objects
+*********************
+
+   Automake can handle derived objects which are not C programs.
+Sometimes the support for actually building such objects must be
+explicitly supplied, but Automake will still automatically handle
+installation and distribution.
+
+* Menu:
+
+* Scripts::                     Executable scripts
+* Headers::                     Header files
+* Data::                        Architecture-independent data files
+* Sources::                     Derived sources
+
+
+File: automake.info,  Node: Scripts,  Next: Headers,  Prev: Other objects,  Up: Other objects
+
+Executable Scripts
+==================
+
+   It is possible to define and install programs which are scripts.
+Such programs are listed using the `SCRIPTS' primary name.  Automake
+doesn't define any dependencies for scripts; the `Makefile.am' should
+include the appropriate rules.
+
+   Automake does not assume that scripts are derived objects; such
+objects must be deleted by hand (*note Clean::).
+
+   The `automake' program itself is a Perl script that is generated at
+configure time from `automake.in'.  Here is how this is handled:
+
+     bin_SCRIPTS = automake
+
+   Since `automake' appears in the `AC_OUTPUT' macro, a target for it
+is automatically generated, and it is also automatically cleaned
+(despite the fact it's a script).
+
+   Script objects can be installed in `bindir', `sbindir',
+`libexecdir', or `pkgdatadir'.
+
+   Scripts that need not being installed can be listed in
+`noinst_SCRIPTS', and among them, those which are needed only by `make
+check' should go in `check_SCRIPTS'.
+
+
+File: automake.info,  Node: Headers,  Next: Data,  Prev: Scripts,  Up: Other objects
+
+Header files
+============
+
+   Header files are specified by the `HEADERS' family of variables.
+Generally header files are not installed, so the `noinst_HEADERS'
+variable will be the most used.  (1)
+
+   All header files must be listed somewhere; missing ones will not
+appear in the distribution.  Often it is clearest to list uninstalled
+headers with the rest of the sources for a program.  *Note A Program::.
+Headers listed in a `_SOURCES' variable need not be listed in any
+`_HEADERS' variable.
+
+   Headers can be installed in `includedir', `oldincludedir', or
+`pkgincludedir'.
+
+   ---------- Footnotes ----------
+
+   (1) However, for the case of a non-installed header file that is
+actually used by a particular program, we recommend listing it in the
+program's `_SOURCES' variable instead of in `noinst_HEADERS'.  We
+believe this is more clear.
+
+
+File: automake.info,  Node: Data,  Next: Sources,  Prev: Headers,  Up: Other objects
+
+Architecture-independent data files
+===================================
+
+   Automake supports the installation of miscellaneous data files using
+the `DATA' family of variables.
+
+   Such data can be installed in the directories `datadir',
+`sysconfdir', `sharedstatedir', `localstatedir', or `pkgdatadir'.
+
+   By default, data files are _not_ included in a distribution.  Of
+course, you can use the `dist_' prefix to change this on a per-variable
+basis.
+
+   Here is how Automake declares its auxiliary data files:
+
+     dist_pkgdata_DATA = clean-kr.am clean.am ...
+
+
+File: automake.info,  Node: Sources,  Prev: Data,  Up: Other objects
+
+Built sources
+=============
+
+   Occasionally a file which would otherwise be called `source' (e.g. a
+C `.h' file) is actually derived from some other file.  Such files
+should be listed in the `BUILT_SOURCES' variable.
+
+   `BUILT_SOURCES' is actually a bit of a misnomer, as any file which
+must be created early in the build process can be listed in this
+variable.
+
+   A source file listed in `BUILT_SOURCES' is created before the other
+`all' targets are made.  However, such a source file is not compiled
+unless explicitly requested by mentioning it in some other `_SOURCES'
+variable.
+
+   So, for instance, if you had header files which were created by a
+script run at build time, then you would list these headers in
+`BUILT_SOURCES', to ensure that they would be built before any other
+compilations (perhaps ones using these headers) were started.
+
+
+File: automake.info,  Node: Other GNU Tools,  Next: Documentation,  Prev: Other objects,  Up: Top
+
+Other GNU Tools
+***************
+
+   Since Automake is primarily intended to generate `Makefile.in's for
+use in GNU programs, it tries hard to interoperate with other GNU tools.
+
+* Menu:
+
+* Emacs Lisp::                  Emacs Lisp
+* gettext::                     Gettext
+* Libtool::                     Libtool
+* Java::                        Java
+* Python::                      Python
+
+
+File: automake.info,  Node: Emacs Lisp,  Next: gettext,  Prev: Other GNU Tools,  Up: Other GNU Tools
+
+Emacs Lisp
+==========
+
+   Automake provides some support for Emacs Lisp.  The `LISP' primary
+is used to hold a list of `.el' files.  Possible prefixes for this
+primary are `lisp_' and `noinst_'.  Note that if `lisp_LISP' is
+defined, then `configure.in' must run `AM_PATH_LISPDIR' (*note
+Macros::).
+
+   By default Automake will byte-compile all Emacs Lisp source files
+using the Emacs found by `AM_PATH_LISPDIR'.  If you wish to avoid
+byte-compiling, simply define the variable `ELCFILES' to be empty.
+Byte-compiled Emacs Lisp files are not portable among all versions of
+Emacs, so it makes sense to turn this off if you expect sites to have
+more than one version of Emacs installed.  Furthermore, many packages
+don't actually benefit from byte-compilation.  Still, we recommend that
+you leave it enabled by default.  It is probably better for sites with
+strange setups to cope for themselves than to make the installation less
+nice for everybody else.
+
+
+File: automake.info,  Node: gettext,  Next: Libtool,  Prev: Emacs Lisp,  Up: Other GNU Tools
+
+Gettext
+=======
+
+   If `AM_GNU_GETTEXT' is seen in `configure.in', then Automake turns
+on support for GNU gettext, a message catalog system for
+internationalization (*note GNU Gettext: (gettext)GNU Gettext.).
+
+   The `gettext' support in Automake requires the addition of two
+subdirectories to the package, `intl' and `po'.  Automake insures that
+these directories exist and are mentioned in `SUBDIRS'.
 
 
 File: automake.info,  Node: Libtool,  Next: Java,  Prev: gettext,  Up: Other GNU Tools
@@ -90,13 +262,23 @@ File: automake.info,  Node: Python,  Prev: Java,  Up: Other GNU Tools
 Python
 ======
 
-   Automake provides support for Python modules.  Automake will turn on
-Python support if the `AM_PATH_PYTHON' macro is used in `configure.in'.
-The `PYTHON' primary is used to hold a list of `.py' files.  Possible
-prefixes for this primary are `python_' and `noinst_'.  Note that if
-`python_PYTHON' is defined, then `configure.in' must run
-`AM_PATH_PYTHON'.  Python source files are included in the distribution
-by default.
+   Automake provides support for Python compilation with the `PYTHON'
+primary.
+
+   Any files listed in a `_PYTHON' variable will be byte-compiled with
+`py-compile' at install time.  `py-compile' actually creates both
+standard (`.pyc') and byte-compiled (`.pyo') versions of the source
+files.  Note that because byte-compilation occurs at install time, any
+files listed in `noinst_PYTHON' will not be compiled.  Python source
+files are included in the distribution by default.
+
+   Automake ships with an Autoconf macro called `AM_PATH_PYTHON' which
+will determine some Python-related directory variables (see below).  If
+have called `AM_PATH_PYTHON' from you `configure.in', then you may use
+the following variables to list you Python source files in your
+variables: `python_PYTHON', `pkgpython_PYTHON', `pkgpython_PYTHON',
+`pyexecdir_PYTHON', `pkgpyexecdir_PYTHON', depending where you want
+your files installed.
 
    `AM_PATH_PYTHON' takes a single optional argument.  This argument,
 if present, is the minimum version of Python which can be used for this
@@ -144,12 +326,6 @@ Python installation found during configuration.
 `pkgpyexecdir'
      This is a convenience variable which is defined as
      `$(pyexecdir)/$(PACKAGE)'.
-
-   By default Automake will byte-compile all Python source files to both
-`.pyc' and `.pyo' forms.  If you wish to avoid generating the optimized
-byte-code files, simply define the variable `PYOFILES' to be empty.
-Similarly, if you don't wish to generate the standard byte-compiled
-files, define the variable `PYCFILES' to be empty.
 
 
 File: automake.info,  Node: Documentation,  Next: Install,  Prev: Other GNU Tools,  Up: Top
@@ -387,7 +563,7 @@ For more information, see *Note Makefile Conventions:
    Support for `DESTDIR' is implemented by coding it directly into the
 install rules.  If your `Makefile.am' uses a local install rule (e.g.,
 `install-exec-local') or an install hook, then you must write that code
-to repsect `DESTDIR'.
+to respect `DESTDIR'.
 
 Rules for the user
 ==================
@@ -396,8 +572,8 @@ Rules for the user
 target, and an `install-strip' target.
 
    Automake supports `uninstall-local' and `uninstall-hook'.  There is
-no notion of separate uninstalls for "exec" and "data", as that does
-not make sense.
+no notion of separate uninstalls for "exec" and "data", as these
+features would not provide additional functionality.
 
    Note that `uninstall' is not meant as a replacement for a real
 packaging tool.
@@ -409,10 +585,12 @@ What Gets Cleaned
 *****************
 
    The GNU Makefile Standards specify a number of different clean rules.
-Generally the files that can be cleaned are determined automatically by
-Automake.  Of course, Automake also recognizes some variables that can
-be defined to specify additional files to clean.  These variables are
-`MOSTLYCLEANFILES', `CLEANFILES', `DISTCLEANFILES', and
+See *Note Standard Targets for Users: (standards)Standard Targets.
+
+   Generally the files that can be cleaned are determined automatically
+by Automake.  Of course, Automake also recognizes some variables that
+can be defined to specify additional files to clean.  These variables
+are `MOSTLYCLEANFILES', `CLEANFILES', `DISTCLEANFILES', and
 `MAINTAINERCLEANFILES'.
 
    As the GNU Standards aren't always explicit as to which files should
@@ -443,19 +621,22 @@ Basics of distribution
 ======================
 
    The `dist' target in the generated `Makefile.in' can be used to
-generate a gzip'd `tar' file for distribution.  The tar file is named
-based on the `PACKAGE' and `VERSION' variables; more precisely it is
-named `PACKAGE-VERSION.tar.gz'.  You can use the `make' variable
-`GZIP_ENV' to control how gzip is run.  The default setting is `--best'.
+generate a gzip'd `tar' file and other flavors of archive for
+distribution.  The files is named based on the `PACKAGE' and `VERSION'
+variables defined by `AM_INIT_AUTOMAKE' (*note Macros::); more
+precisely the gzip'd `tar' file is named `PACKAGE-VERSION.tar.gz'.  You
+can use the `make' variable `GZIP_ENV' to control how gzip is run.  The
+default setting is `--best'.
 
    For the most part, the files to distribute are automatically found by
 Automake: all source files are automatically included in a distribution,
 as are all `Makefile.am's and `Makefile.in's.  Automake also has a
-built-in list of commonly used files which, if present in the current
-directory, are automatically included.  This list is printed by
-`automake --help'.  Also, files which are read by `configure' (i.e. the
-source files corresponding to the files specified in the `AC_OUTPUT'
-invocation) are automatically distributed.
+built-in list of commonly used files which are automatically included
+if they are found in the current directory (either physically, or as
+the target of a `Makefile.am' rule).  This list is printed by `automake
+--help'.  Also, files which are read by `configure' (i.e. the source
+files corresponding to the files specified in various Autoconf macros
+such as `AC_CONFIG_FILES' and siblings) are automatically distributed.
 
    Still, sometimes there are files which must be distributed, but which
 are not covered in the automatic rules.  These files should be listed in
@@ -520,7 +701,14 @@ Checking the distribution
 
    Automake also generates a `distcheck' target which can be of help to
 ensure that a given distribution will actually work.  `distcheck' makes
-a distribution, and then tries to do a `VPATH' build.
+a distribution, then tries to do a `VPATH' build, run the testsuite,
+and finally make another tarfile to ensure the distribution is
+self-contained.
+
+   Building the package involves running `./configure'.  If you need to
+supply additional flags to `configure', define them in the
+`DISTCHECK_CONFIGURE_FLAGS' variable, either in your top-level
+`Makefile.am', or on the commande line when invoking `make'.
 
    If the target `distcheck-hook' is defined in your `Makefile.am',
 then it will be invoked by `distcheck' after the new distribution has
@@ -529,16 +717,44 @@ Your `distcheck-hook' can do almost anything, though as always caution
 is advised.  Generally this hook is used to check for potential
 distribution errors not caught by the standard mechanism.
 
+   Speaking about potential distribution errors, `distcheck' will also
+ensure that the `distclean' target actually removes all built files.
+This is done by running `make distcleancheck' at the end of the `VPATH'
+build.  By default, `distcleancheck' will run `distclean' and then make
+sure the build tree has been emptied by running
+`$(distcleancheck_listfiles)'.  Usually this check will find generated
+files that you forgot to add to the `DISTCLEANFILES' variable (*note
+Clean::).
+
+   The `distcleancheck' behaviour should be ok for most packages,
+otherwise you have the possibility to override the definitition of
+either the `distcleancheck' target, or the
+`$(distcleancheck_listfiles)' variable.  For instance to disable
+`distcleancheck' completely, add the following rule to your top-level
+`Makefile.am':
+
+     distcleancheck:
+             @:
+
+   If you want `distcleancheck' to ignore built files which have not
+been cleaned because they are also part of the distribution, add the
+following definition instead:
+
+     distcleancheck_listfiles = \
+       find -type f -exec sh -c 'test -f $(scrdir)/{} || echo {}'
+
+   The above definition is not the default because it's usually an
+error if your Makefiles cause some distributed files to be rebuilt when
+the user build the package.  (Think about the user missing the tool
+required to build the file; or if the required tool is built by your
+package, consider the cross-compilation case where it can't be run.)
+
 The types of distributions
 ==========================
 
-   By default Automake generates a `.tar.gz' file when asked to create
-a distribution.  However, some projects prefer different packaging
-formats.  Automake accomodates most of these using options; *Note
-Options::.
-
-   Automake also generates a `dist-all' target which can be used to
-make all the requested packaged distributions at once.
+   Automake generates a `.tar.gz' file when asked to create a
+distribution and other archives formats, *Note Options::.  The target
+`dist-gzip' generates the `.tar.gz' file only.
 
 
 File: automake.info,  Node: Tests,  Next: Options,  Prev: Dist,  Up: Top
@@ -606,6 +822,13 @@ can use `AM_RUNTESTFLAGS' instead.
 
    In either case, the testing is done via `make check'.
 
+Install Tests
+=============
+
+   The `installcheck' target is available to the user as a way to run
+any tests after the package has been installed.  You can add tests to
+this by writing an `installcheck-local' target.
+
 
 File: automake.info,  Node: Options,  Next: Miscellaneous,  Prev: Tests,  Up: Top
 
@@ -613,8 +836,11 @@ Changing Automake's Behavior
 ****************************
 
    Various features of Automake can be controlled by options in the
-`Makefile.am'.  Such options are listed in a special variable named
-`AUTOMAKE_OPTIONS'.  Currently understood options are:
+`Makefile.am'.  Such options are applied on a per-`Makefile' basis when
+listed in a special `Makefile' variable named `AUTOMAKE_OPTIONS'.  They
+are applied globally to all processed `Makefiles' when listed in the
+first argument of `AM_INIT_AUTOMAKE' in `configure.in'.  Currently
+understood options are:
 
 `gnits'
 `gnu'
@@ -639,25 +865,30 @@ Changing Automake's Behavior
      Cause `dejagnu'-specific rules to be generated.  *Note Tests::.
 
 `dist-bzip2'
-     Generate a `dist-bzip2' target as well as the ordinary `dist'
-     target.  This new target will create a bzip2 tar archive of the
-     distribution.  bzip2 archives are frequently smaller than even
-     gzipped archives.
+     Generate a `dist-bzip2' target, creating a bzip2 tar archive of the
+     distribution.  `dist' will create it in addition to the other
+     formats.  bzip2 archives are frequently smaller than gzipped
+     archives.
 
 `dist-shar'
-     Generate a `dist-shar' target as well as the ordinary `dist'
-     target.  This new target will create a shar archive of the
-     distribution.
+     Generate a `dist-shar' target, creating a shar archive of the
+     distribution.  `dist' will create it in addition to the other
+     formats.
 
 `dist-zip'
-     Generate a `dist-zip' target as well as the ordinary `dist'
-     target.  This new target will create a zip archive of the
-     distribution.
+     Generate a `dist-zip' target, creating a zip archive of the
+     distribution.  `dist' will create it in addition to the other
+     formats.
 
 `dist-tarZ'
-     Generate a `dist-tarZ' target as well as the ordinary `dist'
-     target.  This new target will create a compressed tar archive of
-     the distribution.
+     Generate a `dist-tarZ' target, creating a compressed tar archive of
+     the distribution.  `dist' will create it in addition to the other
+     formats.
+
+`no-define'
+     This options is meaningful only when passed as an argument to
+     AM_INIT_AUTOMAKE.  It will prevent the `PACKAGE' and `VERSION'
+     variable to be `AC_DEFINE'd.
 
 `no-dependencies'
      This is similar to using `--include-deps' on the command line, but
@@ -718,6 +949,9 @@ VERSION
 
    Unrecognized options are diagnosed by `automake'.
 
+   If you want an option to apply to all the files in the tree, you can
+use the `AM_AUTOMAKE_OPTIONS' macro in `configure.in'.  *Note Macros::.
+
 
 File: automake.info,  Node: Miscellaneous,  Next: Include,  Prev: Options,  Up: Top
 
@@ -751,7 +985,8 @@ file that includes by reference all `TAGS' files from subdirectories.
    The `tags' target will also be generated if the variable
 `ETAGS_ARGS' is defined.  This variable is intended for use in
 directories which contain taggable source that `etags' does not
-understand.
+understand.  The user can use the `ETAGSFLAGS' to pass additional flags
+to `etags'; `AM_ETAGSFLAGS' is also available for use in `Makefile.am'.
 
    Here is how Automake generates tags for its source, and for nodes in
 its Texinfo file:
@@ -778,14 +1013,14 @@ Handling new file extensions
 ============================
 
    It is sometimes useful to introduce a new implicit rule to handle a
-file type that Automake does not know about.  If this is done, you must
-notify GNU Make of the new suffixes.  This can be done by putting a list
-of new suffixes in the `SUFFIXES' variable.
+file type that Automake does not know about.
 
    For instance, suppose you had a compiler which could compile `.foo'
-files to `.o' files.  Then you would add `.foo' to your suffix list:
+files to `.o' files.  You would simply define an suffix rule for your
+language:
 
-     SUFFIXES = .foo
+     .foo.o:
+             foocc -c -o $@ $<
 
    Then you could directly use a `.foo' file in a `_SOURCES' variable
 and expect the correct results:
@@ -793,8 +1028,26 @@ and expect the correct results:
      bin_PROGRAMS = doit
      doit_SOURCES = doit.foo
 
-   Any given `SUFFIXES' go at the start of the generated suffixes list,
-followed by automake generated suffixes not already in the list.
+   This was the simpler and more common case.  In other cases, you will
+have to help Automake to figure which extensions you are defining your
+suffix rule for.  This usually happens when your extensions does not
+start with a dot.  Then, all you have to do is to put a list of new
+suffixes in the `SUFFIXES' variable *before* you define your implicit
+rule.
+
+   For instance the following definition prevents Automake to
+misinterpret `.idlC.cpp:' as an attemp to transform `.idlC' into `.cpp'.
+
+     SUFFIXES = .idl C.cpp
+     .idlC.cpp:
+             # whatever
+
+   As you may have noted, the `SUFFIXES' macro behaves like the
+`.SUFFIXES' special target of `make'.  You should not touch `.SUFFIXES'
+yourself, but use `SUFFIXES' instead and let Automake generate the
+suffix list for `.SUFFIXES'.  Any given `SUFFIXES' go at the start of
+the generated suffixes list, followed by Automake generated suffixes
+not already in the list.
 
 
 File: automake.info,  Node: Multilibs,  Prev: Suffixes,  Up: Miscellaneous
@@ -1013,41 +1266,26 @@ various useful targets have a `-local' version you can specify in your
 user-supplied targets.
 
    The targets that support a local version are `all', `info', `dvi',
-`check', `install-data', `install-exec', `uninstall', and the various
-`clean' targets (`mostlyclean', `clean', `distclean', and
-`maintainer-clean').  Note that there are no `uninstall-exec-local' or
-`uninstall-data-local' targets; just use `uninstall-local'.  It doesn't
-make sense to uninstall just data or just executables.
+`check', `install-data', `install-exec', `uninstall', `installdirs',
+`installcheck' and the various `clean' targets (`mostlyclean', `clean',
+`distclean', and `maintainer-clean').  Note that there are no
+`uninstall-exec-local' or `uninstall-data-local' targets; just use
+`uninstall-local'.  It doesn't make sense to uninstall just data or
+just executables.
 
    For instance, here is one way to install a file in `/etc':
 
      install-data-local:
-             $(INSTALL_DATA) $(srcdir)/afile /etc/afile
+             $(INSTALL_DATA) $(srcdir)/afile $(DESTDIR)/etc/afile
 
    Some targets also have a way to run another target, called a "hook",
 after their work is done.  The hook is named after the principal target,
 with `-hook' appended.  The targets allowing hooks are `install-data',
-`install-exec', `dist', and `distcheck'.
+`install-exec', `uninstall', `dist', and `distcheck'.
 
    For instance, here is how to create a hard link to an installed
 program:
 
      install-exec-hook:
-             ln $(bindir)/program $(bindir)/proglink
-
-
-File: automake.info,  Node: Distributing,  Next: Macro and Variable Index,  Prev: Extending,  Up: Top
-
-Distributing `Makefile.in's
-***************************
-
-   Automake places no restrictions on the distribution of the resulting
-`Makefile.in's.  We still encourage software authors to distribute
-their work under terms like those of the GPL, but doing so is not
-required to use Automake.
-
-   Some of the files that can be automatically installed via the
-`--add-missing' switch do fall under the GPL.  However, these also have
-a special exception allowing you to distribute them with your package,
-regardless of the licensing you choose.
+             ln $(DESTDIR)$(bindir)/program $(DESTDIR)$(bindir)/proglink
 

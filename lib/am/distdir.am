@@ -16,19 +16,25 @@
 ## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
-.PHONY: distdir
-
 ## DIST_COMMON comes first so that README can be the very first file.
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 
 top_distdir = %TOP_DISTDIR%
 if %?TOPDIR_P%
-# Avoid unsightly `./'.
+## Avoid unsightly `./'.
 ?DISTDIR?distdir = $(PACKAGE)-$(VERSION)
 else !%?TOPDIR_P%
 ?DISTDIR?distdir = $(top_distdir)/$(PACKAGE)-$(VERSION)
 endif !%?TOPDIR_P%
 
+if %?TOPDIR_P%
+am__remove_distdir = \
+  { test ! -d $(distdir) \
+    || { find $(distdir) -type d ! -perm -200 -exec chmod u+w {} ';' \
+         && rm -fr $(distdir); }; }
+endif %?TOPDIR_P%
+
+.PHONY: distdir
 distdir: $(DISTFILES)
 ##
 ## For Gnits users, this is pretty handy.  Look at 15 lines
@@ -47,7 +53,7 @@ endif %?TOPDIR_P%
 ## Only for the top dir.
 ##
 if %?TOPDIR_P%
-	-chmod -R a+w $(distdir) >/dev/null 2>&1; rm -rf $(distdir)
+	$(am__remove_distdir)
 	mkdir $(distdir)
 endif %?TOPDIR_P%
 ##
@@ -59,9 +65,10 @@ endif %?TOPDIR_P%
 ##
 ## Always look for the file in the build directory first.  That way
 ## for something like yacc output we will correctly pick up the latest
-## version.
+## version.  Also check for directories in the build directory first,
+## so one can ship generated directories.
 ##
-	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
+	  if test -f $$file || test -d $$file; then d=.; else d=$(srcdir); fi; \
 ##
 ## Make the subdirectory for the file.  This is going to make `dist'
 ## really crawl, but it seems like the only way to do it, given that
@@ -69,7 +76,10 @@ endif %?TOPDIR_P%
 ##
 	  dir=`echo "$$file" | sed -e 's,/[^/]*$$,,'`; \
 	  if test "$$dir" != "$$file" && test "$$dir" != "."; then \
-	    $(mkinstalldirs) "$(distdir)/$$dir"; \
+	    dir="/$$dir"; \
+	    $(mkinstalldirs) "$(distdir)$$dir"; \
+	  else \
+	    dir=''; \
 	  fi; \
 ##
 ## In loop, test for file existence because sometimes a file gets
@@ -83,7 +93,7 @@ endif %?TOPDIR_P%
 ## Don't mention $$file in destination argument, since this fails if
 ## destination directory already exists.  Also, use `-R' and not `-r'.
 ## `-r' is almost always incorrect.
-	    cp -pR $$d/$$file $(distdir) \
+	    cp -pR $$d/$$file $(distdir)$$dir \
 	    || exit 1; \
 	  else \
 	    test -f $(distdir)/$$file \
@@ -101,7 +111,7 @@ endif %?TOPDIR_P%
 ## us work correctly with an enclosing package.
 ##
 if %?SUBDIRS%
-	for subdir in $(%DIST_SUBDIR_NAME%); do \
+	list='$(%DIST_SUBDIR_NAME%)'; for subdir in $$list; do \
 	  if test "$$subdir" = .; then :; else \
 	    test -d $(distdir)/$$subdir \
 	    || mkdir $(distdir)/$$subdir \
@@ -165,16 +175,16 @@ endif %?TOPDIR_P%
 if %?TOPDIR_P%
 
 GZIP_ENV = --best
-.PHONY: dist
-dist: distdir
+.PHONY: dist-gzip
+dist-gzip: distdir
 	$(AMTAR) chof - $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
-	-chmod -R a+w $(distdir) >/dev/null 2>&1; rm -rf $(distdir)
+	$(am__remove_distdir)
 
 if  %?BZIP2%
 .PHONY: dist-bzip2
 dist-bzip2: distdir
 	$(AMTAR) chof - $(distdir) | bzip2 -9 -c >$(distdir).tar.bz2
-	-chmod -R a+w $(distdir) >/dev/null 2>&1; rm -rf $(distdir)
+	$(am__remove_distdir)
 endif  %?BZIP2%
 
 
@@ -182,7 +192,7 @@ if  %?COMPRESS%
 .PHONY: dist-tarZ
 dist-tarZ: distdir
 	$(AMTAR) chof - $(distdir) | compress -c >$(distdir).tar.Z
-	-chmod -R a+w $(distdir) >/dev/null 2>&1; rm -rf $(distdir)
+	$(am__remove_distdir)
 endif  %?COMPRESS%
 
 
@@ -190,7 +200,7 @@ if  %?SHAR%
 .PHONY: dist-shar
 dist-shar: distdir
 	shar $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).shar.gz
-	-chmod -R a+w $(distdir) >/dev/null 2>&1; rm -rf $(distdir)
+	$(am__remove_distdir)
 endif  %?SHAR%
 
 
@@ -199,7 +209,7 @@ if  %?ZIP%
 dist-zip: distdir
 	-rm -f $(distdir).zip
 	zip -rq $(distdir).zip $(distdir)
-	-chmod -R a+w $(distdir) >/dev/null 2>&1; rm -rf $(distdir)
+	$(am__remove_distdir)
 endif  %?ZIP%
 
 endif %?TOPDIR_P%
@@ -215,15 +225,15 @@ endif %?TOPDIR_P%
 
 if %?TOPDIR_P%
 
-.PHONY: dist-all
-dist-all: distdir
+.PHONY: dist dist-all
+dist dist-all: distdir
 	$(AMTAR) chof - $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
 ?BZIP2?	$(AMTAR) chof - $(distdir) | bzip2 -9 -c >$(distdir).tar.bz2
 ?COMPRESS?	$(AMTAR) chof - $(distdir) | compress -c >$(distdir).tar.Z
 ?SHAR?	shar $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).shar.gz
 ?ZIP?	-rm -f $(distdir).zip
 ?ZIP?	zip -rq $(distdir).zip $(distdir)
-	-chmod -R a+w $(distdir) >/dev/null 2>&1; rm -rf $(distdir)
+	$(am__remove_distdir)
 
 endif %?TOPDIR_P%
 
@@ -239,8 +249,7 @@ if %?TOPDIR_P%
 # tarfile.
 .PHONY: distcheck
 distcheck: dist
-## Make sure we can remove distdir before trying to remove it.
-	-chmod -R a+w $(distdir) > /dev/null 2>&1; rm -rf $(distdir)
+	$(am__remove_distdir)
 	GZIP=$(GZIP_ENV) gunzip -c $(distdir).tar.gz | $(AMTAR) xf -
 ## Make the new source tree read-only.  Distributions ought to work in
 ## this case.  However, make the top-level directory writable so we
@@ -250,11 +259,14 @@ distcheck: dist
 	mkdir $(distdir)/=inst
 ## Undo the write access.
 	chmod a-w $(distdir)
-	dc_install_base=`CDPATH=: && cd $(distdir)/=inst && pwd` \
+	dc_install_base=`$(am__cd) $(distdir)/=inst && pwd` \
 ?DISTCHECK-HOOK?	  && $(MAKE) $(AM_MAKEFLAGS) distcheck-hook \
 	  && cd $(distdir)/=build \
 	  && ../configure --srcdir=.. --prefix=$$dc_install_base \
 ?GETTEXT?	    --with-included-gettext \
+## Additional flags for configure.  Keep this last in the configure
+## invocation so the user can override previous options.
+	    $(DISTCHECK_CONFIGURE_FLAGS) \
 	  && $(MAKE) $(AM_MAKEFLAGS) \
 	  && $(MAKE) $(AM_MAKEFLAGS) dvi \
 	  && $(MAKE) $(AM_MAKEFLAGS) check \
@@ -263,17 +275,29 @@ distcheck: dist
 	  && $(MAKE) $(AM_MAKEFLAGS) uninstall \
 ## We use -le 1 because the `dir' file might still exist after uninstall.
 	  && (test `find $$dc_install_base -type f -print | wc -l` -le 1 \
-	     || (echo "Error: files left after uninstall" 1>&2; \
-	         exit 1) ) \
-	  && $(MAKE) $(AM_MAKEFLAGS) dist \
-	  && $(MAKE) $(AM_MAKEFLAGS) distclean \
+	      || { echo "ERROR: files left after uninstall:" ; \
+	           find $$dc_install_base -type f -print ; \
+	           exit 1; } >&2 ) \
+	  && $(MAKE) $(AM_MAKEFLAGS) dist-gzip \
 ## Make sure to remove the dist file we created in the test build
 ## directory.
 	  && rm -f $(distdir).tar.gz \
-	  && (test `find . -type f -print | wc -l` -eq 0 \
-	     || (echo "Error: files left after distclean" 1>&2; \
-	         exit 1) )
-	-chmod -R a+w $(distdir) > /dev/null 2>&1; rm -rf $(distdir)
+	  && $(MAKE) $(AM_MAKEFLAGS) distcleancheck
+	$(am__remove_distdir)
 	@echo "$(distdir).tar.gz is ready for distribution" | \
 	  sed 'h;s/./=/g;p;x;p;x'
+
+## Define distcleancheck_listfiles and distcleancheck separately
+## from distcheck, so that they can be overriden by the user.
+.PHONY: distcleancheck
+distcleancheck_listfiles = find . -type f -print
+distcleancheck: distclean
+	if test '$(srcdir)' = . ; then \
+	  echo "ERROR: distcleancheck can only run from a VPATH build" ; \
+	  exit 1 ; \
+	fi
+	test `$(distcleancheck_listfiles) | wc -l` -eq 0 \
+	  || { echo "ERROR: files left after distclean:" ; \
+	       $(distcleancheck_listfiles) ; \
+	       exit 1; } >&2
 endif %?TOPDIR_P%

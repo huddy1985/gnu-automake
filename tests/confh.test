@@ -6,12 +6,8 @@
 . $srcdir/defs || exit 1
 
 cat > configure.in << 'END'
+AC_INIT
 AM_INIT_AUTOMAKE(nonesuch, nonesuch)
-PACKAGE=nonesuch
-VERSION=nonesuch
-AC_ARG_PROGRAM
-AC_PROG_INSTALL
-AC_PROG_MAKE_SET
 AM_CONFIG_HEADER(include/config.h)
 AC_OUTPUT(Makefile include/Makefile)
 END
@@ -23,6 +19,7 @@ mkdir include
 : > include/Makefile.am
 : > include/config.h.in
 
+$ACLOCAL || exit 1
 $AUTOMAKE || exit 1
 
 (sed -n -e '/^DIST_COMMON =.*\\$/ {
@@ -34,10 +31,9 @@ $AUTOMAKE || exit 1
    n
    }' -e '/^DIST_COMMON =/ p' Makefile.in | grep acconfig.h) || exit 1
 
-grep 'stamp-h.in:.*acconfig.h' include/Makefile.in || exit 1
-
 # Make sure re-running automake in a different way generates same
 # Makefile.in.
 mv Makefile.in save
+$ACLOCAL || exit 1
 $AUTOMAKE Makefile || exit 1
 cmp Makefile.in save
