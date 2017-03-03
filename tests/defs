@@ -73,6 +73,7 @@ test -z "$MAKE" && MAKE=make
 unset MFLAGS
 unset MAKEFLAGS
 unset MAKELEVEL
+unset DESTDIR
 
 if ($MAKE --version) > /dev/null 2>&1; then
    needs_gnu_make=:
@@ -125,6 +126,11 @@ esac
 # Export AUTOMAKE and ACLOCAL so that rebuild rules in Makefiles
 # generated for the tests do not use the installed tools.
 export AUTOMAKE ACLOCAL
+
+# The tests call `make -e' but we do not want $srcdir from the evironment
+# to override the definition from the Makefile.
+testsrcdir=$srcdir
+unset srcdir
 
 # Turn on shell traces when VERBOSE=x.
 if test "x$VERBOSE" = xx; then

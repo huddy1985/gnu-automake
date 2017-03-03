@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 
-XFAIL_TESTS = condd.test subdir5.test auxdir2.test cond17.test
+XFAIL_TESTS = condd.test subdir5.test auxdir2.test cond17.test specflags8.test
 
 TESTS =	\
 acinclude.test \
@@ -15,6 +15,8 @@ acoutput2.test \
 acoutqnl.test \
 acouttbs.test \
 acsilent.test \
+acsubst.test \
+acsubst2.test \
 all.test \
 alpha.test \
 amassign.test \
@@ -147,6 +149,7 @@ extra3.test \
 extra4.test \
 extra5.test \
 extra6.test \
+extra7.test \
 flibs.test \
 fnoc.test \
 fo.test	\
@@ -289,6 +292,9 @@ space.test \
 specflags.test \
 specflags2.test	\
 specflags3.test	\
+specflags6.test	\
+specflags7.test	\
+specflags8.test	\
 spell.test \
 spell2.test \
 spell3.test \
@@ -312,6 +318,7 @@ subobj5.test \
 subobj6.test \
 subobj7.test \
 subobj8.test \
+subobj9.test \
 subst.test \
 substref.test \
 substtarg.test \
@@ -347,6 +354,7 @@ version.test \
 version2.test \
 version3.test \
 version4.test \
+version5.test \
 vpath.test \
 vtexi.test \
 vtexi2.test \

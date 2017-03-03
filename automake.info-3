@@ -1,4 +1,4 @@
-This is automake.info, produced by makeinfo version 4.0 from
+This is automake.info, produced by makeinfo version 4.1 from
 automake.texi.
 
 INFO-DIR-SECTION GNU programming tools
@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.6
+   This file documents GNU automake 1.6.1
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free
 Software Foundation, Inc.
@@ -1152,6 +1152,25 @@ by an `end':
 
 Unbalanced conditions are errors.
 
+   Conditionals do not interact very smoothly with the append operator.
+In particular, an append must happen in the same conditional context as
+the original assignment.  This means that the following will not work:
+
+     DBG = foo
+     if DEBUG
+     DBG += bar
+     endif DEBUG
+
+   The behaviour which is probably desired in this situation can be
+obtained using a temporary variable:
+
+     if DEBUG
+     TMP_DBG = bar
+     endif DEBUG
+     DBG = foo $(TMP_DBG)
+
+   This restriction may be lifted in future versions of automake.
+
    Note that conditionals in Automake are not the same as conditionals
 in GNU Make.  Automake conditionals are checked at configure time by the
 `configure' script, and affect the translation from `Makefile.in' to
@@ -1247,45 +1266,4 @@ the special Cygnus mode.  Some day, perhaps, the differences between
 Cygnus trees and GNU trees will disappear (for instance, as GCC is made
 more standards compliant).  At that time the special Cygnus mode will be
 removed.
-
-
-File: automake.info,  Node: Extending,  Next: Distributing,  Prev: Cygnus,  Up: Top
-
-When Automake Isn't Enough
-**************************
-
-   Automake's implicit copying semantics means that many problems can be
-worked around by simply adding some `make' targets and rules to
-`Makefile.in'.  Automake will ignore these additions.
-
-   There are some caveats to doing this.  Although you can overload a
-target already used by Automake, it is often inadvisable, particularly
-in the topmost directory of a package with subdirectories.  However,
-various useful targets have a `-local' version you can specify in your
-`Makefile.in'.  Automake will supplement the standard target with these
-user-supplied targets.
-
-   The targets that support a local version are `all', `info', `dvi',
-`check', `install-data', `install-exec', `uninstall', `installdirs',
-`installcheck' and the various `clean' targets (`mostlyclean', `clean',
-`distclean', and `maintainer-clean').  Note that there are no
-`uninstall-exec-local' or `uninstall-data-local' targets; just use
-`uninstall-local'.  It doesn't make sense to uninstall just data or
-just executables.
-
-   For instance, here is one way to install a file in `/etc':
-
-     install-data-local:
-             $(INSTALL_DATA) $(srcdir)/afile $(DESTDIR)/etc/afile
-
-   Some targets also have a way to run another target, called a "hook",
-after their work is done.  The hook is named after the principal target,
-with `-hook' appended.  The targets allowing hooks are `install-data',
-`install-exec', `uninstall', `dist', and `distcheck'.
-
-   For instance, here is how to create a hard link to an installed
-program:
-
-     install-exec-hook:
-             ln $(DESTDIR)$(bindir)/program $(DESTDIR)$(bindir)/proglink
 

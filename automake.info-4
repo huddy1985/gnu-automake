@@ -1,4 +1,4 @@
-This is automake.info, produced by makeinfo version 4.0 from
+This is automake.info, produced by makeinfo version 4.1 from
 automake.texi.
 
 INFO-DIR-SECTION GNU programming tools
@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.6
+   This file documents GNU automake 1.6.1
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free
 Software Foundation, Inc.
@@ -29,6 +29,47 @@ permission notice identical to this one.
 manual into another language, under the above conditions for modified
 versions, except that this permission notice may be stated in a
 translation approved by the Foundation.
+
+
+File: automake.info,  Node: Extending,  Next: Distributing,  Prev: Cygnus,  Up: Top
+
+When Automake Isn't Enough
+**************************
+
+   Automake's implicit copying semantics means that many problems can be
+worked around by simply adding some `make' targets and rules to
+`Makefile.in'.  Automake will ignore these additions.
+
+   There are some caveats to doing this.  Although you can overload a
+target already used by Automake, it is often inadvisable, particularly
+in the topmost directory of a package with subdirectories.  However,
+various useful targets have a `-local' version you can specify in your
+`Makefile.in'.  Automake will supplement the standard target with these
+user-supplied targets.
+
+   The targets that support a local version are `all', `info', `dvi',
+`check', `install-data', `install-exec', `uninstall', `installdirs',
+`installcheck' and the various `clean' targets (`mostlyclean', `clean',
+`distclean', and `maintainer-clean').  Note that there are no
+`uninstall-exec-local' or `uninstall-data-local' targets; just use
+`uninstall-local'.  It doesn't make sense to uninstall just data or
+just executables.
+
+   For instance, here is one way to install a file in `/etc':
+
+     install-data-local:
+             $(INSTALL_DATA) $(srcdir)/afile $(DESTDIR)/etc/afile
+
+   Some targets also have a way to run another target, called a "hook",
+after their work is done.  The hook is named after the principal target,
+with `-hook' appended.  The targets allowing hooks are `install-data',
+`install-exec', `uninstall', `dist', and `distcheck'.
+
+   For instance, here is how to create a hard link to an installed
+program:
+
+     install-exec-hook:
+             ln $(DESTDIR)$(bindir)/program $(DESTDIR)$(bindir)/proglink
 
 
 File: automake.info,  Node: Distributing,  Next: API versioning,  Prev: Extending,  Up: Top
@@ -398,6 +439,7 @@ General Index
 * all-local:                             Extending.
 * AM_INIT_AUTOMAKE, example use:         Complete.
 * ansi2knr:                              ANSI.
+* Append operator:                       General Operation.
 * Automake constraints:                  Introduction.
 * Automake options:                      Invoking Automake.
 * Automake requirements <1>:             Requirements.
