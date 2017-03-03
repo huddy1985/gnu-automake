@@ -2,8 +2,8 @@
 
 ## Makefile for Automake.
 
-## Copyright (C) 1995, 1996, 1997, 1998, 1999, 2001, 2002 Free
-## Software Foundation, Inc.
+## Copyright (C) 1995, 1996, 1997, 1998, 1999, 2001, 2002, 2003
+## Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ ETAGS_ARGS = --lang=none \
  --regex='/^@node[ \t]+\([^,]+\)/\1/' $(srcdir)/automake.texi
 TAGS_DEPENDENCIES = automake.texi
 
-EXTRA_DIST = ChangeLog.1996 ChangeLog.1998 ChangeLog.2000 ChangeLog.2001 \
+EXTRA_DIST = ChangeLog.96 ChangeLog.98 ChangeLog.00 ChangeLog.01 \
   $(AUTOMAKESOURCES)
 
 ## Make versioned links.  We only run the transform on the root name;
@@ -68,7 +68,8 @@ do_subst = sed -e 's,[@]datadir[@],$(datadir),g' -e 's,[@]PERL[@],$(PERL),g' \
 	    -e 's,[@]configure_input[@],@configure_input@,g' \
 	    -e 's,[@]PACKAGE[@],$(PACKAGE),g' \
 	    -e 's,[@]VERSION[@],$(VERSION),g' \
-	    -e 's,[@]APIVERSION[@],$(APIVERSION),g'
+	    -e 's,[@]APIVERSION[@],$(APIVERSION),g' \
+	    -e 's,[@]SHELL[@],$(SHELL),g'
 
 automake: automake.in Makefile
 	$(do_subst) < $(srcdir)/automake.in > automake
@@ -94,9 +95,9 @@ INSTALL: lib/INSTALL
 # guaranteed to work on my machine.
 maintainer-check: automake aclocal
 ## This check avoids accidental configure substitutions in the source.
-## There are exactly 7 lines that should be modified.  This works out
-## to 22 lines of diffs.
-	@if test `diff $(srcdir)/automake.in automake | wc -l` -ne 24; then \
+## There are exactly 8 lines that should be modified.  This works out
+## to 28 lines of diffs.
+	@if test `diff $(srcdir)/automake.in automake | wc -l` -ne 28; then \
 	  echo "found too many diffs between automake.in and automake"; 1>&2; \
 	  diff -c $(srcdir)/automake.in automake; \
 	  exit 1; \
@@ -213,37 +214,30 @@ maintainer-check: automake aclocal
 ## recursive targets are used.  Better use an envvar.  SHELL is an exception,
 ## POSIX says it can't come from the environment.
 	@if grep -E '\$$MAKE .*(SHELL=.*=|=.*SHELL=)' $(srcdir)/tests/*.test; then \
-	  echo 'Rewrite "$$MAKE foo=bar SHELL=/bin/sh" as "foo=bar $$MAKE -e SHELL=/bin/sh"' 1>&2; \
+	  echo 'Rewrite "$$MAKE foo=bar SHELL=$$SHELL" as "foo=bar $$MAKE -e SHELL=$$SHELL"' 1>&2; \
 	  echo ' in the above lines, it is more portable.' 1>&2; \
 	  exit 1; \
 	fi
 	@if grep -v SHELL $(srcdir)/tests/*.test | grep '\$$MAKE .*=' ; then \
-	  echo 'Rewrite "$$MAKE foo=bar" as "foo=bar $$MAKE -e SHELL=/bin/sh" in the above lines,' 1>&2; \
+	  echo 'Rewrite "$$MAKE foo=bar" as "foo=bar $$MAKE -e" in the above lines,' 1>&2; \
 	  echo 'it is more portable.' 1>&2; \
 	  exit 1; \
 	fi
-## On NetBSD (1.5) and OSF, the $SHELL variable is still inherited from
-## the environment.
-	@if grep '$$MAKE.* -e' $(srcdir)/tests/*.test | grep -v '-e.*SHELL' ; then \
-	  echo 'Always overwrite SHELL when using "$$MAKE -e".' 1>&2; \
-	  echo 'Use "$$MAKE -e SHELL=/bin/sh" in the above lines.' 1>&2; \
-	  exit 1; \
-	fi
 	@if grep 'SHELL=.*\$$MAKE' $(srcdir)/tests/*.test; then \
-	  echo '$$MAKE ignores the SHELL envvar, use "$$MAKE SHELL=/bin/sh" in' 1>&2; \
+	  echo '$$MAKE ignores the SHELL envvar, use "$$MAKE SHELL=$$SHELL" in' 1>&2; \
 	  echo 'the above lines.' 1>&2; \
 	  exit 1; \
 	fi
 ## Never use `sleep 1' to create files with different timestamps.
-## Use `sleep 2' instead.  Some filesystems (e.g., Windows') have only
+## Use `$sleep' instead.  Some filesystems (e.g., Windows') have only
 ## a 2sec resolution.
-	@if grep -E '\bsleep +1\b' $(srcdir)/tests/*.test; then \
-	  echo 'Do not use "sleep 1" in the above tests.  Use "sleep 2" instead.' 1>&2; \
+	@if grep -E '\bsleep +[12345]\b' $(srcdir)/tests/*.test; then \
+	  echo 'Do not use "sleep x" in the above tests.  Use "$$sleep" instead.' 1>&2; \
 	  exit 1; \
 	fi
 ## fgrep and egrep are not required by POSIX.
 	@if grep -E '\b[ef]grep\b' $(srcdir)/tests/*.test ; then \
-	  echo 'Do not use egrep or fgrep in test cases.  Use $FGREP or $EGREP.' 1>&2; \
+	  echo 'Do not use egrep or fgrep in test cases.  Use $$FGREP or $$EGREP.' 1>&2; \
 	  exit 1; \
 	fi
 	@if grep -E '\b[ef]grep\b' $(srcdir)/lib/am/*.am $(srcdir)/m4/*.m4; then \

@@ -6,7 +6,7 @@ eval 'case $# in 0) exec @PERL@ -S "$0";; *) exec @PERL@ -S "$0" "$@";; esac'
     if 0;
 
 # automake - create Makefile.in from Makefile.am
-# Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
+# Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 # Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
@@ -33,6 +33,15 @@ BEGIN
 {
   my $perllibdir = $ENV{'perllibdir'} || '@datadir@/@PACKAGE@-@APIVERSION@';
   unshift @INC, $perllibdir;
+
+  # Override SHELL.  This is required on DJGPP so that system() uses
+  # bash, not COMMAND.COM which doesn't quote arguments properly.
+  # Other systems aren't expected to use $SHELL when Automake
+  # runs, but it should be safe to drop the `if DJGPP' guard if
+  # it turns up other systems need the same thing.  After all,
+  # if SHELL is used, ./configure's SHELL is always better than
+  # the user's SHELL (which may be something like tcsh).
+  $ENV{'SHELL'} = '@SHELL@' if exists $ENV{'DJGPP'};
 }
 
 use Automake::Struct;
@@ -263,7 +272,7 @@ my %ac_macro_for_var =
 
 # Copyright on generated Makefile.ins.
 my $gen_copyright = "\
-# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
+# Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 # Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -594,7 +603,7 @@ my %object_compilation_map;
 
 
 # This keeps track of the directories for which we've already
-# created `.dirstamp' code.
+# created dirstamp code.
 my %directory_map;
 
 # All .P files.
@@ -1137,7 +1146,7 @@ do
     {
       if (! -f ($am_file . '.am'))
 	{
-	  &err ("`$am_file.am' does not exist");
+	  &error ("`$am_file.am' does not exist");
 	}
       else
 	{
@@ -1163,11 +1172,11 @@ sub prog_error ($;%)
   msg 'automake', '', $msg, %opts;
 }
 
-# err ($WHERE, $MESSAGE, [%OPTIONS])
-# err ($MESSAGE)
-# ----------------------------------
+# error ($WHERE, $MESSAGE, [%OPTIONS])
+# error ($MESSAGE)
+# ------------------------------------
 # Uncategorized errors.
-sub err ($;$%)
+sub error ($;$%)
 {
   my ($where, $msg, %opts) = @_;
   msg ('error', $where, $msg, %opts);
@@ -1899,8 +1908,8 @@ sub process_option_list
 	  # Got a version number.
 	  if (version_check $&)
 	    {
-	      err ($where, "require Automake $_, but have $VERSION",
-		   uniq_scope => US_GLOBAL);
+	      error ($where, "require Automake $_, but have $VERSION",
+		     uniq_scope => US_GLOBAL);
 		return 1;
 	    }
 	}
@@ -1914,8 +1923,8 @@ sub process_option_list
 	}
       else
 	{
-	  err ($where, "option `$_' not recognized",
-	       uniq_scope => US_GLOBAL);
+	  error ($where, "option `$_' not recognized",
+		 uniq_scope => US_GLOBAL);
 	  return 1;
 	}
     }
@@ -3639,7 +3648,8 @@ sub scan_texinfo_file
         $outfile = $1;
         if ($outfile =~ /\.(.+)$/ && $1 ne 'info')
           {
-	    err "$filename:$.", "output `$outfile' has unrecognized extension";
+	    error ("$filename:$.",
+		   "output `$outfile' has unrecognized extension");
             return;
           }
       }
@@ -4703,14 +4713,44 @@ sub handle_gettext
       return;
     }
 
-  my @subdirs = &variable_value_as_list_recursive ('SUBDIRS', 'all');
-  err_var 'SUBDIRS', "AM_GNU_GETTEXT used but `po' not in SUBDIRS"
-    if ! grep ($_ eq 'po', @subdirs);
-  # intl/ is not required when AM_GNU_GETTEXT is called with
-  # the `external' option.
-  err_var 'SUBDIRS', "AM_GNU_GETTEXT used but `intl' not in SUBDIRS"
-    if (! $seen_gettext_external
-	&& ! grep ($_ eq 'intl', @subdirs));
+  # Perform some sanity checks to help users get the right setup.
+  # We disable these tests when po/ doesn't exist in order not to disallow
+  # unusual gettext setups.
+  #
+  # Bruno Haible:
+  # | The idea is:
+  # |
+  # |  1) If a package doesn't have a directory po/ at top level, it
+  # |     will likely have multiple po/ directories in subpackages.
+  # |
+  # |  2) It is useful to warn for the absence of intl/ if AM_GNU_GETTEXT
+  # |     is used without 'external'. It is also useful to warn for the
+  # |     presence of intl/ if AM_GNU_GETTEXT([external]) is used. Both
+  # |     warnings apply only to the usual layout of packages, therefore
+  # |     they should both be disabled if no po/ directory is found at
+  # |     top level.
+
+  if (-d 'po')
+    {
+      my @subdirs = &variable_value_as_list_recursive ('SUBDIRS', 'all');
+
+      msg_var ('syntax', 'SUBDIRS',
+	       "AM_GNU_GETTEXT used but `po' not in SUBDIRS")
+	if ! grep ($_ eq 'po', @subdirs);
+
+      # intl/ is not required when AM_GNU_GETTEXT is called with
+      # the `external' option.
+      msg_var ('syntax', 'SUBDIRS',
+	       "AM_GNU_GETTEXT used but `intl' not in SUBDIRS")
+	if (! $seen_gettext_external
+	    && ! grep ($_ eq 'intl', @subdirs));
+
+      # intl/ should not be used with AM_GNU_GETTEXT([external])
+      msg_var ('syntax', 'SUBDIRS',
+	       "`intl' should not be in SUBDIRS when "
+	       . "AM_GNU_GETTEXT([external]) is used")
+	if ($seen_gettext_external && grep ($_ eq 'intl', @subdirs));
+    }
 
   require_file ($ac_gettext_location, GNU, 'ABOUT-NLS');
 }
@@ -5057,7 +5097,13 @@ sub handle_emacs_lisp
   my @elcfiles = map { $_ . 'c' } @elfiles;
   define_pretty_variable ('ELCFILES', '', @elcfiles);
 
-  push (@all, '$(ELCFILES)');
+  define_pretty_variable ('am__ELFILES', '', @elfiles);
+
+  # It's important that all depends on elc-stamp so that
+  # all .elc files get recompiled whenever a .el changes.
+  # It's important that all depends on $(ELCFILES) so that
+  # we can recover if any of them is deleted.
+  push (@all, 'elc-stamp', '$(ELCFILES)');
 
   require_variables ("$am_file.am", "Emacs Lisp sources seen", 'TRUE',
 		     'EMACS', 'lispdir');
@@ -5280,12 +5326,12 @@ sub scan_autoconf_traces ($)
 	}
       elsif ($macro eq 'AM_AUTOMAKE_VERSION')
         {
-	  err ($here,
-	       "version mismatch.  This is Automake $VERSION,\n" .
-	       "but the definition used by this AM_INIT_AUTOMAKE\n" .
-	       "comes from Automake $args[1].  You should recreate\n" .
-	       "aclocal.m4 with aclocal and run automake again.\n")
-	    if ($VERSION ne $args[1]);
+	  error ($here,
+		 "version mismatch.  This is Automake $VERSION,\n" .
+		 "but the definition used by this AM_INIT_AUTOMAKE\n" .
+		 "comes from Automake $args[1].  You should recreate\n" .
+		 "aclocal.m4 with aclocal and run automake again.\n")
+	    if $VERSION ne $args[1];
 
 	  $seen_automake_version = 1;
         }
@@ -5351,25 +5397,29 @@ sub scan_autoconf_files
 
     @configure_input_files = sort keys %make_list;
 
-    err_ac "`AM_INIT_AUTOMAKE' must be used"
-      if ! $seen_init_automake;
-
-    if (! $seen_automake_version)
+    if (! $seen_init_automake)
       {
-	if (-f 'aclocal.m4')
+	err_ac "`AM_INIT_AUTOMAKE' must be used";
+      }
+    else
+      {
+	if (! $seen_automake_version)
 	  {
-	    err ($seen_init_automake || $me,
-		 "your implementation of AM_INIT_AUTOMAKE comes from " .
-		 "an\nold Automake version.  You should recreate " .
-		 "aclocal.m4\nwith aclocal and run automake again.\n");
-	  }
-	else
-	  {
-	    err ($seen_init_automake || $me,
-		 "no proper implementation of AM_INIT_AUTOMAKE was " .
-		 "found,\nprobably because aclocal.m4 is missing...\n" .
-		 "You should run aclocal to create this file, then\n" .
-		 "run automake again.\n");
+	    if (-f 'aclocal.m4')
+	      {
+		error ($seen_init_automake,
+		       "your implementation of AM_INIT_AUTOMAKE comes from " .
+		       "an\nold Automake version.  You should recreate " .
+		       "aclocal.m4\nwith aclocal and run automake again.\n");
+	      }
+	    else
+	      {
+		error ($seen_init_automake,
+		       "no proper implementation of AM_INIT_AUTOMAKE was " .
+		       "found,\nprobably because aclocal.m4 is missing...\n" .
+		       "You should run aclocal to create this file, then\n" .
+		       "run automake again.\n");
+	      }
 	  }
       }
 
@@ -6106,7 +6156,7 @@ sub cond_stack_if ($$$)
 {
   my ($negate, $cond, $where) = @_;
 
-  err $where, "$cond does not appear in AM_CONDITIONAL"
+  error $where, "$cond does not appear in AM_CONDITIONAL"
     if ! $configure_cond{$cond} && $cond !~ /^TRUE|FALSE$/;
 
   $cond = "${cond}_TRUE"
@@ -6129,7 +6179,7 @@ sub cond_stack_else ($$$)
 
   if (! @cond_stack)
     {
-      err $where, "else without if";
+      error $where, "else without if";
       return;
     }
 
@@ -6143,8 +6193,8 @@ sub cond_stack_else ($$$)
       $cond = condition_negate ($cond)
 	if $negate;
 
-      err ($where, "else reminder ($negate$cond) incompatible with "
-	   . "current conditional: $cond_stack[$#cond_stack]")
+      error ($where, "else reminder ($negate$cond) incompatible with "
+	     . "current conditional: $cond_stack[$#cond_stack]")
 	if $cond_stack[$#cond_stack] ne $cond;
     }
 
@@ -6162,7 +6212,7 @@ sub cond_stack_endif ($$$)
 
   if (! @cond_stack)
     {
-      err $where, "endif without if: $negate$cond";
+      error $where, "endif without if: $negate$cond";
       return;
     }
 
@@ -6175,8 +6225,8 @@ sub cond_stack_endif ($$$)
       $cond = condition_negate ($cond)
 	if $negate;
 
-      err ($where, "endif reminder ($negate$cond) incompatible with "
-	   . "current conditional: $cond_stack[$#cond_stack]")
+      error ($where, "endif reminder ($negate$cond) incompatible with "
+	     . "current conditional: $cond_stack[$#cond_stack]")
 	if $cond_stack[$#cond_stack] ne $cond;
     }
 
@@ -6347,7 +6397,7 @@ sub macro_define ($$$$$$)
   # We will adjust the owener of this variable unless told otherwise.
   my $adjust_owner = 1;
 
-  err $where, "bad characters in variable name `$var'"
+  error $where, "bad characters in variable name `$var'"
     if $var !~ /$MACRO_PATTERN/o;
 
   # NEWS-OS 4.2R complains if a Makefile variable begins with `_'.
@@ -6375,15 +6425,15 @@ sub macro_define ($$$$$$)
 	  && exists $var_type{$var}{$cond}
 	  && $var_type{$var}{$cond} ne $type)
 	{
-	  err ($where, "$var was set with `$var_type{$var}=' "
-	       . "and is now set with `$type='");
+	  error ($where, "$var was set with `$var_type{$var}=' "
+		 . "and is now set with `$type='");
 	}
     }
   else
     {
       if (!exists $var_type{$var} && $type eq '+')
 	{
-	  err $where, "$var must be set with `=' before using `+='";
+	  error $where, "$var must be set with `=' before using `+='";
 	}
     }
   $var_type{$var}{$cond} = $type;
@@ -6470,13 +6520,13 @@ sub macro_define ($$$$$$)
 	  my @undef_cond = variable_not_always_defined_in_cond $var, $cond;
 	  if (@undef_cond != 0)
 	    {
-	      err ($where,
-		   "Cannot apply `+=' because `$var' is not defined "
-		   . "in\nthe following conditions:\n  "
-		   . join ("\n  ", @undef_cond)
-		   . "\nEither define `$var' in these conditions,"
-		   . " or use\n`+=' in the same conditions as"
-		   . " the definitions.");
+	      error ($where,
+		     "Cannot apply `+=' because `$var' is not defined "
+		     . "in\nthe following conditions:\n  "
+		     . join ("\n  ", @undef_cond)
+		     . "\nEither define `$var' in these conditions,"
+		     . " or use\n`+=' in the same conditions as"
+		     . " the definitions.");
 	    }
 	  else
 	    {
@@ -6493,7 +6543,7 @@ sub macro_define ($$$$$$)
       # If Automake tries to override a value specified by the user,
       # just don't let it do.
       if (exists $var_value{$var}{$cond}
-	  && $var_owner{$var} != VAR_AUTOMAKE
+	  && $var_owner{$var}{$cond} != VAR_AUTOMAKE
 	  && $owner == VAR_AUTOMAKE)
 	{
 	  verb ("refusing to override the user definition of:\n"
@@ -7808,7 +7858,7 @@ sub read_am_file ($)
 	}
 	elsif (/$WHITE_PATTERN/o)
 	{
-	    err "$amfile:$.", "blank line following trailing backslash"
+	    error "$amfile:$.", "blank line following trailing backslash"
 	      if $saw_bk;
 	    # Stick a single white line before the incoming macro or rule.
 	    $spacing = "\n";
@@ -7870,7 +7920,7 @@ sub read_am_file ($)
 	{
 	    # Stick a single white line before the incoming macro or rule.
 	    $spacing = "\n";
-	    err $here, "blank line following trailing backslash"
+	    error $here, "blank line following trailing backslash"
 	      if $saw_bk;
 	}
 	elsif (/$COMMENT_PATTERN/o)
@@ -7878,7 +7928,7 @@ sub read_am_file ($)
 	    # Stick comments before the incoming macro or rule.
 	    $comment .= $spacing . $_;
 	    $spacing = '';
-	    err $here, "comment following trailing backslash"
+	    error $here, "comment following trailing backslash"
 	      if $saw_bk && $comment eq '';
 	    $prev_state = IN_COMMENT;
 	}
@@ -8020,7 +8070,7 @@ sub read_am_file ($)
 	    $output_trailer .= &make_condition  (@cond_stack);
 	    $output_trailer .= $_;
 	    $comment = $spacing = '';
-	    err $here, "`#' comment at start of rule is unportable"
+	    error $here, "`#' comment at start of rule is unportable"
 	      if $_ =~ /^\t\s*\#/;
 	}
 
@@ -8247,9 +8297,9 @@ sub file_contents_internal ($$%)
     foreach (make_paragraphs ($file, %transform))
     {
         # Sanity checks.
-	err $file, "blank line following trailing backslash:\n$_"
+	error $file, "blank line following trailing backslash:\n$_"
 	  if /\\$/;
-	err $file, "comment following trailing backslash:\n$_"
+	error $file, "comment following trailing backslash:\n$_"
 	  if /\\#/;
 
  	if (/^$/)
@@ -8368,7 +8418,7 @@ sub file_contents_internal ($$%)
  	elsif (/$ASSIGNMENT_PATTERN/mso)
  	{
 	    my ($var, $type, $val) = ($1, $2, $3);
- 	    err $file, "variable `$var' with trailing backslash"
+ 	    error $file, "variable `$var' with trailing backslash"
 	      if /\\$/;
 
 	    $is_rule = 0;
@@ -9019,23 +9069,28 @@ sub require_conf_file_with_macro ($$$@)
 # dependent upon.
 sub require_build_directory ($)
 {
-    my $directory = shift;
-    my $dirstamp = "$directory/.dirstamp";
+  my $directory = shift;
+  my $dirstamp = "$directory/\$(am__dirstamp)";
 
-    # Don't emit the rule twice.
-    if (! defined $directory_map{$directory})
+  # Don't emit the rule twice.
+  if (! defined $directory_map{$directory})
     {
-	$directory_map{$directory} = 1;
+      $directory_map{$directory} = 1;
 
-	# Directory must be removed by `make distclean'.
-	$clean_files{$dirstamp} = DIST_CLEAN;
+      # Set a variable for the dirstamp basename.
+      define_pretty_variable ('am__dirstamp', 'TRUE',
+			      '$(am__leading_dot)dirstamp')
+	unless variable_defined ('am__dirstamp');
 
-	$output_rules .= ("$dirstamp:\n"
-			  . "\t\@\$(mkinstalldirs) $directory\n"
-			  . "\t\@: > $dirstamp\n");
+      # Directory must be removed by `make distclean'.
+      $clean_files{$dirstamp} = DIST_CLEAN;
+
+      $output_rules .= ("$dirstamp:\n"
+			. "\t\@\$(mkinstalldirs) $directory\n"
+			. "\t\@: > $dirstamp\n");
     }
 
-    return $dirstamp;
+  return $dirstamp;
 }
 
 # &require_build_directory_maybe ($FILE)
@@ -9185,7 +9240,7 @@ sub require_variables ($$$@)
 	    . "`autoconf' again.";
 	}
 
-      err $where, $text, uniq_scope => US_GLOBAL;
+      error $where, $text, uniq_scope => US_GLOBAL;
     }
   return $res;
 }
@@ -9308,7 +9363,7 @@ sub version ()
 automake (GNU $PACKAGE) $VERSION
 Written by Tom Tromey <tromey\@redhat.com>.
 
-Copyright 2002 Free Software Foundation, Inc.
+Copyright 2003 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 EOF

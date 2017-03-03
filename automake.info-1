@@ -1,4 +1,4 @@
-This is automake.info, produced by makeinfo version 4.2 from
+This is automake.info, produced by makeinfo version 4.3d from
 automake.texi.
 
 INFO-DIR-SECTION GNU programming tools
@@ -11,9 +11,9 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.7.2
+   This file documents GNU automake 1.7.3
 
-   Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free
+   Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Free
 Software Foundation, Inc.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -38,7 +38,7 @@ GNU Automake
 
    This file documents the GNU Automake package.  Automake is a program
 which creates GNU standards-compliant Makefiles from template files.
-This edition documents version 1.7.2.
+This edition documents version 1.7.3.
 
 * Menu:
 
@@ -67,6 +67,7 @@ This edition documents version 1.7.2.
 * Extending::                   Extending Automake
 * Distributing::                Distributing the Makefile.in
 * API versioning::              About compatibility between Automake versions
+* FAQ::                         Frequently Asked Questions
 * Macro and Variable Index::
 * General Index::
 
@@ -439,6 +440,7 @@ of them, and we list them here.
      instance, multiple `yacc' instances can be invoked in a single
      directory in parallel.
 
+
 
 File: automake.info,  Node: Examples,  Next: Invoking Automake,  Prev: Generalities,  Up: Top
 
@@ -490,12 +492,12 @@ program.  The `aclocal' program lets you put your own macros into
 `zardoz' is a user program, you want to install it where the rest of
 the user programs go: `bindir'.  Additionally, `zardoz' has some
 Texinfo documentation.  Your `configure.in' script uses
-`AC_REPLACE_FUNCS', so you need to link against `@LIBOBJS@'.  So here's
-what you'd write:
+`AC_REPLACE_FUNCS', so you need to link against `$(LIBOBJS)'.  So
+here's what you'd write:
 
      bin_PROGRAMS = zardoz
      zardoz_SOURCES = main.c head.c float.c vortex9.c gun.c
-     zardoz_LDADD = @LIBOBJS@
+     zardoz_LDADD = $(LIBOBJS)
      
      info_TEXINFOS = zardoz.texi
 
@@ -713,6 +715,12 @@ purpose.
      tries to make a symbolic link pointing to its own copy of the
      missing file; this can be changed with `--copy'.
 
+     Many of the potentially-missing files are common scripts whose
+     location may be specified via the `AC_CONFIG_AUX_DIR' macro.
+     Therefore, `AC_CONFIG_AUX_DIR''s setting affects whether a file is
+     considered missing, and where the missing file is added (*note
+     Optional::).
+
 `--libdir=DIR'
      Look for Automake data files in directory DIR instead of in the
      installation directory.  This is typically used for debugging.
@@ -827,6 +835,7 @@ purpose.
      is also used by other tools like `autoconf'; unknown categories
      are ignored for this reason.
 
+
 
 File: automake.info,  Node: configure,  Next: Top level,  Prev: Invoking Automake,  Up: Top
 
@@ -897,11 +906,21 @@ recognized macros and their effects are:
 `AC_CONFIG_AUX_DIR'
      Automake will look for various helper scripts, such as
      `mkinstalldirs', in the directory named in this macro invocation.
-     If not seen, the scripts are looked for in their `standard'
-     locations (either the top source directory, or in the source
-     directory corresponding to the current `Makefile.am', whichever is
-     appropriate).  *Note Finding `configure' Input: (autoconf)Input.
-     FIXME: give complete list of things looked for in this directory
+     (The full list of scripts is: `config.guess', `config.sub',
+     `depcomp', `elisp-comp', `compile', `install-sh', `ltmain.sh',
+     `mdate-sh', `missing', `mkinstalldirs', `py-compile',
+     `texinfo.tex', and `ylwrap'.)  Not all scripts are always searched
+     for; some scripts will only be sought if the generated
+     `Makefile.in' requires them.
+
+     If `AC_CONFIG_AUX_DIR' is not given, the scripts are looked for in
+     their `standard' locations.  For `mdate-sh', `texinfo.tex', and
+     `ylwrap', the standard location is the source directory
+     corresponding to the current `Makefile.am'.  For the rest, the
+     standard location is the first one of `.', `..', or `../..'
+     (relative to the top source directory) that provides any one of
+     the helper scripts.  *Note Finding `configure' Input:
+     (autoconf)Input.
 
 `AC_CANONICAL_HOST'
      Automake will ensure that `config.guess' and `config.sub' exist.
@@ -990,6 +1009,7 @@ recognized macros and their effects are:
      `maintainer-only' rules to be turned off by default in the
      generated `Makefile.in's. This macro defines the `MAINTAINER_MODE'
      conditional, which you can use in your own `Makefile.am'.
+
 
 
 File: automake.info,  Node: Invoking aclocal,  Next: aclocal options,  Prev: Optional,  Up: configure

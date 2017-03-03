@@ -1,4 +1,4 @@
-This is automake.info, produced by makeinfo version 4.2 from
+This is automake.info, produced by makeinfo version 4.3d from
 automake.texi.
 
 INFO-DIR-SECTION GNU programming tools
@@ -11,9 +11,9 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.7.2
+   This file documents GNU automake 1.7.3
 
-   Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free
+   Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Free
 Software Foundation, Inc.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -29,6 +29,86 @@ permission notice identical to this one.
 manual into another language, under the above conditions for modified
 versions, except that this permission notice may be stated in a
 translation approved by the Foundation.
+
+
+File: automake.info,  Node: Fortran 77 Support,  Next: Java Support,  Prev: Assembly Support,  Up: Programs
+
+Fortran 77 Support
+==================
+
+   Automake includes full support for Fortran 77.
+
+   Any package including Fortran 77 code must define the output variable
+`F77' in `configure.in'; the simplest way to do this is to use the
+`AC_PROG_F77' macro (*note Particular Program Checks:
+(autoconf)Particular Programs.).  *Note Fortran 77 and Autoconf::.
+
+   A few additional variables are defined when a Fortran 77 source file
+is seen:
+
+`F77'
+     The name of the Fortran 77 compiler.
+
+`FFLAGS'
+     Any flags to pass to the Fortran 77 compiler.
+
+`AM_FFLAGS'
+     The maintainer's variant of `FFLAGS'.
+
+`RFLAGS'
+     Any flags to pass to the Ratfor compiler.
+
+`AM_RFLAGS'
+     The maintainer's variant of `RFLAGS'.
+
+`F77COMPILE'
+     The command used to actually compile a Fortran 77 source file.
+     The file name is appended to form the complete command line.
+
+`FLINK'
+     The command used to actually link a pure Fortran 77 program or
+     shared library.
+
+
+   Automake can handle preprocessing Fortran 77 and Ratfor source files
+in addition to compiling them(1).  Automake also contains some support
+for creating programs and shared libraries that are a mixture of
+Fortran 77 and other languages (*note Mixing Fortran 77 With C and
+C++::).
+
+   These issues are covered in the following sections.
+
+* Menu:
+
+* Preprocessing Fortran 77::
+* Compiling Fortran 77 Files::
+* Mixing Fortran 77 With C and C++::
+* Fortran 77 and Autoconf::
+
+   ---------- Footnotes ----------
+
+   (1) Much, if not most, of the information in the following sections
+pertaining to preprocessing Fortran 77 programs was taken almost
+verbatim from *Note Catalogue of Rules: (make)Catalogue of Rules.
+
+
+File: automake.info,  Node: Preprocessing Fortran 77,  Next: Compiling Fortran 77 Files,  Prev: Fortran 77 Support,  Up: Fortran 77 Support
+
+Preprocessing Fortran 77
+------------------------
+
+   `N.f' is made automatically from `N.F' or `N.r'.  This rule runs
+just the preprocessor to convert a preprocessable Fortran 77 or Ratfor
+source file into a strict Fortran 77 source file.  The precise command
+used is as follows:
+
+`.F'
+     `$(F77) -F $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS)
+     $(AM_FFLAGS) $(FFLAGS)'
+
+`.r'
+     `$(F77) -F $(AM_FFLAGS) $(FFLAGS) $(AM_RFLAGS) $(RFLAGS)'
+
 
 
 File: automake.info,  Node: Compiling Fortran 77 Files,  Next: Mixing Fortran 77 With C and C++,  Prev: Preprocessing Fortran 77,  Up: Fortran 77 Support
@@ -48,6 +128,7 @@ the Fortran 77 compiler.  The precise command used is as follows:
 
 `.r'
      `$(F77) -c $(AM_FFLAGS) $(FFLAGS) $(AM_RFLAGS) $(RFLAGS)'
+
 
 
 File: automake.info,  Node: Mixing Fortran 77 With C and C++,  Next: Fortran 77 and Autoconf,  Prev: Compiling Fortran 77 Files,  Up: Fortran 77 Support
@@ -261,20 +342,15 @@ For instance, suppose the package has ANSI C code in the `src' and
    If no directory prefix is given, the files are assumed to be in the
 current directory.
 
-   Files mentioned in `LIBOBJS' which need de-ANSI-fication will not be
-automatically handled.  That's because `configure' will generate an
-object name like `regex.o', while `make' will be looking for `regex_.o'
-(when de-ANSI-fying).  Eventually this problem will be fixed via
-`autoconf' magic, but for now you must put this code into your
-`configure.in', just before the `AC_OUTPUT' call:
-
-     # This is necessary so that .o files in LIBOBJS are also built via
-     # the ANSI2KNR-filtering rules.
-     LIBOBJS=`echo $LIBOBJS|sed 's/\.o /\$U.o /g;s/\.o$/\$U.o/'`
-
    Note that automatic de-ANSI-fication will not work when the package
 is being built for a different host architecture.  That is because
 automake currently has no way to build `ansi2knr' for the build machine.
+
+   Using `LIBOBJS' with source de-ANSI-fication used to require
+hand-crafted code in `configure' to append `$U' to basenames in
+`LIBOBJS'.  This is no longer true today.  Starting with version 2.54,
+Autoconf takes care of rewriting `LIBOBJS' and `LTLIBOBJS'.  (*note
+`AC_LIBOBJ' vs. `LIBOBJS': (autoconf)AC_LIBOBJ vs LIBOBJS.)
 
 
 File: automake.info,  Node: Dependencies,  Next: EXEEXT,  Prev: ANSI,  Up: Programs
@@ -513,7 +589,7 @@ source), because it's a known dependency of the associated object.
    It might be important to emphasize that `BUILT_SOURCES' is honored
 only by `make all' and `make check'.  This means you cannot build a
 specific target (e.g., `make foo') in a clean tree if it depends on a
-built source.  However if it will succeed if you have run `make all'
+built source.  However it will succeed if you have run `make all'
 earlier, because accurate dependencies are already available.
 
    The next section illustrates and discusses the handling of built
@@ -847,12 +923,12 @@ Python installation found during configuration.
      This is currently the value of `sys.version[:3]'.
 
 `PYTHON_PREFIX'
-     The string `$prefix'.  This term may be used in future work which
-     needs the contents of Python's `sys.prefix', but general consensus
-     is to always use the value from configure.
+     The string `${prefix}'.  This term may be used in future work
+     which needs the contents of Python's `sys.prefix', but general
+     consensus is to always use the value from configure.
 
 `PYTHON_EXEC_PREFIX'
-     The string `$exec_prefix'.  This term may be used in future work
+     The string `${exec_prefix}'.  This term may be used in future work
      which needs the contents of Python's `sys.exec_prefix', but general
      consensus is to always use the value from configure.
 
@@ -877,6 +953,14 @@ Python installation found during configuration.
 `pkgpyexecdir'
      This is a convenience variable which is defined as
      `$(pyexecdir)/$(PACKAGE)'.
+
+   All these directory variables have values that start with either
+`${prefix}' or `${exec_prefix}' unexpanded.  This works fine in
+`Makefiles', but it makes these variables hard to use in `configure'.
+This is mandated by the GNU conding standard, so that the user can run
+`make prefix=/foo install'.  The Autoconf manual has a section with
+more details on this topic (*note Installation Directory Variables:
+(autoconf)Installation Directory Variables.).
 
 
 File: automake.info,  Node: Documentation,  Next: Install,  Prev: Other GNU Tools,  Up: Top

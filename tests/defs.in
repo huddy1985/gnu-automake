@@ -1,5 +1,5 @@
 # -*- shell-script -*-
-# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
+# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 # Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
@@ -92,6 +92,20 @@ then
 	echo "$me: running $CXX --version"
 	( $CXX --version ) || exit 77
 	;;
+      icc)
+        CC=icc
+	export CC
+	# There is no way to ask *only* the compiler's version.
+	# This tool always want to do something (by default
+	# it will try link *nothing* and complain it cannot find
+	# main(); funny).  -dryrun is a workaround.
+	echo "$me: running $CC -V -dryrun"
+	( $CC -V -dryrun ) || exit 77
+	;;
+      makedepend)
+	echo "$me: running makedepend -f-"
+	( makedepend -f- ) || exit 77
+	;;
       non-root)
 	# Skip this test case if the user is root.
 	# We try to append to a read-only file to detect this.
@@ -107,6 +121,17 @@ then
 	# Python doesn't support --version, it has -V
 	echo "$me: running python -V"
 	( python -V ) || exit 77
+	;;
+      ro-dir)
+	# Skip this test case if read-only directories aren't supported
+	# (e.g., under DOS.)
+	ro_dir_temp=ro_dir.$$
+	mkdir $ro_dir_temp || exit 1
+	chmod a-w $ro_dir_temp || exit 1
+	(: > $ro_dir_temp/probe) >/dev/null 2>/dev/null
+	create_status=$?
+	rm -rf $ro_dir_temp
+	test $create_status = 0 && exit 77
 	;;
       tex)
         # No all versions of Tex support `--version', so we use
@@ -200,10 +225,10 @@ fi
 
 # We might need extra macros, e.g., from Libtool or Gettext.
 # Find them on the system.
-# Use `-I $srcdir/../m4' in addition to `--acdir', because the
+# Use `-I $srcdir/../m4' in addition to `--acdir=$srcdir/../m4', because the
 # other `-I' directories added for libtool and gettext might contain
 # files from an old version of Automake that we don't want to use.
-aclocaldir=`(aclocal --print-ac-dir) 2>/dev/null`
+aclocaldir='@prefix@/share/aclocal'
 extra_includes=""
 if [ -f $aclocaldir/dirlist ] ; then
    extra_includes=`(tmp_inc=""
@@ -243,6 +268,12 @@ export AUTOMAKE ACLOCAL
 # but some hosts lack 'grep -E' and 'grep -F'.
 EGREP='@EGREP@'
 FGREP='@FGREP@'
+
+# On Windows '95, '98 and ME, files modifications have 2-seconds
+# granularity and can be up to 3 seconds in the future w.r.t. the
+# system clock.  When it is important to ensure one file is older
+# than another we wait at least 5 seconds between creations.
+sleep='sleep 5'
 
 # The tests call `make -e' but we do not want $srcdir from the evironment
 # to override the definition from the Makefile.

@@ -9,6 +9,7 @@ Alan Modra		amodra@bigpond.net.au
 Alex Hornby		alex@anvil.co.uk
 Alexander Mai		st002279@hrzpub.tu-darmstadt.de
 Alexander V. Lukyanov	lav@yars.free.net
+Alexander Turbov	zaufi@sendmail.ru
 Alexandre Duret-Lutz	duret_g@epita.fr
 Alexey Mahotkin		alexm@hsys.msk.ru
 Andreas Buening		andreas.buening@nexgo.de
@@ -70,10 +71,13 @@ Gordon Sadler		gbsadler1@lcisp.com
 Greg A. Woods		woods@most.weird.com
 Guido Draheim		guidod@gmx.de
 Gustavo Carneiro	gjc@inescporto.pt
+Gwenole Beauchesne      gbeauchesne@mandrakesoft.com
 H.J. Lu			hjl@lucon.org
+H.Merijn Brand		h.m.brand@hccnet.nl
 Harlan Stenn		Harlan.Stenn@pfcs.com
 Henrik Frystyk Nielsen	frystyk@w3.org
 Ian Lance Taylor	ian@cygnus.com
+Imacat			imacat@mail.imacat.idv.tw
 Inoue			inoue@ainet.or.jp
 James Henstridge	james@daa.com.au
 James Youngman		jay@gnu.org
@@ -83,7 +87,9 @@ Jason Duell		jcduell@lbl.gov
 Jason Molenda		crash@cygnus.co.jp
 Jeff Bailey		Jbailey@phn.ca
 Jeff Garzik		jgarzik@pobox.com
+Jeff Squyres		jsquyres@lam-mpi.org
 Jens Krüger		jens_krueger@physik.tu-muenchen.de
+Jeremy Nimmer		jwnimmer@alum.mit.edu
 Jerome Lovy		jlovy@multimania.com
 Jerome Santini		santini@chambord.univ-orleans.fr
 Jim Meyering		meyering@na-net.ornl.gov
@@ -171,6 +177,7 @@ Ralph Schleicher	rs@purple.UL.BaWue.DE
 Ramón García Fernández	ramon@jl1.quim.ucm.es
 Rich Wales		richw@webcom.com
 Richard Boulton		richard@tartarus.org
+Richard Dawe		rich@phekda.freeserve.co.uk
 Rob Savoye		rob@cygnus.com
 Robert Bihlmeyer	robbe@orcus.priv.at
 Robert Boehne		rboehne@ricardo-us.com
@@ -179,11 +186,13 @@ Ronald Landheer		ronald@landheer.com
 Rusty Ballinger		rusty@rlyeh.engr.sgi.com
 Ryan T. Sammartino	ryants@shaw.ca
 Sam Hocevar		sam@zoy.org
+Sander Niemeijer	niemeijer@science-and-technology.nl
 Sergey Vlasov		vsu@mivlgu.murom.ru
 Seth Alves		alves@hungry.com
 Shuhei Amakawa		sa264@cam.ac.uk
 Shigio Yamaguchi	shigio@tamacom.com
 Simon Richter		sjr@debian.org
+Stepan Kasal		kasal@math.cas.cz
 Steve M. Robbins	steve@nyongwa.montreal.qc.ca
 Sven Verdoolaege	skimo@kotnet.org
 Tamara L. Dahlgren	dahlgren1@llnl.gov
@@ -200,4 +209,5 @@ Tom Epperly		tepperly@llnl.gov
 Ulrich Drepper		drepper@gnu.ai.mit.edu
 Vadim Zeitlin		Vadim.zeitlin@dptmaths.ens-cachan.fr
 Werner Koch		wk@isil.d.shuttle.de
+William S Fulton	wsf@fultondesigns.co.uk
 Yann Droneaud		ydroneaud@meuh.eu.org

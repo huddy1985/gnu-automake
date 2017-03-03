@@ -1,4 +1,4 @@
-This is automake.info, produced by makeinfo version 4.2 from
+This is automake.info, produced by makeinfo version 4.3d from
 automake.texi.
 
 INFO-DIR-SECTION GNU programming tools
@@ -11,9 +11,9 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.7.2
+   This file documents GNU automake 1.7.3
 
-   Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free
+   Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Free
 Software Foundation, Inc.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -178,6 +178,7 @@ Public macros
      defined.  If `--without-regex' is given, then the `rx' regular
      expression library is used, and `rx.o' is put into `LIBOBJS'.
 
+
 
 File: automake.info,  Node: Private macros,  Prev: Public macros,  Up: Macros
 
@@ -213,6 +214,7 @@ skip this section!
      directory is newer than a file in the source directory.  This can
      fail on systems where the clock is set incorrectly.  This macro is
      automatically run from `AM_INIT_AUTOMAKE'.
+
 
 
 File: automake.info,  Node: Extending aclocal,  Prev: Macros,  Up: configure
@@ -678,9 +680,14 @@ File: automake.info,  Node: Conditional Programs,  Prev: Conditional Sources,  U
 Conditional compilation of programs
 -----------------------------------
 
-   Sometimes it is useful to determine the programs that are to be
-built at configure time.  For instance, GNU `cpio' only builds `mt' and
-`rmt' under special circumstances.
+   Sometimes it is useful to determine the programs that are to be built
+at configure time.  For instance, GNU `cpio' only builds `mt' and `rmt'
+under special circumstances.  The means to achieve conditional
+compilation of programs are the same you can use to compile source
+files conditionally: substitutions or conditionals.
+
+Conditional programs using `configure' substitutions
+....................................................
 
    In this case, you must notify Automake of all the programs that can
 possibly be built, but at the same time cause the generated
@@ -689,8 +696,31 @@ done by having `configure' substitute values into each `_PROGRAMS'
 definition, while listing all optionally built programs in
 `EXTRA_PROGRAMS'.
 
-   Of course you can use Automake conditionals to determine the
-programs to be built.
+     bin_PROGRAMS = cpio pax $(MT)
+     libexec_PROGRAMS = $(RMT)
+     EXTRA_PROGRAMS = mt rmt
+
+   As explained in *Note EXEEXT::, Automake will rewrite
+`bin_PROGRAMS', `libexec_PROGRAMS', and `EXTRA_PROGRAMS', appending
+`$(EXEEXT)' to each binary.  Obviously it cannot rewrite values
+obtained at run-time through `configure' substitutions, therefore you
+should take care of appending `$(EXEEXT)' yourself, as in
+`AC_SUBST([MT], ['mt${EXEEXT}'])'.
+
+Conditional programs using Automake conditionals
+................................................
+
+   You can also use Automake conditionals (*note Conditionals::) to
+select programs to be built.  In this case you don't have to worry
+about `$(EXEEXT)' or `EXTRA_PROGRAMS'.
+
+     bin_PROGRAMS = cpio pax
+     if WANT_MT
+       bin_PROGRAMS += mt
+     endif
+     if WANT_RMT
+       libexec_PROGRAMS = rmt
+     endif
 
 
 File: automake.info,  Node: A Library,  Next: A Shared Library,  Prev: A Program,  Up: Programs
@@ -721,7 +751,7 @@ corresponding to `liblob.a' is `liblob_a_SOURCES', not
 variable.  This should be used for objects determined by `configure'.
 Again from `cpio':
 
-     libcpio_a_LIBADD = @LIBOBJS@ @ALLOCA@
+     libcpio_a_LIBADD = $(LIBOBJS) $(ALLOCA)
 
    In addition, sources for extra objects that will not exist until
 configure-time must be added to the `BUILT_SOURCES' variable (*note
@@ -755,8 +785,8 @@ of extra libtool objects (`.lo' files) to add to the shared library.
 The `LIBRARY_LDFLAGS' variable contains any additional libtool flags,
 such as `-version-info' or `-static'.
 
-   Where an ordinary library might include `@LIBOBJS@', a libtool
-library must use `@LTLIBOBJS@'.  This is required because the object
+   Where an ordinary library might include `$(LIBOBJS)', a libtool
+library must use `$(LTLIBOBJS)'.  This is required because the object
 files that libtool operates on do not necessarily end in `.o'.  The
 libtool manual contains more details on this topic.
 
@@ -853,14 +883,14 @@ libraries differ.
           libmaude_a_AR = $(CXX) -ar -o
 
 `maude_LIBADD'
-     Extra objects can be added to a library using the `_LIBADD'
-     variable.  This should be used for objects determined by
-     `configure'.
+     Extra objects can be added to a _library_ using the `_LIBADD'
+     variable.  For instance this should be used for objects determined
+     by `configure' (*note A Library::).
 
 `maude_LDADD'
-     Extra objects can be added to a shared library or a program by
-     listing them in the `_LDADD' variable.  This should be used for
-     objects determined by `configure'.
+     Extra objects can be added to a _program_ by listing them in the
+     `_LDADD' variable.  For instance this should be used for objects
+     determined by `configure' (*note Linking::).
 
      `_LDADD' and `_LIBADD' are inappropriate for passing
      program-specific linker flags (except for `-l', `-L', `-dlopen'
@@ -955,15 +985,15 @@ File: automake.info,  Node: LIBOBJS,  Next: Program variables,  Prev: Program an
 Special handling for LIBOBJS and ALLOCA
 =======================================
 
-   Automake explicitly recognizes the use of `@LIBOBJS@' and
-`@ALLOCA@', and uses this information, plus the list of `LIBOBJS' files
-derived from `configure.in' to automatically include the appropriate
-source files in the distribution (*note Dist::).  These source files
-are also automatically handled in the dependency-tracking scheme; see
-*Note Dependencies::.
+   Automake explicitly recognizes the use of `$(LIBOBJS)' and
+`$(ALLOCA)', and uses this information, plus the list of `LIBOBJS'
+files derived from `configure.in' to automatically include the
+appropriate source files in the distribution (*note Dist::).  These
+source files are also automatically handled in the dependency-tracking
+scheme; see *Note Dependencies::.
 
-   `@LIBOBJS@' and `@ALLOCA@' are specially recognized in any `_LDADD'
-or `_LIBADD' variable.
+   `$(LIBOBJS)' and `$(ALLOCA)' are specially recognized in any
+`_LDADD' or `_LIBADD' variable.
 
 
 File: automake.info,  Node: Program variables,  Next: Yacc and Lex,  Prev: LIBOBJS,  Up: Programs
@@ -1058,10 +1088,24 @@ macro `AC_PROG_YACC' (*note Particular Program Checks:
 former is a user variable and the latter is intended for the
 `Makefile.am' author.
 
-   Similarly, if a `lex' source file is seen, then your `configure.in'
-must define the variable `LEX'.  You can use `AC_PROG_LEX' to do this
-(*note Particular Program Checks: (autoconf)Particular Programs.), but
-using `AM_PROG_LEX' macro (*note Macros::) is recommended.
+   `AM_YFLAGS' is usually used to pass the `-d' option to `yacc'.
+Automake knows what this means and will automatically adjust its rules
+to update and distribute the header file built by `yacc -d'.  What
+Automake cannot guess, though, is where this header will be used: it is
+up to you to ensure the header gets built before it is first used.
+Typically this is necessary in order for dependency tracking to work
+when the header is included by another file.  The common solution is
+listing the header file in `BUILT_SOURCES' (*note Sources::) as follows.
+
+     BUILT_SOURCES = parser.h
+     AM_YFLAGS = -d
+     bin_PROGRAMS = foo
+     foo_SOURCES = ... parser.y ...
+
+   If a `lex' source file is seen, then your `configure.in' must define
+the variable `LEX'.  You can use `AC_PROG_LEX' to do this (*note
+Particular Program Checks: (autoconf)Particular Programs.), but using
+`AM_PROG_LEX' macro (*note Macros::) is recommended.
 
    When `lex' is invoked, it is passed `LFLAGS' and `AM_LFLAGS'.  The
 former is a user variable and the latter is intended for the
@@ -1181,82 +1225,4 @@ the C compiler flags.
 
    Only the suffixes `.s' and `.S' are recognized by `automake' as
 being files containing assembly code.
-
-
-File: automake.info,  Node: Fortran 77 Support,  Next: Java Support,  Prev: Assembly Support,  Up: Programs
-
-Fortran 77 Support
-==================
-
-   Automake includes full support for Fortran 77.
-
-   Any package including Fortran 77 code must define the output variable
-`F77' in `configure.in'; the simplest way to do this is to use the
-`AC_PROG_F77' macro (*note Particular Program Checks:
-(autoconf)Particular Programs.).  *Note Fortran 77 and Autoconf::.
-
-   A few additional variables are defined when a Fortran 77 source file
-is seen:
-
-`F77'
-     The name of the Fortran 77 compiler.
-
-`FFLAGS'
-     Any flags to pass to the Fortran 77 compiler.
-
-`AM_FFLAGS'
-     The maintainer's variant of `FFLAGS'.
-
-`RFLAGS'
-     Any flags to pass to the Ratfor compiler.
-
-`AM_RFLAGS'
-     The maintainer's variant of `RFLAGS'.
-
-`F77COMPILE'
-     The command used to actually compile a Fortran 77 source file.
-     The file name is appended to form the complete command line.
-
-`FLINK'
-     The command used to actually link a pure Fortran 77 program or
-     shared library.
-
-   Automake can handle preprocessing Fortran 77 and Ratfor source files
-in addition to compiling them(1).  Automake also contains some support
-for creating programs and shared libraries that are a mixture of
-Fortran 77 and other languages (*note Mixing Fortran 77 With C and
-C++::).
-
-   These issues are covered in the following sections.
-
-* Menu:
-
-* Preprocessing Fortran 77::
-* Compiling Fortran 77 Files::
-* Mixing Fortran 77 With C and C++::
-* Fortran 77 and Autoconf::
-
-   ---------- Footnotes ----------
-
-   (1) Much, if not most, of the information in the following sections
-pertaining to preprocessing Fortran 77 programs was taken almost
-verbatim from *Note Catalogue of Rules: (make)Catalogue of Rules.
-
-
-File: automake.info,  Node: Preprocessing Fortran 77,  Next: Compiling Fortran 77 Files,  Prev: Fortran 77 Support,  Up: Fortran 77 Support
-
-Preprocessing Fortran 77
-------------------------
-
-   `N.f' is made automatically from `N.F' or `N.r'.  This rule runs
-just the preprocessor to convert a preprocessable Fortran 77 or Ratfor
-source file into a strict Fortran 77 source file.  The precise command
-used is as follows:
-
-`.F'
-     `$(F77) -F $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS)
-     $(AM_FFLAGS) $(FFLAGS)'
-
-`.r'
-     `$(F77) -F $(AM_FFLAGS) $(FFLAGS) $(AM_RFLAGS) $(RFLAGS)'
 

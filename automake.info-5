@@ -1,4 +1,4 @@
-This is automake.info, produced by makeinfo version 4.2 from
+This is automake.info, produced by makeinfo version 4.3d from
 automake.texi.
 
 INFO-DIR-SECTION GNU programming tools
@@ -11,9 +11,9 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.7.2
+   This file documents GNU automake 1.7.3
 
-   Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free
+   Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Free
 Software Foundation, Inc.
 
    Permission is granted to make and distribute verbatim copies of this
@@ -29,6 +29,326 @@ permission notice identical to this one.
 manual into another language, under the above conditions for modified
 versions, except that this permission notice may be stated in a
 translation approved by the Foundation.
+
+
+File: automake.info,  Node: distcleancheck,  Prev: wildcards,  Up: FAQ
+
+Files left in build directory after distclean
+=============================================
+
+   This is a diagnostic you might encounter while running `make
+distcheck'.
+
+   As explained in *Note Dist::, `make distcheck' attempts to build and
+check your package for errors like this one.
+
+   `make distcheck' will perform a `VPATH' build of your package, and
+then call `make distclean'.  Files left in the build directory after
+`make distclean' has run are listed after this error.
+
+   This diagnostic really covers two kinds of errors:
+
+   * files that are forgotten by distclean;
+
+   * distributed files that are erroneously rebuilt.
+
+   The former left-over files are not distributed, so the fix is to mark
+them for cleaning (*note Clean::), this is obvious and doesn't deserve
+more explanations.
+
+   The latter bug is not always easy to understand and fix, so let's
+proceed with an example.  Suppose our package contains a program for
+which we want to build a man page using `help2man'.  GNU `help2man'
+produces simple manual pages from the `--help' and `--version' output
+of other commands (*note Overview: (help2man)Top.).  Because we don't
+want our users to install `help2man', we decide to distribute the
+generated man page using the following setup.
+
+     # This Makefile.am is bogus.
+     bin_PROGRAMS = foo
+     foo_SOURCES = foo.c
+     dist_man_MANS = foo.1
+     
+     foo.1: foo$(EXEEXT)
+     	help2man --output=foo.1 ./foo$(EXEEXT)
+
+   This will effectively distribute the man page.  However, `make
+distcheck' will fail with:
+
+     ERROR: files left in build directory after distclean:
+     ./foo.1
+
+   Why was `foo.1' rebuilt?  Because although distributed, `foo.1'
+depends on a non-distributed built file: `foo$(EXEEXT)'.
+`foo$(EXEEXT)' is built by the user, so it will always appear to be
+newer than the distributed `foo.1'.
+
+   `make distcheck' caught an inconsistency in our package.  Our intent
+was to distribute `foo.1' so users do not need installing `help2man',
+however since this our rule causes this file to be always rebuilt,
+users _do_ need `help2man'.  Either we should ensure that `foo.1' is
+not rebuilt by users, or there is no point in distributing `foo.1'.
+
+   More generally, the rule is that distributed files should never
+depend on non-distributed built files.  If you distribute something
+generated, distribute its sources.
+
+   One way to fix the above example, while still distributing `foo.1'
+is to not depend on `foo$(EXEEXT)'.  For instance, assuming `foo
+--version' and `foo --help' do not change unless `foo.c' or
+`configure.ac' change, we could write the following `Makefile.am':
+
+     bin_PROGRAMS = foo
+     foo_SOURCES = foo.c
+     dist_man_MANS = foo.1
+     
+     foo.1: foo.c $(top_srcdir)/configure.ac
+             $(MAKE) $(AM_MAKEFLAGS) foo$(EXEEXT)
+     	help2man --output=foo.1 ./foo$(EXEEXT)
+
+   This way, `foo.1' will not get rebuilt every time `foo$(EXEEXT)'
+changes.  The `make' call makes sure `foo$(EXEEXT)' is up-to-date
+before `help2man'.  Another way to ensure this would be to use separate
+directories for binaries and man pages, and set `SUBDIRS' so that
+binaries are built before man pages.
+
+   We could also decide not to distribute `foo.1'.  In this case it's
+fine to have `foo.1' dependent upon `foo$(EXEEXT)', since both will
+have to be rebuilt.  However it would be impossible to build the
+package in a cross-compilation, because building `foo.1' involves an
+_execution_ of `foo$(EXEEXT)'.
+
+   Another context where such errors are common is when distributed
+files are built by tools which are built by the package.  The pattern
+is similar:
+
+     distributed-file: built-tools distributed-sources
+             build-command
+
+should be changed to
+
+     distributed-file: distributed-sources
+             $(MAKE) $(AM_MAKEFLAGS) built-tools
+             build-command
+
+or you could choose not to distribute `distributed-file', if
+cross-compilation does not matter.
+
+   The points made through these examples are worth a summary:
+
+   * Distributed files should never depend upon non-distributed built
+     files.
+
+   * Distributed files should be distributed will all their
+     dependencies.
+
+   * If a file is _intended_ be rebuilt by users, there is no point in
+     distributing it.
+
+   For desperate cases, it's always possible to disable this check by
+setting `distcleancheck_listfiles' as documented in *Note Dist::.  Make
+sure you do understand the reason why `make distcheck' complains before
+you do this.  `distcleancheck_listfiles' is a way to _hide_ errors, not
+to fix them.  There is always better to do.
+
+
+File: automake.info,  Node: Macro and Variable Index,  Next: General Index,  Prev: FAQ,  Up: Top
+
+Macro and Variable Index
+************************
+
+* Menu:
+
+* _LDADD:                                Linking.
+* _LDFLAGS:                              Linking.
+* _LIBADD:                               A Library.
+* _SOURCES:                              Program Sources.
+* _TEXINFOS:                             Texinfo.
+* AC_CANONICAL_HOST:                     Optional.
+* AC_CANONICAL_SYSTEM:                   Optional.
+* AC_CONFIG_AUX_DIR:                     Optional.
+* AC_CONFIG_HEADERS:                     Optional.
+* AC_F77_LIBRARY_LDFLAGS:                Optional.
+* AC_LIBOBJ:                             Optional.
+* AC_LIBSOURCE:                          Optional.
+* AC_LIBSOURCES:                         Optional.
+* AC_OUTPUT:                             Requirements.
+* AC_PROG_CXX:                           Optional.
+* AC_PROG_F77:                           Optional.
+* AC_PROG_LEX:                           Optional.
+* AC_PROG_LIBTOOL:                       Optional.
+* AC_PROG_RANLIB:                        Optional.
+* AC_PROG_YACC:                          Optional.
+* AC_SUBST:                              Optional.
+* ACLOCAL_AMFLAGS:                       Rebuilding.
+* AM_C_PROTOTYPES <1>:                   ANSI.
+* AM_C_PROTOTYPES <2>:                   Public macros.
+* AM_C_PROTOTYPES:                       Optional.
+* AM_CFLAGS:                             Program variables.
+* AM_CONDITIONAL:                        Conditionals.
+* AM_CONFIG_HEADER:                      Public macros.
+* AM_CPPFLAGS:                           Program variables.
+* am_cv_sys_posix_termios:               Public macros.
+* AM_CXXFLAGS:                           C++ Support.
+* AM_ETAGSFLAGS:                         Tags.
+* AM_FFLAGS:                             Fortran 77 Support.
+* AM_GCJFLAGS:                           Java Support.
+* AM_GNU_GETTEXT:                        Optional.
+* AM_HEADER_TIOCGWINSZ_NEEDS_SYS_IOCTL:  Public macros.
+* AM_INIT_AUTOMAKE:                      Requirements.
+* AM_INSTALLCHECK_STD_OPTIONS_EXEMPT:    Options.
+* AM_JAVACFLAGS:                         Java.
+* AM_LDFLAGS <1>:                        Program variables.
+* AM_LDFLAGS:                            Linking.
+* AM_MAINTAINER_MODE <1>:                maintainer-mode.
+* AM_MAINTAINER_MODE:                    Optional.
+* AM_MAKEINFOFLAGS:                      Texinfo.
+* AM_PATH_LISPDIR:                       Public macros.
+* AM_PROG_GCJ:                           Public macros.
+* AM_RFLAGS:                             Fortran 77 Support.
+* AM_RUNTESTFLAGS:                       Tests.
+* AUTOCONF:                              Invoking Automake.
+* AUTOMAKE_OPTIONS <1>:                  Options.
+* AUTOMAKE_OPTIONS <2>:                  Dependencies.
+* AUTOMAKE_OPTIONS:                      ANSI.
+* bin_PROGRAMS:                          Program Sources.
+* bin_SCRIPTS:                           Scripts.
+* build_alias:                           Optional.
+* BUILT_SOURCES:                         Sources.
+* CC:                                    Program variables.
+* CCAS:                                  Assembly Support.
+* CCASFLAGS:                             Assembly Support.
+* CFLAGS:                                Program variables.
+* check_LTLIBRARIES:                     A Shared Library.
+* check_PROGRAMS:                        Program Sources.
+* check_SCRIPTS:                         Scripts.
+* CLASSPATH_ENV:                         Java.
+* CLEANFILES:                            Clean.
+* COMPILE:                               Program variables.
+* CPPFLAGS:                              Program variables.
+* CXX:                                   C++ Support.
+* CXXCOMPILE:                            C++ Support.
+* CXXFLAGS:                              C++ Support.
+* CXXLINK:                               C++ Support.
+* DATA <1>:                              Data.
+* DATA:                                  Uniform.
+* data_DATA:                             Data.
+* DEFS:                                  Program variables.
+* DEJATOOL:                              Tests.
+* DESTDIR:                               Install.
+* dist_:                                 Dist.
+* DIST_SUBDIRS <1>:                      Dist.
+* DIST_SUBDIRS:                          Top level.
+* DISTCHECK_CONFIGURE_FLAGS:             Dist.
+* distcleancheck_listfiles <1>:          distcleancheck.
+* distcleancheck_listfiles:              Dist.
+* DISTCLEANFILES:                        Clean.
+* distuninstallcheck_listfiles:          Dist.
+* ELCFILES:                              Emacs Lisp.
+* ETAGS_ARGS:                            Tags.
+* ETAGSFLAGS:                            Tags.
+* EXPECT:                                Tests.
+* EXTRA_DIST:                            Dist.
+* EXTRA_PROGRAMS:                        Conditional Programs.
+* F77:                                   Fortran 77 Support.
+* F77COMPILE:                            Fortran 77 Support.
+* FFLAGS:                                Fortran 77 Support.
+* FLINK:                                 Fortran 77 Support.
+* GCJFLAGS:                              Java Support.
+* GTAGS_ARGS:                            Tags.
+* HEADERS <1>:                           Headers.
+* HEADERS:                               Uniform.
+* host_alias:                            Optional.
+* host_triplet:                          Optional.
+* include_HEADERS:                       Headers.
+* INCLUDES:                              Program variables.
+* info_TEXINFOS:                         Texinfo.
+* JAVA:                                  Uniform.
+* JAVAC:                                 Java.
+* JAVACFLAGS:                            Java.
+* JAVAROOT:                              Java.
+* LDADD:                                 Linking.
+* LDFLAGS:                               Program variables.
+* lib_LIBRARIES:                         A Library.
+* lib_LTLIBRARIES:                       A Shared Library.
+* LIBADD:                                A Library.
+* libexec_PROGRAMS:                      Program Sources.
+* libexec_SCRIPTS:                       Scripts.
+* LIBOBJS:                               Optional.
+* LIBRARIES:                             Uniform.
+* LIBS:                                  Program variables.
+* LINK:                                  Program variables.
+* LISP <1>:                              Emacs Lisp.
+* LISP:                                  Uniform.
+* lisp_LISP:                             Emacs Lisp.
+* localstate_DATA:                       Data.
+* MAINTAINERCLEANFILES:                  Clean.
+* MAKE:                                  Top level.
+* MAKEFLAGS:                             Top level.
+* MAKEINFO:                              Texinfo.
+* MAKEINFOFLAGS:                         Texinfo.
+* man_MANS:                              Man pages.
+* MANS <1>:                              Man pages.
+* MANS:                                  Uniform.
+* MOSTLYCLEANFILES:                      Clean.
+* nodist_:                               Dist.
+* noinst_HEADERS:                        Headers.
+* noinst_LIBRARIES:                      A Library.
+* noinst_LISP:                           Emacs Lisp.
+* noinst_LTLIBRARIES:                    A Shared Library.
+* noinst_PROGRAMS:                       Program Sources.
+* noinst_SCRIPTS:                        Scripts.
+* oldinclude_HEADERS:                    Headers.
+* PACKAGE:                               Dist.
+* PACKAGE, directory:                    Uniform.
+* PACKAGE, prevent definition:           Public macros.
+* pkgdata_DATA:                          Data.
+* pkgdata_SCRIPTS:                       Scripts.
+* pkgdatadir:                            Uniform.
+* pkginclude_HEADERS:                    Headers.
+* pkgincludedir:                         Uniform.
+* pkglib_LIBRARIES:                      A Library.
+* pkglib_LTLIBRARIES:                    A Shared Library.
+* pkglib_PROGRAMS:                       Program Sources.
+* pkglibdir:                             Uniform.
+* pkgpyexecdir:                          Python.
+* pkgpythondir:                          Python.
+* PROGRAMS:                              Uniform.
+* pyexecdir:                             Python.
+* PYTHON <1>:                            Python.
+* PYTHON:                                Uniform.
+* PYTHON_EXEC_PREFIX:                    Python.
+* PYTHON_PLATFORM:                       Python.
+* PYTHON_PREFIX:                         Python.
+* PYTHON_VERSION:                        Python.
+* pythondir:                             Python.
+* RFLAGS:                                Fortran 77 Support.
+* RUNTEST:                               Tests.
+* RUNTESTDEFAULTFLAGS:                   Tests.
+* RUNTESTFLAGS:                          Tests.
+* sbin_PROGRAMS:                         Program Sources.
+* sbin_SCRIPTS:                          Scripts.
+* SCRIPTS <1>:                           Scripts.
+* SCRIPTS:                               Uniform.
+* sharedstate_DATA:                      Data.
+* SOURCES:                               Program Sources.
+* SUBDIRS:                               Top level.
+* SUFFIXES:                              Suffixes.
+* sysconf_DATA:                          Data.
+* TAGS_DEPENDENCIES:                     Tags.
+* target_alias:                          Optional.
+* TESTS:                                 Tests.
+* TESTS_ENVIRONMENT:                     Tests.
+* TEXINFO_TEX:                           Texinfo.
+* TEXINFOS <1>:                          Texinfo.
+* TEXINFOS:                              Uniform.
+* VERSION:                               Dist.
+* VERSION, prevent definition:           Public macros.
+* WARNINGS:                              Invoking Automake.
+* WITH_DMALLOC:                          Public macros.
+* WITH_REGEX:                            Public macros.
+* XFAIL_TESTS:                           Tests.
+* YACC:                                  Optional.
 
 
 File: automake.info,  Node: General Index,  Prev: Macro and Variable Index,  Up: Top
@@ -77,9 +397,6 @@ General Index
 * -o:                                    Invoking Automake.
 * -v:                                    Invoking Automake.
 * -W:                                    Invoking Automake.
-* @ALLOCA@, special handling:            LIBOBJS.
-* @LIBOBJS@, special handling:           LIBOBJS.
-* @LTLIBOBJS@, special handling:         A Shared Library.
 * _DATA primary, defined:                Data.
 * _DEPENDENCIES, defined:                Linking.
 * _HEADERS primary, defined:             Headers.
@@ -108,9 +425,13 @@ General Index
 * Adding new SUFFIXES:                   Suffixes.
 * all:                                   Extending.
 * all-local:                             Extending.
+* ALLOCA, special handling:              LIBOBJS.
 * AM_CONDITIONAL and SUBDIRS:            Top level.
 * AM_INIT_AUTOMAKE, example use:         Complete.
+* AM_MAINTAINER_MODE, purpose:           maintainer-mode.
 * ansi2knr:                              ANSI.
+* ansi2knr and LIBOBJS:                  ANSI.
+* ansi2knr and LTLIBOBJS:                ANSI.
 * Append operator:                       General Operation.
 * Automake constraints:                  Introduction.
 * Automake options:                      Invoking Automake.
@@ -136,6 +457,7 @@ General Index
 * Comment, special to Automake:          General Operation.
 * Complete example:                      Complete.
 * Conditional example,  -enable-debug:   Conditionals.
+* Conditional programs:                  Conditional Programs.
 * Conditional subdirectories:            Top level.
 * Conditional SUBDIRS:                   Top level.
 * Conditionals:                          Conditionals.
@@ -144,6 +466,9 @@ General Index
 * configure.in, scanning:                configure.
 * Constraints of Automake:               Introduction.
 * cpio example:                          Uniform.
+* CVS and generated files:               CVS.
+* CVS and third-party files:             CVS.
+* CVS and timestamps:                    CVS.
 * cvs-dist:                              General Operation.
 * cvs-dist, non-standard example:        General Operation.
 * Cygnus strictness:                     Cygnus.
@@ -151,6 +476,7 @@ General Index
 * de-ANSI-fication, defined:             ANSI.
 * dejagnu:                               Tests.
 * depcomp:                               Dependencies.
+* dependencies and distributed files:    distcleancheck.
 * Dependency tracking:                   Dependencies.
 * Dependency tracking, disabling:        Dependencies.
 * dirlist:                               Macro search path.
@@ -166,8 +492,11 @@ General Index
 * dist_ and nobase_:                     Alternative.
 * DIST_SUBDIRS, explained:               Top level.
 * distcheck:                             Dist.
+* distclean <1>:                         distcleancheck.
 * distclean:                             Extending.
+* distclean, diagnostic:                 distcleancheck.
 * distclean-local:                       Extending.
+* distcleancheck <1>:                    distcleancheck.
 * distcleancheck:                        Dist.
 * dmalloc, support for:                  Public macros.
 * dvi:                                   Extending.
@@ -204,6 +533,8 @@ General Index
 * Fortran 77 support:                    Fortran 77 Support.
 * Fortran 77, mixing with C and C++:     Mixing Fortran 77 With C and C++.
 * Fortran 77, Preprocessing:             Preprocessing Fortran 77.
+* generated files and CVS:               CVS.
+* generated files, distributed:          CVS.
 * Gettext support:                       gettext.
 * gnits strictness:                      Strictness.
 * GNU Gettext support:                   gettext.
@@ -265,10 +596,14 @@ General Index
 * lex problems with HP-UX 10:            Public macros.
 * lex, multiple lexers:                  Yacc and Lex.
 * LIBADD primary, defined:               A Library.
+* LIBOBJS and ansi2knr:                  ANSI.
+* LIBOBJS, special handling:             LIBOBJS.
 * LIBRARIES primary, defined:            A Library.
 * Linking Fortran 77 with C and C++:     Mixing Fortran 77 With C and C++.
 * LISP primary, defined:                 Emacs Lisp.
 * local targets:                         Extending.
+* LTLIBOBJS and ansi2knr:                ANSI.
+* LTLIBOBJS, special handling:           A Shared Library.
 * LTLIBRARIES primary, defined:          A Shared Library.
 * Macro search path:                     Macro search path.
 * Macros Automake recognizes:            Optional.
@@ -285,6 +620,7 @@ General Index
 * Makefile.am, first line:               General Operation.
 * MANS primary, defined:                 Man pages.
 * mdate-sh:                              Texinfo.
+* missing, purpose:                      maintainer-mode.
 * Mixed language example:                Mixing Fortran 77 With C and C++.
 * Mixing Fortran 77 with C and C++:      Mixing Fortran 77 With C and C++.
 * Mixing Fortran 77 with C and/or C++:   Mixing Fortran 77 With C and C++.
@@ -358,11 +694,13 @@ General Index
 * PROGRAMS primary variable:             Uniform.
 * Programs, auxiliary:                   Auxiliary Programs.
 * PROGRAMS, bindir:                      Program Sources.
+* Programs, conditional:                 Conditional Programs.
 * ps:                                    Extending.
 * ps-local:                              Extending.
 * PYTHON primary, defined:               Python.
 * Ratfor programs:                       Preprocessing Fortran 77.
 * README-alpha:                          Gnits.
+* rebuild rules:                         CVS.
 * Recognized macros by Automake:         Optional.
 * Recursive operation of Automake:       General Operation.
 * regex package:                         Public macros.
@@ -414,6 +752,8 @@ General Index
 * Texinfo flag, VERSION:                 Texinfo.
 * texinfo.tex:                           Texinfo.
 * TEXINFOS primary, defined:             Texinfo.
+* third-party files and CVS:             CVS.
+* timestamps and CVS:                    CVS.
 * true Example:                          true.
 * Uniform naming scheme:                 Uniform.
 * uninstall <1>:                         Extending.
@@ -426,6 +766,7 @@ General Index
 * Variables, overriding:                 General Operation.
 * variables, reserved for the user:      User Variables.
 * VERSION Texinfo flag:                  Texinfo.
+* wildcards:                             wildcards.
 * Windows:                               EXEEXT.
 * yacc, multiple parsers:                Yacc and Lex.
 * ylwrap:                                Yacc and Lex.

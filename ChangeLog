@@ -1,4 +1,335 @@
+2003-02-20  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.in, NEWS: Bump version to 1.7.3.
+
+	* lib/am/texibuild.am (%SOURCE_SUFFIX%%DEST_SUFFIX%): Use $(...)
+	instead of ${...}.
+
+	* tests/defs.in: Handle required=ro-dir.
+	* tests/destdir.test: Use this.
+
+2003-02-19  Richard Dawe  <rich@phekda.freeserve.co.uk>
+
+	* lib/am/distdir.am (distcheck): Strip any leading DOS drive
+	from dc_install_base.
+
+2003-02-19  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/am/texinfos.am (install-info-am, uninstall-info-am): Install
+	DJGPP-style *.iNN info files.
+	(maintainer-clean-aminfo): Rewrite using the same pattern
+	as in uninstall-info-am.
+	* lib/am/texibuild.am (%SOURCE_SUFFIX%%DEST_SUFFIX%): Erase
+	DJGPP-style *.iNN info files before running $(MAKEINFO).
+	* tests/txinfo19.test: New file.
+	* tests/Makefile.am (TESTS): Add txinfo19.test.
+
+2003-02-18  Richard Dawe  <rich@phekda.freeserve.co.uk>
+
+	* lib/depcomp (dashmstdout): Cope with DOS filenames in
+	dependencies.
+
+2003-02-17  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/depcomp (makedepend): Don't pass $object to makedepend.
+	Reported by Stepan Kasal.
+
+2003-02-12  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.in: Bump version to 1.7.2c.
+
+	* tests/defs.in: Handle required=makedepend.
+
+	* configure.in, NEWS: Bump version to 1.7.2b.
+
+	* Makefile.am (maintainer-check): Update the diff check
+	to account for the recent @SHELL@ substitution.
+
+2003-02-11  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/depcomp: Do not put comments on the `icc)' line.
+
+	* lib/config.guess, lib/config.sub, lib/texinfo.tex: New upstream
+	versions.
+
+	Fix for PR automake/381:
+	* automake.in (handle_gettext): Do not print diagnostics
+	about po/ and intl/ missing from SUBDIRS if po/ does not
+	exist.  Warn if `SUBDIRS = intl' is used although libintl
+	is 'external'.
+	* tests/gettext.test: Make sure diagnostics are not output
+	when po/ does not exist.
+	* tests/gettext2.test: Test for unwanted intl/.
+	PR from Alexander Turbov, fix suggested by Bruno Haible.
+
+	* m4/depend.m4: Grep depcomp's stderr for icc warnings about
+	ignored options.
+	* lib/depcomp (icc): New mode.
+	* tests/depcomp5.test: New file.
+	* tests/defs.in: Handle required=icc.
+	* tests/Makefile.am (TESTS): Add it.
+
+	Temporary hack for PR automake/381:
+	* automake.in (handle_gettext): Turn missing po/ and intl/ errors
+	into -Wsyntax warnings.
+
+2003-02-10  Richard Dawe  <rich@phekda.freeserve.co.uk>
+
+	* Makefile.am: Substitute @SHELL@ in automake.in and aclocal.in.
+	This makes the setting of SHELL work for DJGPP.
+
+2003-02-10  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	For PR automake/385:
+	* lib/depcomp (makedepend): Strip any libtool call, before
+	running makedepends.
+	* tests/depcomp4.test: New file.
+	* tests/Makefile.am (TESTS): Add it.
+	Reported by Jeff Squyres.
+
+	Related to PR automake/385:
+	* lib/depcomp (dashmstdout): Do not use `-o /dev/null', or gcc will
+	write dependencies to /dev/null.  `-o /dev/null' was added
+	on 2002-06-13 just because I tried to replace `-o foo.o' by something
+	else and didn't thought about removing it entirely.
+	* tests/depcomp3.test: New file.
+	* tests/Makefile.am (TESTS): Add it.
+
+	* automake.in (BEGIN): Override $ENV{'SHELL'} with ./configure's
+	SHELL for DJGPP.
+	Suggested by Richard Dawe.
+
+2003-02-09  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* NEWS: Summarize recent changes.
+
+	* automake.texi (FAQ, CVS, maintainer-mode, wildcards)
+	(distcleancheck): New nodes.
+
+2003-02-06  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (scan_autoconf_files): Don't complain that
+	AM_INIT_AUTOMAKE comes from an old version if it was not found.
+
+2003-02-04  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* m4/init.m4 (_AC_AM_CONFIG_HEADER_HOOK): Recompute
+	indexes of header files so we create stamp files with
+	the right numbers when config.status is run on some headers.
+	* tests/stamph2.test: Check for this.
+	Reported by Sander Niemeijer.
+
+2003-02-02  Jeremy Nimmer  <jwnimmer@alum.mit.edu>  (tiny change)
+
+	For Debian Bug #39542:
+	* automake.texi (Invoking Automake, Optional): Document how
+	AC_CONFIG_AUX_DIR interacts with missing files.
+
+2003-01-31  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.texi (Program and Library Variables): Clarify that
+	_LIBADD is for libraries and _LDADD for programs.
+
+2003-01-22  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.texi (Python): Explain that directory variables start
+	with either ${prefix} or ${exec_prefix}, and point to the
+	`Installation Directory Variables' section of the Autoconf manual.
+
+2003-01-21  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.texi (Dist): Reorder the dist-hook section, and
+	move the DIST_SUBDIRS paragraph earlier.
+
+2003-01-19  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/README: New file.
+
+	* automake.texi (Conditional Programs): Show a sample Makefile.am.
+	Remind $(EXEEXT) must be appended to configure substitutions.
+	Show how Automake conditionals can be used instead.
+	* tests/exeext.test (check_PROGRAMS): Make sure EXEEXT is also
+	appended to conditionally defined programs.
+
+2003-01-16  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* m4/python.m4 (AM_PATH_PYTHON) <_AM_PYTHON_INTERPRETER_LIST>: Add
+	python2.3.
+
+	* m4/python.m4 (AM_PATH_PYTHON): Query distutils for `pythondir'
+	or `pyexecdir', for the sake of 64-bit distributions that usually
+	use lib64/ instead of lib/.  Fall back to the default directory
+	if it doesn't work.
+	Suggested by Gwenole Beauchesne.
+
+2003-01-14  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	For PR automake/382:
+	* automake.texi (Yacc and Lex): Document `AM_YFLAGS = -d'.
+	Explain BUILT_SOURCES is usually needed in this case.
+	Reported by William S Fulton.
+
+2003-01-13  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	Rename some files for the sake of 8+3 file systems.
+	* tests/aclocali.test:     Rename to tests/aclocal.test.
+	* tests/aclocali1.test:    Rename to tests/aclocal2.test.
+	* tests/aclocalii.test:    Rename to tests/aclocal3.test.
+	* tests/acoutput.test:     Rename to tests/acoutpt.test.
+	* tests/acoutput2.test:    Rename to tests/acoutpt2.test.
+	* tests/acouttbs.test:     Rename to tests/acoutbs.test.
+	* tests/acouttbs2.test:    Rename to tests/acoutbs2.test.
+	* tests/autoheader.test:   Rename to tests/autohdr.test.
+	* tests/autoheader2.test:  Rename to tests/autohdr2.test.
+	* tests/condincl.test:     Rename to tests/condinc.test.
+	* tests/condincl2.test:    Rename to tests/condinc2.test.
+	* tests/distcommon.test:   Rename to tests/distcom.test.
+	* tests/distcommon2.test:  Rename to tests/distcom2.test.
+	* tests/distcommon3.test:  Rename to tests/distcom3.test.
+	* tests/installsh.test:    Rename to tests/instsh.test.
+	* tests/installsh2.test:   Rename to tests/instsh2.test.
+	* tests/instdata.test:     Rename to tests/instdat.test.
+	* tests/instdata2.test:    Rename to tests/instdat2.test.
+	* tests/libobj12b.test:    Rename to tests/libobj13.test.
+	* tests/link_f_c.test:     Rename to tests/link_fc.test.
+	* tests/link_f_c_cxx.test: Rename to tests/link_fccxx.test.
+	* tests/link_f_cxx.test:   Rename to tests/link_fcxx.test.
+	* tests/nodefine.test:     Rename to tests/nodef.test.
+	* tests/nodefine2.test:    Rename to tests/nodef2.test.
+	* tests/required.test:     Rename to tests/reqd.test.
+	* tests/required2.test:    Rename to tests/reqd2.test.
+	* tests/sourcesub.test:    Rename to tests/srcsub.test.
+	* tests/sourcesub2.test:   Rename to tests/srcsub2.test.
+	* tests/specflags.test:    Rename to tests/specflg.test.
+	* tests/specflags2.test:   Rename to tests/specflg2.test.
+	* tests/specflags3.test:   Rename to tests/specflg3.test.
+	* tests/specflags6.test:   Rename to tests/specflg6.test.
+	* tests/specflags7.test:   Rename to tests/specflg7.test.
+	* tests/specflags8.test:   Rename to tests/specflg8.test.
+	* tests/specflags9.test:   Rename to tests/specflg9.test.
+	* tests/subdircond.test:   Rename to tests/subcond.test.
+	* tests/subdircond2.test:  Rename to tests/subcond2.test.
+	* tests/subdircond3.test:  Rename to tests/subcond3.test.
+	* tests/texinfo.test:      Rename to tests/txinfo.test.
+	* tests/texinfo2.test:     Rename to tests/txinfo2.test.
+	* tests/texinfo3.test:     Rename to tests/txinfo3.test.
+	* tests/texinfo4.test:     Rename to tests/txinfo4.test.
+	* tests/texinfo5.test:     Rename to tests/txinfo5.test.
+	* tests/texinfo6.test:     Rename to tests/txinfo6.test.
+	* tests/texinfo7.test:     Rename to tests/txinfo7.test.
+	* tests/texinfo8.test:     Rename to tests/txinfo8.test.
+	* tests/texinfo9.test:     Rename to tests/txinfo9.test.
+	* tests/texinfo10.test:    Rename to tests/txinfo10.test.
+	* tests/texinfo13.test:    Rename to tests/txinfo13.test.
+	* tests/texinfo16.test:    Rename to tests/txinfo16.test.
+	* tests/texinfo17.test:    Rename to tests/txinfo17.test.
+	* tests/texinfo18.test:    Rename to tests/txinfo18.test.
+	* tests/Makefile.am (TESTS): Adjust.
+	* ChangeLog.1996: Rename to ChangeLog.96.
+	* ChangeLog.1998: Rename to ChangeLog.98.
+	* ChangeLog.2000: Rename to ChangeLog.00.
+	* ChangeLog.2001: Rename to ChangeLog.01.
+	* Makefile.am (EXTRA_DIST): Adjust.
+	Reported by Richard Dawe.
+
+2003-01-13  Richard Dawe  <rich@phekda.freeserve.co.uk>  (tiny change)
+
+	* lib/am/distdir.am (distcheck): '=' is not valid in DOS filenames.
+	Use '_build' and '_inst' instead of '=build' and '=inst'.
+	* tests/man2.test: Reflect change automake: check for files in
+	'_build' and '_inst' directories instead of '=build' and '=inst'.
+
+2003-01-13  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	Use `_dirstamp' when the file-system doesn't support `.dirstamp'.
+	* m4/lead-dot.m4: New file.
+	* m4/Makefile.am (dist_m4data_DATA): Add lead-dot.m4
+	* m4/init.m4 (AM_INIT_AUTOMAKE): Require AM_SET_LEADING_DOT.:
+	* m4/depend.m4 (AM_SET_DEPDIR): Require AM_SET_LEADING_DOT. Define
+	DEPDIR using am__leading_dot.
+	* automake.in (require_build_directory): Define am__dirstamp, a new
+	variable for the dirstamp basename, based on am__leading_dot.
+	* tests/subobj6.test: Move all `test -f' into Makefiles, so we can
+	use $(am__dirstamp).
+	Reported by Richard Dawe.
+
+	* tests/gnits2.test, tests/pr300-prog.test, tests/transform.test:
+	Move all `test -f' into Makefiles, so we can honor $(EXEEXT) when
+	testing for programs.
+	Reported by Richard Dawe.
+
+2003-01-10  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* Makefile.am (maintainer-check): Suggest using $sleep instead of
+	sleep 2.
+	* tests/defs.in (sleep): New variable.
+	* tests/asm.test, tests/confsub.test, tests/lisp3.test,
+	tests/texinfo16.test, tests/warnopts.test, tests/yaccvpath.test:
+	Use $sleep instead of sleep 2, to work around timestamp
+	inconsistencies in Windows.
+	Reported by Richard Dawe.
+
+	* Makefile.am (maintainer-check): Do not require SHELL=/bin/sh
+	after $MAKE -e.
+	* tests/ansi3.test, tests/ansi5.test, tests/cond22.test,
+	tests/man2.test, tests/subobj3.test, tests/suffix8.test,
+	tests/suffix11.test: Do not set SHELL=/bin/sh after $MAKE -e.
+	$SHELL is overridden by tests/defs, so it won't hurt even
+	if $MAKE -e uses the $SHELL envvar.
+	* tests/ansi.test, tests/insh2.test, tests/texinfo.test,
+	tests/texinfo8.test: Use SHELL=$SHELL, not SHELL=/bin/sh.
+	Reported by Richard Dawe.
+
+	Build elisp files all at once instead of one by one.
+	* automake.in (handle_emacs_lisp): Define am__ELFILES.  Add
+	elc-stamp to all's dependencies.
+	* lib/am/lisp.am (elc-stamp): New rule, build all *.elc files.
+	(.el.elc): Rewrite to call elc-stamp if $@ doesn't exist.
+	(clean-lisp): Clean elc-stamp.
+	* lib/elisp-comp: Reindent.  Erase the temporatry directory
+	from a trap.  Propagate Emacs's exit status.
+	* tests/lisp3.test: New file.
+	* tests/Makefile.am (TESTS): Add lisp3.test.
+	Reported by Ryan T. Sammartino.
+
+2003-01-05  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (macro_define): Add missing `{$cond}' (typo from
+	2002-09-18).
+	($gen_copyright): Append year 2003.
+	(version): Increase year.
+
+	* tests/defs.in: Substitute aclocaldir instead of running
+	the installed aclocal.  Otherwise Libtool and Gettext
+	tests get skipped when aclocal doesn't preexist.
+	Reported by Imacat.
+	* tests/listval.test, tests/suffix2.test: Remove pointless -I
+	argument to aclocal.
+
+2002-12-31  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (err): Rename as ...
+	(error): ... this.  Adjust all callers.
+	Suggested by H.Merijn Brand.
+
+2002-12-11  Brian Ford  <ford@vss.fsi.com>
+
+	* m4/init.m4 (AM_INIT_AUTOMAKE): Properly quote AC_PACKAGE_TARNAME
+	and AC_PACKAGE_VERSION.
+
+2002-12-11  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.texi (ANSI): Since Autoconf 2.54, LIBOBJ and LTLIBOBJ
+	no longer have to be rewritten in order to support deansification.
+	(Tests): Link to the DejaGnu manual.
+	(Optional): Comment out FIXME.
+	(Complete, A Library, LIBOBJS): Use $(LIBOBJ) and $(ALLOCA)
+	instead of @LIBOBJ@ and @ALLOCA@.
+	(Sources): Typo.
+
 2002-12-05  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.in: Bump version to 1.7.2a.
 
 	* configure.in, NEWS: Bump version to 1.7.2.
 
@@ -2906,7 +3237,7 @@
 
 -----
 
-Copyright (C) 2002 Free Software Foundation, Inc.
+Copyright (C) 2002, 2003  Free Software Foundation, Inc.
 
 This file is part of GNU Automake.
 

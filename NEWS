@@ -1,3 +1,35 @@
+Bugs fixed in 1.7.3:
+* Fix stamp files numbering (when using multiple AC_CONFIG_HEADERS).
+* Query distutils for `pythondir' and `pythonexecdir', instead of
+  using an hardcoded path.  This should allow builds on 64-bit
+  distributions that usually use lib64/ instead of lib/.
+* AM_PATH_PYTHON will also search for python2.3.
+* elisp files are now built all at once instead of one by one. Besides
+  incurring a speed-up, this is required to support interdependent elisp files.
+* Support for DJGPP:
+  - `make distcheck' will now work in `_inst/' and `_build' instead
+    of `=inst/' and `=build/'
+  - use `_dirstamp' when the file-system doesn't support `.dirstamp'
+  - install/uninstall `*.i[0-9][0-9]'-style info files
+  - more changes that affect only the Automake package (not its output)
+* Fix some incompatibilities with upcoming perl-5.10.
+* Properly quote AC_PACKAGE_TARNAME and AC_PACKAGE_VERSION when defining
+  PACKAGE and VERSION.
+* depcomp fixes:
+  - dashmstdout and dashXmstdout modes: don't use `-o /dev/null', this
+    is troublesome with gcc and Solaris compilers. (PR/385)
+  - makedepend mode: work with Libtool. (PR/385 too)
+  - support for ICC.
+* better support for unusual gettext setups, such as multiple po/ directories
+  (PR/381):
+  - Flag missing po/ and intl/ directories as warnings, not errors.
+  - Disable these warnings if po/ does not exist.
+* Noteworthy manual updates:
+  - New FAQ chapter.
+  - Document how AC_CONFIG_AUX_DIR interacts with missing files.
+    (Debian Bug #39542)
+  - Document `AM_YFLAGS = -d'.  (PR/382)
+
 Bugs fixed in 1.7.2:
 * Fix installation and uninstallation of Info files built in subdirectories.
 * Do not run `./configure --with-included-gettext' during `make distcheck'

@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 1998, 2001, 2002  Free Software Foundation, Inc.
+# Copyright (C) 1998, 2002  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -18,9 +18,26 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# Test to make sure that aclocal --output works.  Report from
-# Alexandre Oliva.
+# Make sure that ACLOCAL_AMFLAGS actually gets the right dependencies.
 . ./defs || exit 1
 
-$ACLOCAL --output=fred || exit 1
-test -f fred
+echo AM_QUUX >> configure.in
+
+mkdir macros
+
+cat > macros/quux.m4 << 'END'
+AC_DEFUN([AM_QUUX], [
+])
+END
+
+cat > Makefile.am << 'END'
+ACLOCAL_AMFLAGS = -I macros
+END
+
+# We have to run aclocal first to make sure that aclocal.m4 exists.
+# Otherwise automake won't guess that we want to auto-generate it.
+$ACLOCAL -I macros || exit 1
+
+$AUTOMAKE || exit 1
+
+$FGREP quux.m4 Makefile.in
