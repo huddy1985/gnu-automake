@@ -7,6 +7,7 @@ check-tests_environment-p.test \
 check-p.test \
 check10-p.test \
 check11-p.test \
+check12-p.test \
 check2-p.test \
 check3-p.test \
 check4-p.test \
@@ -20,5 +21,4 @@ color2-p.test \
 comment9-p.test \
 dejagnu-p.test \
 exeext4-p.test \
-maken3-p.test \
-maken4-p.test
+maken3-p.test

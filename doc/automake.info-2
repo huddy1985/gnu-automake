@@ -1,12 +1,12 @@
 This is automake.info, produced by makeinfo version 4.13 from
 automake.texi.
 
-This manual is for GNU Automake (version 1.11.2, 21 December 2011), a
+This manual is for GNU Automake (version 1.11.3, 1 February 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software
+2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Free Software
 Foundation, Inc.
 
      Permission is granted to copy, distribute and/or modify this
@@ -24,9 +24,52 @@ END-INFO-DIR-ENTRY
 
 INFO-DIR-SECTION Individual utilities
 START-INFO-DIR-ENTRY
-* aclocal: (automake)Invoking aclocal.          Generating aclocal.m4.
-* automake: (automake)Invoking Automake.        Generating Makefile.in.
+* aclocal-invocation: (automake)aclocal Invocation.   Generating aclocal.m4.
+* automake-invocation: (automake)automake Invocation. Generating Makefile.in.
 END-INFO-DIR-ENTRY
+
+
+File: automake.info,  Node: The dist Hook,  Next: Checking the Distribution,  Prev: Fine-grained Distribution Control,  Up: Dist
+
+14.3 The dist Hook
+==================
+
+Occasionally it is useful to be able to change the distribution before
+it is packaged up.  If the `dist-hook' rule exists, it is run after the
+distribution directory is filled, but before the actual tar (or shar)
+file is created.  One way to use this is for distributing files in
+subdirectories for which a new `Makefile.am' is overkill:
+
+     dist-hook:
+             mkdir $(distdir)/random
+             cp -p $(srcdir)/random/a1 $(srcdir)/random/a2 $(distdir)/random
+
+   Another way to use this is for removing unnecessary files that get
+recursively included by specifying a directory in EXTRA_DIST:
+
+     EXTRA_DIST = doc
+
+     dist-hook:
+             rm -rf `find $(distdir)/doc -type d -name .svn`
+
+   Two variables that come handy when writing `dist-hook' rules are
+`$(distdir)' and `$(top_distdir)'.
+
+   `$(distdir)' points to the directory where the `dist' rule will copy
+files from the current directory before creating the tarball.  If you
+are at the top-level directory, then `distdir = $(PACKAGE)-$(VERSION)'.
+When used from subdirectory named `foo/', then `distdir =
+../$(PACKAGE)-$(VERSION)/foo'.  `$(distdir)' can be a relative or
+absolute path, do not assume any form.
+
+   `$(top_distdir)' always points to the root directory of the
+distributed tree.  At the top-level it's equal to `$(distdir)'.  In the
+`foo/' subdirectory `top_distdir = ../$(PACKAGE)-$(VERSION)'.
+`$(top_distdir)' too can be a relative or absolute path.
+
+   Note that when packages are nested using `AC_CONFIG_SUBDIRS' (*note
+Subpackages::), then `$(distdir)' and `$(top_distdir)' are relative to
+the package where `make dist' was run, not to any sub-packages involved.
 
 
 File: automake.info,  Node: Checking the Distribution,  Next: The Types of Distributions,  Prev: The dist Hook,  Up: Dist
@@ -144,11 +187,15 @@ distributions in various formats.  Their targets are:
 `dist-gzip'
      Generate a gzip tar archive of the distribution.  
 
+`dist-lzip'
+     Generate a `lzip' tar archive of the distribution.  `lzip'
+     archives are frequently smaller than `bzip2'-compressed archives.  
+
 `dist-lzma'
-     Generate an `lzma' tar archive of the distribution.  `lzma'
-     archives are frequently smaller than `bzip2'-compressed archives.
-     The `lzma' format is obsolete, you should use the `xz' format
-     instead.  
+     Generate an `lzma' tar archive of the distribution.  The `lzma'
+     format is obsolete, you should use the `xz' format instead.
+     _Support for `lzma'-compressed archives will be removed in the
+     next major Automake release._ 
 
 `dist-shar'
      Generate a shar archive of the distribution.  
@@ -270,13 +317,13 @@ The option `parallel-tests' (*note Options::) enables a test suite
 driver that is mostly compatible to the simple test driver described in
 the previous section, but provides a few more features and slightly
 different semantics.  It features concurrent execution of tests with
-`make -j', allows to specify inter-test dependencies, lazy reruns of
-tests that have not completed in a prior run, summary and verbose
-output in `RST' (reStructuredText) and `HTML' format, and hard errors
-for exceptional failures.  Similar to the simple test driver,
-`TESTS_ENVIRONMENT', `AM_COLOR_TESTS', `XFAIL_TESTS', and the `check_*'
-variables are honored, and the environment variable `srcdir' is set
-during test execution.
+`make -j' and automatic collection of the test scripts output and
+summary thereof in `.log' files, and allows to specify inter-test
+dependencies, lazy reruns of tests that have not completed in a prior
+run, and hard errors for exceptional failures.  Similar to the simple
+test driver, `TESTS_ENVIRONMENT', `AM_COLOR_TESTS', `XFAIL_TESTS', and
+the `check_*' variables are honored, and the environment variable
+`srcdir' is set during test execution.
 
    This test driver is still experimental and may undergo changes in
 order to satisfy additional portability requirements.
@@ -331,11 +378,10 @@ in the `test-suite.log' file.  If the variable `VERBOSE' is set, this
 file is output after the summary.  For best results, the tests should be
 verbose by default now.
 
-   With `make check-html', the log files may be converted from RST
-(reStructuredText, see `http://docutils.sourceforge.net/rst.html') to
-HTML using `RST2HTML', which defaults to `rst2html' or `rst2html.py'.
-The variable `TEST_SUITE_HTML' contains the set of converted log files.
-The log and HTML files are removed upon `make mostlyclean'.
+   Previous versions of automake used to provide a `check-html' target
+to convert the log files to HTML.  This feature is now deprecated, and
+_will be removed_ in the next major Automake release, so don't rely on
+it anymore.
 
    Even in the presence of expected failures (see `XFAIL_TESTS'), there
 may be conditions under which a test outcome needs attention.  For
@@ -394,9 +440,7 @@ several ways to limit the set of tests that are run:
    * You can ensure that all tests are rerun which have failed or passed
      unexpectedly, by running `make recheck' in the test directory.
      This convenience target will set `RECHECK_LOGS' appropriately
-     before invoking the main test driver.  The `recheck-html' target
-     does the same as `recheck' but again converts the resulting log
-     file in HTML format, like the `check-html' target.
+     before invoking the main test driver.
 
    In order to guarantee an ordering between tests even with `make
 -jN', dependencies between the corresponding log files may be specified
@@ -632,6 +676,9 @@ below.
 `dist-bzip2'
      Hook `dist-bzip2' to `dist'.  
 
+`dist-lzip'
+     Hook `dist-lzip' to `dist'.  
+
 `dist-lzma'
      Hook `dist-lzma' to `dist'.  Obsoleted by `dist-xz'.  
 
@@ -763,7 +810,8 @@ below.
      These three mutually exclusive options select the tar format to use
      when generating tarballs with `make dist'.  (The tar file created
      is then compressed according to the set of `no-dist-gzip',
-     `dist-bzip2', `dist-xz' and `dist-tarZ' options in use.)
+     `dist-bzip2', `dist-lzip', `dist-xz' and `dist-tarZ' options in
+     use.)
 
      These options must be passed as arguments to `AM_INIT_AUTOMAKE'
      (*note Macros::) because they can require additional configure
@@ -811,9 +859,9 @@ VERSION
 
 `-WCATEGORY' or `--warnings=CATEGORY'
      These options behave exactly like their command-line counterpart
-     (*note Invoking Automake::).  This allows you to enable or disable
-     some warning categories on a per-file basis.  You can also setup
-     some warnings for your entire project; for instance, try
+     (*note automake Invocation::).  This allows you to enable or
+     disable some warning categories on a per-file basis.  You can also
+     setup some warnings for your entire project; for instance, try
      `AM_INIT_AUTOMAKE([-Wall])' in your `configure.ac'.
 
 
@@ -832,9 +880,9 @@ There are a few rules and variables that didn't fit anywhere else.
 
 * Menu:
 
-* Tags::                        Interfacing to etags and mkid
-* Suffixes::                    Handling new file extensions
-* Multilibs::                   Support for multilibs.
+* Tags::        Interfacing to etags and mkid
+* Suffixes::    Handling new file extensions
+* Multilibs::   Support for multilibs (deprecated, soon to be removed).
 
 
 File: automake.info,  Node: Tags,  Next: Suffixes,  Up: Miscellaneous
@@ -934,18 +982,21 @@ not already in the list.
 
 File: automake.info,  Node: Multilibs,  Prev: Suffixes,  Up: Miscellaneous
 
-18.3 Support for Multilibs
-==========================
+18.3 Support for Multilibs (deprecated, soon to be removed).
+============================================================
 
-Automake has support for an obscure feature called multilibs.  A
-"multilib" is a library that is built for multiple different ABIs at a
-single time; each time the library is built with a different target
+Automake used to support an obscure feature called multilibs.  _This
+feature is now deprecated, and will be removed in the next major
+Automake version_.  Still, its implementation will remain available in
+the `contrib/' directory of the Automake distribution, so it should be
+very easy for motivated users to continue to use it in their projects,
+if they really need to.
+
+   A "multilib" is a library that is built for multiple different ABIs
+at a single time; each time the library is built with a different target
 flag combination.  This is only useful when the library is intended to
 be cross-compiled, and it is almost exclusively used for compiler
 support libraries.
-
-   The multilib support is still experimental.  Only use it if you are
-familiar with multilibs and can debug problems you might encounter.
 
 
 File: automake.info,  Node: Include,  Next: Conditionals,  Prev: Miscellaneous,  Up: Top
@@ -1349,13 +1400,16 @@ default to `yes'.  This should still allow disabling silent rules at
 are advised to not set the variable `V' inside the `Makefile.am' file,
 to allow the user to override the value for subdirectories as well.
 
-   The current implementation of this feature relies on a non-POSIX,
-but in practice rather widely supported `Makefile' construct of nested
-variable expansion `$(VAR1$(V))'.  Do not use the `silent-rules' option
-if your package needs to build with `make' implementations that do not
-support it.  The `silent-rules' option turns off warnings about
-recursive variable expansion, which are in turn enabled by
-`-Wportability' (*note Invoking Automake::).
+   The current implementation of this feature normally uses nested
+variable expansion `$(VAR1$(V))', a `Makefile' feature that is not
+required by POSIX 2008 but is widely supported in practice.  The
+`silent-rules' option thus turns off warnings about recursive variable
+expansion, which are in turn enabled by `-Wportability' (*note automake
+Invocation::).  On the rare `make' implementations that do not support
+nested variable expansion, whether rules are silent is always
+determined at configure time, and cannot be overridden at make time.
+Future versions of POSIX are likely to require nested variable
+expansion, so this minor limitation should go away with time.
 
    To extend the silent mode to your own rules, you have two choices:
 
@@ -1369,8 +1423,8 @@ recursive variable expansion, which are in turn enabled by
      shown.  The following snippet shows how you would define your own
      equivalent of `AM_V_GEN':
 
-          pkg_verbose = $(pkg_verbose_$(V))
-          pkg_verbose_ = $(pkg_verbose_$(AM_DEFAULT_VERBOSITY))
+          pkg_verbose = $(pkg_verbose_@AM_V@)
+          pkg_verbose_ = $(pkg_verbose_@AM_DEFAULT_V@)
           pkg_verbose_0 = @echo PKG-GEN $@;
 
           foo: foo.in
@@ -1525,7 +1579,7 @@ respected by `automake' to ensure the user always has the last word:
 settings of Automake, or replace some of its rules.  Overriding
 Automake rules is often inadvisable, particularly in the topmost
 directory of a package with subdirectories.  The `-Woverride' option
-(*note Invoking Automake::) comes in handy to catch overridden
+(*note automake Invocation::) comes in handy to catch overridden
 definitions.
 
    Note that Automake does not make any distinction between rules with
@@ -1879,7 +1933,7 @@ or more conveniently:
      autoreconf -vfi
 
    The use of `--force-missing' ensures that auxiliary tools will be
-overridden by new versions (*note Invoking Automake::).
+overridden by new versions (*note automake Invocation::).
 
    It is important to regenerate all these files each time Automake is
 upgraded, even between bug fixes releases.  For instance, it is not
@@ -4272,6 +4326,7 @@ Date         Rel      am     acl    pm     `*.am'      m4          doc   t
 2009-12-07   1.10.3   7892   1089   8027   3566 (40)   1535 (34)   174   636
 2009-12-07   1.11.1   8722   1092   8292   4162 (42)   1730 (37)   181   739 (20)
 2011-12-21   1.11.2   8822   1112   8330   4223 (42)   1821 (38)   189   915 (22)
+2012-02-01   1.11.3   8790   1068   8453   4280 (42)   1852 (38)   190   932 (22)
 
 
 File: automake.info,  Node: Copying This Manual,  Next: Indices,  Prev: History,  Up: Top
@@ -4798,14 +4853,14 @@ B.1 Macro Index
 * AC_CONFIG_AUX_DIR:                     Optional.            (line  19)
 * AC_CONFIG_FILES:                       Requirements.        (line  15)
 * AC_CONFIG_HEADERS:                     Optional.            (line  46)
-* AC_CONFIG_LIBOBJ_DIR <1>:              LIBOBJS.             (line  50)
+* AC_CONFIG_LIBOBJ_DIR <1>:              LIBOBJS.             (line  51)
 * AC_CONFIG_LIBOBJ_DIR:                  Optional.            (line  41)
 * AC_CONFIG_LINKS:                       Optional.            (line  55)
 * AC_CONFIG_SUBDIRS:                     Subpackages.         (line   6)
 * AC_DEFUN:                              Extending aclocal.   (line  36)
 * AC_F77_LIBRARY_LDFLAGS:                Optional.            (line  98)
 * AC_FC_SRCEXT:                          Optional.            (line 104)
-* AC_INIT:                               Public Macros.       (line  25)
+* AC_INIT:                               Public Macros.       (line  30)
 * AC_LIBOBJ <1>:                         LIBOBJS.             (line  11)
 * AC_LIBOBJ <2>:                         LTLIBOBJS.           (line   6)
 * AC_LIBOBJ:                             Optional.            (line  65)
@@ -4814,11 +4869,11 @@ B.1 Macro Index
 * AC_LIBSOURCES:                         Optional.            (line  67)
 * AC_OUTPUT:                             Requirements.        (line  15)
 * AC_PREREQ:                             Extending aclocal.   (line  36)
-* AC_PROG_CC_C_O:                        Public Macros.       (line  87)
+* AC_PROG_CC_C_O:                        Public Macros.       (line  92)
 * AC_PROG_CXX:                           Optional.            (line  85)
 * AC_PROG_F77:                           Optional.            (line  93)
 * AC_PROG_FC:                            Optional.            (line 109)
-* AC_PROG_LEX <1>:                       Public Macros.       (line  93)
+* AC_PROG_LEX <1>:                       Public Macros.       (line  98)
 * AC_PROG_LEX:                           Optional.            (line 124)
 * AC_PROG_LIBTOOL:                       Optional.            (line 114)
 * AC_PROG_OBJC:                          Optional.            (line  89)
@@ -4841,31 +4896,31 @@ B.1 Macro Index
 * AM_GNU_GETTEXT:                        Optional.            (line 164)
 * AM_GNU_GETTEXT_INTL_SUBDIR:            Optional.            (line 170)
 * AM_HEADER_TIOCGWINSZ_NEEDS_SYS_IOCTL:  Obsolete Macros.     (line  28)
-* AM_INIT_AUTOMAKE <1>:                  Public Macros.       (line  16)
+* AM_INIT_AUTOMAKE <1>:                  Public Macros.       (line  21)
 * AM_INIT_AUTOMAKE:                      Requirements.        (line   6)
 * AM_MAINTAINER_MODE <1>:                maintainer-mode.     (line  37)
 * AM_MAINTAINER_MODE:                    Rebuilding.          (line   9)
 * AM_MAINTAINER_MODE([DEFAULT-MODE]):    Optional.            (line 175)
 * AM_MAKE_INCLUDE:                       Private Macros.      (line  20)
 * AM_OUTPUT_DEPENDENCY_COMMANDS:         Private Macros.      (line  15)
-* AM_PATH_LISPDIR:                       Public Macros.       (line  60)
+* AM_PATH_LISPDIR:                       Public Macros.       (line  65)
 * AM_PATH_PYTHON:                        Python.              (line  29)
-* AM_PROG_AR:                            Public Macros.       (line  75)
-* AM_PROG_AS:                            Public Macros.       (line  82)
-* AM_PROG_CC_C_O:                        Public Macros.       (line  87)
-* AM_PROG_GCJ:                           Public Macros.       (line  98)
+* AM_PROG_AR:                            Public Macros.       (line  80)
+* AM_PROG_AS:                            Public Macros.       (line  87)
+* AM_PROG_CC_C_O:                        Public Macros.       (line  92)
+* AM_PROG_GCJ:                           Public Macros.       (line 103)
 * AM_PROG_INSTALL_STRIP:                 Private Macros.      (line  25)
-* AM_PROG_LEX:                           Public Macros.       (line  93)
+* AM_PROG_LEX:                           Public Macros.       (line  98)
 * AM_PROG_MKDIR_P:                       Obsolete Macros.     (line  34)
-* AM_PROG_UPC:                           Public Macros.       (line 103)
+* AM_PROG_UPC:                           Public Macros.       (line 108)
 * AM_PROG_VALAC:                         Vala Support.        (line  21)
 * AM_SANITY_CHECK:                       Private Macros.      (line  30)
 * AM_SET_DEPDIR:                         Private Macros.      (line  13)
-* AM_SILENT_RULES:                       Public Macros.       (line 109)
+* AM_SILENT_RULES:                       Public Macros.       (line 114)
 * AM_SUBST_NOTMAKE(VAR):                 Optional.            (line 183)
 * AM_SYS_POSIX_TERMIOS:                  Obsolete Macros.     (line  56)
-* AM_WITH_DMALLOC:                       Public Macros.       (line 113)
-* AM_WITH_REGEX:                         Public Macros.       (line 118)
+* AM_WITH_DMALLOC:                       Public Macros.       (line 118)
+* AM_WITH_REGEX:                         Obsolete Macros.     (line  63)
 * m4_include <1>:                        Basics of Distribution.
                                                               (line  14)
 * m4_include:                            Optional.            (line 193)
@@ -4909,8 +4964,10 @@ B.2 Variable Index
 * AM_CPPFLAGS:                           Program Variables.   (line  16)
 * AM_CXXFLAGS:                           C++ Support.         (line  22)
 * AM_DEFAULT_SOURCE_EXT:                 Default _SOURCES.    (line   6)
+* AM_DEFAULT_V:                          Automake silent-rules Option.
+                                                              (line 139)
 * AM_DEFAULT_VERBOSITY:                  Automake silent-rules Option.
-                                                              (line 136)
+                                                              (line 139)
 * AM_DISTCHECK_CONFIGURE_FLAGS:          Checking the Distribution.
                                                               (line  12)
 * AM_ETAGSFLAGS:                         Tags.                (line  25)
@@ -4920,7 +4977,7 @@ B.2 Variable Index
 * AM_FFLAGS:                             Fortran 77 Support.  (line  22)
 * AM_GCJFLAGS:                           Java Support with gcj.
                                                               (line  26)
-* AM_INSTALLCHECK_STD_OPTIONS_EXEMPT:    Options.             (line 153)
+* AM_INSTALLCHECK_STD_OPTIONS_EXEMPT:    Options.             (line 156)
 * AM_JAVACFLAGS:                         Java.                (line  42)
 * AM_LDFLAGS <1>:                        Program Variables.   (line  61)
 * AM_LDFLAGS:                            Linking.             (line  10)
@@ -4937,21 +4994,23 @@ B.2 Variable Index
 * AM_UPCFLAGS:                           Unified Parallel C Support.
                                                               (line  21)
 * AM_UPDATE_INFO_DIR:                    Texinfo.             (line  86)
+* AM_V:                                  Automake silent-rules Option.
+                                                              (line 139)
 * AM_V_at:                               Automake silent-rules Option.
-                                                              (line 136)
+                                                              (line 139)
 * AM_V_GEN:                              Automake silent-rules Option.
-                                                              (line 136)
+                                                              (line 139)
 * AM_VALAFLAGS:                          Vala Support.        (line  35)
 * AM_YFLAGS:                             Yacc and Lex.        (line  33)
 * ANSI2KNR:                              Obsolete Macros.     (line  13)
-* AR:                                    Public Macros.       (line  75)
-* AUTOCONF:                              Invoking Automake.   (line  28)
-* AUTOM4TE:                              Invoking aclocal.    (line  45)
-* AUTOMAKE_JOBS:                         Invoking Automake.   (line 185)
+* AR:                                    Public Macros.       (line  80)
+* AUTOCONF:                              automake Invocation. (line  28)
+* AUTOM4TE:                              aclocal Invocation.  (line  45)
+* AUTOMAKE_JOBS:                         automake Invocation. (line 185)
 * AUTOMAKE_OPTIONS <1>:                  Options.             (line  17)
 * AUTOMAKE_OPTIONS <2>:                  Dependencies.        (line  34)
 * AUTOMAKE_OPTIONS <3>:                  ANSI.                (line  22)
-* AUTOMAKE_OPTIONS:                      Public Macros.       (line  19)
+* AUTOMAKE_OPTIONS:                      Public Macros.       (line  24)
 * bin_PROGRAMS:                          Program Sources.     (line   6)
 * bin_SCRIPTS:                           Scripts.             (line  18)
 * build_triplet:                         Optional.            (line  14)
@@ -4960,9 +5019,9 @@ B.2 Variable Index
                                                               (line   9)
 * CC:                                    Program Variables.   (line  12)
 * CCAS <1>:                              Assembly Support.    (line  10)
-* CCAS:                                  Public Macros.       (line  82)
+* CCAS:                                  Public Macros.       (line  87)
 * CCASFLAGS <1>:                         Assembly Support.    (line  10)
-* CCASFLAGS:                             Public Macros.       (line  82)
+* CCASFLAGS:                             Public Macros.       (line  87)
 * CFLAGS:                                Program Variables.   (line  12)
 * check_:                                Uniform.             (line  96)
 * check_LTLIBRARIES:                     Libtool Convenience Libraries.
@@ -4991,7 +5050,7 @@ B.2 Variable Index
 * DESTDIR <1>:                           Staged Installs.     (line   6)
 * DESTDIR:                               DESTDIR.             (line   6)
 * DISABLE_HARD_ERRORS:                   Simple Tests using parallel-tests.
-                                                              (line  77)
+                                                              (line  76)
 * dist_ <1>:                             Fine-grained Distribution Control.
                                                               (line   6)
 * dist_:                                 Alternative.         (line  29)
@@ -5015,7 +5074,7 @@ B.2 Variable Index
 * distuninstallcheck_listfiles:          Checking the Distribution.
                                                               (line   6)
 * DVIPS:                                 Texinfo.             (line 135)
-* EMACS:                                 Public Macros.       (line  60)
+* EMACS:                                 Public Macros.       (line  65)
 * ETAGS_ARGS:                            Tags.                (line  25)
 * ETAGSFLAGS:                            Tags.                (line  25)
 * EXPECT:                                DejaGnu Tests.       (line  19)
@@ -5027,6 +5086,9 @@ B.2 Variable Index
                                                               (line  39)
 * EXTRA_DIST:                            Basics of Distribution.
                                                               (line  31)
+* EXTRA_maude_DEPENDENCIES <1>:          Program and Library Variables.
+                                                              (line 119)
+* EXTRA_maude_DEPENDENCIES:              Linking.             (line  41)
 * EXTRA_maude_SOURCES:                   Program and Library Variables.
                                                               (line  53)
 * EXTRA_PROGRAMS:                        Conditional Programs.
@@ -5045,10 +5107,10 @@ B.2 Variable Index
 * FLIBS:                                 Mixing Fortran 77 With C and C++.
                                                               (line  21)
 * FLINK:                                 Fortran 77 Support.  (line  35)
-* GCJ:                                   Public Macros.       (line  98)
+* GCJ:                                   Public Macros.       (line 103)
 * GCJFLAGS <1>:                          Java Support with gcj.
                                                               (line  16)
-* GCJFLAGS:                              Public Macros.       (line  98)
+* GCJFLAGS:                              Public Macros.       (line 103)
 * GCJLINK:                               How the Linker is Chosen.
                                                               (line  10)
 * GTAGS_ARGS:                            Tags.                (line  49)
@@ -5081,7 +5143,7 @@ B.2 Variable Index
 * LINK:                                  Program Variables.   (line  66)
 * LISP:                                  Uniform.             (line 102)
 * lisp_LISP:                             Emacs Lisp.          (line   6)
-* lispdir:                               Public Macros.       (line  60)
+* lispdir:                               Public Macros.       (line  65)
 * localstate_DATA:                       Data.                (line   9)
 * LOG_COMPILE:                           Simple Tests using parallel-tests.
                                                               (line  39)
@@ -5104,20 +5166,20 @@ B.2 Variable Index
 * maude_AR:                              Program and Library Variables.
                                                               (line  68)
 * maude_CCASFLAGS:                       Program and Library Variables.
-                                                              (line 166)
+                                                              (line 171)
 * maude_CFLAGS:                          Program and Library Variables.
-                                                              (line 167)
+                                                              (line 172)
 * maude_CPPFLAGS:                        Program and Library Variables.
-                                                              (line 168)
+                                                              (line 173)
 * maude_CXXFLAGS:                        Program and Library Variables.
-                                                              (line 169)
+                                                              (line 174)
 * maude_DEPENDENCIES <1>:                Program and Library Variables.
                                                               (line 118)
 * maude_DEPENDENCIES:                    Linking.             (line  41)
 * maude_FFLAGS:                          Program and Library Variables.
-                                                              (line 170)
+                                                              (line 175)
 * maude_GCJFLAGS:                        Program and Library Variables.
-                                                              (line 171)
+                                                              (line 176)
 * maude_LDADD <1>:                       Program and Library Variables.
                                                               (line  86)
 * maude_LDADD:                           Linking.             (line  17)
@@ -5125,7 +5187,7 @@ B.2 Variable Index
                                                               (line 106)
 * maude_LDFLAGS:                         Linking.             (line  37)
 * maude_LFLAGS:                          Program and Library Variables.
-                                                              (line 172)
+                                                              (line 177)
 * maude_LIBADD <1>:                      Program and Library Variables.
                                                               (line  78)
 * maude_LIBADD:                          A Library.           (line  26)
@@ -5133,19 +5195,19 @@ B.2 Variable Index
                                                               (line 111)
 * maude_LIBTOOLFLAGS:                    Libtool Flags.       (line   6)
 * maude_LINK:                            Program and Library Variables.
-                                                              (line 149)
+                                                              (line 154)
 * maude_OBJCFLAGS:                       Program and Library Variables.
-                                                              (line 173)
+                                                              (line 178)
 * maude_RFLAGS:                          Program and Library Variables.
-                                                              (line 174)
+                                                              (line 179)
 * maude_SHORTNAME:                       Program and Library Variables.
-                                                              (line 207)
+                                                              (line 212)
 * maude_SOURCES:                         Program and Library Variables.
                                                               (line  18)
 * maude_UPCFLAGS:                        Program and Library Variables.
-                                                              (line 175)
+                                                              (line 180)
 * maude_YFLAGS:                          Program and Library Variables.
-                                                              (line 176)
+                                                              (line 181)
 * mkdir_p:                               Obsolete Macros.     (line  34)
 * MKDIR_P:                               Obsolete Macros.     (line  34)
 * MOSTLYCLEANFILES:                      Clean.               (line  13)
@@ -5180,6 +5242,7 @@ B.2 Variable Index
 * pkglib_LTLIBRARIES:                    Libtool Libraries.   (line   6)
 * pkglibdir:                             Uniform.             (line  19)
 * pkglibexec_PROGRAMS:                   Program Sources.     (line   6)
+* pkglibexec_SCRIPTS:                    Scripts.             (line  18)
 * pkglibexecdir:                         Uniform.             (line  19)
 * pkgpyexecdir:                          Python.              (line 105)
 * pkgpythondir:                          Python.              (line  91)
@@ -5193,7 +5256,7 @@ B.2 Variable Index
 * PYTHON_VERSION:                        Python.              (line  68)
 * pythondir:                             Python.              (line  87)
 * RECHECK_LOGS:                          Simple Tests using parallel-tests.
-                                                              (line 119)
+                                                              (line 118)
 * RFLAGS:                                Fortran 77 Support.  (line  25)
 * RST2HTML:                              Simple Tests using parallel-tests.
                                                               (line  71)
@@ -5237,7 +5300,7 @@ B.2 Variable Index
 * U:                                     Obsolete Macros.     (line  13)
 * UPC <1>:                               Unified Parallel C Support.
                                                               (line  15)
-* UPC:                                   Public Macros.       (line 103)
+* UPC:                                   Public Macros.       (line 108)
 * UPCCOMPILE:                            Unified Parallel C Support.
                                                               (line  24)
 * UPCFLAGS:                              Unified Parallel C Support.
@@ -5254,13 +5317,13 @@ B.2 Variable Index
                                                               (line  62)
 * VERSION:                               Basics of Distribution.
                                                               (line   6)
-* WARNINGS <1>:                          aclocal Options.     (line  99)
-* WARNINGS:                              Invoking Automake.   (line 177)
-* WITH_DMALLOC:                          Public Macros.       (line 113)
-* WITH_REGEX:                            Public Macros.       (line 118)
+* WARNINGS <1>:                          aclocal Options.     (line 100)
+* WARNINGS:                              automake Invocation. (line 177)
+* WITH_DMALLOC:                          Public Macros.       (line 118)
+* WITH_REGEX:                            Obsolete Macros.     (line  63)
 * XFAIL_TESTS:                           Simple Tests.        (line  52)
 * XZ_OPT:                                The Types of Distributions.
-                                                              (line  28)
+                                                              (line  32)
 * YACC:                                  Optional.            (line 119)
 * YFLAGS:                                Yacc and Lex.        (line  33)
 

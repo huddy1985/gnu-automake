@@ -1,12 +1,12 @@
 This is automake.info, produced by makeinfo version 4.13 from
 automake.texi.
 
-This manual is for GNU Automake (version 1.11.2, 21 December 2011), a
+This manual is for GNU Automake (version 1.11.3, 1 February 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software
+2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Free Software
 Foundation, Inc.
 
      Permission is granted to copy, distribute and/or modify this
@@ -24,8 +24,8 @@ END-INFO-DIR-ENTRY
 
 INFO-DIR-SECTION Individual utilities
 START-INFO-DIR-ENTRY
-* aclocal: (automake)Invoking aclocal.          Generating aclocal.m4.
-* automake: (automake)Invoking Automake.        Generating Makefile.in.
+* aclocal-invocation: (automake)aclocal Invocation.   Generating aclocal.m4.
+* automake-invocation: (automake)automake Invocation. Generating Makefile.in.
 END-INFO-DIR-ENTRY
 
 
@@ -34,12 +34,12 @@ File: automake.info,  Node: Top,  Next: Introduction,  Up: (dir)
 GNU Automake
 ************
 
-This manual is for GNU Automake (version 1.11.2, 21 December 2011), a
+This manual is for GNU Automake (version 1.11.3, 1 February 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software
+2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Free Software
 Foundation, Inc.
 
      Permission is granted to copy, distribute and/or modify this
@@ -56,7 +56,7 @@ Foundation, Inc.
 * Autotools Introduction::      An Introduction to the Autotools
 * Generalities::                General ideas
 * Examples::                    Some example packages
-* Invoking Automake::           Creating a Makefile.in
+* automake Invocation::         Creating a Makefile.in
 * configure::                   Scanning configure.ac, using aclocal
 * Directories::                 Declaring subdirectories
 * Programs::                    Building programs and libraries
@@ -134,7 +134,7 @@ Scanning `configure.ac', using `aclocal'
 
 * Requirements::                Configuration requirements
 * Optional::                    Other things Automake recognizes
-* Invoking aclocal::            Auto-generating aclocal.m4
+* aclocal Invocation::          Auto-generating aclocal.m4
 * Macros::                      Autoconf macros supplied with Automake
 
 Auto-generating aclocal.m4
@@ -279,7 +279,7 @@ Miscellaneous Rules
 
 * Tags::                        Interfacing to etags and mkid
 * Suffixes::                    Handling new file extensions
-* Multilibs::                   Support for multilibs.
+* Multilibs::                   Support for multilibs (deprecated, soon to be removed).
 
 Conditionals
 
@@ -1941,8 +1941,11 @@ source in case you need more recent versions.
 
 `config-ml.in'
      This file is not a program, it is a `configure' fragment used for
-     multilib support (*note Multilibs::).  This file is maintained in
-     the GCC tree at `http://gcc.gnu.org/svn.html'.
+     multilib support (*note Multilibs::).  Since the Automake multilib
+     support has been _deprecated_ and targeted for removal, this file
+     is going to be _removed from the Automake core_ in the next major
+     release.  The master copy of this file is maintained in the GCC
+     tree at `http://gcc.gnu.org/svn.html'.
 
 `depcomp'
      This program understands how to run a compiler so that it will
@@ -1983,8 +1986,11 @@ source in case you need more recent versions.
 `symlink-tree'
      This program duplicates a tree of directories, using symbolic links
      instead of copying files.  Such an operation is performed when
-     building multilibs (*note Multilibs::).  This file is maintained
-     in the GCC tree at `http://gcc.gnu.org/svn.html'.
+     building multilibs (*note Multilibs::).  Since the Automake
+     multilib support has been _deprecated_ and targeted for removal,
+     this file is going to be _removed from the Automake core_ in the
+     next major release.  The master copy of this file is maintained in
+     the GCC tree at `http://gcc.gnu.org/svn.html'.
 
 `texinfo.tex'
      Not a program, this file is required for `make dvi', `make ps' and
@@ -1999,7 +2005,7 @@ source in case you need more recent versions.
 
 
 
-File: automake.info,  Node: Examples,  Next: Invoking Automake,  Prev: Generalities,  Up: Top
+File: automake.info,  Node: Examples,  Next: automake Invocation,  Prev: Generalities,  Up: Top
 
 4 Some example packages
 ***********************
@@ -2138,7 +2144,7 @@ be chosen by automake; they would be `false-true.o' and `true-true.o'.
 (The name of the object files rarely matters.)
 
 
-File: automake.info,  Node: Invoking Automake,  Next: configure,  Prev: Examples,  Up: Top
+File: automake.info,  Node: automake Invocation,  Next: configure,  Prev: Examples,  Up: Top
 
 5 Creating a `Makefile.in'
 **************************
@@ -2328,7 +2334,7 @@ number, it is taken as the maximum number of Perl threads to use in
 This is an experimental feature.
 
 
-File: automake.info,  Node: configure,  Next: Directories,  Prev: Invoking Automake,  Up: Top
+File: automake.info,  Node: configure,  Next: Directories,  Prev: automake Invocation,  Up: Top
 
 6 Scanning `configure.ac', using `aclocal'
 ******************************************
@@ -2346,7 +2352,7 @@ using the `aclocal' program.
 
 * Requirements::                Configuration requirements
 * Optional::                    Other things Automake recognizes
-* Invoking aclocal::            Auto-generating aclocal.m4
+* aclocal Invocation::          Auto-generating aclocal.m4
 * Macros::                      Autoconf macros supplied with Automake
 
 
@@ -2473,7 +2479,7 @@ run by `AM_INIT_AUTOMAKE':
 
 
 
-File: automake.info,  Node: Optional,  Next: Invoking aclocal,  Prev: Requirements,  Up: configure
+File: automake.info,  Node: Optional,  Next: aclocal Invocation,  Prev: Requirements,  Up: configure
 
 6.2 Other things Automake recognizes
 ====================================
@@ -2673,11 +2679,11 @@ their effects are:
      `m4_include' is seldom used by `configure.ac' authors, but can
      appear in `aclocal.m4' when `aclocal' detects that some required
      macros come from files local to your package (as opposed to macros
-     installed in a system-wide directory, *note Invoking aclocal::).
+     installed in a system-wide directory, *note aclocal Invocation::).
 
 
 
-File: automake.info,  Node: Invoking aclocal,  Next: Macros,  Prev: Optional,  Up: configure
+File: automake.info,  Node: aclocal Invocation,  Next: Macros,  Prev: Optional,  Up: configure
 
 6.3 Auto-generating aclocal.m4
 ==============================
@@ -2739,7 +2745,7 @@ just as `autoconf'.  Its location can be overridden using the
 * Future of aclocal::           aclocal's scheduled death
 
 
-File: automake.info,  Node: aclocal Options,  Next: Macro Search Path,  Up: Invoking aclocal
+File: automake.info,  Node: aclocal Options,  Next: Macro Search Path,  Up: aclocal Invocation
 
 6.3.1 aclocal Options
 ---------------------
@@ -2778,6 +2784,7 @@ File: automake.info,  Node: aclocal Options,  Next: Macro Search Path,  Up: Invo
 `--install'
      Install system-wide third-party macros into the first directory
      specified with `-I DIR' instead of copying them in the output file.
+     Note that this will happen also if DIR is an absolute path.
 
      When this option is used, and only when this option is used,
      `aclocal' will also honor `#serial NUMBER' lines that appear in
@@ -2838,11 +2845,11 @@ File: automake.info,  Node: aclocal Options,  Next: Macro Search Path,  Up: Invo
      All warnings are output by default.
 
      The environment variable `WARNINGS' is honored in the same way as
-     it is for `automake' (*note Invoking Automake::).
+     it is for `automake' (*note automake Invocation::).
 
 
 
-File: automake.info,  Node: Macro Search Path,  Next: Extending aclocal,  Prev: aclocal Options,  Up: Invoking aclocal
+File: automake.info,  Node: Macro Search Path,  Next: Extending aclocal,  Prev: aclocal Options,  Up: aclocal Invocation
 
 6.3.2 Macro Search Path
 -----------------------
@@ -2998,7 +3005,7 @@ taking precedence over `ACDIR-APIVERSION', and directories in
 a possible future incompatibility!_
 
 
-File: automake.info,  Node: Extending aclocal,  Next: Local Macros,  Prev: Macro Search Path,  Up: Invoking aclocal
+File: automake.info,  Node: Extending aclocal,  Next: Local Macros,  Prev: Macro Search Path,  Up: aclocal Invocation
 
 6.3.3 Writing your own aclocal macros
 -------------------------------------
@@ -3080,7 +3087,7 @@ mails.
 macros that are used locally by the package, *note Local Macros::.
 
 
-File: automake.info,  Node: Local Macros,  Next: Serials,  Prev: Extending aclocal,  Up: Invoking aclocal
+File: automake.info,  Node: Local Macros,  Next: Serials,  Prev: Extending aclocal,  Up: aclocal Invocation
 
 6.3.4 Handling Local Macros
 ---------------------------
@@ -3171,7 +3178,7 @@ serial number for each macro you distribute, even if you do not use the
 `--install' option of `aclocal': this allows other people to use it.
 
 
-File: automake.info,  Node: Serials,  Next: Future of aclocal,  Prev: Local Macros,  Up: Invoking aclocal
+File: automake.info,  Node: Serials,  Next: Future of aclocal,  Prev: Local Macros,  Up: aclocal Invocation
 
 6.3.5 Serial Numbers
 --------------------
@@ -3295,7 +3302,7 @@ do so, simply erase the local macros you want to revert, and run
 `aclocal -I m4 --install'.
 
 
-File: automake.info,  Node: Future of aclocal,  Prev: Serials,  Up: Invoking aclocal
+File: automake.info,  Node: Future of aclocal,  Prev: Serials,  Up: aclocal Invocation
 
 6.3.6 The Future of `aclocal'
 -----------------------------
@@ -3341,7 +3348,7 @@ really easy provided all macros are properly written (*note Extending
 aclocal::).
 
 
-File: automake.info,  Node: Macros,  Prev: Invoking aclocal,  Up: configure
+File: automake.info,  Node: Macros,  Prev: aclocal Invocation,  Up: configure
 
 6.4 Autoconf macros supplied with Automake
 ==========================================
@@ -3363,12 +3370,17 @@ File: automake.info,  Node: Public Macros,  Next: Obsolete Macros,  Up: Macros
 -------------------
 
 `AM_ENABLE_MULTILIB'
-     This is used when a "multilib" library is being built.  The first
-     optional argument is the name of the `Makefile' being generated; it
-     defaults to `Makefile'.  The second optional argument is used to
-     find the top source directory; it defaults to the empty string
-     (generally this should not be used unless you are familiar with
-     the internals).  *Note Multilibs::.
+     This is used when a "multilib" library is being built.  Please be
+     aware that multilib support _will be removed_ from the Automake
+     core in the next major release, and then _this macro will go away
+     as well_ (even if a "frozen" version of will remain available in
+     the `contrib/' directory of the Automake distribution).
+
+     The first optional argument is the name of the `Makefile' being
+     generated; it defaults to `Makefile'.  The second optional argument
+     is used to find the top source directory; it defaults to the empty
+     string (generally this should not be used unless you are familiar
+     with the internals).  *Note Multilibs::.
 
 `AM_INIT_AUTOMAKE([OPTIONS])'
 `AM_INIT_AUTOMAKE(PACKAGE, VERSION, [NO-DEFINE])'
@@ -3473,13 +3485,6 @@ File: automake.info,  Node: Public Macros,  Next: Obsolete Macros,  Up: Macros
      user runs `configure' with `--with-dmalloc', then define
      `WITH_DMALLOC' and add `-ldmalloc' to `LIBS'.
 
-`AM_WITH_REGEX'
-     Adds `--with-regex' to the `configure' command line.  If specified
-     (the default), then the `regex' regular expression library is
-     used, `regex.o' is put into `LIBOBJS', and `WITH_REGEX' is
-     defined.  If `--without-regex' is given, then the `rx' regular
-     expression library is used, and `rx.o' is put into `LIBOBJS'.
-
 
 
 File: automake.info,  Node: Obsolete Macros,  Next: Private Macros,  Prev: Public Macros,  Up: Macros
@@ -3542,6 +3547,16 @@ Invocation.).
      `am_cv_sys_posix_termios' to `yes'.  If not, set the variable to
      `no'.  This macro is obsolete, you should use Autoconf's
      `AC_SYS_POSIX_TERMIOS' instead.
+
+`AM_WITH_REGEX'
+     Adds `--with-regex' to the `configure' command line.  If specified
+     (the default), then the `regex' regular expression library is
+     used, `regex.o' is put into `LIBOBJS', and `WITH_REGEX' is
+     defined.  If `--without-regex' is given, then the `rx' regular
+     expression library is used, and `rx.o' is put into `LIBOBJS'.
+     This macro is obsolete now (since `rx' doesn't seem to be
+     maintained), and _will be removed the next major version of
+     Automake_.  Consider using gnulib if you need regex functionality.
 
 
 
@@ -4145,8 +4160,9 @@ flags (except for `-l', `-L', `-dlopen' and `-dlpreopen').  So, use the
 
    It is also occasionally useful to have a program depend on some other
 target that is not actually part of that program.  This can be done
-using the `PROG_DEPENDENCIES' variable.  Each program depends on the
-contents of such a variable, but no further interpretation is done.
+using either the `PROG_DEPENDENCIES' or the `EXTRA_PROG_DEPENDENCIES'
+variable.  Each program depends on the contents both variables, but no
+further interpretation is done.
 
    Since these dependencies are associated to the link rule used to
 create the programs they should normally list files used by the link
@@ -4167,6 +4183,10 @@ generated.
 
    *note Conditional Sources:: shows a situation where `_DEPENDENCIES'
 may be used.
+
+   The `EXTRA_PROG_DEPENDENCIES' may be useful for cases where you
+merely want to augment the `automake'-generated `PROG_DEPENDENCIES'
+rather than replacing it.
 
    We recommend that you avoid using `-l' options in `LDADD' or
 `PROG_LDADD' when referring to libraries built by your package.
@@ -4929,6 +4949,7 @@ libraries differ.
      flags).  *Note Libtool Flags::.
 
 `maude_DEPENDENCIES'
+`EXTRA_maude_DEPENDENCIES'
      It is also occasionally useful to have a target (program or
      library) depend on some other file that is not actually part of
      that target.  This can be done using the `_DEPENDENCIES' variable.
@@ -4958,6 +4979,10 @@ libraries differ.
      compilation using an `AC_SUBST' variable that contains a list of
      objects.  *Note Conditional Sources::, and *note Conditional
      Libtool Sources::.
+
+     The `EXTRA_*_DEPENDENCIES' variable may be useful for cases where
+     you merely want to augment the `automake'-generated
+     `_DEPENDENCIES' variable rather than replacing it.
 
 `maude_LINK'
      You can override the linker on a per-program basis.  By default the
@@ -5122,9 +5147,10 @@ is no need to list the corresponding sources in `EXTRA_*_SOURCES' nor
 to define `*_DEPENDENCIES'.  Automake automatically adds `$(LIBOBJS)'
 and `$(ALLOCA)' to the dependencies, and it will discover the list of
 corresponding source files automatically (by tracing the invocations of
-the `AC_LIBSOURCE' Autoconf macros).  However, if you have already
-defined `*_DEPENDENCIES' explicitly for an unrelated reason, then you
-have to add these variables manually.
+the `AC_LIBSOURCE' Autoconf macros).  If you have already defined
+`*_DEPENDENCIES' explicitly for an unrelated reason, then you either
+need to add these variables manually, or use `EXTRA_*_DEPENDENCIES'
+instead of `*_DEPENDENCIES'.
 
    These variables are usually used to build a portability library that
 is linked with all the programs of the project.  We now review a sample
@@ -6091,8 +6117,8 @@ looks as follows:
 that should be distributed can be specified using a `dist_' prefix as
 with other primaries.
 
-   Scripts can be installed in `bindir', `sbindir', `libexecdir', or
-`pkgdatadir'.
+   Scripts can be installed in `bindir', `sbindir', `libexecdir',
+`pkglibexecdir', or `pkgdatadir'.
 
    Scripts that need not be installed can be listed in
 `noinst_SCRIPTS', and among them, those which are needed only by `make
@@ -7236,47 +7262,4 @@ distributed while leaving some source code out of the distribution:
      dist_data_DATA = distribute-this
      bin_PROGRAMS = foo
      nodist_foo_SOURCES = do-not-distribute.c
-
-
-File: automake.info,  Node: The dist Hook,  Next: Checking the Distribution,  Prev: Fine-grained Distribution Control,  Up: Dist
-
-14.3 The dist Hook
-==================
-
-Occasionally it is useful to be able to change the distribution before
-it is packaged up.  If the `dist-hook' rule exists, it is run after the
-distribution directory is filled, but before the actual tar (or shar)
-file is created.  One way to use this is for distributing files in
-subdirectories for which a new `Makefile.am' is overkill:
-
-     dist-hook:
-             mkdir $(distdir)/random
-             cp -p $(srcdir)/random/a1 $(srcdir)/random/a2 $(distdir)/random
-
-   Another way to use this is for removing unnecessary files that get
-recursively included by specifying a directory in EXTRA_DIST:
-
-     EXTRA_DIST = doc
-
-     dist-hook:
-             rm -rf `find $(distdir)/doc -type d -name .svn`
-
-   Two variables that come handy when writing `dist-hook' rules are
-`$(distdir)' and `$(top_distdir)'.
-
-   `$(distdir)' points to the directory where the `dist' rule will copy
-files from the current directory before creating the tarball.  If you
-are at the top-level directory, then `distdir = $(PACKAGE)-$(VERSION)'.
-When used from subdirectory named `foo/', then `distdir =
-../$(PACKAGE)-$(VERSION)/foo'.  `$(distdir)' can be a relative or
-absolute path, do not assume any form.
-
-   `$(top_distdir)' always points to the root directory of the
-distributed tree.  At the top-level it's equal to `$(distdir)'.  In the
-`foo/' subdirectory `top_distdir = ../$(PACKAGE)-$(VERSION)'.
-`$(top_distdir)' too can be a relative or absolute path.
-
-   Note that when packages are nested using `AC_CONFIG_SUBDIRS' (*note
-Subpackages::), then `$(distdir)' and `$(top_distdir)' are relative to
-the package where `make dist' was run, not to any sub-packages involved.
 
