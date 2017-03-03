@@ -45,6 +45,7 @@ ansi8.test \
 ansi9.test \
 ansi10.test \
 ar.test \
+ar2.test \
 asm.test \
 autohdr.test \
 autohdr2.test \
@@ -71,6 +72,7 @@ check2.test \
 check3.test \
 checkall.test \
 clean.test \
+clean2.test \
 colneq.test \
 colneq2.test \
 colon.test \

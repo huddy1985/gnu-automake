@@ -1818,7 +1818,10 @@ sub handle_source_transform
 	my $old_default_source = "$one_file.c";
 	(my $default_source = $unxformed) =~ s,(\.[^./\\]*)?$,.c,;
 	if ($old_default_source ne $default_source
-	    && (rule $old_default_source || -f $old_default_source))
+	    && (rule $old_default_source
+		|| rule '$(srcdir)/' . $old_default_source
+		|| rule '${srcdir}/' . $old_default_source
+		|| -f $old_default_source))
 	  {
 	    my $loc = $where->clone;
 	    $loc->pop_context;
@@ -1827,6 +1830,14 @@ sub handle_source_transform
 		 . "to `$default_source'.\n(Using `$old_default_source' for "
 		 . "backward compatibility.)");
 	    $default_source = $old_default_source;
+	  }
+	# If a rule exists to build this source with a $(srcdir)
+	# prefix, use that prefix in our variables too.  This is for
+	# the sake of BSD Make.
+	if (rule '$(srcdir)/' . $default_source
+	    || rule '${srcdir}/' . $default_source)
+	  {
+	    $default_source = '$(srcdir)/' . $default_source;
 	  }
 
 	&define_variable ($one_file . "_SOURCES", $default_source, $where);
@@ -2236,6 +2247,9 @@ sub handle_libraries
       my $var = rvar ($prefix[0] . '_LIBRARIES');
       $var->requires_variables ('library used', 'RANLIB');
     }
+
+  &define_variable ('AR', 'ar', INTERNAL);
+  &define_variable ('ARFLAGS', 'cru', INTERNAL);
 
   foreach my $pair (@liblist)
     {
@@ -3198,6 +3212,49 @@ sub for_dist_common
 # Handle 'dist' target.
 sub handle_dist ()
 {
+  # Substutions for distdit.am
+  my %transform;
+
+  # Define DIST_SUBDIRS.  This must always be done, regardless of the
+  # no-dist setting: target like `distclean' or `maintainer-clean' use it.
+  my $subdirs = var ('SUBDIRS');
+  if ($subdirs)
+    {
+      # If SUBDIRS is conditionally defined, then set DIST_SUBDIRS
+      # to all possible directories, and use it.  If DIST_SUBDIRS is
+      # defined, just use it.
+      my $dist_subdir_name;
+      # Note that we check DIST_SUBDIRS first on purpose, so that
+      # we don't call has_conditional_contents for now reason.
+      # (In the past one project used so many conditional subdirectories
+      # that calling has_conditional_contents on SUBDIRS caused
+      # automake to grow to 150Mb -- this should not happen with
+      # the current implementation of has_conditional_contents,
+      # but it's more efficient to avoid the call anyway.)
+      if (var ('DIST_SUBDIRS'))
+	{
+	  $dist_subdir_name = 'DIST_SUBDIRS';
+	}
+      elsif ($subdirs->has_conditional_contents)
+	{
+	  $dist_subdir_name = 'DIST_SUBDIRS';
+	  define_pretty_variable
+	    ('DIST_SUBDIRS', TRUE, INTERNAL,
+	     uniq ($subdirs->value_as_list_recursive));
+	}
+      else
+	{
+	  $dist_subdir_name = 'SUBDIRS';
+	  # We always define this because that is what `distclean'
+	  # wants.
+	  define_pretty_variable ('DIST_SUBDIRS', TRUE, INTERNAL,
+				  '$(SUBDIRS)');
+	}
+
+      $transform{'DIST_SUBDIR_NAME'} = $dist_subdir_name;
+    }
+
+  # The remaining definitions are only required when a dist target is used.
   return if option 'no-dist';
 
   # At least one of the archive formats must be enabled.
@@ -3304,59 +3361,19 @@ sub handle_dist ()
 	unless $_ eq '.';
     }
 
-  # Rule to check whether a distribution is viable.
-  my %transform = ('DISTCHECK-HOOK' => !! rule 'distcheck-hook',
-		   'GETTEXT' => $seen_gettext && !$seen_gettext_external);
+  $transform{'DISTCHECK-HOOK'} = !! rule 'distcheck-hook';
+  $transform{'GETTEXT'} = $seen_gettext && !$seen_gettext_external;
 
   # Prepend $(distdir) to each directory given.
   my %rewritten = map { '$(distdir)/' . "$_" => 1 } keys %dist_dirs;
   $transform{'DISTDIRS'} = join (' ', sort keys %rewritten);
-
-  # If we have SUBDIRS, create all dist subdirectories and do
-  # recursive build.
-  my $subdirs = var ('SUBDIRS');
-  if ($subdirs)
-    {
-      # If SUBDIRS is conditionally defined, then set DIST_SUBDIRS
-      # to all possible directories, and use it.  If DIST_SUBDIRS is
-      # defined, just use it.
-      my $dist_subdir_name;
-      # Note that we check DIST_SUBDIRS first on purpose, so that
-      # we don't call has_conditional_contents for now reason.
-      # (In the past one project used so many conditional subdirectories
-      # that calling has_conditional_contents on SUBDIRS caused
-      # automake to grow to 150Mb -- this should not happen with
-      # the current implementation of has_conditional_contents,
-      # but it's more efficient to avoid the call anyway.)
-      if (var ('DIST_SUBDIRS'))
-	{
-	  $dist_subdir_name = 'DIST_SUBDIRS';
-	}
-      elsif ($subdirs->has_conditional_contents)
-	{
-	  $dist_subdir_name = 'DIST_SUBDIRS';
-	  define_pretty_variable
-	    ('DIST_SUBDIRS', TRUE, INTERNAL,
-	     uniq ($subdirs->value_as_list_recursive));
-	}
-      else
-	{
-	  $dist_subdir_name = 'SUBDIRS';
-	  # We always define this because that is what `distclean'
-	  # wants.
-	  define_pretty_variable ('DIST_SUBDIRS', TRUE, INTERNAL,
-				  '$(SUBDIRS)');
-	}
-
-      $transform{'DIST_SUBDIR_NAME'} = $dist_subdir_name;
-    }
 
   # If the target `dist-hook' exists, make sure it is run.  This
   # allows users to do random weird things to the distribution
   # before it is packaged up.
   push (@dist_targets, 'dist-hook')
     if rule 'dist-hook';
-  $transform{'DIST-TARGETS'} = join(' ', @dist_targets);
+  $transform{'DIST-TARGETS'} = join (' ', @dist_targets);
 
   $output_rules .= &file_contents ('distdir',
 				   new Automake::Location,
@@ -7118,6 +7135,7 @@ sub parse_arguments ()
       $output_directory = '.';
     }
 
+  my $errspec = 0;
   foreach my $arg (@ARGV)
     {
       if ($arg =~ /^-./)
@@ -7137,9 +7155,12 @@ sub parse_arguments ()
 	}
       else
 	{
-	  error "no Automake input file found in `$arg'";
+	  error "no Automake input file found for `$arg'";
+	  $errspec = 1;
 	}
     }
+  fatal "no input file found among supplied arguments"
+    if $errspec && ! @input_files;
 }
 
 ################################################################
@@ -7155,8 +7176,13 @@ $configure_ac = require_configure_ac;
 # Do configure.ac scan only once.
 scan_autoconf_files;
 
-fatal "no `Makefile.am' found or specified\n"
-  if ! @input_files;
+if (! @input_files)
+  {
+    my $msg = '';
+    $msg = "\nDid you forget AC_CONFIG_FILES([Makefile]) in $configure_ac?"
+      if -f 'Makefile.am';
+    fatal ("no `Makefile.am' found for any configure output$msg");
+  }
 
 my $automake_has_run = 0;
 

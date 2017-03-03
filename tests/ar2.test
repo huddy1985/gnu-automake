@@ -1,6 +1,5 @@
 #! /bin/sh
-# Copyright (C) 1997, 2000, 2001, 2002, 2003, 2004  Free Software
-#   Foundation, Inc.
+# Copyright (C) 2004  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -19,20 +18,25 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# Make sure Automake complains when there is no Makefile specified.
+# Make sure AR and ARFLAGS are defined for EXTRA_LIBRARIES.
+# Report from Kevin Ryde.
 
 . ./defs || exit 1
 
 set -e
 
-cat > configure.in << 'END'
-AC_INIT([foo], [bar], [baz])
-AM_INIT_AUTOMAKE
+cat >> configure.in << 'END'
+AC_PROG_CC
+AC_PROG_RANLIB
 AC_OUTPUT
 END
 
-: > Makefile.am
+cat > Makefile.am << 'END'
+EXTRA_LIBRARIES = libfoo.a
+libfoo_a_SOURCES = foo.c
+END
 
 $ACLOCAL
-AUTOMAKE_fails
-grep 'AC_CONFIG_FILES(.Makefile.)' stderr
+$AUTOMAKE
+grep 'ARFLAGS =' Makefile.in
+grep 'AR =' Makefile.in

@@ -1,4 +1,66 @@
+2004-05-16  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.ac, NEWS: Bump version to 1.8.5.
+
+	* lib/texinfo.tex: New upstream version.
+
+2004-05-15  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (handle_dist): Always define DIST_SUBDIRS, even when
+	the no-dist or cygnus options are used.
+	* tests/clean2.test: New file.
+	* tests/Makefile.am (TESTS): Add clean2.test.
+	Report from Daniel Jacobowitz.
+
+	* automake.in (parse_arguments, MAIN): Give more precise
+	diagnostics when no input file is found.
+	* tests/output5.test: Adjust.
+	Suggested by Jens Petersen.
+
+2004-05-14  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/am/libs.am (AR, ARFLAGS): Move these definition ...
+	* automake.in (handle_libraries): ... here, so that they are
+	output even for EXTRA_LIBRARIES.
+	* tests/ar2.test: New file.
+	* tests/Makefile.am (TESTS): Add it.
+	Report from Kevin Ryde.
+
+2004-05-13  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (Program and Library Variables): Remove
+	doubled word in footnote.
+
+	* automake.in (handle_source_transform): Also check for a
+	$(srcdir)/old_source rule when computing the default source name.
+	Propagate this $(srcdir) prefix in Automake variables.
+	* tests/ltlibsrc.test (noinst_LTLIBRARIES): Explicitly refer to
+	$(srcdir)/zoo_d_old2_la.c.  This fixes another failure with BSD Make.
+
+2004-05-13  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* Makefile.am (fetch): Work even with FreeBSD "make", which
+	uses sh -e and thus errors-out if a simple-command fails.
+	* lib/am/check.am (check-TESTS): Likewise.
+	* lib/am/ltlib.am (clean-%DIR%LTLIBRARIES): Likewise.
+	* lib/am/tags.am (TAGS): Likewise.
+
+2004-05-13  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/lex3.test, tests/yacc6.test: Require GNU Make.
+	Fixing these for BSD Make requires invasive changes (lexers and
+	parsers must be built into $srcdir, and--most annoyingly--all
+	references to parse.h must be changed to $(srcdir)/parse.h).
+	Report from Mark D. Baushke.
+
+2004-05-10  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/defs.in (GNUmake): Grep for GNU to parry FreeBSD make.
+	Report from Mark D. Baushke.
+
 2004-04-25  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.ac, NEWS: Bump version to 1.8.4a.
 
 	* configure.ac, NEWS: Bump version to 1.8.4.
 

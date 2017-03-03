@@ -3,7 +3,7 @@ automake.texi.
 
 
 
-   This manual is for GNU Automake (version 1.8.4, 25 April 2004), a
+   This manual is for GNU Automake (version 1.8.5, 13 May 2004), a
 program which creates GNU standards-compliant Makefiles from template
 files.
 
@@ -40,7 +40,7 @@ GNU Automake
 
 
 
-   This manual is for GNU Automake (version 1.8.4, 25 April 2004), a
+   This manual is for GNU Automake (version 1.8.5, 13 May 2004), a
 program which creates GNU standards-compliant Makefiles from template
 files.
 
@@ -2827,8 +2827,8 @@ libraries differ.
 
    ---------- Footnotes ----------
 
-   (1) There are other, more obscure reasons reasons for this
-limitation as well.
+   (1) There are other, more obscure reasons for this limitation as
+well.
 
 
 File: automake.info,  Node: Default _SOURCES,  Next: LIBOBJS,  Prev: Program and Library Variables,  Up: Programs
