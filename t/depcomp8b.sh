@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2010-2012 Free Software Foundation, Inc.
+# Copyright (C) 2010-2013 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -56,8 +56,8 @@ DISTCHECK_CONFIGURE_FLAGS='--enable-dependency-tracking' $MAKE distcheck
 
 # Try again with subdir-objects option.
 
-sed 's/#x //' configure.ac >configure.int
-mv -f configure.int configure.ac
+sed 's/#x //' configure.ac >configure.tmp
+mv -f configure.tmp configure.ac
 echo AUTOMAKE_OPTIONS = subdir-objects >> Makefile.am
 
 $ACLOCAL

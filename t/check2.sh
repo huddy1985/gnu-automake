@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2002-2012 Free Software Foundation, Inc.
+# Copyright (C) 2002-2013 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ grep '^PASS: subrun\.sh *$' stdout
 grep 'PASS.*echo\.sh' stdout && exit 1
 
 # 'check' should depend directly on 'check-am' (similar tests are
-# in check.sh and check3.sh).
+# in 'check.sh' and 'built-sources-check.sh').
 $EGREP '^check:.* check-recursive( |$)' Makefile.in
 $EGREP '^check:.* check-am( |$)' dir/Makefile.in
 

@@ -1,3 +1,346 @@
+2013-01-01  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	release: stable minor release 1.13.1
+
+	* configure.ac (AC_INIT): Bump version number to 1.13.1.
+	* m4/amversion.m4: Likewise (auto-updated by "make bootstrap").
+
+2013-01-01  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: don't always look for a C++ compiler named 'RCC'
+
+	On MacOS X (10.8), since the file system is case-insensitive, RCC
+	can point to the "Resource Compiler" of the Qt4 Toolkit:
+
+	    <http://doc.qt.digia.com/4.2/rcc.html>
+
+	That mismatch causes our configure script to erroneously think that
+	no working C++ compiler is present, and that is thus necessary to
+	skip all the test cases requiring such a compiler.
+
+	So only look for a compiler named 'RCC' if the file system is
+	case-sensible.
+
+	Issue spotted analyzing the testsuite logs reported in bug#13317.
+
+	* configure.ac: Adjust.
+
+2013-01-01  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fix bug in pkg-config-macros.sh, could cause spurious SKIPs
+
+	Issue spotted perusing the testsuite logs reported in bug#13317.
+
+	* t/pkg-config-macros.sh: Don't use (uninitialized) '$dir' where '$d'
+	should have been used instead.  Set IFS to ':' before looping on the
+	$PATH expansion.  Fix typo: 'alocal' instead of 'aclocal'.  These
+	issues were causing the location in PATH of the 'pkg-config' program
+	not to be found even when the program was present.
+	* THANKS: Update.
+
+2013-01-01  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	docs: autom4te cache can break CONFIGURE_DEPENDENCIES
+
+	In fact, the new test 'remake-configure-dependencies.sh' only
+	works because it disables the autom4te cache :-(  That is more
+	of an AUtotools design issue than an Automake bug, so better
+	just document it ...
+
+	* doc/automake.texi (Rebuilding): ... here.
+
+2013-01-01  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	coverage: test CONFIGURE_DEPENDENCIES
+
+	* t/remake-configure-dependencies.sh: New test.
+	* t/list-of-tests.mk: Add it.
+	* doc/automake.texi: Reference it in comments.
+
+2013-01-01  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	coverage: test CONFIG_STATUS_DEPENDENCIES
+
+	* t/remake-config-status-dependencies.sh: New test.
+	* t/list-of-tests.mk: Add it.
+	* doc/automake.texi: Reference it in comments.
+
+2012-12-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fix reference to related tests in some comments
+
+	* t/acloca10.sh: Here.
+	* t/check2.sh: And here.
+	* t/remake-deleted-m4-file.sh: And here.
+
+2012-12-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: some enhancements to texinfo tests (from Automake-NG)
+
+	* t/txinfo-many-output-formats.sh: Backport improvements, almost verbatim,
+	from Automake-NG commit 'v1.13-768-gb434acc' (plus minor tweaks for the
+	sake of non-GNU make implementation).
+	* t/txinfo-many-output-formats-vpath.sh: New test, backported almost
+	verbatim from that same Automake-NG commit (again, with minor tweaks for
+	the sake of non-GNU make implementations).
+	* t/lsit-of-tests.mk: Adjust.
+
+2012-12-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fix reference to sister tests in two heading comments
+
+	* t/color-tests.sh: Here.
+	* t/color-tests2.sh: And here.
+
+2012-12-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: update copyright year for 2013 (in branch maint)
+
+2012-12-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	docs: adjust comment w.r.t. recent tests renaming
+
+2012-12-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: some more renames for texinfo tests
+
+	* t/txinfo.sh: Rename ...
+	* t/txinfo-tex-dist.sh: ... like this.
+	* t/txinfo10.sh: Rename ...
+	* t/txinfo-dvi-recurs.sh: ... like this.
+	* t/txinfo20.sh: Rename ...
+	* t/txinfo-makeinfo-error-no-clobber.sh: ... like this.
+	* t/txinfo-setfilename-suffix-match.sh: Rename ...
+	* t/txinfo-setfilename-suffix-strip.sh: ... like this.
+	* t/txinfo-suffix-less-info.sh: Rename ...
+	* t/txinfo-without-info-suffix.sh: ... like this.
+	* t/vtexi.sh: Rename ...
+	* t/txinfo-vtexi.sh: ... like this.
+	* t/vtexi2.sh: Rename ...
+	* t/txinfo-vtexi2.sh: ... like this.
+	* t/vtexi3.sh: Rename ...
+	* t/txinfo-vtexi3.sh: ... like this, and adjust heading comments.
+	* t/vtexi4.sh: Rename ...
+	* t/txinfo-vtexi4.sh: ... like this, and adjust heading comments.
+	* t/list-of-tests.mk: Adjust.
+
+2012-12-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: enhance and tweak some texinfo tests
+
+	* t/txinfo-subdir-pr343.sh: Move the tests checking that '.info.bak'
+	files in subdirs are not unduly distributed into ...
+	* t/txinfo-no-extra-dist.sh: ... in here.  Enhance a little while
+	at it.
+	* t/txinfo-other-suffixes.sh: Also check that the '.texinfo' suffix
+	is accepted and works.
+	* t/txinfo-setfilename-suffix-match.sh: Remove useless call to
+	autoconf, enhance a little.
+
+2012-12-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: remove a redundant texinfo test
+
+	* t/txinfo-add-missing.sh: This one, its checks being already covered
+	by the more extensive 't/add-missing.tap' test.
+	* t/txinfo-add-missing2.sh: Rename ...
+	* t/txinfo-add-missing-and-dist.sh: Like this.
+	* t/list-of-tests.mk: Adjust.
+
+2012-12-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: don't list a removed tests in XFAIL_TESTS
+
+	* t/list-of-tests.mk (XFAIL_TESTS): No longer list 't/txinfo5.sh' here,
+	it has been removed together with the Cygnus support.
+
+2012-12-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: more explicative names for some tests
+
+	Do so for several Texinfo-related tests.  Note that some of such tests
+	with suboptimal names are *not* renamed; that's because they are going
+	to be removed in the master branch anyway (since they check from some
+	soon-to-be-removed features), so renaming them would be wasted work,
+	and could even create useless merge conflicts.
+
+	* t/txinfo2.sh: Rename ...
+	* t/txinfo-no-extra-dist.sh: ... like this.
+	* t/txinfo3.sh: Rename ...
+	* t/txinfo-suffix-less-info.sh: ... like this.
+	* t/txinfo4.sh: Rename ...
+	* t/txinfo-unrecognized-info-suffix.sh: ... like this.
+	* t/txinfo6.sh: Rename ...
+	* t/txinfo-other-suffixes.sh: ... like this.
+	* t/txinfo7.sh: Rename ...
+	* t/txinfo-add-missing.sh: ... like this.
+	* t/txinfo8.sh: Rename ...
+	* t/txinfo-add-missing2.sh: ... like this.
+	* t/txinfo9.sh: Rename ...
+	* t/txinfo-no-repeated-targets.sh: ... like this.
+	* t/txinfo17.sh: Rename ...
+	* t/txinfo-setfilename-repeated.sh: ... like this.
+	* t/txinfo13.sh: Rename ...
+	* t/txinfo-subdir-pr343.sh: ... like this.
+	* t/txinfo16.sh: Rename ...
+	* t/txinfo-info-in-srcdir.sh: ... like this.
+	* t/txinfo21.sh: Rename ...
+	* t/txinfo-many-output-formats.sh: ... like this.
+	* t/txinfo22.sh: Rename ...
+	* t/txinfo-override-texinfo-tex.sh: ... like this.
+	* t/txinfo26.sh: Rename ...
+	* t/txinfo-absolute-srcdir-pr408.sh: ... like this.
+	* t/txinfo27.sh: Rename ...
+	* t/txinfo-no-installinfo.sh: ... like this.
+	* t/txinfo29.sh: Rename ...
+	* t/txinfo-override-infodeps.sh: ... like this.
+	* t/txinfo31.sh: Rename ...
+	* t/txinfo-setfilename-suffix-match.sh: ... like this.
+	* t/txinfo32.sh: Rename ...
+	* t/txinfo-bsd-make-recurs.sh: ... like this.
+	* t/txinfo33.sh: Rename ...
+	* t/txinfo-clean.sh: ... like this.
+	* t/list-of-tests.mk: Adjust.
+
+2012-12-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	cleanup: drop a redundant %?FIRST% transform
+
+	* lib/am/texinfos.am: Here: this file is only included one time
+	per Makefile by Automake.
+
+	Cherry picked from Automake-NG commit 'v1.12.2-864-g5c580b0'.
+
+2012-12-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: state when compatibility cruft should be removed or warned about
+
+	* automake.in: Here.
+	* lib/Automake/Options.pm: And here.
+	* m4/obsolete-err.m4: And here.
+
+2012-12-30  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	fixup: copyright yars in two recent tests
+
+2012-12-30  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	obsolete: fixup: don't use AU_DEFUN where AC_DEFUN is required
+
+	* m4/obsolete-err.m4: Here, for the definition of 'AM_PROG_CC_STDC'
+
+2012-12-30  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	NEWS: minor fixup
+
+2012-12-30  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	obsolete: better error message if AM_PROG_CC_STDC is used
+
+	In Automake 1.13, the long-deprecated (since 2002) macro AM_PROG_CC_STDC
+	has been removed.  Such a removal, albeit sensible and justified, was
+	probably done in a too-abrupt way, since it didn't turn the pre-existing
+	warning messages into fatal error messages, but simply dropped the macro
+	definition, so that remaining usages of it would cause unclear error
+	messages, e.g.:
+
+	    configure.ac:4: warning: macro 'AM_PROG_CC_STDC' not found in library
+
+	from aclocal, and:
+
+	    configure.ac:4: error: possibly undefined macro: AM_PROG_CC_STDC
+	      If this token and others are legitimate, please use m4_pattern_allow.
+	      See the Autoconf documentation.
+
+	from autoconf.
+
+	In an attempt to mitigate this issue, we re-add an AM_PROG_CC_STDC
+	definition that simply raises a *clear* error message when the macro
+	is used.
+
+	* t/am-prog-cc-stdc-no-more.sh: New test.
+	* t/list-of-tests.mk: Add it.
+	* m4/obsolete-err.m4: Add the new "error-raising" definition for
+	AM_PROG_CC_STDC; the error message is a variation of the one already
+	present in the older version of this macro, before it got removed in
+	commit 'v1.12-15-gd2ca168'.
+	* NEWS: Update.
+
+2012-12-30  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	obsolete: better error message if AM_CONFIG_HEADER is used
+
+	In Automake 1.13, the long-deprecated macro AM_CONFIG_HEADER (deprecated
+	since 2002) has been removed in favour of AC_CONFIG_HEADERS.  However,
+	the removal was done without a proper deprecation period, and that
+	caused packages upgrading to Automake 1.13 to fail with very unclear
+	error messages, e.g.:
+
+	    configure.ac:4: warning: macro 'AM_CONFIG_HEADER' not found in library
+
+	from aclocal, and:
+
+	    configure.ac:4: error: possibly undefined macro: AM_CONFIG_HEADER
+	      If this token and others are legitimate, please use m4_pattern_allow.
+	      See the Autoconf documentation.
+
+	from autoconf.
+
+	In an attempt to mitigate this issue, we re-add an AM_CONFIG_HEADER
+	definition that simply raises a *clear* error message when the macro
+	is used.
+
+	Report by Paolo Bonzini:
+	<http://lists.gnu.org/archive/html/automake/2012-12/msg00039.html>
+
+	* t/am-config-header-no-more.sh: New test.
+	* t/list-of-tests.mk: Add it.
+	* m4/obsolete-err.m4: New file, contain the new AM_CONFIG_HEADER
+	"error-raising" definition, as well as the definition of the
+	similarly obsolete macros 'AM_C_PROTOTYPES' and 'fp_C_PROTOTYPES',
+	moved in from ...
+	* m4/protos.m4: ... this file, which has thus been removed.
+	* Makefile.am (dist_automake_ac_DATA): Adjust.
+	* t/ansi2knr-no-more.sh: Likewise.
+	* NEWS: Update.
+
+2012-12-29  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	sync: update files from upstream with "make fetch"
+
+	* lib/config.sub: Update.
+	* lib/config.guess: Likewise.
+
+2012-12-29  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: better names for temporary configure.ac files
+
+	When editing a pre-existent 'configure.ac' file in a test script, name
+	the temporary file 'configure.tmp' rather than 'configure.int'; the
+	latter was a relict of the times when we used 'configure.in' as the
+	default name for the Autoconf input files throughout the testsuite.
+
+	* t/cond43.sh: Adjust.
+	* t/depcomp8a.sh: Likewise.
+	* t/depcomp8b.sh: Likewise.
+	* t/gettext.sh: Likewise.
+	* t/mmode.sh: Likewise.
+	* t/pr401.sh: Likewise.
+	* t/pr401b.sh: Likewise.
+	* t/pr401c.sh: Likewise.
+	* t/python11.sh: Likewise.
+	* t/cond42.sh: Likewise.  Also, while at it, rename ...
+	(edit_configure_in): ... this function ...
+	(edit_configure_ac): ... like this.
+
+2012-12-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	post-release: minor version bump
+
+	This is for the maint branch.
+
+	* configure.ac, m4/amversion.m4: Bump version to 1.13.0a.
+
 2012-12-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
 
 	release: stable major release 1.13

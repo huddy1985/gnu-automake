@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2003-2012 Free Software Foundation, Inc.
+# Copyright (C) 2003-2013 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Make sure aclocal define macros in the same order as -I's.
-# This is the same as aclocal9.sh, with the macro calls reversed.
-# (It did make a difference.)
+# This is the same as aclocal-I-order-1.sh, with the macro calls
+# reversed (it did make a difference).
 #
 # Also check for --install.
 

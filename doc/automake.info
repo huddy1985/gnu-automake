@@ -1,11 +1,11 @@
 This is doc/automake.info, produced by makeinfo version 4.13 from
 ./doc/automake.texi.
 
-This manual is for GNU Automake (version 1.13, 28 December 2012), a
+This manual is for GNU Automake (version 1.13.1, 1 January 2013), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
-   Copyright (C) 1995-2012 Free Software Foundation, Inc.
+   Copyright (C) 1995-2013 Free Software Foundation, Inc.
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -30,7 +30,7 @@ END-INFO-DIR-ENTRY
 Indirect:
 automake.info-1: 1090
 automake.info-2: 297446
-automake.info-3: 526065
+automake.info-3: 526309
 
 Tag Table:
 (Indirect)
@@ -196,48 +196,48 @@ Node: Links and external resources on TAP349445
 Node: DejaGnu Tests351026
 Node: Install Tests353060
 Node: Rebuilding353362
-Node: Options355740
-Node: Options generalities356039
-Node: List of Automake options357757
-Ref: tar-formats363328
-Node: Miscellaneous366576
-Node: Tags366919
-Node: Suffixes369861
-Node: Include371433
-Node: Conditionals372324
-Node: Usage of Conditionals373155
-Node: Limits of Conditionals376396
-Node: Silencing Make377577
-Node: Make verbosity377924
-Ref: Make verbosity-Footnote-1379224
-Node: Tricks For Silencing Make379298
-Node: Automake Silent Rules381729
-Node: Gnits388535
-Node: Not Enough390844
-Node: Extending391281
-Node: Third-Party Makefiles396014
-Node: Distributing402604
-Node: API Versioning403241
-Node: Upgrading405880
-Node: FAQ407837
-Node: CVS408957
-Node: maintainer-mode417125
-Node: Wildcards421117
-Node: Limitations on File Names424391
-Node: Errors with distclean426967
-Node: Flag Variables Ordering431717
-Node: Renamed Objects439089
-Node: Per-Object Flags440632
-Node: Multiple Outputs443529
-Node: Hard-Coded Install Paths455145
-Node: Debugging Make Rules460158
-Ref: Debugging Make Rules-Footnote-1462310
-Node: Reporting Bugs462474
-Node: Copying This Manual464405
-Node: GNU Free Documentation License464635
-Node: Indices489754
-Node: Macro Index490043
-Node: Variable Index495481
-Node: General Index526065
+Node: Options355984
+Node: Options generalities356283
+Node: List of Automake options358001
+Ref: tar-formats363572
+Node: Miscellaneous366820
+Node: Tags367163
+Node: Suffixes370105
+Node: Include371677
+Node: Conditionals372568
+Node: Usage of Conditionals373399
+Node: Limits of Conditionals376640
+Node: Silencing Make377821
+Node: Make verbosity378168
+Ref: Make verbosity-Footnote-1379468
+Node: Tricks For Silencing Make379542
+Node: Automake Silent Rules381973
+Node: Gnits388779
+Node: Not Enough391088
+Node: Extending391525
+Node: Third-Party Makefiles396258
+Node: Distributing402848
+Node: API Versioning403485
+Node: Upgrading406124
+Node: FAQ408081
+Node: CVS409201
+Node: maintainer-mode417369
+Node: Wildcards421361
+Node: Limitations on File Names424635
+Node: Errors with distclean427211
+Node: Flag Variables Ordering431961
+Node: Renamed Objects439333
+Node: Per-Object Flags440876
+Node: Multiple Outputs443773
+Node: Hard-Coded Install Paths455389
+Node: Debugging Make Rules460402
+Ref: Debugging Make Rules-Footnote-1462554
+Node: Reporting Bugs462718
+Node: Copying This Manual464649
+Node: GNU Free Documentation License464879
+Node: Indices489998
+Node: Macro Index490287
+Node: Variable Index495725
+Node: General Index526309
 
 End Tag Table

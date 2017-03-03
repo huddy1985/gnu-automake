@@ -2,7 +2,7 @@
 
 ## Makefile for Automake.
 
-# Copyright (C) 1995-2012 Free Software Foundation, Inc.
+# Copyright (C) 1995-2013 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -283,8 +283,8 @@ dist_automake_ac_DATA = \
   m4/minuso.m4 \
   m4/missing.m4 \
   m4/mkdirp.m4 \
+  m4/obsolete-err.m4 \
   m4/options.m4 \
-  m4/protos.m4 \
   m4/python.m4 \
   m4/runlog.m4 \
   m4/sanity.m4 \

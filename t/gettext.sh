@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2002-2012 Free Software Foundation, Inc.
+# Copyright (C) 2002-2013 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,8 +46,8 @@ if $ACLOCAL; then
 fi
 
 : >config.rpath
-sed '/AM_GNU_GETTEXT_VERSION/d' configure.ac >configure.int
-mv -f configure.int configure.ac
+sed '/AM_GNU_GETTEXT_VERSION/d' configure.ac >configure.tmp
+mv -f configure.tmp configure.ac
 
 $ACLOCAL
 

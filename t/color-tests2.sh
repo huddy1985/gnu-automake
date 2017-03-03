@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2007-2012 Free Software Foundation, Inc.
+# Copyright (C) 2007-2013 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Test Automake TESTS color output, using the expect(1) program.
-# Keep this in sync with the sister test 'color.sh'.
+# Keep this in sync with the sister test 'color-tests.sh'.
 
 required='grep-nonprint'
 # For gen-testsuite-part: ==> try-with-serial-tests <==

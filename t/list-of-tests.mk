@@ -2,7 +2,7 @@
 ## testsuite.  This fragment is meant to be included by the Makefile.am,
 ## but also to be executed directly by make when bootstrapping automake.
 
-## Copyright (C) 2011-2012 Free Software Foundation, Inc.
+## Copyright (C) 2011-2013 Free Software Foundation, Inc.
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@ t/remake-timing-bug-pr8365.sh \
 t/lex-subobj-nodep.sh \
 t/remake-am-pr10111.sh \
 t/remake-m4-pr10111.sh \
-t/txinfo5.sh \
 $(perl_fake_XFAIL_TESTS)
 
 perl_TESTS = \
@@ -131,6 +130,8 @@ t/amhello-cross-compile.sh \
 t/amhello-binpkg.sh \
 t/aminit-moreargs-deprecation.sh \
 t/amassign.sh \
+t/am-config-header-no-more.sh \
+t/am-prog-cc-stdc-no-more.sh \
 t/am-macro-not-found.sh \
 t/amopt.sh \
 t/amopts-location.sh \
@@ -918,6 +919,8 @@ t/remake-after-aclocal-m4.sh \
 t/remake-include-configure.sh \
 t/remake-include-makefile.sh \
 t/remake-include-aclocal.sh \
+t/remake-config-status-dependencies.sh \
+t/remake-configure-dependencies.sh \
 t/remake-deeply-nested.sh \
 t/remake-mild-stress.sh \
 t/remake-all-1.sh \
@@ -1156,34 +1159,38 @@ t/target-cflags.sh \
 t/targetclash.sh \
 t/tests-environment-fd-redirect.sh \
 t/tests-environment-and-log-compiler.sh \
-t/txinfo.sh \
-t/txinfo2.sh \
-t/txinfo3.sh \
-t/txinfo4.sh \
-t/txinfo6.sh \
-t/txinfo7.sh \
-t/txinfo8.sh \
-t/txinfo9.sh \
-t/txinfo10.sh \
-t/txinfo13.sh \
-t/txinfo16.sh \
-t/txinfo17.sh \
+t/txinfo-absolute-srcdir-pr408.sh \
+t/txinfo-add-missing-and-dist.sh \
+t/txinfo-bsd-make-recurs.sh \
+t/txinfo-clean.sh \
+t/txinfo-dvi-recurs.sh \
+t/txinfo-info-in-srcdir.sh \
+t/txinfo-makeinfo-error-no-clobber.sh \
+t/txinfo-many-output-formats.sh \
+t/txinfo-many-output-formats-vpath.sh \
+t/txinfo-no-clutter.sh \
+t/txinfo-no-extra-dist.sh \
+t/txinfo-no-installinfo.sh \
+t/txinfo-no-repeated-targets.sh \
+t/txinfo-other-suffixes.sh \
+t/txinfo-override-infodeps.sh \
+t/txinfo-override-texinfo-tex.sh \
+t/txinfo-setfilename-repeated.sh \
+t/txinfo-setfilename-suffix-strip.sh \
+t/txinfo-subdir-pr343.sh \
+t/txinfo-tex-dist.sh \
+t/txinfo-unrecognized-extension.sh \
+t/txinfo-unrecognized-info-suffix.sh \
+t/txinfo-vtexi.sh \
+t/txinfo-vtexi2.sh \
+t/txinfo-vtexi3.sh \
+t/txinfo-vtexi4.sh \
+t/txinfo-without-info-suffix.sh \
 t/txinfo19.sh \
-t/txinfo20.sh \
-t/txinfo21.sh \
-t/txinfo22.sh \
 t/txinfo23.sh \
 t/txinfo24.sh \
 t/txinfo25.sh \
-t/txinfo26.sh \
-t/txinfo27.sh \
 t/txinfo28.sh \
-t/txinfo29.sh \
-t/txinfo31.sh \
-t/txinfo32.sh \
-t/txinfo33.sh \
-t/txinfo-no-clutter.sh \
-t/txinfo-unrecognized-extension.sh \
 t/transform.sh \
 t/transform2.sh \
 t/transform3.sh \
@@ -1218,10 +1225,6 @@ t/version6.sh \
 t/version7.sh \
 t/version8.sh \
 t/vpath.sh \
-t/vtexi.sh \
-t/vtexi2.sh \
-t/vtexi3.sh \
-t/vtexi4.sh \
 t/warnings-obsolete-default.sh \
 t/warnings-override.sh \
 t/warnings-precedence.sh \
