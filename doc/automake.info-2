@@ -1,7 +1,7 @@
-This is doc/automake.info, produced by makeinfo version 4.13 from
-./doc/automake.texi.
+This is automake.info, produced by makeinfo version 4.13 from
+/home/stefano/src/am/branches/trunks/doc/automake.texi.
 
-This manual is for GNU Automake (version 1.12.2, 8 July 2012), a
+This manual is for GNU Automake (version 1.12.3, 13 August 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -4618,8 +4618,8 @@ B.2 Variable Index
 * AM_LOG_FLAGS:                          Parallel Test Harness.
                                                               (line  51)
 * AM_MAKEFLAGS:                          Subdirectories.      (line  29)
-* AM_MAKEINFOFLAGS:                      Texinfo.             (line 109)
-* AM_MAKEINFOHTMLFLAGS:                  Texinfo.             (line 110)
+* AM_MAKEINFOFLAGS:                      Texinfo.             (line 110)
+* AM_MAKEINFOHTMLFLAGS:                  Texinfo.             (line 111)
 * AM_OBJCFLAGS:                          Objective C Support. (line  22)
 * AM_OBJCXXFLAGS:                        Objective C++ Support.
                                                               (line  22)
@@ -4711,7 +4711,7 @@ B.2 Variable Index
 * distdir:                               The dist Hook.       (line  33)
 * distuninstallcheck_listfiles:          Checking the Distribution.
                                                               (line 102)
-* DVIPS:                                 Texinfo.             (line 135)
+* DVIPS:                                 Texinfo.             (line 136)
 * EMACS:                                 Public Macros.       (line  51)
 * ETAGS_ARGS:                            Tags.                (line  25)
 * ETAGSFLAGS:                            Tags.                (line  25)
@@ -4804,9 +4804,9 @@ B.2 Variable Index
 * LTLIBRARIES:                           Uniform.             (line 102)
 * MAINTAINERCLEANFILES:                  Clean.               (line  13)
 * MAKE:                                  Subdirectories.      (line  29)
-* MAKEINFO:                              Texinfo.             (line  93)
-* MAKEINFOFLAGS:                         Texinfo.             (line 103)
-* MAKEINFOHTML:                          Texinfo.             (line  99)
+* MAKEINFO:                              Texinfo.             (line  94)
+* MAKEINFOFLAGS:                         Texinfo.             (line 104)
+* MAKEINFOHTML:                          Texinfo.             (line 100)
 * man_MANS:                              Man Pages.           (line   6)
 * MANS:                                  Uniform.             (line 102)
 * maude_AR:                              Program and Library Variables.
@@ -4946,9 +4946,9 @@ B.2 Variable Index
                                                               (line  89)
 * TESTS_ENVIRONMENT:                     Scripts-based Testsuites.
                                                               (line  89)
-* TEXI2DVI:                              Texinfo.             (line 126)
-* TEXI2PDF:                              Texinfo.             (line 131)
-* TEXINFO_TEX:                           Texinfo.             (line 139)
+* TEXI2DVI:                              Texinfo.             (line 127)
+* TEXI2PDF:                              Texinfo.             (line 132)
+* TEXINFO_TEX:                           Texinfo.             (line 140)
 * TEXINFOS <1>:                          Texinfo.             (line  59)
 * TEXINFOS:                              Uniform.             (line 102)
 * top_distdir <1>:                       Third-Party Makefiles.

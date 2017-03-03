@@ -1,7 +1,7 @@
-This is doc/automake.info, produced by makeinfo version 4.13 from
-./doc/automake.texi.
+This is automake.info, produced by makeinfo version 4.13 from
+/home/stefano/src/am/branches/trunks/doc/automake.texi.
 
-This manual is for GNU Automake (version 1.12.2, 8 July 2012), a
+This manual is for GNU Automake (version 1.12.3, 13 August 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -32,7 +32,7 @@ File: automake.info,  Node: Top,  Next: Introduction,  Up: (dir)
 GNU Automake
 ************
 
-This manual is for GNU Automake (version 1.12.2, 8 July 2012), a
+This manual is for GNU Automake (version 1.12.3, 13 August 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -6779,10 +6779,11 @@ the `no-installinfo' option.  In this case, `.info' files are not
 installed by default, and user must request this explicitly using `make
 install-info'.
 
-   By default, `make install-info' and `make install-info' will try to
-run the `install-info' program (if available) to update (or create) the
-``${infodir}'/dir' index.  If this is undesired, it can be prevented by
-exporting the `AM_UPDATE_INFO_DIR' variable to "`no'".
+   By default, `make install-info' and `make uninstall-info' will try
+to run the `install-info' program (if available) to update (or
+create/remove) the ``${infodir}'/dir' index.  If this is undesired, it
+can be prevented by exporting the `AM_UPDATE_INFO_DIR' variable to
+"`no'".
 
    The following variables are used by the Texinfo build rules.
 

@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 AC_PREREQ([2.69])
-AC_INIT([GNU Automake], [1.12.2], [bug-automake@gnu.org])
+AC_INIT([GNU Automake], [1.12.3], [bug-automake@gnu.org])
 
 AC_CONFIG_SRCDIR([automake.in])
 AC_CONFIG_AUX_DIR([lib])
@@ -297,6 +297,14 @@ AC_DEFUN([_AM_CHECK_CANDIDATE_SHELL],
       [], [am_score=1; break])
 
     _AM_CHECK_SHELL_FEATURE([$1],
+      [supports \${@%:@var}],
+      [zero='' one='x' twelve=' foobar baz!' \
+        && test ${@%:@zero} -eq 0 \
+        && test ${@%:@one} -eq 1 \
+        && test ${@%:@twelve} -eq 12],
+      [], [am_score=1; break])
+
+    _AM_CHECK_SHELL_FEATURE([$1],
       [supports \${var@%:@glob} and \${var%glob}],
       [v=a/b/c \
         && test ${v@%:@*/} = b/c \
@@ -311,9 +319,22 @@ AC_DEFUN([_AM_CHECK_CANDIDATE_SHELL],
       [], [am_score=1; break])
 
     _AM_CHECK_SHELL_FEATURE([$1],
+      [can define exit traps in a shell function],
+      [fail=0 && foo() { trap 'fail=1' 0; } && foo && test $fail = 0],
+      [], [am_score=1; break])
+
+    _AM_CHECK_SHELL_FEATURE([$1],
       [corrupts stderr with "set -x"],
       [(set -x; P=1 true 2>&3) 3>&1 2>/dev/null | grep P=1],
       [am_score=9], [])
+
+    echo 'return 34' > conftest-return.sh
+    echo 'ok=no' >> conftest-return.sh
+    _AM_CHECK_SHELL_FEATURE([$1],
+      [can return early from "dot-sourced" files],
+      [ok=yes; . ./conftest-return.sh; test $? -eq 34 && test $ok = yes],
+      [rm -f conftest-return.sh],
+      [rm -f conftest-return.sh; am_score=1; break])
 
     echo 'alias false=echo' > conftest-alias.sh
     echo 'false && test "$(false 97)" = 97' >> conftest-alias.sh
@@ -442,12 +463,23 @@ _AM_COMPILER_CAN_FAIL(dnl
 
 AS_IF([test x"$GCC" = x"yes"], [am_CC_is_GNU=yes], [am_CC_is_GNU=no])
 
+# On case-insensitive file systems (seen e.g. on Cygwin and Mac OS X)
+# we must avoid looking for 'CC', because that would be the same as
+# 'cc', and could cause $CXX to point to the C compiler, instead of
+# to a C++ compiler as expected.  See automake bugs #11893 and #10766.
+if test -f /bIn/rMdIr || test -f /uSr/bIn/rMdIr; then
+  # Case-insensitive file system, don't look for CC.
+  am_CC=
+else
+  am_CC=CC
+fi
+
 # The list of C++ compilers here has been copied, pasted and edited
 # from 'lib/autoconf/c.m4:AC_PROG_CXX' in the Autoconf distribution.
 # Keep it in sync, or better again, find out a way to avoid this code
 # duplication.
 _AM_COMPILER_CAN_FAIL([AC_PROG_CXX(dnl
-  [aCC CC FCC KCC RCC xlC_r xlC c++ cxx cc++ gpp g++])],
+  [aCC $am_CC FCC KCC RCC xlC_r xlC c++ cxx cc++ gpp g++])],
   [CXX=false; _AM_SKIP_COMP_TESTS([C++])])
 
 AS_IF([test x"$GXX" = x"yes"], [am_CXX_is_GNU=yes], [am_CXX_is_GNU=no])

@@ -15,11 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # TAP support: more unusual forms for valid TAP input.
-# See also related test 'tap-fancy.test'.
+# See also related test 'tap-fancy.sh'.
 
 . ./defs || exit 1
 
-. "$am_testauxdir"/tap-setup.sh || fatal_ "sourcing tap-setup.sh"
+. tap-setup.sh
 
 #
 # From manpage Test::Harness::TAP(3):

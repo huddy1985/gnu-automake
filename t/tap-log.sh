@@ -20,7 +20,7 @@
 #  - stdout and stderr of a script go in its log file
 #  - TEST_SUITE_LOG redefinition, at either automake or make time
 #  - VERBOSE environment variable support
-# Keep in sync with 'test-log.test'.
+# Keep in sync with 'test-log.sh'.
 
 . ./defs || exit 1
 
@@ -29,7 +29,7 @@ TESTS = pass.test skip.test xfail.test fail.test xpass.test error.test
 TEST_SUITE_LOG = global.log
 END
 
-. "$am_testauxdir"/tap-setup.sh || fatal_ "sourcing tap-setup.sh"
+. tap-setup.sh
 
 # Custom markers, for use in grepping checks.
 cmarker=::: # comment marker

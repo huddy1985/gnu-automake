@@ -30,8 +30,6 @@ t/pm/Version3.pl
 
 XFAIL_TESTS = \
 t/all.sh \
-t/yacc-bison-skeleton-cxx.sh \
-t/yacc-bison-skeleton.sh \
 t/cond17.sh \
 t/gcj6.sh \
 t/override-conditional-2.sh \
@@ -39,7 +37,6 @@ t/dist-pr109765.sh \
 t/instdir-cond2.sh \
 t/java-nobase.sh \
 t/objext-pr10128.sh \
-t/parallel-tests-many.sh \
 t/pr8365-remake-timing.sh \
 t/lex-subobj-nodep.sh \
 t/remake-am-pr10111.sh \
@@ -73,7 +70,6 @@ t/perf/testsuite-summary.sh
 handwritten_TESTS = \
 t/get-sysconf.sh \
 $(perl_TESTS) \
-$(perf_TESTS) \
 t/instspc.tap \
 t/aclocal.sh \
 t/aclocal3.sh \
@@ -505,7 +501,6 @@ t/help-silent.sh \
 t/help-upc.sh \
 t/hfs.sh \
 t/implicit.sh \
-t/info.sh \
 t/init.sh \
 t/init2.sh \
 t/insh2.sh \
@@ -791,7 +786,6 @@ t/parallel-tests-exit-statuses.sh \
 t/parallel-tests-console-output.sh \
 t/parallel-tests-once.sh \
 t/parallel-tests-trailing-bslash.sh \
-t/parallel-tests-many.sh \
 t/tests-environment.sh \
 t/am-tests-environment.sh \
 t/tests-environment-backcompat.sh \
@@ -893,16 +887,12 @@ t/py-compile-usage.sh \
 t/python.sh \
 t/python2.sh \
 t/python3.sh \
-t/python4.sh \
-t/python5.sh \
-t/python5b.sh \
-t/python6.sh \
-t/python7.sh \
-t/python8.sh \
-t/python9.sh \
 t/python10.sh \
 t/python11.sh \
 t/python12.sh \
+t/python-am-path-iftrue.sh \
+t/python-missing.sh \
+t/python-too-old.sh \
 t/python-dist.sh \
 t/python-vars.sh \
 t/python-virtualenv.sh \
@@ -959,7 +949,6 @@ t/repeated-options.sh \
 t/rulepat.sh \
 t/self-check-configure-help.sh \
 t/self-check-dir.tap \
-t/self-check-env-sanitize.tap \
 t/self-check-exit.tap \
 t/self-check-explicit-skips.sh \
 t/self-check-is_newest.tap \
@@ -967,10 +956,8 @@ t/self-check-me.tap \
 t/self-check-report.sh \
 t/self-check-seq.tap \
 t/self-check-is-blocked-signal.tap \
-t/self-check-tap.sh \
 t/self-check-unindent.tap \
 t/sanity.sh \
-t/scripts.sh \
 t/seenc.sh \
 t/silent.sh \
 t/silent2.sh \

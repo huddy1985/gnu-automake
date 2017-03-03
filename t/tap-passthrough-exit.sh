@@ -17,7 +17,7 @@
 # TAP support:
 #  - non-success exit status of a test script is reported in the
 #    log file
-# See also related test 'tap-passthrough.test'.
+# See also related test 'tap-passthrough.sh'.
 
 . ./defs || exit 1
 
@@ -38,7 +38,7 @@ END
   echo TESTS += exit-$e.test >> Makefile.am
 done
 
-. "$am_testauxdir"/tap-setup.sh || fatal_ "sourcing tap-setup.sh"
+. tap-setup.sh
 
 st=0
 $MAKE check || st=$?

@@ -16,7 +16,7 @@
 
 # Tests Yacc support with yacc-generated headers
 # (i.e., '-d' in *YFLAGS).
-# Keep in sync with sister test 'yacc-d-cxx.test'.
+# Keep in sync with sister test 'yacc-d-cxx.sh'.
 
 required='cc yacc'
 . ./defs || exit 1
@@ -54,7 +54,14 @@ void yyerror (char *s) {}
 x : 'x' {};
 %%
 END
-cp foo/parse.y bar/parse.y
+# Using ylwrap, we actually generate y.tab.[ch].  Unfortunately, we
+# forgot to rename #include "y.tab.h" into #include "parse.h" during
+# the conversion from y.tab.c to parse.c.  This was OK when Bison was
+# not issuing such an #include (up to 2.6).
+#
+# To make sure that we perform this conversion, in bar/parse.y, use
+# y.tab.h instead of parse.c.
+sed -e 's/parse\.h/y.tab.h/' <foo/parse.y >bar/parse.y
 
 cat > foo/main.c << 'END'
 #include "parse.h"

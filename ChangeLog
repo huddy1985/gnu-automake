@@ -1,3 +1,1167 @@
+2012-08-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	release: stable release 1.12.3
+
+	* configure.ac (AC_INIT): Bump version number to 1.12.3.
+	* m4/amversion.m4: Likewise (auto-updated by "./bootstrap").
+
+2012-08-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maintcheck: fix spurious warnings
+
+	* t/distcheck-override-infodir.sh: Be sure that valid occurences
+	of the "aclocal" and "automake" strings, which can confuse the
+	'sc_tests_plain_automake' check, are protected by leading "#"
+	characters.
+	* t/ax/test-lib.sh: Always use '$(...)' for command subtitution,
+	to avoid triggering the 'sc_tests_command_subst' check; there was
+	still once place where `...` was used.  While at it, fix a related
+	comment.
+	* t/ax/test-defs.in ($sleep): Use creative quoting to avoid
+	spuriously triggering the 'sc_tests_plain_sleep' check.
+
+2012-08-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	docs: fix typo: s/make install-info/make uninstall-info/
+
+	* doc/automake.texi (Texinfo): Here.  And a minor wording improvement
+	while we are at it.
+
+2012-08-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fixup: make a couple of tests executable
+
+	* t/python-am-path-iftrue.sh: This.
+	* t/python-missing.sh: And this.
+
+2012-08-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: rework tests on AM_PATH_PYTHON
+
+	* t/python8.sh, t/python9.sh: Merge into ...
+	* t/python-am-path-iftrue.sh: ... this new test, with minor adjustments.
+	* t/python4.sh, t/python5.sh, t/python6.sh, t/python7.sh: Merge into ...
+	* t/python-missing.sh: ... this new test.
+	* t/python5b.sh: Rename ...
+	* t/python-too-old.sh: ... like this, and adjust/extend.
+	* t/list-of-tests.mk: Adjust.
+
+2012-08-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	cosmetics: fix typos and references in comments
+
+	* lib/am/check.am: Here.
+	* doc/automake.texi: And here.
+	* t/*.sh: And in several of these tests.
+
+2012-08-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	typofix: in a test diagnostic
+
+	* t/cscope.tap: Here.
+
+2012-08-12  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	readme: fixlets to HACKING
+
+	* HACKING: Use longer "=====" lines to separate different section (this
+	is just eye-candy admittedly, but I prefer it).
+	(Release procedure): Don't tell to "update NEWS"; that should be updated
+	throughout the normal course of development.  Instead, tell to just check
+	it.  Improve description of the re-bootstrapping and rechecking procedure,
+	also suggesting to use "git clean" beforehand (with all due warnings!).
+
+2012-08-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	cleanup: remove stale references to 'lzma' option
+
+	* automake.in (preprocess_file): Here.
+	(handle_dist): And here.
+
+2012-08-10  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	automake: remove an unused local variable
+
+	* automake.in (handle_dist): Here, the '$extra_dist' variable.
+
+2012-08-10  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	distcheck: more resilient against possible failures
+
+	* lib/am/distdir.am (distcheck): Ensure that a failure in the commands
+	making the just-extracted source tree read-only cause the recipe to fail.
+	While at it, save a fork by creating the '_build' and '_inst' subdir
+	with a single mkdir invocation.
+
+2012-08-10  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	cleanup: remove almost-unused global var 'am_relative_dir'
+
+	Cherry picked from commit v1.12.2-741-g53b5d11 of Automake-NG.
+
+	* automake.in ($am_relative_dir): Delete, it was only used once ...
+	(generate_makefile): ... in here, so it's simpler to inline its
+	expansion.
+	(initialize_per_input): Don't reset the deleted variable.
+
+2012-08-10  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	cleanup: remove two almost-unused global variables: {am,in}_file_name
+
+	Cherry picked from commit v1.12.2-739-gbf2a8b0 of Automake-NG.
+
+	* automake.in ($am_file_name, $in_file_name): Delete these, which were
+	used only in the 'read_main_am_file' subroutine; instead ...
+	(read_main_am_file): ... modify it to only work from the '$makefile_am'
+	argument (which it was already receiving), and the new '$makefile_in'
+	argument, which is now passed to it ...
+	(generate_makefile): ... from here.
+	(initialize_per_input): Don't reset the two deleted variables anymore.
+
+2012-08-10  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	cleanup: remove almost-unused global var 'topsrcdir'
+
+	Cherry picked from commit v1.12.2-740-ga7f24eb in Automake-NG.
+
+	* automake.in ($topsrcdir): Delete, it was only used once ...
+	(handle_LIBOBJS_or_ALLOCA): ... in here, so it's simpler to inline
+	its expansion.  Improve formatting of immediately surrounding code
+	a little while we are at it.
+	(initialize_per_input): Don't reset the deleted variable.
+
+2012-08-10  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	automake: remove an unused variable
+
+	* automake.in ($canonical_location): This.
+	(scan_autoconf_traces): Don't initialize it.
+
+2012-08-08  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: make a test script more semantic
+
+	This is mostly useful for Automake-NG, that is heavily overhauling the
+	generated Makefiles and thus is prone to break grepping checks (which
+	can sometimes end up causing false negatives in the testsuite, sadly).
+	But this is not a reason not to strengthen the test for mainline
+	Automake as well.
+
+	* t/noinstdir.sh: Add semantic checks.
+
+2012-08-08  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: remove an obsolete, no-op test script
+
+	* t/info.sh: This: it tried to operate by checking the contents of the
+	variable '$(INFOS)', but that is not even defined (and probably has been
+	obsolete for quite a long time).  Since other tests already do thorough
+	testing of the Texinfo support, just remove this test.
+	* t/list-of-tests.mk: Adjust.
+
+2012-08-08  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: remove an obsolete test script
+
+	* t/scripts.sh: This: it used to check that the 'AC_PROG_INSTALL' macro
+	was not uselessly required, but today that macro is AC_REQUIRE'd by
+	'AM_INIT_AUTOMAKE' anyway, so that the test is no more significant.
+	* t/list-of-tests.mk: Adjust.
+
+2012-08-05  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: avoid spurious failures with older Texinfo
+
+	* t/distcheck-override-infodir.sh (main.texi): Add explicit calls to
+	'@dircategory' and '@direntry', to ensure a 'dir' file will be created
+	also by 'install-info' coming with Texinfo 4.8.
+
+2012-08-05  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: avoid tons of spurious failures on NetBSD
+
+	* t/ax/am-test-lib.sh (process_requirements): Set the '$am_tool' variable
+	to the empty string before trying to unset it; otherwise, we might be
+	attempting to unset an already-unset variable, which (together with the
+	presence of the 'errexit' shell flag) causes spurious failures at least
+	with the /bin/sh shell from NetBSD 5.1.  This was actually causing the
+	great majority of the Automake tests (all those not using a "required=..."
+	declaration) to fail spuriously on that platform!
+
+2012-08-05  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	runtest: avoid spurious failures on NetBSD
+
+	* runtest.in: Use ${1+"$@"} rather than simply "$@", because the 'set -u'
+	setting used in the script causes the latter to trigger a spurious error
+	with the NetBSD 5.1 /bin/sh ("./runtest: @: parameter not set") if there
+	are no arguments to the test.
+
+2012-08-05  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: dependency tracking for Portland Group Compilers is now supported
+
+	* NEWS: So document it here.
+
+2012-08-05  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: cater to OpenSolaris 'zip'
+
+	* t/dist-formats.tap: Here: OpenSolaris zip do not accept the
+	'--version' option, but accept the '-v' one with a similar
+	meaning (if no further arguments are given).
+
+2012-08-04  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fix a spurious XPASS on OpenIndiana
+
+	* t/instspc.tap: Here, by isolating the $(DESTDIR) used by runs with
+	different "problematic strings" to prevent them to unduly interfering
+	with each other.  With this, the Automake testsuite finally run cleanly
+	on the OpenIndiana and Solaris 10 systems I have access to.
+
+2012-08-04  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: avoid spurious failure of 't/vala-vapi.sh' on OpenIndiana
+
+	* t/vala-vapi.sh: Use 'printf', not 'echo', to print strings containing
+	substrings like '\n', that can be interpreted like escape strings.  That
+	because the /bin/sh and the /bin/bash shell from OpenIndiana actually
+	interpret them that way:
+
+	  $ /bin/sh -c 'echo "foo\nbar"'
+	  foo
+	  bar
+	  $ /bin/bash -c 'echo "foo\nbar"'
+	  foo
+	  bar
+
+2012-08-04  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: avoid spurious failure of 't/uninstall-fail.sh' on OpenIndiana
+
+	On current OpenIndiana (based on what once was OpenSolaris 11), the shell
+	/bin/sh (which, differently from what happens on Solaris, is a true POSIX
+	shell, thus worthy of consideration) somehow manages to "eat" the
+	error message from 'rm' when that fails to remove a file due to lacking
+	permission on the parent directory:
+
+	  $ /bin/sh -c "cd unwritable-dir || { echo OOPS; exit 1; }; rm -f foo"
+	  $ echo rc = $?
+	  rc = 1
+	  $ /bin/bash -c "cd unwritable-dir || { echo OOPS; exit 1; }; rm -f foo"
+	  rm: foo not removed: Permission denied
+	  $ echo rc = $?
+	  rc = 2
+	  $ /bin/sh -c "cd unwritable-dir || { echo OOPS; exit 1; }; env rm -f foo"
+	  rm: foo not removed: Permission denied
+	  $ echo rc = $?
+	  rc = 2
+
+	That is probably due to an improper optimization, that is, the shell tries
+	to be smart and remove the file itself instead of invoking 'rm', but fails
+	spectacularly in the attempt.
+
+	* t/uninstall-fail.sh: The just-described bug was causing a spurious
+	failure in this test case.  Cater to thus situation, by relaxing the
+	test when a faulty shell is detected.  And while at it, fix and improve
+	an unrelated comment.
+
+2012-08-04  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: reimplement wrappers for automake and aclocal in perl
+
+	This will allow us to avoid one extra shell invocation per automake
+	and aclocal invocation in our testsuite, and, more importantly, will
+	allow us not to worry about potential shell portability issues, at
+	least in those wrappers.  For an example of such a portability issue,
+	refer to the recent commit v1.12.2-80-g65dadf6 "tests: work around a
+	ksh bug w.r.t. ${1+"$@"}".
+
+	* t/wrap/automake.in, t/wrap/aclocal.in: Rewritten in perl.
+
+2012-08-04  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: work around a ksh bug w.r.t. ${1+"$@"}
+
+	Fixes automake bug#10898.  See also the older (much older) thread:
+	<http://lists.gnu.org/archive/html/automake-patches/2009-12/msg00036.html>
+
+	At least the AT&T and OpenSolaris versions of the Korn shell, as well
+	as the /bin/sh from OpenIndiana 11, have a strange bug regarding the
+	expansion of ${1+"$@"}: when exactly *one empty* argument is passed to
+	a script run by one of this shells, inside that script ${1+"$@"} will
+	expand to *nothing*, rather than to to the single empty string, as
+	one would expect (OTOH, $# will correctly expand to 1).  This buggy
+	behaviour was causing a spurious failure in our testsuite (test 6 in
+	't/automake-cmdline.tap').  Work around it.
+
+	* t/wrap/automake.in: Here.
+
+2012-08-02  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'depcomp-pgcc' into maint
+
+	* depcomp-pgcc:
+	  depcomp: style changes to Portland Group Compilers support
+	  depcomp: initial support for Portland Group Compilers
+
+2012-07-30  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	build: fix build in VPATH setup
+
+	* Makefile.am (t/ax/test-defs.sh): Ensure the 't/ax' directory exists,
+	before trying to create 'test-defs.sh' in there.  This is required in
+	VPATH builds.
+
+	Reported-by: Akim Demaille <akim@lrde.epita.fr>
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	gen-tests: simplify sourcing of helper shell files
+
+	This is a follow-up on commit v1.12.2-49-g42fb45b, for an occurrence
+	of '. "$am_testauxdir"/foo.sh' that wasn't in a test script, but
+	rather in 'gen-testsuite-part' (ending up in the tests generated by
+	that script).
+
+	* gen-testsuite-part: In the generated 'depcomp*.tap' tests, use
+	simply:
+	    . depcomp.sh
+	rather than:
+	    . "$am_testauxdir/depcomp.sh"
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'testsuite-refactor' into maint
+
+	* testsuite-refactor: (33 commits)
+	  maintcheck: fixup list of files in $(xdefs)
+	  tests: never source test-defs.sh directly, source test-lib.sh instead
+	  runtest: sanitize test environment
+	  tests: remove an obsolescent self test
+	  tests: "am_using_tap=yes" -> "am_test_protocol=tap"
+	  tests: protect test libs against multiple inclusion
+	  configure: testsuite shell can return early from "dot-sourced" files
+	  tests: move sanitization and "Bournification" in the generic test lib
+	  tests: source test defs in the generic test lib
+	  test defs: no need to re-add $srcdir/t/ax to $PATH
+	  tests: split test libs into "generic" and "automake-specific"
+	  test setup: move actual calling of testsuite setup in ./defs
+	  test setup: merge definitions of function for simple tests
+	  test init: refactor: new function 'am_test_setup'
+	  test init: refactor: move displaying of debugging info later
+	  test init: refactor: new function 'am_setup_testdir'
+	  test init: refactor: new function 'am_set_exit_traps'
+	  configure: testsuite shell set exit traps in shell functions
+	  test init: refactor: new function 'am_exit_trap'
+	  test init: refactor: new function 'process_requirements'
+	  ...
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'fix-pr12041' into maint
+
+	* fix-pr12041:
+	  tests: avoid spurious failure when running as root
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maintcheck: fixup list of files in $(xdefs)
+
+	syntax-checks.mk (xdefs): Adjust to recent changes: add 't/ax/test-lib.sh'
+	and 't/ax/test-lib.sh', remove the now-deleted 't/ax/test-init.sh'
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: never source test-defs.sh directly, source test-lib.sh instead
+
+	After the recent re-organization, sourcing 'test-defs.sh' directly might
+	not work well and cause spurious failures or other unexpected behaviours.
+	We should source 'test-lib.sh' instead, which contains not more direct
+	code execution (only definition of shell variables/functions, or sourcing
+	of other '*.sh' with the same property), is protected against multiple
+	inclusions, and sources 'test-defs.sh' automatically in in a proper way.
+
+	* t/testsuite-summary-count.sh, t/tap-summary.sh, t/tap-summary-color.sh,
+	t/testsuite-summary-color.sh: Source 'test-lib.sh', not 'test-defs.sh'.
+	* gen-testsuite-part: Likewise, in the generated wrapper scripts.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	runtest: sanitize test environment
+
+	* runtest.in: Here, similarly to what is done by AM_TESTS_ENVIRONMENT
+	in Makefile.am, unset variables that should be under the complete control
+	of the test framework, and that could create havoc if inherited from the
+	environment.  This remove the need to check against possible environment
+	"pollution" ...
+	* t/ax/test-defs.in: ... in here.
+	* Makefile.am (AM_TESTS_ENVIRONMENT): Add a comment about the need of
+	synchronization with 'runtest.in'.
+	* t/self-check-env-sanitize.tap: Remove as obsolete.
+	* t/list-of-tests.mk: Adjust.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: remove an obsolescent self test
+
+	* t/self-check-tap.sh: This.  The recent reorganization and code
+	moving between 'test-defs.sh' and 'test-lib.sh' has made it
+	brittle and prone to failures.  Since the usefulness of this self
+	check is extremely limited, it's not worth trying to fix it. Just
+	remove it.
+	* t/list-of-tests.mk: Adjust.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: "am_using_tap=yes" -> "am_test_protocol=tap"
+
+	And similarly, "am_using_tap=no" -> "am_test_protocol=none".
+
+	The new '$am_test_protocol' name is clearer, and will allow the easy
+	addition of further test protocols in the future.  This is not truly
+	relevant for automake, but we are trying to make some parts of our
+	testsuite framework as general as possible, in view of a future move
+	to a more generic project like Gnulib.
+
+	* Makefile.am, t/ax/am-test-lib.sh, t/ax/test-defs.in, t/ax/test-lib.sh,
+	t/self-check-env-sanitize.tap, t/self-check-tap.sh: Adjust.
+	* syntax-checks.mk (sc_tests_obsolete_variables): Add 'am_using_tap' to
+	the list of obsolete variables to check against.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: protect test libs against multiple inclusion
+
+	* t/ax/test-lib.sh, t/ax/am-test-lib.sh: Return early if already sourced.
+	Use the witness variables '$test_lib_sourced' and '$am_test_lib_sourced',
+	respectively, for this purpose.
+	* runtest.in, Makefile.am (AM_TESTS_ENVIRONMENT): Unset 'test_lib_sourced'
+	and 'am_test_lib_sourced', to avoid interferences from the environment.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	configure: testsuite shell can return early from "dot-sourced" files
+
+	* configure.ac: Check that the shell selected to run the test
+	scripts can call 'return' form within a file being sourced
+	with the '.' built-in.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: move sanitization and "Bournification" in the generic test lib
+
+	* t/ax/test-defs.sh: From here ...
+	* t/ax/test-lib.sh: ... to here.  Also move the initialization of
+	'$argv0' and '$me'.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: source test defs in the generic test lib
+
+	* t/ax/test-lib.sh: That is, here ...
+	* defs: ... rather than here.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	test defs: no need to re-add $srcdir/t/ax to $PATH
+
+	* t/ax/test-defs.sh: Here.  That is already done by both 'runtest' and
+	AM_TESTS_ENVIRONMENT, and the presence of '$srcdir/t/ax' in $PATH is
+	anyway required, after the recent changes, for our testsuite framework
+	to work at all.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: split test libs into "generic" and "automake-specific"
+
+	This is the first step in the quest to merge the generically useful
+	parts of our test suite framework in a more generic project, like
+	Gnulib.  Time will tell if we'll succeed, and whether the success will
+	be worth the extra hassle.
+
+	* t/ax/test-init.sh: Split out ...
+	* t/ax/am-test-lib.sh, t/ax/test-lib.sh: ... into these two tests.
+	* defs, Makefile.am: Adjust.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	test setup: move actual calling of testsuite setup in ./defs
+
+	* t/ax/test-init.sh: Move call to 'am_test_setup' ...
+	* defs: ... here.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	test setup: merge definitions of function for simple tests
+
+	* t/ax/plain-functions.sh: Delete, moving the definitions of ...
+	($stderr_fileno_): ... this variable ...
+	(warn_, fail_, skip_, skip_all_, fatal_, framework_failure_): ... and
+	these functions ...
+	* t/ax/test-init.sh: ... in here.  This allow us to use those functions
+	earlier in this file (instead of having to duplicate their behaviour
+	with inlined code).  The TAP-based tests are still able to override these
+	functions later to their TAP-enhanced equivalents when 'tap-functions.sh'
+	is sourced.
+	* Makefile.am (dist_noinst_DATA): Remove 't/ax/plain-functions.sh'.
+	* t/ax/tap-functions.sh: Adjust a comment.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	test init: refactor: new function 'am_test_setup'
+
+	* t/ax/test-init.sh (am_test_setup): Here.
+	Call it from the main code.  Remove other calls of functions and
+	settings that are now duly called by 'am_test_setup'.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	test init: refactor: move displaying of debugging info later
+
+	* t/ax/test-init.sh: Here, about the values of $PATH, $am_using_tap
+	and $am_running_installcheck.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	test init: refactor: new function 'am_setup_testdir'
+
+	* t/ax/test-init.sh (am_setup_testdir): Here.
+	Use it instead of inlining its contents in the main code.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	test init: refactor: new function 'am_set_exit_traps'
+
+	* t/ax/test-init.sh (am_set_exit_traps): Here.
+	(trap): Use it instead of inlining the cleanup/finalization code.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	configure: testsuite shell set exit traps in shell functions
+
+	* configure.ac: Check that the shell selected to run the test
+	scripts can set an exit trap in a shell function, without having
+	that trap executed at the termination of the function rather
+	than of the scripts.  According to the Autoconf manual, at least
+	AUX 5.3 /bin/sh suffers of such a bug.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	test init: refactor: new function 'am_exit_trap'
+
+	* t/ax/test-init.sh (am_exit_trap): Here.
+	(trap): Use it instead of inlining the cleanup/finialization code.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	test init: refactor: new function 'process_requirements'
+
+	* t/ax/test-init.sh (process_requirements): Here.
+	Use it in to check that the tools in $required are present.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	test init: refactor: new function 'require_tool'
+
+	* t/ax/test-init.sh (require_tool): Here.
+	Use it in the loop in the prerequisites in $required.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	test init: remove a couple of paranoid sanity checks
+
+	* t/ax/test-init.sh: Here, about 'am_top_srcdir' and 'am_top_builddir';
+	the values of those variables are AC_SUBST'd, so it's nigh impossible
+	for the to be wrong or get "messed up".
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: simplify sourcing of helper shell files
+
+	Now that the early $PATH setup in both 'runtest' and AM_TESTS_ENVIRONMENT
+	allow the '.' built-in to find to-be-sourced shell scripts in the 't/ax/'
+	directory automatically, we can simplify several usages like:
+
+	   . "$am_testauxdir"/foo.sh
+
+	to just:
+
+	   . foo.sh
+
+	Also, because our test scripts run with the 'errexit' flag active, and
+	because POSIX mandates that, when the '.' built-in is used,
+
+	   ... if no readable file is found, a non-interactive shell shall abort ...
+
+	we can further simplify usages like:
+
+	    . "$am_testauxdir"/foo.sh || fatal_ "sourcing foo.sh"
+
+	once again to to just:
+
+	    . foo.sh
+
+	* ./defs, several tests: Adjusted.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	test defs: move in 't/ax/test-defs.sh'
+
+	We can do so with minimal churn, now that the early setup of $PATH in
+	both 'runtest' and AM_TESTS_ENVIRONMENT allow the '.' built-in to find
+	to-be-sourced shell scripts in 't/ax' automatically, both in in-tree
+	and  VPATH builds.
+
+	With this change, we take another step forward a more rational and
+	"segregated" organization of our testsuite framework.
+
+	* defs-static.in: Rename ...
+	* t/ax/test-defs.in: ... like this, and adjust.
+	* Makefile.am, syntax-checks.mk, t/README, gen-testsuite-part,
+	t/tests-init.sh, t/ax/tap-setup.sh, t/tap-summary.sh, .gitignore,
+	t/testsuite-summary-color.sh, t/testsuite-summary-count.sh,
+	t/self-check-tap.sh, defs: Adjust.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: update PATH early from AM_TESTS_ENVIRONMENT and runtest
+
+	Because the POSIX standards mandate that sourcing a file with ". FILE"
+	will cause FILE (assuming it is a relative containing no slashes) to be
+	looked for in PATH, such a move will allow us to simplify our sourcing
+	of shell testing libraries like (currently) 't/ax/test-init.sh' and
+	'defs', and to modularize and re-organize them better in the feature,
+	with minimal churn.
+
+	* runtest.in, Makefile.am (AM_TEST_ENVIRONMENT): Prepend $(abs_srcdir)/t/ax
+	and $(abs_builddir)/t/ax (in that order) to PATH; do so avoiding repetition
+	in the common case of non-VPATH builds.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	runtest: export $srcdir for use by the test scripts
+
+	This is mostly a preparatory change in view of future ones.  But it
+	also make the behaviour of runtest more similar to that of the test
+	harness used by "make check".
+
+	* runtest.in: Export srcdir (was already defined to '@srcdir@').
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	gen-tests: $testdir/ax -> $testauxdir
+
+	* gen-testsuite-part ($testauxdir): New, defined to "$testdir/ax".
+	Use it throughout, for better encapsulation and less duplication.
+	($auxdir): Remove as unneeded.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	gen-tests: less hard-coding of 't' as the test directory
+
+	This will make life easier for us in case we decide to rename the
+	testsuite directory in the future (perhaps to something like 'tests',
+	which is somewhat less cryptic than the current 't').
+
+	* gen-testsuite-part ($testdir): New variable, used throughout instead
+	of hard-coding the name of the test directory to 't'.
+	All the script adjusted to make proper use of '$testdir'.
+	($auxdir): Move its definition earlier, for consistency with the one
+	of '$testdir'.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	build: auxiliary testsuite files/scripts built by "make all"
+
+	This will allow the developers to run a tests case by hand out of
+	a newly extracted tarball simply doing:
+
+	    $ ./configure && make
+	    $ ./runtest t/the-test-case.sh
+
+	while before this change one has to resort to:
+
+	    $ ./configure && make && make check TESTS=
+	    $ ./runtest t/the-test-case.sh
+
+	or, with some non-GNU makes, even:
+
+	    $ ./configure && make && make check TESTS= AM_MAKEFLAGS="TESTS="
+	    $ ./runtest t/the-test-case.sh
+
+	This come very handy sometimes, especially when doing one-shot
+	debugging.  Admittedly not a big deal, but one less friction in
+	the build system is always nice.
+
+	* Makefile.am (check_SCRIPTS, dist_check_DATA, nodist_check_DATA):
+	Move their content to ...
+	(noinst_SCRIPTS, dist_noinst_DATA, nodist_noinst_DATA): ... these
+	variables.
+	Adjust comments.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	perf tests: reorganize
+
+	* t/list-of-tests.mk (handwritten_TESTS): Don't list ($perf_TESTS) in
+	here anymore.
+	* Makefile.am (EXTRA_DIST): Add them explicitly.
+	(perf): New target, run the performance tests and save the logs of
+	the ones with unexpected results in the file 't/perf/test-suite.log',
+	which is thus ...
+	(PERF_TEST_SUITE_LOG): ... defined in this variable ...
+	(CLEANFILES): ... and added to this.
+	(test_subdirs): Remove 't/perf': the tests in there are no more
+	listed in $(TESTS).
+	* t/ax/test-init.sh: Don't explicitly skip "perf" test here.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	runtest: pass *all* the given shell options to the test invocation
+
+	* runtest.in: Here.  This didn't work previously because, in our
+	option parsing loop, we were mistakenly redefining '$shell_opts'
+	each time, instead of appending to it.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	runtest: correctly pass shell option also for TAP tests
+
+	* runtest.in: Here.  This required code refactoring not
+	completely trivial.
+
+2012-07-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	cosmetics: remove leftover comment fragment from runtest.in
+
+2012-07-25  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	test defs: improve a comment
+
+	* defs-static.in: Here, about the unsetting of CDPATH.
+
+2012-07-25  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	test defs: remove obsolete comment
+
+	* defs-static.in: Here: do not state anymore that this file should execute
+	correctly with any system's /bin/sh shell, as this is not true anymore: the
+	testsuite assumes a POSIX shell throughout these days.
+
+2012-07-25  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	runtest: support option --shell, tell which shell should run the test
+
+	* runtest.in: Here.  The same effect could have been obtained by
+	exporting AM_TEST_RUNNER_SHELL to the desired value, but the new
+	API is simpler and requires less typing and less thinking.
+
+2012-07-25  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	runtest: support passing options over to the shell
+
+	* runtest.in: Here.  Also, support '--help' to display a nice
+	help screen.
+
+2012-07-25  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: avoid spurious failure when running as root
+
+	Fixes automake bug#12041.
+
+	* t/primary-prefix-couples-force-valid.sh: If run as root, don't expect
+	a "test -x" on a non-executable files to fail: for root, all files are
+	executable (as well as readable and writable), and at least on Solaris
+	10 that causes "test -x" to succeed also on non-executable files.
+
+2012-07-24  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: avoid non-textual output in a '.log' file
+
+	* t/dist-formats.tap: Here.  Otherwise, some inferior awk implementations,
+	like OpenIndiana /usr/xpg4/bin/awk, could be confused and cause spurious
+	errors in the testsuite harness.
+
+2012-07-23  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'fix-pr11909' into maint
+
+	* fix-pr11909:
+	  self tests: avoid spurious failures on older bash
+
+2012-07-23  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	self tests: avoid spurious failures on older bash
+
+	Fixes automake bug#11909.
+
+	* t/self-check-explicit-skips.sh: Remove or rework few checks for use
+	cases that are no more relevant nor supported now that we've got rid
+	of the need to use the 'Exit' function explicitly.  Make the other
+	existing checks stricter.
+
+2012-07-23  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: remove t/parallel-tests-many.sh (fixes spurious failure)
+
+	That test was checking for automake#7868 "parallel-tests and command-line
+	length limit issue".  That bug is still open, and the tests was xfailing.
+
+	What concerns us is that the test was also causing an annoying problem.
+	On Solaris 10, it produced a '.log' file with two overly-long lines (more
+	than 1 million characters long!) and that was causing the test harness to
+	experience spurious failures, with Solaris XPG4 awk complaining that:
+
+	 /usr/xpg4/bin/awk: line 0 (NR=734): Record too long (LIMIT: 19999 bytes)
+
+	A little consideration shows that the bug#7868 checked by the culprit
+	test cannot be solved "by accident", e.g., by another bug fix or some
+	simple refactoring, so there is little added value in keeping the xfailing
+	test for it, if this causes other problems (and we've seen it does).
+
+	So we just remove the test.  In case we ever manage to fix the bug in
+	mainline automake, we can copy over the similar test(s) from Automake-NG,
+	which has actually managed to fix the bug (and have simpler test cases
+	for it).
+
+	* t/parallel-tests-many.sh: Delete.
+	* t/list-of-tests.mk (XFAIL_TESTS, handwritten_TESTS): Remove it.
+
+2012-07-21  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	typofix: in a comment in the automake script
+
+	* automake.in (process_file): Here.
+
+2012-07-17  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: minor fixlets and reordering
+
+2012-07-16  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	fixup: delete "# serial" line in m4/amversion.in
+
+	Otherwise, when m4/amversion.m4 is regenerated, it will contain a
+	serial line as well.
+
+2012-07-16  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'yacc-work' into maint
+
+	* yacc-work:
+	  news: update about recent ylwrap changes and fixes
+	  yacc tests: fix a spurious failure with parallel make
+	  ylwrap: use proper quoting inside a `...` substitution
+	  ylwrap: don't uselessly reset the exit status in case of failure
+	  ylwrap: fix C++ support for Bison
+	  ylwrap: refactor: move loop invariant
+	  ylwrap: refactoring: don't rely on the file order
+	  tests: upgrade and fix Bison test case
+	  tests: fix bison input file
+	  ylwrap: comment changes
+	  ylwrap: modernize idioms
+	  ylwrap: rename header inclusion in generated parsers
+	  ylwrap: simplify the list of renamings
+	  ylwrap: refactor: less duplication
+
+2012-07-16  Akim Demaille  <akim@lrde.epita.fr>
+
+	news: update about recent ylwrap changes and fixes
+
+	* NEWS: In ylwrap, renamings are properly propagated, and unknown
+	files are preserved.
+
+2012-07-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	m4: get rid of "# serial" lines
+
+	The "#serial" lines are only considered by aclocal for the system-wide
+	third-party '.m4' files, not for the Automake-provided ones.  So they
+	serve no real purpose in the Automake '.m4' files.
+
+	In addition, now that we use git and topic branches, and that we are also
+	writing the Automake-NG fork, the "#serial" lines are becoming more and
+	more unreliable (e.g., different version of the same file in different
+	branches can easily end up having the same serial numbers).
+
+	So let's just nuke all the "#serial" lines.  See also automake bug#11932.
+
+	* m4/*.m4: All "# serial" lines removed.
+
+2012-07-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	configure: ${#param} must be supported by the shell for the testsuite
+
+	This will be required at least by the Automake-NG branch.
+
+	* configure.ac: Require the $AM_TEST_RUNNER_SHELL supports ${#param} as
+	a way to obtain the length of the expansion of the variable $param.
+
+2012-07-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	yacc tests: fix a spurious failure with parallel make
+
+	* t/yacc-bison-skeleton.sh (Makefile.am): Add 'zardoz.h'
+	to BUILT_SOURCES.
+
+2012-07-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	ylwrap: use proper quoting inside a `...` substitution
+
+	* lib/ylwrap ($target): Here, when redefining this to a temporary file.
+
+2012-07-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	ylwrap: don't uselessly reset the exit status in case of failure
+
+	* lib/ylwrap: Here.  In case of a failure in the wrapped yacc/lex
+	invocation, '$ret' (holding the final exit status of ylwrap) was
+	being uselessly reset to '1' in the later if/else.
+
+2012-07-14  Akim Demaille  <akim@lrde.epita.fr>
+
+	ylwrap: fix C++ support for Bison
+
+	Fixes automake bug#7648.
+
+	The current logic of ylwrap is to call yacc in a sub directory, and
+	pull out of it all the files that were requested on its command line.
+	Reverse this approach: export *all* the files created in the
+	subdirectory, but rename them according to what the command says.
+	This way, extra files, such as position.hh, location.hh and stack.hh
+	for C++ parsers, but also parser.xml or parser.dot if XML or Dot
+	output is enabled, will be preserved.
+
+	* lib/ylwrap (pairlist): Remove.
+	(main loop): Don't loop over pairlist, but over the files in the
+	temporary directory.
+	* t/list-of-tests.mk (XFAIL_TESTS): Fixes t/yacc-bison-skeleton-cxx.sh.
+	* THANKS (James Bostock): Add, he reported bug#7648.
+
+2012-07-14  Akim Demaille  <akim@lrde.epita.fr>
+
+	ylwrap: refactor: move loop invariant
+
+	* lib/ylwrap (input_rx): Move its definition next to its sibling's,
+	outside of the main loop.
+
+2012-07-14  Akim Demaille  <akim@lrde.epita.fr>
+
+	ylwrap: refactoring: don't rely on the file order
+
+	Forthcoming changes will make us iterate over the files in a different
+	order.
+
+	lib/ylwrap (first): Remove, replaced by...
+	(parser): this.
+
+2012-07-14  Akim Demaille  <akim@lrde.epita.fr>
+
+	tests: upgrade and fix Bison test case
+
+	* t/yacc-bison-skeleton-cxx.sh: Request locations, to be
+	even more stressful.
+	Use %union to make sure the %{...%} is inserted where appropriate.
+	Fix some indentation/coding style issues.
+
+2012-07-14  Akim Demaille  <akim@lrde.epita.fr>
+
+	tests: fix bison input file
+
+	Do not provide implementations in the %{...%} section, especially if the
+	header is included elsewhere, since then the linker will complain about
+	multiple definitions.
+
+	Reported by Stefano Lattarini,
+	<http://lists.gnu.org/archive/html/automake-patches/2012-07/msg00126.html>.
+
+	* t/yacc-bison-skeleton.sh (zardoz.y): Define yylex and yyerror in the
+	epilogue.
+
+2012-07-14  Akim Demaille  <akim@lrde.epita.fr>
+
+	ylwrap: comment changes
+
+	* lib/ylwrap: Improve some comments.
+
+2012-07-14  Akim Demaille  <akim@lrde.epita.fr>
+
+	ylwrap: modernize idioms
+
+	* lib/ylwrap: Prefer printf to echo when special characters may
+	occur.
+	Replace the historical ',' sed separator with '|'.
+
+2012-07-14  Akim Demaille  <akim@lrde.epita.fr>
+
+	ylwrap: rename header inclusion in generated parsers
+
+	Some types of Bison parsers, such as the GLR ones, generate a header
+	file that they include.  ylwrap, which renames the generated files,
+	does not rename the included file.  Fix this shortcoming, reported
+	for instance here:
+	<http://lists.gnu.org/archive/html/bug-bison/2012-06/msg00033.html>.
+	Fixes t/yacc-bison-skeleton.sh, see Automake bug#7648 and PR automake/491.
+
+	* lib/ylwrap (quote_for_sed): Accept arguments.
+	Catch more special characters.
+	(rename_sed): New.
+	Improve the previous renaming sed commands using quote_for_sed.
+	Suggested by Stefano Lattarini here:
+	<http://lists.gnu.org/archive/html/automake-patches/2012-07/msg00095.html>.
+	(main loop): Use rename_sed to rename the dependencies to other files.
+	* t/yacc-d-basic.sh: Exercise this case, even if bison/yacc was
+	not issuing such an include.
+	* t/list-of-tests.mk (XFAIL_TESTS): Adjust.
+
+2012-07-14  Akim Demaille  <akim@lrde.epita.fr>
+
+	ylwrap: simplify the list of renamings
+
+	* lib/ylwrap (pairwise): Instead of being a straightforward copy from
+	the command line arguments, and having to deal with y.tab vs. y_tab
+	later, let pairwise store the real file names to process, y_tab
+	conversion included when needed.
+	(main loop): Use $to instead of $2, for symmetry with $from.
+
+2012-07-14  Akim Demaille  <akim@lrde.epita.fr>
+
+	ylwrap: refactor: less duplication
+
+	* lib/ylwrap (guard): New function.
+	Move functions before actual code.
+
+2012-07-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: mention fixed testsuite weaknesses
+
+2012-07-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: bump, for future 1.12.3
+
+2012-07-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branches 'fix-pr11898' and 'fix-pr-11893-and-10766' into maint
+
+	* fix-pr11898:
+	  tests: verify the shell test scripts are syntactically valid
+
+	* fix-pr-11893-and-10766:
+	  tests: don't use C instead of C++ compiler on case-insensitive platforms
+
+2012-07-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: verify the shell test scripts are syntactically valid
+
+	Fixes automake bug#11898.
+
+	This measure of extra safety is mostly motivated by the fact that some
+	shells (at least some versions of Bash in the 3.x release series, one
+	of which serves as /bin/sh on Mac OS X 10.7, as well as Bash 4.0 and the
+	/usr/xpg4/bin/sh shell from Solaris 10) erroneously exit with exit status
+	0 upon encountering a syntax error, if an exit trap is sett (as it is in
+	our test scripts).
+
+	* Makefile.am (check-tests-syntax): New, check that the shell test
+	scripts listed in $(TESTS) are syntactically correct.
+	(.PHONY, check-local): Depend on it.
+	* t/self-check-exit.tap : Remove checks verifying that a script exits
+	with non-zero status upon encountering a syntax error; as explained
+	above, we can't depend on that.
+
+2012-07-12  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	depcomp: style changes to Portland Group Compilers support
+
+	* lib/depcomp (pgcc): Quote 'like this', not `like this'.  Other minor
+	quoting improvements.  Remove a commented-out command.  In comments,
+	use proper capitalization and punctuation.  Make a more consistent use
+	of whitespace.  Make fatal error messages more nicely formatted, and
+	send them to standard error rather than to standard output.
+
+2012-07-12  Dave Goodell  <goodell@mcs.anl.gov>
+	    Jeff A. Daily  <jeff.daily@pnnl.gov>
+
+	depcomp: initial support for Portland Group Compilers
+
+	* lib/depcomp: Here.  See automake bug#8880.
+
+	Acked-by: Stefano Lattarini <stefano.lattarini@gmail.com>
+
+2012-07-12  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: don't use C instead of C++ compiler on case-insensitive platforms
+
+	This change fixes automake bug#11893 and bug#10766.
+
+	On at least Cygwin and Mac OS X 10.7, the file system where the system
+	compilers are located can be case-insensitive, so that looking for a
+	program named 'CC' might actually find the C compiler in /usr/bin/cc.
+
+	Now, the Automake configure script looks for a C++ compiler named 'CC'
+	before looking for more obvious names like c++ or g++ (that is done to
+	increase testsuite "coverage in the wild", e.g., preferring, on Solaris,
+	the Sun Studio C++ compiler /usr/bin/CC over the GNU C++ compiler).
+
+	Since the checks done in AC_PROG_CXX are apparently not strict enough
+	to rule out C compilers like those from GCC or Clang (which are smart
+	enough to recognize if a file has a C++ extension, passing it to the
+	C++ front end) the testsuite might end up using a C compiler where a
+	C++ one is expected, with some subtle bad consequences.
+
+	* configure.ac: Don't look for a C++ compiler named 'CC' if the
+	"top-level" file system(s) (where /bin and /usr/bin are) are detected
+	to be case-insensitive.
+
+	Reported-by: Peter Rosin <peda@lysator.liu.se>
+	Reported-by: Max Horn <max@quendi.de>
+	Helped-by: Eric Blake <eblake@redhat.com>
+
+2012-07-10  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: avoid spurious TAP errors on Mac OS X 10.7
+
+	Fixes automake bug#1897.  Reported by Max Horn.
+
+	* t/suffix8.tap: The libtool bug#11895 was causing the ./configure script
+	to output a stray "ok" string on a line of its own, confusing the TAP
+	driver into thinking this was an extra test result (which resulted in the
+	next, real test results being flagged as "OUT-OF-ORDER").  Fix this by
+	protecting configure output.
+	* t/suffix10.tap: Likewise, and for the "make distcheck" output as well.
+	* THANKS: Update.
+
+2012-07-10  Adam Sampson  <ats@offog.org>  (tiny change)
+
+	tests: fix spurious failure in aclocal7.sh on fast machines
+
+	Fixes automake bug#11896.  Issue introduced in commit v1.12.1-46-g13dd512.
+
+	* t/aclocal7.sh: Since aclocal rewrites aclocal.m4 unless the input files
+	are all older than the existing aclocal.m4, so we must sleep to ensure
+	somedefs.m4 has an older timestamp than the aclocal.m4 the next aclocal
+	call will generate.
+
+2012-07-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	sync: update files from upstream with "make fetch"
+
+	* lib/config.guess, lib/gitlog-to-changelog, lib/texinfo.tex: Update.
+
+2012-07-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: improve wording in entry about CVE-2012-3386
+
+2012-07-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: post-release minor version bump
+
+	* configure.ac (AC_INIT): Bump version number to 1.12.2a.
+	* m4/amversion.m4: Likewise (automatically regenerated by
+	"make bootstrap").
+
 2012-07-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
 
 	release: stable release 1.12.2
