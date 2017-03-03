@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 AC_PREREQ([2.69])
-AC_INIT([GNU Automake], [1.13.1], [bug-automake@gnu.org])
+AC_INIT([GNU Automake], [1.13.2], [bug-automake@gnu.org])
 
 AC_CONFIG_SRCDIR([automake.in])
 AC_CONFIG_AUX_DIR([lib])
@@ -44,7 +44,7 @@ AM_INIT_AUTOMAKE([dist-xz filename-length-max=99 color-tests
 
 ## Keep this on a line of its own, since it must be found and processed
 ## by the 'update-copyright' rule in our Makefile.
-RELEASE_YEAR=2012
+RELEASE_YEAR=2013
 AC_SUBST([RELEASE_YEAR])
 
 # The API version is the base version.  We must guarantee

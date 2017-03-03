@@ -1,7 +1,7 @@
 This is doc/automake.info, produced by makeinfo version 4.13 from
 ./doc/automake.texi.
 
-This manual is for GNU Automake (version 1.13.1, 1 January 2013), a
+This manual is for GNU Automake (version 1.13.2, 15 May 2013), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -32,7 +32,7 @@ File: automake.info,  Node: Top,  Next: Introduction,  Up: (dir)
 GNU Automake
 ************
 
-This manual is for GNU Automake (version 1.13.1, 1 January 2013), a
+This manual is for GNU Automake (version 1.13.2, 15 May 2013), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -273,7 +273,7 @@ Support for test suites
 Simple Tests
 
 * Scripts-based Testsuites::    Automake-specific concepts and terminology
-* Serial Test Harness::         Older (and obsolescent) serial test harness
+* Serial Test Harness::         Older (and discouraged) serial test harness
 * Parallel Test Harness::       Generic concurrent test harness
 
 Using the TAP test protocol
@@ -3332,24 +3332,31 @@ File: automake.info,  Node: Public Macros,  Next: Obsolete Macros,  Up: Macros
      Runs many macros required for proper operation of the generated
      Makefiles.
 
-     `AM_INIT_AUTOMAKE' is called with a single argument: a
+     Today, `AM_INIT_AUTOMAKE' is called with a single argument: a
      space-separated list of Automake options that should be applied to
      every `Makefile.am' in the tree.  The effect is as if each option
      were listed in `AUTOMAKE_OPTIONS' (*note Options::).
 
-     This macro could once (before Automake 1.13) also be called in the
-     _now obsolete and completely unsupported_ form
+     This macro can also be called in another, _deprecated_ form:
      `AM_INIT_AUTOMAKE(PACKAGE, VERSION, [NO-DEFINE])'.  In this form,
-     there were two required arguments: the package and the version
-     number.
+     there are two required arguments: the package and the version
+     number.  This usage is mostly obsolete because the PACKAGE and
+     VERSION can be obtained from Autoconf's `AC_INIT' macro.  However,
+     differently from what happens for `AC_INIT' invocations, this
+     `AM_INIT_AUTOMAKE' invocation supports shell variables' expansions
+     in the `PACKAGE' and `VERSION' arguments, and this can be still be
+     useful in some selected situations.  Our hope is that future
+     Autoconf versions will improve their support for package versions
+     defined dynamically at configure runtime; when (and if) this
+     happens, support for the two-args `AM_INIT_AUTOMAKE' invocation
+     will likely be removed from Automake.
 
      If your `configure.ac' has:
 
           AC_INIT([src/foo.c])
           AM_INIT_AUTOMAKE([mumble], [1.5])
 
-     you must modernize it as follows in order to make it work with
-     Automake 1.13 or later:
+     you should modernize it as follows:
 
           AC_INIT([mumble], [1.5])
           AC_CONFIG_SRCDIR([src/foo.c])
@@ -3368,8 +3375,9 @@ File: automake.info,  Node: Public Macros,  Next: Obsolete Macros,  Up: Macros
      explicitly).
 
      By default this macro `AC_DEFINE''s `PACKAGE' and `VERSION'.  This
-     can be avoided by passing the `no-define' option:
-          AM_INIT_AUTOMAKE([gnits 1.5 no-define dist-bzip2])
+     can be avoided by passing the `no-define' option (*note List of
+     Automake options::):
+          AM_INIT_AUTOMAKE([no-define ...])
 
 `AM_PATH_LISPDIR'
      Searches for the program `emacs', and, if found, sets the output
@@ -6495,11 +6503,11 @@ File: automake.info,  Node: Java,  Next: Python,  Prev: Libtool,  Up: Other GNU 
 Automake provides some minimal support for Java bytecode compilation
 with the `JAVA' primary (in addition to the support for compiling Java
 to native machine code; *note Java Support with gcj::).  Note however
-that _the interface and most features described here are deprecated_;
-the next automake release will strive to provide a better and cleaner
+that _the interface and most features described here are deprecated_.
+Future Automake releases will strive to provide a better and cleaner
 interface, which however _won't be backward-compatible_; the present
-interface will probably be removed altogether in future automake
-releases (1.13 or later), so don't use it in new code.
+interface will probably be removed altogether some time after the
+introduction of the new interface (if that ever materializes).
 
    Any `.java' files listed in a `_JAVA' variable will be compiled with
 `JAVAC' at build time.  By default, `.java' files are not included in
@@ -6682,8 +6690,9 @@ File: automake.info,  Node: Texinfo,  Next: Man Pages,  Up: Documentation
 If the current directory contains Texinfo source, you must declare it
 with the `TEXINFOS' primary.  Generally Texinfo files are converted
 into info, and thus the `info_TEXINFOS' variable is most commonly used
-here.  Any Texinfo source file must end in the `.texi', `.txi', or
-`.texinfo' extension.  We recommend `.texi' for new manuals.
+here.  Any Texinfo source file should have the `.texi' extension.
+Automake also accepts `.txi' or `.texinfo' extensions, but their use is
+discouraged now, and will elicit runtime warnings.
 
    Automake generates rules to build `.info', `.dvi', `.ps', `.pdf' and
 `.html' files from your Texinfo sources.  Following the GNU Coding

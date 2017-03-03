@@ -1,53 +1,169 @@
-New in 1.13.1:
+* WARNING: New versioning scheme for Automake.
+
+  - Starting with this version onward, Automake will use an update and
+    more rational versioning scheme, one that will allow users to know
+    which kind of changes can be expected from a new version, based on
+    its version number.
+
+    + Micro versions (e.g., 1.13.3, 2.0.1, 3.2.8) will introduce only
+      documentation updates and bug and regression fixes; they will
+      not introduce new features, nor any backward-incompatibility (any
+      such incompatibility would be considered a bug, to be fixed with
+      a further micro release).
+
+    + Minor versions (e.g., 1.14, 2.1) can introduce new backward
+      compatible features; the only backward-incompatibilities allowed
+      in such a release are new *non-fatal* deprecations and warnings,
+      and possibly fixes for old or non-trivial bugs (or even inefficient
+      behaviours) that could unfortunately have been seen, and used, by
+      some developers as "corner case features".  Possible disruptions
+      caused by this kind of fixes should hopefully be quite rare.
+
+    + Major versions (now expected to be released every 18 or 24 months,
+      and not more often) can introduce new big features (possibly with
+      rough edges and not-fully-stabilized APIs), removal of deprecated
+      features, backward-incompatible changes of behaviour, and possibly
+      major refactorings (that, while ideally transparent to the user,
+      could introduce new bugs).  Incompatibilities should however not
+      be introduced gratuitously and abruptly; a proper deprecation path
+      should be duly implemented in the preceding minor releases.
+
+  - According to this new scheme, the next major version of Automake
+    (the one that has until now been labelled as '1.14') will actually
+    become "Automake 2.0".  Automake 1.14 will be the next minor version,
+    which will introduce new features, deprecations and bug fixes, but
+    no real backward incompatibility.
+
+  - See discussion about automake bug#13578 for more details and
+    background: <http://debbugs.gnu.org/cgi/bugreport.cgi?bug=13578>
 
 * WARNING: Future backward-incompatibilities!
 
-  - Automake 1.14 will likely require Autoconf 2.70 or later (which is
-    still unreleased at the moment of writing, but is planned to be
-    released before Automake 1.14 is).
+  - Automake 2.0 will require Autoconf 2.70 or later (which is still
+    unreleased at the moment of writing, but is planned to be released
+    before Automake 2.0 is).
 
-  - Automake 1.14 will likely drop support for the long-deprecated
-    'configure.in' name for the Autoconf input file.  You are advised
-    to use the recommended name 'configure.ac' instead.
-
-  - The long-obsolete (since automake 1.10) AM_PROG_MKDIR m4 macro will
-    be removed in Automake 1.14.  The $(mkdir_p) make variable and the
-    @mkdir_p@ substitution will still remain available (as aliases of
-    $(MKDIR_P)) for the moment, for better backward compatibility; but
-    you are advised to stop using ASAP.
+  - Automake 2.0 will drop support for the long-deprecated 'configure.in'
+    name for the Autoconf input file.  You are advised to start using the
+    recommended name 'configure.ac' instead, ASAP.
 
   - The ACLOCAL_AMFLAGS special make variable will be fully deprecated
-    in Automake 1.14 (where it will raise warnings in the "obsolete"
+    in Automake 2.0 (where it will raise warnings in the "obsolete"
     category).  You are advised to start relying on the new Automake
-    support for AC_CONFIG_MACRO_DIRS instead (which is introduced with
-    this release; see below for more information).
+    support for AC_CONFIG_MACRO_DIRS instead (which was introduced in
+    Automake 1.13).
 
-  - Support for IRIX and the SGI C/C++ compilers will be removed in
-    Automake 1.14: they have seen their last release in 2006, and SGI
-    is expected to retire support from them in December 2013; see
-    <http://www.sgi.com/services/support/irix_mips_support.html> for
-    more information.
+  - Automake 2.0 will remove support for automatic dependency tracking
+    with the SGI C/C++ compilers on IRIX.  The SGI depmode has been
+    reported broken "in the wild" already, and we don't think investing
+    time in debugging and fixing is worthwhile, especially considering
+    that SGI has last updated those compilers in 2006, and is expected
+    to retire support for them in December 2013:
+    <http://www.sgi.com/services/support/irix_mips_support.html>
 
   - Future versions of Automake might remove support for MS-DOS and
     Windows 95/98/ME (support for them was offered by relying on the
     DJGPP project).  Note however that both Cygwin and MSYS/MinGW on
     modern Windows versions will continue to be fully supported.
 
-  - Support for the long-deprecated INCLUDES variable will be removed
-    altogether in Automake 1.14.  The AM_CPPFLAGS variable should be
-    used instead.
-
   - Automake-provided scripts and makefile recipes might (finally!)
-    start assuming a POSIX shell in Automake 1.14.
+    start assuming a POSIX shell in Automake 2.0.
 
-  - Starting from Automake 1.14, third-party m4 files located in the
+  - Starting from Automake 2.0, third-party m4 files located in the
     system-wide aclocal directory, as well as in any directory listed
     in the ACLOCAL_PATH environment variable, will take precedence
     over "built-in" Automake macros.  For example (assuming Automake
     is installed in the /usr/local hierarchy), a definition of the
     AM_PROG_VALAC macro found in '/usr/local/share/aclocal/my-vala.m4'
     should take precedence over the same-named automake-provided macro
-    (defined in '/usr/local/share/aclocal-1.14/vala.m4').
+    (defined in '/usr/local/share/aclocal-2.0/vala.m4').
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+New in 1.13.2:
+
+* Obsolescent features:
+
+  - Use of suffix-less info files (that can be specified through the
+    '@setfilename' macro in Texinfo input files) is discouraged, and
+    its use will raise warnings in the 'obsolete' category.
+
+  - Use of Texinfo input files with '.txi' or '.texinfo' extensions
+    is discouraged, and its use will raise warnings in the 'obsolete'
+    category.  You are advised to simply use the '.texi' extension
+    instead.
+
+* Documentation fixes:
+
+  - The long-deprecated but still supported two-arguments invocation form
+    of AM_INIT_AUTOMAKE is documented once again.  This seems the sanest
+    thing to do, given that support for such an usage might need to remain
+    in place for a unspecified amount of time in order to cater for people
+    who want to define the version number for their package dynamically at
+    configure runtime (unfortunately, Autoconf does not yet support this
+    scenario, so we cannot delegate the work to it).
+
+  - The serial testsuite harness is no longer reported as "deprecated",
+    but as "discouraged".  We have no plan to remove it, not to make its
+    use cause runtime warnings.
+
+  - The parallel testsuite is no longer reported as "experimental"; it
+    is well tested, and should be stable now.
+
+  - The 'shar' and 'tarZ' distribution formats and the 'dist-shar' and
+    'dist-tarZ' options are obsolescent, and their use is deprecated
+    in the documentation.
+
+  - Other minor miscellaneous fixes and improvements; in particular,
+    some improvements in cross-references.
+
+* Bugs fixed:
+
+  - When the 'ustar' option is used, the generated configure script no
+    longer risks hanging during the tests for the availability of the
+    'pax' utility, even if the user running configure has a UID or GID
+    that requires more than 21 bits to be represented.
+    See automake bug#8343 and bug#13588.
+
+  - The obsolete macros AM_CONFIG_HEADER or AM_PROG_CC_STDC work once
+    again, as they did in Automake 1.12.x (albeit printing runtime
+    warnings in the 'obsolete' category).  Removing them has turned
+    out to be a very bad idea, because it complicated distro packing
+    enormously.  Making them issue fatal warnings, as we did in
+    Automake 1.13, has turned out to be a similarly very bad idea,
+    for exactly the same reason.
+
+  - aclocal will no longer error out if the first local m4 directory
+    (as specified by the '-I' option or the 'AC_CONFIG_MACRO_DIRS' or
+    'AC_CONFIG_MACRO_DIR' macros) doesn't exist; it will merely report
+    a warning in the 'unsupported' category.  This is done to support
+    some pre-existing real-world usages.  See automake bug#13514.
+
+  - aclocal will no longer consider directories for extra m4 files more
+    than once, even if they are specified multiple times.  This ensures
+    packages that specify both
+
+        AC_CONFIG_MACRO_DIR([m4])       in configure.ac
+        ACLOCAL_AMFLAGS = -I m4         in Makefile.am
+
+    will work correctly, even when the 'm4' directory contains no
+    package-specific files, but is used only to install third-party
+    m4 files (as can happen with e.g., "libtoolize --install").
+    See automake bug#13514.
+
+  - Analysis of make flags in Automake-generated rules has been made more
+    robust, and more future-proof.  For example, in presence of make that
+    (like '-I') take an argument, the characters in said argument will no
+    longer be spuriously considered as a set of additional make options.
+    In particular, automake-generated rules will no longer spuriously
+    believe to be running in dry mode ("make -n") if run with an invocation
+    like "make -I noob"; nor will they believe to be running in keep-going
+    mode ("make -k") if run with an invocation like "make -I kool"
+    (automake bug#12554).
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+New in 1.13.1:
 
 * Bugs fixed:
 

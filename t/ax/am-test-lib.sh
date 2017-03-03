@@ -439,8 +439,6 @@ fetch_tap_driver ()
     || framework_failure_ "couldn't fetch $am_tap_implementation TAP driver"
   sed 10q tap-driver # For debugging.
 }
-# The shell/awk implementation of the TAP driver is still mostly dummy, so
-# use the perl implementation by default for the moment.
 am_tap_implementation=${am_tap_implementation-shell}
 
 # $PYTHON and support for PEP-3147.  Needed to check our python-related
@@ -766,6 +764,19 @@ require_tool ()
       YACC='bison -y'; export YACC
       echo "$me: running bison --version"
       bison --version || skip_all_ "required program 'bison' not available"
+      ;;
+    valac)
+      echo "$me: running valac --version"
+      if ! valac --version; then
+        skip_all_ "required program 'valac' not available"
+      elif cross_compiling; then
+        skip_all_ "cross-compiling valac-generated C files is brittle"
+      fi
+      # TODO: We also know we need GNU make, the C compiler, and pkg-config
+      # here, but there is no easy way to express this with the current
+      # code organization.  We should improve the situation, sooner or
+      # later.  At which point the tests requiring 'valac' can drop the
+      # explicit requirements for those tools.
       ;;
     *)
       # Generic case: the tool must support --version.

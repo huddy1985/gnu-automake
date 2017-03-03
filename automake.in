@@ -318,7 +318,7 @@ my $configure_ac;
 # Files found by scanning configure.ac for LIBOBJS.
 my %libsources = ();
 
-# Names used in AC_CONFIG_HEADER call.
+# Names used in AC_CONFIG_HEADERS call.
 my @config_headers = ();
 
 # Names used in AC_CONFIG_LINKS call.
@@ -334,8 +334,8 @@ my @configure_input_files = ();
 # List of files in AC_CONFIG_FILES/AC_OUTPUT without Makefile.am's,
 # and their outputs.
 my @other_input_files = ();
-# Where each AC_CONFIG_FILES/AC_OUTPUT/AC_CONFIG_LINK/AC_CONFIG_HEADER appears.
-# The keys are the files created by these macros.
+# Where each AC_CONFIG_FILES/AC_OUTPUT/AC_CONFIG_LINK/AC_CONFIG_HEADERS
+# appears.  The keys are the files created by these macros.
 my %ac_config_files_location = ();
 # The condition under which AC_CONFIG_FOOS appears.
 my %ac_config_files_condition = ();
@@ -2131,7 +2131,7 @@ sub handle_source_transform ($$$$%)
 	msg_var ('unsupported', $ext_var, $ext_var->name . " can assume at most one value")
 	  if $default_source_ext =~ /[\t ]/;
 	(my $default_source = $unxformed) =~ s,(\.[^./\\]*)?$,$default_source_ext,;
-	# TODO: Remove this backward-compatibility hack in Automake 1.14.
+	# TODO: Remove this backward-compatibility hack in Automake 2.0.
 	if ($old_default_source ne $default_source
 	    && !$ext_var
 	    && (rule $old_default_source
@@ -2993,9 +2993,12 @@ sub scan_texinfo_file ($)
 	  next if $outfile;
 
 	  $outfile = $1;
-	  # TODO: In Automake 1.14 (or even 1.13.2), start warning against
-	  # TODO: suffixes != ".info", to ease transition to Automake-NG.
-	  if ($outfile =~ /\.([^.]+)$/ && $1 ne 'info')
+	  if (index ($outfile, '.') < 0)
+	    {
+	      msg 'obsolete', "$filename:$.",
+	          "use of suffix-less info files is discouraged"
+	    }
+	  elsif ($outfile !~ /\.info$/)
 	    {
 	      error ("$filename:$.",
 		     "output '$outfile' has unrecognized extension");
@@ -3016,10 +3019,6 @@ sub scan_texinfo_file ($)
       return;
     }
 
-  my $infobase = basename ($filename);
-  # TODO: In Automake 1.14 (or even 1.13.2), start warning against
-  # TODO: suffixes != ".texi", to ease transition to Automake-NG.
-  $infobase =~ s/\.te?xi(nfo)?$//;
   return ($outfile, $vfile);
 }
 
@@ -3147,11 +3146,17 @@ sub handle_texinfo_helper ($)
       ($info_texinfos->value_as_list_recursive (inner_expand => 1))
     {
       my $infobase = $texi;
-      # TODO: In Automake 1.14 (or even 1.13.2), start warning against
-      # TODO: suffixes != ".texi", to ease transition to Automake-NG.
-      $infobase =~ s/\.(txi|texinfo|texi)$//;
-
-      if ($infobase eq $texi)
+      if ($infobase =~ s/\.texi$//)
+        {
+          1; # Nothing more to do.
+        }
+      elsif ($infobase =~ s/\.(txi|texinfo)$//)
+        {
+	  msg_var 'obsolete', $info_texinfos,
+	          "suffix '.$1' for Texinfo files is discouraged;" .
+                  " use '.texi' instead";
+        }
+      else
 	{
 	  # FIXME: report line number.
 	  err_am "texinfo file '$texi' has unrecognized extension";
@@ -4141,8 +4146,8 @@ sub handle_configure ($$$@)
   # Distribute and define mkinstalldirs only if it is already present
   # in the package, for backward compatibility (some people may still
   # use $(mkinstalldirs)).
-  # TODO: start warning about this in Automake 1.13.2, and have
-  # TODO: Automake 1.14 or 1.15 drop it (and the mkinstalldirs script
+  # TODO: start warning about this in Automake 1.14, and have
+  # TODO: Automake 2.0 drop it (and the mkinstalldirs script
   # TODO: as well).
   my $mkidpath = "$config_aux_dir/mkinstalldirs";
   if (-f $mkidpath)
@@ -5089,7 +5094,7 @@ sub scan_autoconf_config_files ($$)
       # Handle $local:$input syntax.
       my ($local, @rest) = split (/:/);
       @rest = ("$local.in",) unless @rest;
-      # Keep in sync with 'conffile-leading-dot.test'.
+      # Keep in sync with test 'conffile-leading-dot.sh'.
       msg ('unsupported', $where,
            "omit leading './' from config file names such as '$local';"
            . "\nremake rules might be subtly broken otherwise")
@@ -5139,7 +5144,7 @@ sub scan_autoconf_traces ($)
 		AC_REQUIRE_AUX_FILE => 1,
 		AC_SUBST_TRACE => 1,
 		AM_AUTOMAKE_VERSION => 1,
-                AM_PROG_MKDIR_P => 0, # FIXME: to be removed in 1.14
+                AM_PROG_MKDIR_P => 0,
 		AM_CONDITIONAL => 2,
 		AM_EXTRA_RECURSIVE_TARGETS => 1,
 		AM_GNU_GETTEXT => 0,
@@ -5295,10 +5300,10 @@ sub scan_autoconf_traces ($)
 
 	  $seen_automake_version = 1;
 	}
-      elsif ($macro eq 'AM_PROG_MKDIR_P') # FIXME: to be removed in 1.14
+      elsif ($macro eq 'AM_PROG_MKDIR_P')
 	{
 	  msg 'obsolete', $where, <<'EOF';
-The 'AM_PROG_MKDIR_P' macro is deprecated, and will soon be removed.
+The 'AM_PROG_MKDIR_P' macro is deprecated, and its use is discouraged.
 You should use the Autoconf-provided 'AC_PROG_MKDIR_P' macro instead,
 and use '$(MKDIR_P)' instead of '$(mkdir_p)'in your Makefile.am files.
 EOF
@@ -5331,7 +5336,7 @@ EOF
 	    {
               msg 'obsolete', $where, <<'EOF';
 AM_INIT_AUTOMAKE: two- and three-arguments forms are deprecated.  For more info, see:
-http://www.gnu.org/software/automake/manual/automake.html#Modernize-AM_INIT_AUTOMAKE-invocation
+http://www.gnu.org/software/automake/manual/automake.html#Modernize-AM_005fINIT_005fAUTOMAKE-invocation
 EOF
 	      $package_version = $args[2];
 	      $package_version_location = $where;
@@ -5967,7 +5972,7 @@ sub register_language (%)
   # Update the pattern of known extensions.
   accept_extensions (@{$lang->extensions});
 
-  # Upate the $suffix_rule map.
+  # Update the $suffix_rule map.
   foreach my $suffix (@{$lang->extensions})
     {
       foreach my $dest (&{$lang->output_extensions} ($suffix))
@@ -6557,7 +6562,7 @@ sub read_am_file ($$)
 		# otherwise OSF make will implicitly copy the included
 		# file in the build tree during "make distdir" to satisfy
 		# the dependency.
-		# (subdircond2.test and subdircond3.test will fail.)
+		# (subdir-am-cond.sh and subdir-ac-cond.sh will fail)
 		push_dist_common ("\$\(top_srcdir\)/$path");
 	      }
 	    else
@@ -6568,7 +6573,7 @@ sub read_am_file ($$)
 		# otherwise OSF make will implicitly copy the included
 		# file in the build tree during "make distdir" to satisfy
 		# the dependency.
-		# (subdircond2.test and subdircond3.test will fail.)
+		# (subdir-am-cond.sh and subdir-ac-cond.sh will fail)
 		push_dist_common ("\$\(srcdir\)/$path");
 		$path = $relative_dir . "/" . $path if $relative_dir ne '.';
 	      }
@@ -7404,7 +7409,7 @@ sub push_required_file
     }
   # This is needed to allow a construct in a non-top-level Makefile.am
   # to require a file in the build-aux directory (see at least the test
-  # script 'test-driver-is-distributed.test').  This is related to the
+  # script 'test-driver-is-distributed.sh').  This is related to the
   # automake bug#9546.  Note that the use of $config_aux_dir instead
   # of $am_config_aux_dir here is deliberate and necessary.
   elsif ($dir eq $config_aux_dir)

@@ -1,7 +1,7 @@
 This is doc/automake.info, produced by makeinfo version 4.13 from
 ./doc/automake.texi.
 
-This manual is for GNU Automake (version 1.13.1, 1 January 2013), a
+This manual is for GNU Automake (version 1.13.2, 15 May 2013), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -158,22 +158,20 @@ File: automake.info,  Node: The Types of Distributions,  Prev: Checking the Dist
 Automake generates rules to provide archives of the project for
 distributions in various formats.  Their targets are:
 
+`dist-gzip'
+     Generate a `gzip' tar archive of the distribution.  This is the
+     only format enabled by default.  
+
 `dist-bzip2'
-     Generate a bzip2 tar archive of the distribution.  bzip2 archives
+     Generate a `bzip2' tar archive of the distribution.  bzip2 archives
      are frequently smaller than gzipped archives.  By default, this
      rule makes `bzip2' use a compression option of `-9'.  To make it
      use a different one, set the `BZIP2' environment variable.  For
      example, `make dist-bzip2 BZIP2=-7'.  
 
-`dist-gzip'
-     Generate a gzip tar archive of the distribution.  
-
 `dist-lzip'
      Generate an `lzip' tar archive of the distribution.  `lzip'
      archives are frequently smaller than `bzip2'-compressed archives.  
-
-`dist-shar'
-     Generate a shar archive of the distribution.  
 
 `dist-xz'
      Generate an `xz' tar archive of the distribution.  `xz' archives
@@ -185,14 +183,22 @@ distributions in various formats.  Their targets are:
      XZ_OPT=-ve'.  
 
 `dist-zip'
-     Generate a zip archive of the distribution.  
+     Generate a `zip' archive of the distribution.  
 
 `dist-tarZ'
-     Generate a compressed tar archive of the distribution.  
+     Generate a tar archive of the distribution, compressed with the
+     historical (obsolescent) program `compress'.  Use of this option
+     is discouraged.  
+
+`dist-shar'
+     Generate a `shar' archive of the distribution.  This format archive
+     is obsolescent, and use of this option is discouraged.  
+
 
    The rule `dist' (and its historical synonym `dist-all') will create
-archives in all the enabled formats, *note Options::.  By default, only
-the `dist-gzip' target is hooked to `dist'.
+archives in all the enabled formats (*note List of Automake options::
+for how to change this list).  By default, only the `dist-gzip' target
+is hooked to `dist'.
 
 
 File: automake.info,  Node: Tests,  Next: Rebuilding,  Prev: Dist,  Up: Top
@@ -288,7 +294,7 @@ File: automake.info,  Node: Simple Tests,  Next: Custom Test Drivers,  Prev: Gen
 * Menu:
 
 * Scripts-based Testsuites::    Automake-specific concepts and terminology
-* Serial Test Harness::         Older (and obsolescent) serial test harness
+* Serial Test Harness::         Older (and discouraged) serial test harness
 * Parallel Test Harness::       Generic concurrent test harness
 
 
@@ -435,12 +441,16 @@ all your programs are test cases.
 
 File: automake.info,  Node: Serial Test Harness,  Next: Parallel Test Harness,  Prev: Scripts-based Testsuites,  Up: Simple Tests
 
-15.2.2 Older (and obsolescent) serial test harness
+15.2.2 Older (and discouraged) serial test harness
 --------------------------------------------------
 
-_This harness is obsolescent_, and kept for backward-compatibility
-reasons only.  The user is strongly advised to just use the parallel
-test harness instead (*note Parallel Test Harness::).
+First, note that today the use of this harness is strongly discouraged
+in favour of the parallel test harness (*note Parallel Test Harness::).
+Still, there are _few_ situations when the advantages offered by the
+parallel harness are irrelevant, and when test concurrency can even
+cause tricky problems.  In those cases, it might make sense to still
+use the serial harness, for simplicity and reliability (we still
+suggest trying to give the parallel harness a shot though).
 
    The serial test harness is enabled by the Automake option
 `serial-tests'. It operates by simply running the tests serially, one
@@ -481,9 +491,6 @@ files, concurrent execution of tests with `make -j', specification of
 inter-test dependencies, lazy reruns of tests that have not completed
 in a prior run, and hard errors for exceptional failures.
 
-   This harness is still somewhat experimental and may undergo changes
-in order to satisfy additional portability requirements.
-
    The parallel test harness operates by defining a set of `make' rules
 that run the test scripts listed in `TESTS', and, for each such script,
 save its output in a corresponding `.log' file and its results (and
@@ -518,6 +525,11 @@ user, in which case any extension listed in it must be constituted by a
 dot, followed by a non-digit alphabetic character, followed by any
 number of alphabetic characters.  For example, `.sh', `.T' and `.t1'
 are valid extensions, while `.x-y', `.6c' and `.t.1' are not.
+
+   It is important to note that, due to current limitations (unlikely
+to be lifted), configure substitutions in the definition of `TESTS' can
+only work if they will expand to a list of tests that have a suffix
+listed in `TEST_EXTENSIONS'.
 
    For tests that match an extension `.EXT' listed in
 `TEST_EXTENSIONS', you can provide a custom "test runner" using the
@@ -1289,8 +1301,23 @@ read as a side effect of running `configure', like `version.sh' in the
 example above.
 
    Speaking of `version.sh' scripts, we recommend against them today.
-We recommend that `version.sh' be replaced by an M4 file that is
-included by `configure.ac':
+They are mainly used when the version of a package is updated
+automatically by a script (e.g., in daily builds).  Here is what some
+old-style `configure.ac's may look like:
+
+     AC_INIT
+     . $srcdir/version.sh
+     AM_INIT_AUTOMAKE([name], $VERSION_NUMBER)
+     ...
+
+Here, `version.sh' is a shell fragment that sets `VERSION_NUMBER'.  The
+problem with this example is that `automake' cannot track dependencies
+(listing `version.sh' in `CONFIG_STATUS_DEPENDENCIES', and distributing
+this file is up to the user), and that it uses the obsolete form of
+`AC_INIT' and `AM_INIT_AUTOMAKE'.  Upgrading to the new syntax is not
+straightforward, because shell variables are not allowed in `AC_INIT''s
+arguments.  We recommend that `version.sh' be replaced by an M4 file
+that is included by `configure.ac':
 
      m4_include([version.m4])
      AC_INIT([name], VERSION_NUMBER)
@@ -1301,7 +1328,9 @@ Here `version.m4' could contain something like
 `m4_define([VERSION_NUMBER], [1.2])'.  The advantage of this second
 form is that `automake' will take care of the dependencies when
 defining the rebuild rule, and will also distribute the file
-automatically.
+automatically.  An inconvenience is that `autoconf' will now be rerun
+each time the version number is bumped, when only `configure' had to be
+rerun in the previous setup.
 
 
 File: automake.info,  Node: Options,  Next: Miscellaneous,  Prev: Rebuilding,  Up: Top
@@ -1381,14 +1410,19 @@ File: automake.info,  Node: List of Automake options,  Prev: Options generalitie
 `dist-lzip'
      Hook `dist-lzip' to `dist'.  
 
-`dist-shar'
-     Hook `dist-shar' to `dist'.  
+`dist-xz'
+     Hook `dist-xz' to `dist'.  
 
 `dist-zip'
      Hook `dist-zip' to `dist'.  
 
+`dist-shar'
+     Hook `dist-shar' to `dist'.  Use of this option is discouraged, as
+     the `shar' format is obsolescent and problematic.  
+
 `dist-tarZ'
-     Hook `dist-tarZ' to `dist'.  
+     Hook `dist-tarZ' to `dist'.  Use of this option is discouraged, as
+     the `compress' program is obsolete.  
 
 `filename-length-max=99'
      Abort if file names longer than 99 characters are found during
@@ -4410,11 +4444,11 @@ B.1 Macro Index
 * AC_LIBSOURCES:                         Optional.            (line  69)
 * AC_OUTPUT:                             Requirements.        (line  15)
 * AC_PREREQ:                             Extending aclocal.   (line  36)
-* AC_PROG_CC_C_O:                        Public Macros.       (line  77)
+* AC_PROG_CC_C_O:                        Public Macros.       (line  85)
 * AC_PROG_CXX:                           Optional.            (line  87)
 * AC_PROG_F77:                           Optional.            (line  99)
 * AC_PROG_FC:                            Optional.            (line 114)
-* AC_PROG_LEX <1>:                       Public Macros.       (line  83)
+* AC_PROG_LEX <1>:                       Public Macros.       (line  91)
 * AC_PROG_LEX:                           Optional.            (line 129)
 * AC_PROG_LIBTOOL:                       Optional.            (line 119)
 * AC_PROG_OBJC:                          Optional.            (line  91)
@@ -4438,24 +4472,24 @@ B.1 Macro Index
 * AM_MAINTAINER_MODE:                    Rebuilding.          (line   9)
 * AM_MAINTAINER_MODE([DEFAULT-MODE]):    Optional.            (line 175)
 * AM_MAKE_INCLUDE:                       Private Macros.      (line  20)
-* AM_MISSING_PROG:                       Public Macros.       (line  99)
+* AM_MISSING_PROG:                       Public Macros.       (line 107)
 * AM_OUTPUT_DEPENDENCY_COMMANDS:         Private Macros.      (line  15)
-* AM_PATH_LISPDIR:                       Public Macros.       (line  50)
+* AM_PATH_LISPDIR:                       Public Macros.       (line  58)
 * AM_PATH_PYTHON:                        Python.              (line  29)
-* AM_PROG_AR:                            Public Macros.       (line  65)
-* AM_PROG_AS:                            Public Macros.       (line  72)
-* AM_PROG_CC_C_O:                        Public Macros.       (line  77)
-* AM_PROG_GCJ:                           Public Macros.       (line  88)
+* AM_PROG_AR:                            Public Macros.       (line  73)
+* AM_PROG_AS:                            Public Macros.       (line  80)
+* AM_PROG_CC_C_O:                        Public Macros.       (line  85)
+* AM_PROG_GCJ:                           Public Macros.       (line  96)
 * AM_PROG_INSTALL_STRIP:                 Private Macros.      (line  25)
-* AM_PROG_LEX:                           Public Macros.       (line  83)
+* AM_PROG_LEX:                           Public Macros.       (line  91)
 * AM_PROG_MKDIR_P:                       Obsolete Macros.     (line  14)
-* AM_PROG_UPC:                           Public Macros.       (line  93)
+* AM_PROG_UPC:                           Public Macros.       (line 101)
 * AM_PROG_VALAC:                         Vala Support.        (line  21)
 * AM_SANITY_CHECK:                       Private Macros.      (line  30)
 * AM_SET_DEPDIR:                         Private Macros.      (line  13)
-* AM_SILENT_RULES:                       Public Macros.       (line 107)
+* AM_SILENT_RULES:                       Public Macros.       (line 115)
 * AM_SUBST_NOTMAKE(VAR):                 Optional.            (line 183)
-* AM_WITH_DMALLOC:                       Public Macros.       (line 111)
+* AM_WITH_DMALLOC:                       Public Macros.       (line 119)
 * m4_include <1>:                        Basics of Distribution.
                                                               (line  14)
 * m4_include:                            Optional.            (line 193)
@@ -4474,15 +4508,15 @@ B.2 Variable Index
 * _LIBRARIES:                            A Library.           (line   6)
 * _LISP:                                 Emacs Lisp.          (line   6)
 * _LOG_COMPILE:                          Parallel Test Harness.
-                                                              (line  50)
+                                                              (line  52)
 * _LOG_COMPILER:                         Parallel Test Harness.
-                                                              (line  50)
+                                                              (line  52)
 * _LOG_DRIVER:                           Declaring Custom Test Drivers.
                                                               (line   6)
 * _LOG_DRIVER_FLAGS:                     Declaring Custom Test Drivers.
                                                               (line   6)
 * _LOG_FLAGS:                            Parallel Test Harness.
-                                                              (line  50)
+                                                              (line  52)
 * _LTLIBRARIES:                          Libtool Libraries.   (line   6)
 * _MANS:                                 Man Pages.           (line   6)
 * _PROGRAMS <1>:                         Program Sources.     (line   6)
@@ -4512,13 +4546,13 @@ B.2 Variable Index
 * AM_EXT_LOG_DRIVER_FLAGS:               Declaring Custom Test Drivers.
                                                               (line   6)
 * AM_EXT_LOG_FLAGS:                      Parallel Test Harness.
-                                                              (line  50)
+                                                              (line  52)
 * AM_FCFLAGS:                            Fortran 9x Support.  (line  22)
 * AM_FFLAGS:                             Fortran 77 Support.  (line  22)
 * AM_GCJFLAGS:                           Java Support with gcj.
                                                               (line  26)
 * AM_INSTALLCHECK_STD_OPTIONS_EXEMPT:    List of Automake options.
-                                                              (line 118)
+                                                              (line 123)
 * AM_JAVACFLAGS:                         Java.                (line  42)
 * AM_LDFLAGS <1>:                        Program Variables.   (line  60)
 * AM_LDFLAGS:                            Linking.             (line  10)
@@ -4527,10 +4561,10 @@ B.2 Variable Index
 * AM_LOG_DRIVER_FLAGS:                   Declaring Custom Test Drivers.
                                                               (line   6)
 * AM_LOG_FLAGS:                          Parallel Test Harness.
-                                                              (line  50)
+                                                              (line  52)
 * AM_MAKEFLAGS:                          Subdirectories.      (line  29)
-* AM_MAKEINFOFLAGS:                      Texinfo.             (line 110)
-* AM_MAKEINFOHTMLFLAGS:                  Texinfo.             (line 111)
+* AM_MAKEINFOFLAGS:                      Texinfo.             (line 111)
+* AM_MAKEINFOHTMLFLAGS:                  Texinfo.             (line 112)
 * AM_OBJCFLAGS:                          Objective C Support. (line  22)
 * AM_OBJCXXFLAGS:                        Objective C++ Support.
                                                               (line  22)
@@ -4542,7 +4576,7 @@ B.2 Variable Index
                                                               (line  95)
 * AM_UPCFLAGS:                           Unified Parallel C Support.
                                                               (line  21)
-* AM_UPDATE_INFO_DIR:                    Texinfo.             (line  86)
+* AM_UPDATE_INFO_DIR:                    Texinfo.             (line  87)
 * AM_V:                                  Automake Silent Rules.
                                                               (line 121)
 * AM_V_at:                               Automake Silent Rules.
@@ -4551,7 +4585,7 @@ B.2 Variable Index
                                                               (line 121)
 * AM_VALAFLAGS:                          Vala Support.        (line  41)
 * AM_YFLAGS:                             Yacc and Lex.        (line  37)
-* AR:                                    Public Macros.       (line  65)
+* AR:                                    Public Macros.       (line  73)
 * AUTOCONF:                              automake Invocation. (line  28)
 * AUTOM4TE:                              aclocal Invocation.  (line  45)
 * AUTOMAKE_JOBS:                         automake Invocation. (line 184)
@@ -4564,12 +4598,12 @@ B.2 Variable Index
 * build_triplet:                         Optional.            (line  14)
 * BUILT_SOURCES:                         Sources.             (line  27)
 * BZIP2:                                 The Types of Distributions.
-                                                              (line   9)
+                                                              (line  13)
 * CC:                                    Program Variables.   (line  12)
 * CCAS <1>:                              Assembly Support.    (line  10)
-* CCAS:                                  Public Macros.       (line  72)
+* CCAS:                                  Public Macros.       (line  80)
 * CCASFLAGS <1>:                         Assembly Support.    (line  10)
-* CCASFLAGS:                             Public Macros.       (line  72)
+* CCASFLAGS:                             Public Macros.       (line  80)
 * CFLAGS:                                Program Variables.   (line  12)
 * check_:                                Uniform.             (line  96)
 * check_LTLIBRARIES:                     Libtool Convenience Libraries.
@@ -4622,21 +4656,21 @@ B.2 Variable Index
 * distdir:                               The dist Hook.       (line  33)
 * distuninstallcheck_listfiles:          Checking the Distribution.
                                                               (line 102)
-* DVIPS:                                 Texinfo.             (line 136)
-* EMACS:                                 Public Macros.       (line  50)
+* DVIPS:                                 Texinfo.             (line 137)
+* EMACS:                                 Public Macros.       (line  58)
 * ETAGS_ARGS:                            Tags.                (line  25)
 * ETAGSFLAGS:                            Tags.                (line  25)
 * EXPECT:                                DejaGnu Tests.       (line  19)
 * EXT_LOG_COMPILE:                       Parallel Test Harness.
-                                                              (line  50)
+                                                              (line  52)
 * EXT_LOG_COMPILER:                      Parallel Test Harness.
-                                                              (line  50)
+                                                              (line  52)
 * EXT_LOG_DRIVER:                        Declaring Custom Test Drivers.
                                                               (line   6)
 * EXT_LOG_DRIVER_FLAGS:                  Declaring Custom Test Drivers.
                                                               (line   6)
 * EXT_LOG_FLAGS:                         Parallel Test Harness.
-                                                              (line  50)
+                                                              (line  52)
 * EXTRA_DIST:                            Basics of Distribution.
                                                               (line  31)
 * EXTRA_maude_DEPENDENCIES <1>:          Program and Library Variables.
@@ -4660,10 +4694,10 @@ B.2 Variable Index
 * FLIBS:                                 Mixing Fortran 77 With C and C++.
                                                               (line  21)
 * FLINK:                                 Fortran 77 Support.  (line  35)
-* GCJ:                                   Public Macros.       (line  88)
+* GCJ:                                   Public Macros.       (line  96)
 * GCJFLAGS <1>:                          Java Support with gcj.
                                                               (line  16)
-* GCJFLAGS:                              Public Macros.       (line  88)
+* GCJFLAGS:                              Public Macros.       (line  96)
 * GCJLINK:                               How the Linker is Chosen.
                                                               (line  10)
 * GTAGS_ARGS:                            Tags.                (line  60)
@@ -4696,18 +4730,18 @@ B.2 Variable Index
 * LINK:                                  Program Variables.   (line  65)
 * LISP:                                  Uniform.             (line 102)
 * lisp_LISP:                             Emacs Lisp.          (line   6)
-* lispdir:                               Public Macros.       (line  50)
+* lispdir:                               Public Macros.       (line  58)
 * localstate_DATA:                       Data.                (line   9)
 * LOG_COMPILE:                           Parallel Test Harness.
-                                                              (line  50)
+                                                              (line  52)
 * LOG_COMPILER:                          Parallel Test Harness.
-                                                              (line  50)
+                                                              (line  52)
 * LOG_DRIVER:                            Declaring Custom Test Drivers.
                                                               (line   6)
 * LOG_DRIVER_FLAGS:                      Declaring Custom Test Drivers.
                                                               (line   6)
 * LOG_FLAGS:                             Parallel Test Harness.
-                                                              (line  50)
+                                                              (line  52)
 * LTALLOCA <1>:                          LIBOBJS.             (line   6)
 * LTALLOCA:                              LTLIBOBJS.           (line   6)
 * LTLIBOBJS <1>:                         LIBOBJS.             (line   6)
@@ -4715,9 +4749,9 @@ B.2 Variable Index
 * LTLIBRARIES:                           Uniform.             (line 102)
 * MAINTAINERCLEANFILES:                  Clean.               (line  13)
 * MAKE:                                  Subdirectories.      (line  29)
-* MAKEINFO:                              Texinfo.             (line  94)
-* MAKEINFOFLAGS:                         Texinfo.             (line 104)
-* MAKEINFOHTML:                          Texinfo.             (line 100)
+* MAKEINFO:                              Texinfo.             (line  95)
+* MAKEINFOFLAGS:                         Texinfo.             (line 105)
+* MAKEINFOHTML:                          Texinfo.             (line 101)
 * man_MANS:                              Man Pages.           (line   6)
 * MANS:                                  Uniform.             (line 102)
 * maude_AR:                              Program and Library Variables.
@@ -4767,7 +4801,7 @@ B.2 Variable Index
                                                               (line 181)
 * maude_YFLAGS:                          Program and Library Variables.
                                                               (line 182)
-* MISSING:                               Public Macros.       (line  99)
+* MISSING:                               Public Macros.       (line 107)
 * mkdir_p:                               Obsolete Macros.     (line  14)
 * MKDIR_P:                               Obsolete Macros.     (line  14)
 * MOSTLYCLEANFILES:                      Clean.               (line  13)
@@ -4826,7 +4860,7 @@ B.2 Variable Index
 * PYTHON_VERSION:                        Python.              (line  68)
 * pythondir:                             Python.              (line  87)
 * RECHECK_LOGS:                          Parallel Test Harness.
-                                                              (line 117)
+                                                              (line 119)
 * RFLAGS:                                Fortran 77 Support.  (line  25)
 * RUNTEST:                               DejaGnu Tests.       (line  19)
 * RUNTESTDEFAULTFLAGS:                   DejaGnu Tests.       (line  14)
@@ -4846,28 +4880,28 @@ B.2 Variable Index
 * TAGS_DEPENDENCIES:                     Tags.                (line  35)
 * target_triplet:                        Optional.            (line  14)
 * TEST_EXTENSIONS:                       Parallel Test Harness.
-                                                              (line  38)
+                                                              (line  35)
 * TEST_LOGS:                             Parallel Test Harness.
-                                                              (line  38)
+                                                              (line  35)
 * TEST_SUITE_LOG:                        Parallel Test Harness.
-                                                              (line  15)
+                                                              (line  12)
 * TESTS <1>:                             Parallel Test Harness.
-                                                              (line  15)
+                                                              (line  12)
 * TESTS:                                 Scripts-based Testsuites.
                                                               (line  87)
 * TESTS_ENVIRONMENT:                     Scripts-based Testsuites.
                                                               (line  87)
-* TEXI2DVI:                              Texinfo.             (line 127)
-* TEXI2PDF:                              Texinfo.             (line 132)
-* TEXINFO_TEX:                           Texinfo.             (line 140)
-* TEXINFOS <1>:                          Texinfo.             (line  59)
+* TEXI2DVI:                              Texinfo.             (line 128)
+* TEXI2PDF:                              Texinfo.             (line 133)
+* TEXINFO_TEX:                           Texinfo.             (line 141)
+* TEXINFOS <1>:                          Texinfo.             (line  60)
 * TEXINFOS:                              Uniform.             (line 102)
 * top_distdir <1>:                       Third-Party Makefiles.
                                                               (line  25)
 * top_distdir:                           The dist Hook.       (line  33)
 * UPC <1>:                               Unified Parallel C Support.
                                                               (line  15)
-* UPC:                                   Public Macros.       (line  93)
+* UPC:                                   Public Macros.       (line 101)
 * UPCCOMPILE:                            Unified Parallel C Support.
                                                               (line  24)
 * UPCFLAGS:                              Unified Parallel C Support.
@@ -4881,16 +4915,16 @@ B.2 Variable Index
 * VALAC:                                 Vala Support.        (line  34)
 * VALAFLAGS:                             Vala Support.        (line  38)
 * VERBOSE:                               Parallel Test Harness.
-                                                              (line  29)
+                                                              (line  26)
 * VERSION:                               Basics of Distribution.
                                                               (line   6)
 * WARNINGS <1>:                          aclocal Options.     (line  96)
 * WARNINGS:                              automake Invocation. (line 176)
-* WITH_DMALLOC:                          Public Macros.       (line 111)
+* WITH_DMALLOC:                          Public Macros.       (line 119)
 * XFAIL_TESTS:                           Scripts-based Testsuites.
                                                               (line  33)
 * XZ_OPT:                                The Types of Distributions.
-                                                              (line  26)
+                                                              (line  24)
 * YACC:                                  Optional.            (line 124)
 * YFLAGS:                                Yacc and Lex.        (line  37)
 
