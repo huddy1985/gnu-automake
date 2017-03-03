@@ -699,6 +699,30 @@ t/depcomp-cpp.log: t/ax/depcomp.sh
 t/depcomp-gcc.log: t/ax/depcomp.sh 
 t/depcomp-dashmstdout.log: t/ax/depcomp.sh 
 
+## Added by deps-extracting key 'pkgconfig_macros'.
+pkgconfig_macros_TESTS = \
+  t/vala-headers.sh \
+  t/vala-libs.sh \
+  t/vala-mix.sh \
+  t/vala-mix2.sh \
+  t/vala-non-recursive-setup.sh \
+  t/vala-parallel.sh \
+  t/vala-per-target-flags.sh \
+  t/vala-recursive-setup.sh \
+  t/vala-vapi.sh \
+  t/vala-vpath.sh
+EXTRA_DIST += 
+t/vala-headers.log:  t/pkg-config-macros.log
+t/vala-libs.log:  t/pkg-config-macros.log
+t/vala-mix.log:  t/pkg-config-macros.log
+t/vala-mix2.log:  t/pkg-config-macros.log
+t/vala-non-recursive-setup.log:  t/pkg-config-macros.log
+t/vala-parallel.log:  t/pkg-config-macros.log
+t/vala-per-target-flags.log:  t/pkg-config-macros.log
+t/vala-recursive-setup.log:  t/pkg-config-macros.log
+t/vala-vapi.log:  t/pkg-config-macros.log
+t/vala-vpath.log:  t/pkg-config-macros.log
+
 ## Added by deps-extracting key 'extract_testsuite_summary'.
 extract_testsuite_summary_TESTS = \
   t/testsuite-summary-count-many.sh

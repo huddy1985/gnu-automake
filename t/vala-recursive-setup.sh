@@ -19,38 +19,32 @@
 required="pkg-config valac gcc GNUmake"
 . test-init.sh
 
-cat >> configure.ac << 'END'
+mkdir src
+
+cat >> 'configure.ac' << 'END'
 AC_PROG_CC
+AM_PROG_CC_C_O
 AM_PROG_VALAC([0.7.0])
 PKG_CHECK_MODULES([GOBJECT], [gobject-2.0 >= 2.4])
+AC_CONFIG_FILES([src/Makefile])
 AC_OUTPUT
 END
 
-cat > Makefile.am << 'END'
-bin_PROGRAMS = zardoz quux
-
-zardoz_SOURCES = zardoz.vala
-quux_SOURCES = quux.vala
-quux.vala: zardoz.vala
-	sed 's/Zardoz/Quux/' <zardoz.vala >quux.vala
-
-quux_VALAFLAGS = \
-  --header HDR.h \
-  --vapi hello.vapi
-
-zardoz_VALAFLAGS = \
-  -H foo.h \
-  --internal-header foo2.h \
-  --internal-vapi foo3.vapi
-
-AM_CFLAGS = $(GOBJECT_CFLAGS)
-LDADD = $(GOBJECT_LIBS)
+cat > 'Makefile.am' <<'END'
+SUBDIRS = src
 END
 
-headers='HDR.h hello.vapi foo.h foo2.h foo3.vapi'
+cat > 'src/Makefile.am' <<'END'
+bin_PROGRAMS = zardoz
+zardoz_VALAFLAGS = -H zardoz.h
+zardoz_CFLAGS = $(GOBJECT_CFLAGS)
+zardoz_LDADD = $(GOBJECT_LIBS)
+zardoz_SOURCES = zardoz.vala
+END
 
-cat > zardoz.vala << 'END'
+cat > 'src/zardoz.vala' <<'END'
 using GLib;
+
 public class Zardoz {
   public static void main () {
     stdout.printf ("Zardoz!\n");
@@ -67,19 +61,48 @@ $MAKE
 
 # Test rebuild rules.
 
-for h in $headers; do
-  rm -f $h
-  $MAKE $h
-  test -f $h
-done
+rm -f src/zardoz.h
+$MAKE -C src zardoz.h
+test -f src/zardoz.h
+rm -f src/zardoz.c
+$MAKE -C src
+test -f src/zardoz.c
 
-rm -f $headers
-$MAKE $headers
-for h in $headers; do test -f $h; done
+echo am--error > src/zardoz.h
+echo am--error > src/zardoz.c
+$sleep
+touch src/zardoz.vala
+$MAKE
+grep 'am--error' src/zardoz.[ch] && exit 1
+
+# Check the distribution.
 
 $MAKE distcheck
+$MAKE distclean
 
-$MAKE maintainer-clean
-for h in $headers; do test ! -e $h; done
+# Tru a VPATH setup.
+
+mkdir build
+cd build
+../configure
+$MAKE
+$MAKE distcheck
+
+# Test rebuild rules from builddir.
+
+rm -f ../src/zardoz.h
+$MAKE -C src ../../src/zardoz.h
+test -f ../src/zardoz.h
+
+rm -f ../src/zardoz.c
+$MAKE
+grep 'Zardoz!' ../src/zardoz.c
+
+$sleep
+sed 's/Zardoz!/FooBar!/' ../src/zardoz.vala > t
+mv -f t ../src/zardoz.vala
+$MAKE
+grep 'FooBar!' ../src/zardoz.c
+grep 'Zardoz!' ../src/zardoz.c && exit 1
 
 :

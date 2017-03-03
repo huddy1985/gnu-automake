@@ -1,7 +1,7 @@
 This is doc/automake.info, produced by makeinfo version 4.13 from
 ./doc/automake.texi.
 
-This manual is for GNU Automake (version 1.12.5, 17 November 2012), a
+This manual is for GNU Automake (version 1.12.6, 14 December 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -182,7 +182,7 @@ distributions in various formats.  Their targets are:
      To make it use a different one, set the `XZ_OPT' environment
      variable.  For example, run this command to use the default
      compression ratio, but with a progress indicator: `make dist-xz
-     XZ_OPT=-7e'.  
+     XZ_OPT=-ve'.  
 
 `dist-zip'
      Generate a zip archive of the distribution.  

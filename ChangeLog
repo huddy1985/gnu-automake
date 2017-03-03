@@ -1,3 +1,616 @@
+2012-12-15  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	release: stable release 1.12.5
+
+	* configure.ac (AC_INIT): Bump version number to 1.12.5.
+	* m4/amversion.m4: Likewise (auto-updated by "make bootstrap").
+
+2012-12-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: avoid errors due to underquoted third-party macros
+
+	* t/pkg-config-macros.sh: Call aclocal with the warnings in the
+	"syntax" category disabled.
+
+2012-12-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maintcheck: also consider contrib tests for syntax checks
+
+	* syntax-checks.mk (xtests): By listing them here.
+
+2012-12-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	cosmetics: whitespace fixlets in syntax-checks.mk
+
+2012-12-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: prefer $(MKDIR_P) over $(mkinstalldirs) in maintainer rules
+
+	* maint.mk (check-coverage-run, recheck-coverage-run): Here.  This
+	is especially useful since $(mkinstalldirs) is no longer available
+	in Automake-NG.
+
+2012-12-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	sync: update files from upstream with "make fetch"
+
+	* lib/gnupload: Update.  See:
+	<http://lists.gnu.org/archive/html/bug-gnulib/2012-12/msg00050.html>
+
+2012-12-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	gitignore: align with recent changes
+
+2012-12-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	fixup: add dummy rule for ChangeLog generation in Makefile.am
+
+	So that automake won't complain about the missing ChangeLog.
+	The real rule for ChangeLog generation is now in maint.mk (as
+	it is maintainer-specific).
+
+	* Makefile.am (ChangeLog): Dummy.
+
+2012-12-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: no longer use AM_MAKEFLAGS in maintainer rules
+
+	They are not required with GNU make.
+
+	* maint.mk: Adjust accordingly.
+
+2012-12-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: use more GNU make features in maintainer rules
+
+	* maint.mk: Here, throughout the file.  Other minor cleanups
+	and refactorings while at it.
+
+2012-12-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: move maintainer make rules in maint.mk
+
+	This is done for two reasons:
+
+	  1. It will enable us to take advantage of more GNU make
+	     features in our maintainer-specific recipes, if we
+	     want to (and we probably will).
+
+	  2. The Makefile.am won't have to be modified each time a
+	     maintainer rule needs to be changed or tweaked; this
+	     will prevent useless remaking of (in particular) the
+	     't/testsuite-part.am' file.
+
+	* maint.mk: New, several recipes, rules and variables for
+	maintainer-specific tasks, extracted (with some tweaks)
+	from ...
+	* Makefile.am: ... this file.
+	(EXTRA_DIST): Add 'maint.mk'.
+	* GNUmakefile: Include 'maint.mk' after 'Makefile'.
+
+2012-12-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'improve-release-process' into maint
+
+	* improve-release-process:
+	  HACKING: update instructions to update the manuals at www.gnu.org
+	  maint: add an explicative comment in Makefile
+	  maint: factor out the name of the dir where web manuals are generated
+	  maint: rename rules to build/upload web manuals
+	  cosmetic: minor variable and rules reordering in Makefile.am
+	  docs: build the web manuals for CVS in the builddir, not in the srcdir
+	  release: automate uploading of web manuals in CVS
+	  docs: AM_CFLAGS: remove reference to non-existing "more detailed" desc
+	  tests: avoid two spurious failures on FreeBSD
+
+2012-12-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'pkgconfing-tests-requirement' into maint
+
+	* pkgconfing-tests-requirement:
+	  tests: improve 'pkg-config' requirement
+
+2012-12-14  Patrick Welche  <prlw1@cam.ac.uk>  (tiny change)
+
+	docs: fixlet about xz compression levels and command line options
+
+	* doc/automake.texi (The types of distributions): To display a
+	progress bar, xz takes "-v" for verbose.
+
+2012-12-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: more files excluded in 'update-copyright'
+
+	This will avoid the following spurious warnings when
+	"make update-copyright" is run:
+
+	    .autom4te.cfg: warning: copyright statement not found
+	    .git-log-fix: warning: copyright statement not found
+	    .gitattributes: warning: copyright statement not found
+	    .gitignore: warning: copyright statement not found
+	    AUTHORS: warning: copyright statement not found
+	    THANKS: warning: copyright statement not found
+	    contrib/README: warning: copyright statement not found
+	    contrib/multilib/README: warning: copyright statement not found
+	    doc/amhello/README: warning: copyright statement not found
+	    lib/install-sh: warning: copyright statement not found
+	    lib/mkinstalldirs: warning: copyright statement not found
+	    m4/acdir/README: warning: copyright statement not found
+	    t/README: warning: copyright statement not found
+
+	* Makefile.am (files_without_copyright): New.
+	(update-copyright): Use it when computing '$exclude_list'.
+	Also, skip any README file.
+
+2012-12-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: adapt 'update-copyright' recipe to the new $(FETCHFILES) format
+
+	This is a fixup for commit v1.12.5-27-g71ce1b4 of 2012-12-09, "fetch:
+	improve, and reduce code duplication".
+
+	* Makefile.am (update-copyright): Adjust.
+
+2012-12-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	HACKING: update instructions to update the manuals at www.gnu.org
+
+2012-12-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: add an explicative comment in Makefile
+
+	* Makefile.am (web-manual-update): Here, about a slightly tricky
+	feature of rsync(1) used in the recipe.
+
+2012-12-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: factor out the name of the dir where web manuals are generated
+
+	Just a minor refactoring to reduce duplication; no semantic change is
+	intended.
+
+	* Makefile.am (web_manual_dir): New.
+	(web-manual, web-manual-update, clean-web-manual): Use it.
+
+2012-12-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: rename rules to build/upload web manuals
+
+	The new names are the same used by the similar-purpose rules provided by
+	the 'top/maint.mk' makefile in gnulib (as of commit v0.0-7741-g4a8c422).
+	No need to have gratuitous incompatibilities.
+
+	* Makefile.am (web-manuals): Rename ...
+	(web-manual): ... like this.
+	(upload-web-manuals): Rename ...
+	(web-manual-update): ... like this.
+	(clean-web-manuals): Rename ...
+	(clean-web-manual): ... like this.
+
+2012-12-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	cosmetic: minor variable and rules reordering in Makefile.am
+
+2012-12-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	docs: build the web manuals for CVS in the builddir, not in the srcdir
+
+	We can do so using the '-I' option of the gendocs.sh script.
+
+	Inspired by the 'web-manual' rule in the 'top/maint.mk' file provided
+	by gnulib (as of commit v0.0-7741-g4a8c422) as customized by Bison in
+	its 'cfg.mk' file (as of commit v2.6.5-1007-gf5fceda).
+
+	* Makefile.am (web-manuals): Modify and simplify to take advantage
+	of gendocs.sh's  '-I' option.
+	(upload-we-manuals): Accordingly adjust sanity checks and the rsync
+	invocation in the recipe.
+	(clean_texinfo_clutter_cmd): Delete this variable, it's no longer
+	required.
+	(clean-texinfo-clutter): Delete this phony target, it's no longer
+	required.
+	(clean-local): Don't depend on it.
+	* configure.ac: Invoke AC_PROG_LN_S, since we want to use $(LN_S)
+	in the new 'web-manuals' recipe.
+
+2012-12-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	release: automate uploading of web manuals in CVS
+
+	This is partly inspired to the 'gnu-web-doc-update' script from
+	gnulib.  Unfortunately, we can't use that script directly, because
+	as of now it assumes a build system integrated with gnulib.
+
+	* Makefile.am (upload-web-manuals): New .PHONY rule.
+	(RSYNC, CVS, CVSU, CVS_USER, WEBCVS_ROOT): New variables, used by
+	the new rule.
+
+2012-12-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	docs: AM_CFLAGS: remove reference to non-existing "more detailed" desc
+
+	* doc/automake.texi (Program variables): Here.  Reported by NightStrike:
+	<http://lists.gnu.org/archive/html/automake/2012-12/msg00012.html>
+
+2012-12-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: avoid two spurious failures on FreeBSD
+
+	Due to the FreeBSD make bug that causes of the well-known automake
+	bug#7884, two of our bison-requiring tests were failing on FreeBSD.
+	To avoid this, simply skip the part of these tests affected by that
+	bug.
+
+	* t/yacc-bison-skeleton.sh: Here, using the 'yl_distcheck' function.
+	* t/yacc-bison-skeleton-cxx.sh: Likewise.
+	* t/yacc-nodist.sh: While at it, use the 'yl_distcheck' here
+	as well, instead of running "$MAKE distcheck" only when $MAKE
+	is GNU make.
+
+2012-12-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: improve 'pkg-config' requirement
+
+	This improves (and unifies among different tests) the detection of
+	both the 'pkg-config' program and m4 macros provided by it; they are
+	needed in particular by tests on Vala support.
+
+	Before this, some Vala-related tests were failing spuriously when the
+	pkg-config program was available but the macros from pkg.m4 were not
+	made explicitly available in ACLOCAL_PATH.  These tests were:
+
+	    vala-mix vala-mix2 vala-parallel vala-vapi vala-vpath
+
+	See also similar commit 'v1.11-581-gb7d67d5' of 2011-12-22,
+	"tests: better handling of gettext and libtool requirements".
+
+	* t/ax/am-test-lib.sh (process_requirements): If a requirement
+	matches the 'pkg-config*' wildcard, try to make available to it
+	the pkg-config m4 macros, and skip it if it's not possible.
+	This is done by sourcing the 'get.sh' fragment generated by ...
+	* t/pkg-config-macros.sh: ... this new test, which looks in
+	advance for the 'pkg-config' program and the m4 macros that
+	comes with it.
+	* t/list-of-tests.mk: Add the new test.
+	* gen-testsuite-part (%deps_extractor): Tests requiring pkg-config
+	will need the m4 macros coming with it; so these tests should be
+	run after the 'pkg-config-macros.sh' test.  Automatically generate
+	proper declarations for such dependencies.
+	* t/vala-header.sh: No need to explicitly check that the macro
+	PKG_CHECK_MODULES has been expanded by autoconf.
+	* t/vala-libs.sh: Likewise.
+	* t/vala-non-recursive-setup.sh: Likewise.
+	* t/vala-per-target-flags.sh: Likewise.
+	* t/vala-recursive-setup.sh: Likewise.
+
+2012-12-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'improve-release-process' into maint
+
+	* improve-release-process:
+	  maintcheck: prefer '$(am__cd)' over plain 'cd'
+	  fetch: improve, and reduce code duplication
+	  docs: add rule to generate manuals for www.gnu.org
+	  docs: copy the 'gendocs.sh' script from Texinfo CVS repository
+	  sync: update files from upstream with "make fetch"
+	  release: generate a stub for the release announcement
+	  release: distinguish major and minor releases
+
+2012-12-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	docs: AM_CFLAGS: remove reference to non-existing "more detailed" desc
+
+	* doc/automake.texi (Program variables): Here.  Reported by NightStrike:
+	<http://lists.gnu.org/archive/html/automake/2012-12/msg00012.html>
+
+2012-12-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maintcheck: prefer '$(am__cd)' over plain 'cd'
+
+	In a couple of rules in out own build system, as suggested by the
+	maintainer check 'sc_cd_relative_dir'.
+
+	* Makefile.am (web-manuals, clean_texinfo_clutter_cmd): Adjust.
+
+2012-12-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	fetch: improve, and reduce code duplication
+
+	* Makefile.am (WGET_SV_CVS, WGET_SV_GIT_CF, WGET_SV_GIT_AC,
+	WGET_SV_GIT_GL): Delete.
+	(SV_CVS, SV_GIT_CF, SV_GIT_AC, SV_GIT_GL): New.
+	(fetch): Simplify and enhance.
+	(update-copyright): Adjust.
+
+2012-12-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	docs: add rule to generate manuals for www.gnu.org
+
+	Less clerical work to do by hand.
+
+	* Makefile.am (web-manuals): New rule.
+	(clean_texinfo_clutter): New macro.
+	* clean-web-manuals, clean-texinfo-clutter: New cleaning
+	rules.
+	(clean-local): Depend on them.
+	* .gitignore: Update.
+	* HACKING: Adjust instructions for generation of manuals.
+
+2012-12-08  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	docs: copy the 'gendocs.sh' script from Texinfo CVS repository
+
+	As well as the 'gendocs_template' file.  And enhance the "make fetch"
+	target to keep them synced.  It's better than having to fetch these
+	files by hand each time a release is to be made.
+
+	* Makefile.am (FETCHFILES): List 'gendocs.sh' and 'gendocs_template'.
+	(fetch): Fetch them, into 'lib/'.
+	(EXRA_DIST): Distribute them.
+	* HACKING: Adjust instructions for generation of manuals.
+
+2012-12-08  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	sync: update files from upstream with "make fetch"
+
+	* lib/config.sub: Update.
+
+2012-12-08  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	release: generate a stub for the release announcement
+
+	It's much better than having to write it my hand each time; after all,
+	most of it is either boilerplate or a cope of NEWS entries.
+
+	* Makefile.am (determine_release_type): Also set the shell variable
+	'$announcement_type' appropriately.
+	(print-release-type): Print the value of this new variable as well.
+	(announcement): New phony target, generate a files with the same name.
+	The recipe uses the shell variable '$announcement_type'.
+	(CLEANFILES): Clean it.
+	(PACKAGE_MAILINGLIST): New make macro, used when generating the
+	'announcement' file.
+	* HACKING: Explain how to take advantage of the new convenience
+	target.
+	* .gitignore: Ignore the 'announcement' file.
+
+2012-12-08  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	release: distinguish major and minor releases
+
+	This is mostly a preparatory change, in view of future
+	improvements in our release process.
+
+	* Makefile.am (determine_release_type): Also distinguish
+	between major and minor releases, with the help of ...
+	(stable_major_version_rx, stable_minor_version_rx): ... these
+	new macros.
+	(stable_version_rx): Remove, it's obsolete now.
+	(version_rx): Rename ...
+	(base_version_rx): ... like this, and adjust.
+	(print-release-type): New target; helps in debugging the code
+	that determines the release type.
+
+2012-11-30  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: avoid two spurious failures on FreeBSD
+
+	Due to the FreeBSD make bug that causes of the well-known automake
+	bug#7884, two of our bison-requiring tests were failing on FreeBSD.
+	To avoid this, simply skip the part of these tests affected by that
+	bug.
+
+	* t/yacc-bison-skeleton.sh: Here, using the 'yl_distcheck' function.
+	* t/yacc-bison-skeleton-cxx.sh: Likewise.
+	* t/yacc-nodist.sh: While at it, use the 'yl_distcheck' here
+	as well, instead of running "$MAKE distcheck" only when $MAKE
+	is GNU make.
+
+2012-11-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: we'll remove AM_PROG_MKDIR in 1.14, not 1.13
+
+	See also commit v1.12.4-158-gdf23daf.
+
+	* NEWS (Future backward-incompatibilities): Adjust accordingly.
+
+2012-11-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: give few vala tests more significant names
+
+	* t/vala.sh: Rename ...
+	* t/vala-grepping.sh: ... like this.
+	* t/vala2.sh: Rename ...
+	* t/vala-recursive-setup.sh: ... like this.
+	* t/vala3.sh: Rename ...
+	* t/vala-non-recursive-setup.sh: ... like this.
+	* t/vala4.sh: Rename ...
+	* t/vala-configure.sh: ... like this.
+	* t/vala5.sh: Rename ...
+	* t/vala-per-target-flags.sh: ... like this, and slightly
+	improve heading comments.
+	* t/list-of-tests.mk: Adjust.
+
+2012-11-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	vala tests: don't use the 'posix' profile, it's no longer supported
+
+	Fixes automake bug#12934 a.k.a. bug#12522.
+
+	Some of automake's Vala tests used to rely on "valac --profile posix"
+	(which makes it not use glib).  However, the posix profile was removed
+	in August 2012, and is no longer present in the GNOME 3.6.2 version
+	of valac (see commit ca020bf0 in the vala Git repository).
+
+
+	* t/vala-libs.sh: Adjust to avoid using the posix profile.
+	* t/vala-mix.sh: Likewise.
+	* t/vala-mix2.sh: Likewise.
+	* t/vala-parallel.sh: Likewise.
+	* t/vala-vapi.sh: Likewise.
+	* t/vala-vpath.sh: Likewise.
+	* NEWS: Update and adjust.
+
+2012-11-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: fixup: bug#8847 is fixed in 1.12.6, not in 1.12.5
+
+	* NEWS (Bugs fixed in 1.12.5): So move it from here ...
+	(Bugs fixed in 1.12.6): ... to here.
+
+2012-11-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: document the fix for automake bug#10227
+
+	This is a follow-up commit for v1.12.5-14-g1f113f6.
+
+	* NEWS: Update.
+
+2012-11-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'python-fix-pr10227' into maint
+
+	* python-fix-pr10227:
+	  python: make installed modules find by default on Debian and Ubuntu
+
+2012-11-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fix a spurious testsuite failure on Solaris
+
+	Reported in automake bug#11524.
+
+	* t/amhello-binpkg.sh: When non-GNU tar is in use, relax grepping of
+	"tar cvf ..." output a little more.
+
+2012-11-24  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	python: make installed modules find by default on Debian and Ubuntu
+
+	This change fixes automake bug#10227.
+
+	The code used to get the python package directory was wrong for Python 3,
+	at least on Debian and Ubuntu distributions.  In the case the installation
+	was using the default prefix "/usr/local", python modules were incorrectly
+	installed in the directory
+
+	    /usr/local/lib/python3/dist-packages
+
+	(which is *not* searched by default), rather than in a directory like
+
+	    /usr/local/lib/python3.x/dist-packages
+
+	which is searched by default.
+
+	* m4/python.m4 (AM_PATH_PYTHON): Try to use the 'sysconfig' module if
+	possible, for better interactions with python 3.x.
+
+	Helped-by: Reuben Thomas <rrt@sc3d.org>
+	Helped-by: Roumen Petrov <bugtrack@roumenpetrov.info>
+
+2012-11-24  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fix a spurious failure with older flex versions
+
+	See automake bug#11524 and bug#12836.
+
+	* t/lex-header.sh: Here, we use flex option '--header-file',
+	but that option is not supported by some older flex versions.
+	Simply skip this test if such an old flex version is detected.
+
+2012-11-21  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'python-pep-3147' into maint
+
+	* python-pep-3147:
+	  tests: fix a spurious failure when $PYTHON is in the environment
+	  python tests: support PEP-3147 installation layout
+	  python: uninstall cater to PEP-3147
+	  tests: improve a comment
+	  tests: honour $PYTHON override
+	  tests: typofix in message
+	  news: document fix for bug#8847 (PEP-3147, __pycache__)
+	  python: improve support for modern python (CPython 3.2 and PyPy)
+
+2012-11-19  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fix a spurious failure when $PYTHON is in the environment
+
+	* t/python11.sh: This test doesn't interact well with user-overrides of
+	$PYTHON; and, given its particular nature, neither should it be expected
+	to honour that override.  Just unset that $PYTHON variable and live
+	happy.
+
+2012-11-19  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	python tests: support PEP-3147 installation layout
+
+	This fixes several spurious testsuite failures with python >= 3.2,
+	introduced by recent commit v1.12.4-43-ge0e99ed, "python: improve
+	support for modern python (CPython 3.2 and PyPy)".
+
+	* t/ax/am-test-lib.sh (python_has_pep3147, pyc_location, py_installed):
+	New functions.
+	($am_pep3147_tag): New variable.
+	* t/py-compile-basic2.sh: Deleted, too difficult to adapt for the
+	gain it would offer; move the still relevant parts ...
+	* t/py-compile-basic.sh: ... here.  Adapt and adjust the rest of
+	the test as well.
+	* t/nobase-python.sh: Adapt and adjust.
+	* t/py-compile-basedir.sh: Likewise.
+	* t/py-compile-destdir.sh: Likewise.
+	* t/py-compile-option-terminate.sh: Likewise.
+	* t/python-pr10995.sh: Likewise.
+	* t/python-virtualenv.sh: Likewise.
+	* t/python10.sh: Likewise.
+	* t/python12.sh: Likewise.
+	* t/python3.sh: Likewise.
+	* t/list-of-tests.mk: Adjust list of tests.
+
+2012-11-19  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	python: uninstall cater to PEP-3147
+
+	After recent commit commit v1.12.4-43-ge0e99ed, "python: improve
+	support for modern python (CPython 3.2 and PyPy)", the python install
+	rules have been made smart enough to install "*.pyc" byte-compiled
+	files according to PEP-3147 with modern (post-3.2) pythons.  However,
+	the uninstall rules hadn't been updated accordingly, causing leftover
+	files to remain around after "make uninstall", as well as failures in
+	"make distcheck".
+
+	* lib/am/python.am (am__pep3147_tweak): New internal macro, used
+	in ...
+	(uninstall-%DIR%PYTHON): ... the recipe of this target, which has
+	been adjusted to cater to PEP-3147
+
+2012-11-17  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	build: fix rebuild rules for Makefile.in and aclocal.m4
+
+	They have been broken after our removal of the 'perllibdir' hack
+	in yesterday's commit v1.12.4-45-g4872dfe.
+
+	* configure.ac: Rather then redefining AUTOMAKE and ACLOCAL to
+	explicitly override the perllibdir, the acdir and the libdir, use
+	the ready-made t/wrap/{aclocal,automake}-$APIVERSION scripts.
+	* NEWS: Document the fix.
+
+2012-11-17  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	hacking: release procedure: fix order of some steps
+
+	* HACKING (Release procedure): The manuals should be rebuilt and
+	uploaded at at www.gnu.org *before* bumping the version number to
+	the next alpha release.
+
+2012-11-17  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: post-release minor version bump
+
+	* configure.ac (AC_INIT): Bump version number to 1.12.5a.
+	* m4/amversion.m4: Likewise (automatically regenerated by
+	"make bootstrap").
+
 2012-11-17  Stefano Lattarini  <stefano.lattarini@gmail.com>
 
 	release: stable release 1.12.5
@@ -67,6 +680,47 @@
 2012-11-16  Stefano Lattarini  <stefano.lattarini@gmail.com>
 
 	cosmetics: de-tabify configure.ac
+
+2012-11-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: improve a comment
+
+	* t/ax/am-test-lib.sh (require_tool): Here, about python support
+	for '--version' option.
+
+2012-11-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: honour $PYTHON override
+
+	* t/ax/am-test-lib.sh (require_tool): Here.
+	* t/python-too-old.sh: And here.
+	* t/python-vars.sh: And here.
+	* t/python-virtualenv.sh: And here.  Also add some sanity
+	checks while at it.
+
+2012-11-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: typofix in message
+
+	* t/python-virtualenv.sh: Here.
+
+2012-11-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: document fix for bug#8847 (PEP-3147, __pycache__)
+
+	* NEWS (Bugs fixed in 1.12.5): Here.
+
+2012-11-11  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>  (tiny change)
+
+	python: improve support for modern python (CPython 3.2 and PyPy)
+
+	This fixes automake bug#8847.
+
+	* m4/python.m4 (AM_PATH_PYTHON): Add python3.3 to
+	_AM_PYTHON_INTERPRETER_LIST.
+	* lib/py-compile: Fix compiled filenames for PEP-3147, currently
+	implemented in CPython 3.2 and newer.  Do not create '.pyo' files
+	for PyPy.
 
 2012-11-07  Stefano Lattarini  <stefano.lattarini@gmail.com>
 

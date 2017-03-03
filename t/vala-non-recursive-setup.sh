@@ -14,48 +14,36 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Test to make sure compiling Vala code really works with recursive make.
+# Test to make sure compiling Vala code really works with non-recursive make.
 
 required="pkg-config valac gcc GNUmake"
 . test-init.sh
 
-cat >> configure.ac << 'END'
+mkdir src
+
+cat >> 'configure.ac' << 'END'
 AC_PROG_CC
+AM_PROG_CC_C_O
 AM_PROG_VALAC([0.7.0])
 PKG_CHECK_MODULES([GOBJECT], [gobject-2.0 >= 2.4])
 AC_OUTPUT
 END
 
-cat > Makefile.am << 'END'
-bin_PROGRAMS = zardoz quux
-
-zardoz_SOURCES = zardoz.vala
-quux_SOURCES = quux.vala
-quux.vala: zardoz.vala
-	sed 's/Zardoz/Quux/' <zardoz.vala >quux.vala
-
-quux_VALAFLAGS = \
-  --header HDR.h \
-  --vapi hello.vapi
-
-zardoz_VALAFLAGS = \
-  -H foo.h \
-  --internal-header foo2.h \
-  --internal-vapi foo3.vapi
-
-AM_CFLAGS = $(GOBJECT_CFLAGS)
-LDADD = $(GOBJECT_LIBS)
-END
-
-headers='HDR.h hello.vapi foo.h foo2.h foo3.vapi'
-
-cat > zardoz.vala << 'END'
+cat > 'src/zardoz.vala' <<'END'
 using GLib;
+
 public class Zardoz {
   public static void main () {
     stdout.printf ("Zardoz!\n");
   }
 }
+END
+
+cat > 'Makefile.am' <<'END'
+bin_PROGRAMS = src/zardoz
+src_zardoz_CFLAGS = $(GOBJECT_CFLAGS)
+src_zardoz_LDADD = $(GOBJECT_LIBS)
+src_zardoz_SOURCES = src/zardoz.vala
 END
 
 $ACLOCAL
@@ -64,22 +52,45 @@ $AUTOMAKE -a
 
 ./configure
 $MAKE
+test -f src/zardoz.c
+test -f src_zardoz_vala.stamp
+$MAKE distcheck
+$MAKE maintainer-clean
+test ! -e src/zardoz.c
+test ! -e src_zardoz_vala.stamp
 
-# Test rebuild rules.
-
-for h in $headers; do
-  rm -f $h
-  $MAKE $h
-  test -f $h
-done
-
-rm -f $headers
-$MAKE $headers
-for h in $headers; do test -f $h; done
-
+mkdir build
+cd build
+../configure
+$MAKE
 $MAKE distcheck
 
-$MAKE maintainer-clean
-for h in $headers; do test ! -e $h; done
+cd ..
+rm -rf build
 
-:
+# Try again with subdir-objects.
+
+cat > 'Makefile.am' <<'END'
+AUTOMAKE_OPTIONS = subdir-objects
+
+bin_PROGRAMS = src/zardoz
+src_zardoz_CFLAGS = $(GOBJECT_CFLAGS)
+src_zardoz_LDADD = $(GOBJECT_LIBS)
+src_zardoz_SOURCES = src/zardoz.vala
+END
+
+$ACLOCAL
+$AUTOCONF
+$AUTOMAKE -a
+
+./configure || skip_ "configure failure"
+$MAKE
+$MAKE distcheck
+$MAKE distclean
+mkdir build
+cd build
+../configure
+$MAKE
+$MAKE distcheck
+
+

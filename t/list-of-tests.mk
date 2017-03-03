@@ -882,7 +882,6 @@ t/print-libdir.sh \
 t/proginst.sh \
 t/programs-primary-rewritten.sh \
 t/py-compile-basic.sh \
-t/py-compile-basic2.sh \
 t/py-compile-basedir.sh \
 t/py-compile-destdir.sh \
 t/py-compile-env.sh \
@@ -1200,18 +1199,18 @@ t/unused.sh \
 t/upc.sh \
 t/upc2.sh \
 t/upc3.sh \
-t/vala.sh \
-t/vala2.sh \
-t/vala3.sh \
-t/vala4.sh \
-t/vala5.sh \
-t/vala-vapi.sh \
+t/vala-configure.sh \
+t/vala-grepping.sh \
 t/vala-headers.sh \
 t/vala-libs.sh \
-t/vala-vpath.sh \
 t/vala-mix.sh \
 t/vala-mix2.sh \
+t/vala-non-recursive-setup.sh \
 t/vala-parallel.sh \
+t/vala-per-target-flags.sh \
+t/vala-recursive-setup.sh \
+t/vala-vapi.sh \
+t/vala-vpath.sh \
 t/vars.sh \
 t/vars3.sh \
 t/vartar.sh \
@@ -1280,7 +1279,8 @@ t/yflags-force-conditional.sh \
 t/yflags-force-override.sh \
 t/yflags-var-expand.sh \
 t/libtool-macros.sh \
-t/gettext-macros.sh
+t/gettext-macros.sh \
+t/pkg-config-macros.sh
 
 print-list-of-tests:
 	@echo $(handwritten_TESTS)

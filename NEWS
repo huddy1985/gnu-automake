@@ -1,4 +1,4 @@
-New in 1.12.5:
+New in 1.12.6:
 
 * WARNING: Future backward-incompatibilities!
 
@@ -10,7 +10,7 @@ New in 1.12.5:
     option) will be removed in the next major Automake release (1.13).
 
   - The long-obsolete (since automake 1.10) AM_PROG_MKDIR m4 macro will
-    be removed in Automake 1.13.  The $(mkdir_p) make variable and the
+    be removed in Automake 1.14.  The $(mkdir_p) make variable and the
     @mkdir_p@ substitution will still remain available (as aliases of
     $(MKDIR_P)) for the moment, for better backward compatibility.
 
@@ -60,6 +60,45 @@ New in 1.12.5:
     of it).  In fact, starting from Automake 1.13, all it'll do will be
     giving more useful warnings than a bare "command not found" from a
     make recipe would.
+
+Bugs fixed in 1.12.6:
+
+* Python-related bugs:
+
+  - The default installation location for python modules has been improved
+    for Python 3 on Debian and Ubuntu systems, changing from:
+
+        ${prefix}/lib/python3/dist-packages
+
+    to
+
+        ${prefix}/lib/python3.x/site-packages
+
+    This change should ensure modules installed using the default ${prefix}
+    "/usr/local" are found by default by system python 3.x installations.
+    See automake bug#10227.
+
+  - Python byte-compilation supports the new layout mandated by PEP-3147,
+    with its __pycache__ directory (automake bug#8847).
+
+* Build system issues:
+
+  - The maintainer rebuild rules for Makefiles and aclocal.m4 in
+    Automake's own build system works correctly again (bug introduced
+    in Automake 1.12.5).
+
+* Testsuite issues:
+
+  - The Vala-related tests has been changed to adjust to the removal of
+    the 'posix' profile in the valac compiler.  See automake bug#12934
+    a.k.a. bug#12522.
+
+  - Some spurious testsuite failures related to older tools and systems
+    have been fixed.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+New in 1.12.5:
 
 * Vala support:
 
