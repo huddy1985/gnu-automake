@@ -1,12 +1,12 @@
 This is automake.info, produced by makeinfo version 4.7 from
 automake.texi.
 
-   This manual is for GNU Automake (version 1.9.4, 18 December 2004), a
+   This manual is for GNU Automake (version 1.9.5, 12 February 2005), a
 program which creates GNU standards-compliant Makefiles from template
 files.
 
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-2004 Free Software Foundation, Inc.
+2004, 2005 Free Software Foundation, Inc.
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -1560,7 +1560,7 @@ B.1 Macro Index
 * AC_CONFIG_LIBOBJ_DIR:                  LIBOBJS.             (line  48)
 * AC_CONFIG_LINKS:                       Optional.            (line  16)
 * AC_CONFIG_SUBDIRS:                     Subpackages.         (line   6)
-* AC_DEFUN:                              Extending aclocal.   (line  29)
+* AC_DEFUN:                              Extending aclocal.   (line  33)
 * AC_F77_LIBRARY_LDFLAGS:                Optional.            (line  80)
 * AC_INIT:                               Public macros.       (line  43)
 * AC_LIBOBJ <1>:                         LIBOBJS.             (line  11)
@@ -1570,7 +1570,7 @@ B.1 Macro Index
 * AC_LIBSOURCE:                          Optional.            (line  51)
 * AC_LIBSOURCES:                         Optional.            (line  52)
 * AC_OUTPUT:                             Requirements.        (line  15)
-* AC_PREREQ:                             Extending aclocal.   (line  29)
+* AC_PREREQ:                             Extending aclocal.   (line  33)
 * AC_PROG_CC_C_O:                        Public macros.       (line  98)
 * AC_PROG_CXX:                           Optional.            (line  71)
 * AC_PROG_F77:                           Optional.            (line  75)
@@ -1688,6 +1688,8 @@ B.2 Variable Index
 * CXX:                                   C++ Support.         (line  16)
 * CXXCOMPILE:                            C++ Support.         (line  25)
 * CXXFLAGS:                              C++ Support.         (line  19)
+* CXXLINK <1>:                           How the Linker is Chosen.
+                                                              (line  12)
 * CXXLINK:                               C++ Support.         (line  29)
 * DATA <1>:                              Data.                (line   7)
 * DATA:                                  Uniform.             (line  78)
@@ -1723,10 +1725,14 @@ B.2 Variable Index
                                                               (line  15)
 * F77:                                   Fortran 77 Support.  (line  16)
 * F77COMPILE:                            Fortran 77 Support.  (line  31)
+* F77LINK:                               How the Linker is Chosen.
+                                                              (line  14)
 * FC:                                    Fortran 9x Support.  (line  16)
 * FCCOMPILE:                             Fortran 9x Support.  (line  25)
 * FCFLAGS:                               Fortran 9x Support.  (line  19)
-* FCLINK:                                Fortran 9x Support.  (line  29)
+* FCLINK <1>:                            Fortran 9x Support.  (line  29)
+* FCLINK:                                How the Linker is Chosen.
+                                                              (line  16)
 * FFLAGS:                                Fortran 77 Support.  (line  19)
 * FLIBS:                                 Mixing Fortran 77 With C and C++.
                                                               (line  21)
@@ -1734,6 +1740,8 @@ B.2 Variable Index
 * GCJ:                                   Public macros.       (line 108)
 * GCJFLAGS <1>:                          Java Support.        (line  14)
 * GCJFLAGS:                              Public macros.       (line 108)
+* GCJLINK:                               How the Linker is Chosen.
+                                                              (line  10)
 * GTAGS_ARGS:                            Tags.                (line  48)
 * GZIP_ENV:                              Dist.                (line  13)
 * HEADERS:                               Uniform.             (line  78)
@@ -1758,6 +1766,8 @@ B.2 Variable Index
 * LIBOBJS:                               Optional.            (line  54)
 * LIBRARIES:                             Uniform.             (line  78)
 * LIBS:                                  Program variables.   (line  11)
+* LINK <1>:                              How the Linker is Chosen.
+                                                              (line  20)
 * LINK:                                  Program variables.   (line  51)
 * LISP:                                  Uniform.             (line  78)
 * lisp_LISP:                             Emacs Lisp.          (line   6)
@@ -1801,7 +1811,7 @@ B.2 Variable Index
                                                               (line 132)
 * maude_LIBADD <1>:                      Program and Library Variables.
                                                               (line  77)
-* maude_LIBADD:                          A Library.           (line  25)
+* maude_LIBADD:                          A Library.           (line  26)
 * maude_LINK:                            Program and Library Variables.
                                                               (line 115)
 * maude_OBJCFLAGS:                       Program and Library Variables.
@@ -1826,6 +1836,8 @@ B.2 Variable Index
                                                               (line   6)
 * noinst_PROGRAMS:                       Program Sources.     (line   6)
 * noinst_SCRIPTS:                        Scripts.             (line  38)
+* OBJCLINK:                              How the Linker is Chosen.
+                                                              (line  18)
 * oldinclude_HEADERS:                    Headers.             (line   6)
 * PACKAGE:                               Dist.                (line   9)
 * pkgdata_DATA:                          Data.                (line   9)
@@ -1894,6 +1906,7 @@ B.3 General Index
 * Menu:
 
 * ## (special Automake comment):         General Operation.   (line  54)
+* $(LIBOBJS) and empty libraries:        LIBOBJS.             (line  69)
 * +=:                                    General Operation.   (line  23)
 * --acdir:                               aclocal options.     (line   9)
 * --add-missing:                         Invoking Automake.   (line  41)
@@ -1929,7 +1942,7 @@ B.3 General Index
 * -a:                                    Invoking Automake.   (line  41)
 * -c:                                    Invoking Automake.   (line  62)
 * -f:                                    Invoking Automake.   (line  71)
-* -hook targets:                         Extending.           (line  53)
+* -hook targets:                         Extending.           (line  58)
 * -I:                                    aclocal options.     (line  16)
 * -i:                                    Invoking Automake.   (line  94)
 * -local targets:                        Extending.           (line  36)
@@ -2084,13 +2097,13 @@ B.3 General Index
 * dependencies and distributed files:    distcleancheck.      (line   6)
 * Dependency tracking:                   Dependencies.        (line  11)
 * Dependency tracking, disabling:        Dependencies.        (line  37)
-* dirlist:                               Macro search path.   (line  63)
+* dirlist:                               Macro search path.   (line  62)
 * Disabling dependency tracking:         Dependencies.        (line  37)
 * dist:                                  Dist.                (line   9)
 * dist-bzip2 <1>:                        Options.             (line  36)
 * dist-bzip2:                            Dist.                (line 192)
 * dist-gzip:                             Dist.                (line 195)
-* dist-hook <1>:                         Extending.           (line  56)
+* dist-hook <1>:                         Extending.           (line  61)
 * dist-hook:                             Dist.                (line  71)
 * dist-shar <1>:                         Options.             (line  39)
 * dist-shar:                             Dist.                (line 198)
@@ -2120,6 +2133,8 @@ B.3 General Index
 * EDITION Texinfo flag:                  Texinfo.             (line  18)
 * else:                                  Conditionals.        (line  38)
 * empty _SOURCES:                        Default _SOURCES.    (line  43)
+* Empty libraries:                       A Library.           (line  46)
+* Empty libraries and $(LIBOBJS):        LIBOBJS.             (line  69)
 * endif:                                 Conditionals.        (line  38)
 * Example conditional --enable-debug:    Conditionals.        (line  23)
 * Example of recursive operation:        General Operation.   (line  44)
@@ -2188,7 +2203,7 @@ B.3 General Index
 * HEADERS, installation directories:     Headers.             (line   6)
 * Hello example:                         Hello.               (line   6)
 * Hello, configure.ac:                   Hello.               (line  16)
-* hook targets:                          Extending.           (line  53)
+* hook targets:                          Extending.           (line  58)
 * HP-UX 10, lex problems:                Public macros.       (line 103)
 * html:                                  Extending.           (line  40)
 * HTML installation, example:            Uniform.             (line  62)
@@ -2209,12 +2224,12 @@ B.3 General Index
 * Install hook:                          Install.             (line  71)
 * Install, two parts of:                 Install.             (line  45)
 * install-data:                          Install.             (line  45)
-* install-data-hook:                     Extending.           (line  56)
+* install-data-hook:                     Extending.           (line  61)
 * install-data-local <1>:                Extending.           (line  40)
 * install-data-local:                    Install.             (line  65)
 * install-exec <1>:                      Extending.           (line  40)
 * install-exec:                          Install.             (line  45)
-* install-exec-hook:                     Extending.           (line  56)
+* install-exec-hook:                     Extending.           (line  61)
 * install-exec-local <1>:                Extending.           (line  40)
 * install-exec-local:                    Install.             (line  65)
 * install-info <1>:                      Options.             (line  88)
@@ -2233,7 +2248,7 @@ B.3 General Index
 * installdirs-local:                     Extending.           (line  40)
 * Installing headers:                    Headers.             (line   6)
 * Installing scripts:                    Scripts.             (line  38)
-* installing versioned binaries:         Extending.           (line  72)
+* installing versioned binaries:         Extending.           (line  77)
 * Interfacing with third-party packages: Third-Party Makefiles.
                                                               (line   6)
 * Invoking aclocal:                      Invoking aclocal.    (line   6)
@@ -2266,7 +2281,7 @@ B.3 General Index
 * Linking Fortran 77 with C and C++:     Mixing Fortran 77 With C and C++.
                                                               (line   6)
 * LISP primary, defined:                 Emacs Lisp.          (line   6)
-* LN_S example:                          Extending.           (line  72)
+* LN_S example:                          Extending.           (line  77)
 * local targets:                         Extending.           (line  36)
 * LTALLOCA, special handling:            LTLIBOBJS.           (line   6)
 * LTLIBOBJS and ansi2knr:                ANSI.                (line  48)
@@ -2503,11 +2518,11 @@ B.3 General Index
                                                               (line   6)
 * timestamps and CVS:                    CVS.                 (line  28)
 * true Example:                          true.                (line   6)
-* underquoted AC_DEFUN:                  Extending aclocal.   (line  29)
+* underquoted AC_DEFUN:                  Extending aclocal.   (line  33)
 * Uniform naming scheme:                 Uniform.             (line   6)
 * uninstall <1>:                         Extending.           (line  40)
 * uninstall:                             Install.             (line 105)
-* uninstall-hook:                        Extending.           (line  56)
+* uninstall-hook:                        Extending.           (line  61)
 * uninstall-local:                       Extending.           (line  40)
 * UPDATED Texinfo flag:                  Texinfo.             (line  18)
 * UPDATED-MONTH Texinfo flag:            Texinfo.             (line  18)
@@ -2521,7 +2536,7 @@ B.3 General Index
 * VERSION, prevent definition:           Public macros.       (line  72)
 * version.m4, example:                   Rebuilding.          (line  19)
 * version.sh, example:                   Rebuilding.          (line  19)
-* versioned binaries, installing:        Extending.           (line  72)
+* versioned binaries, installing:        Extending.           (line  77)
 * wildcards:                             wildcards.           (line   6)
 * Windows:                               EXEEXT.              (line   6)
 * yacc, multiple parsers:                Yacc and Lex.        (line  60)

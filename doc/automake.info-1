@@ -1,12 +1,12 @@
 This is automake.info, produced by makeinfo version 4.7 from
 automake.texi.
 
-   This manual is for GNU Automake (version 1.9.4, 18 December 2004), a
+   This manual is for GNU Automake (version 1.9.5, 12 February 2005), a
 program which creates GNU standards-compliant Makefiles from template
 files.
 
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-2004 Free Software Foundation, Inc.
+2004, 2005 Free Software Foundation, Inc.
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -36,12 +36,12 @@ File: automake.info,  Node: Top,  Next: Introduction,  Up: (dir)
 GNU Automake
 ************
 
-This manual is for GNU Automake (version 1.9.4, 18 December 2004), a
+This manual is for GNU Automake (version 1.9.5, 12 February 2005), a
 program which creates GNU standards-compliant Makefiles from template
 files.
 
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-2004 Free Software Foundation, Inc.
+2004, 2005 Free Software Foundation, Inc.
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -232,6 +232,7 @@ Frequently Asked Questions about Automake
 * renamed objects::             Why are object files sometimes renamed?
 * Per-Object Flags::            How to simulate per-object flags?
 * Multiple Outputs::            Writing rules for tools with many output files
+* Hard-Coded Install Paths::    Installing to Hard-Coded Locations
 
 History of Automake
 
@@ -1361,16 +1362,15 @@ that can be used to change or extend this search path.
 5.5.1 Modifying the macro search path: `--acdir'
 ------------------------------------------------
 
-The most obvious option to modify the search path is `--acdir=DIR',
+The most erroneous option to modify the search path is `--acdir=DIR',
 which changes default directory and drops the APIVERSION directory.
 For example, if one specifies `--acdir=/opt/private/', then the search
 path becomes:
 
   1. `/opt/private/'
 
-   Note that this option, `--acdir', is intended for use by the
-internal automake test suite only; it is not ordinarily needed by
-end-users.
+   This option, `--acdir', is intended for use by the internal automake
+test suite only; it is not ordinarily needed by end-users.
 
 5.5.2 Modifying the macro search path: `-I DIR'
 -----------------------------------------------
@@ -1665,6 +1665,10 @@ installed in `$(datadir)/aclocal'.  This is as simple as writing:
 
      aclocaldir = $(datadir)/aclocal
      aclocal_DATA = mymacro.m4 myothermacro.m4
+
+Please do use `$(datadir)/aclocal', and not something based on the
+result of `aclocal --print-ac-dir'.  *Note Hard-Coded Install Paths::,
+for arguments.
 
    A file of macros should be a series of properly quoted `AC_DEFUN''s
 (*note Macro Definitions: (autoconf)Macro Definitions.).  The `aclocal'
@@ -2507,12 +2511,13 @@ For instance to create a library named `libcpio.a', but not install it,
 you would write:
 
      noinst_LIBRARIES = libcpio.a
+     libcpio_a_SOURCES = ...
 
    The sources that go into a library are determined exactly as they are
 for programs, via the `_SOURCES' variables.  Note that the library name
 is canonicalized (*note Canonicalization::), so the `_SOURCES' variable
-corresponding to `liblob.a' is `liblob_a_SOURCES', not
-`liblob.a_SOURCES'.
+corresponding to `libcpio.a' is `libcpio_a_SOURCES', not
+`libcpio.a_SOURCES'.
 
    Extra objects can be added to a library using the `LIBRARY_LIBADD'
 variable.  This should be used for objects determined by `configure'.
@@ -2533,6 +2538,10 @@ default to `ar' and `cru' respectively; you can override these two
 variables my setting them in your `Makefile.am', by `AC_SUBST'ing them
 from your `configure.ac', or by defining a per-library `maude_AR'
 variable (*note Program and Library Variables::).
+
+   Be careful when selecting library components conditionally.  Because
+building an empty library is not portable, you should ensure that any
+library contains always at least one object.
 
 
 File: automake.info,  Node: A Shared Library,  Next: Program and Library Variables,  Prev: A Library,  Up: Programs
@@ -3162,8 +3171,8 @@ a default.
 
 File: automake.info,  Node: LIBOBJS,  Next: Program variables,  Prev: Default _SOURCES,  Up: Programs
 
-7.6 Special handling for LIBOBJS and ALLOCA
-===========================================
+7.6 Special handling for `LIBOBJS' and `ALLOCA'
+===============================================
 
 The `$(LIBOBJS)' and `$(ALLOCA)' variables list object files that
 should be compiled into the project to provide an implementation for
@@ -3222,12 +3231,18 @@ variables are used.
      libcompat_a_SOURCES =
      libcompat_a_LIBADD = $(LIBOBJS) $(ALLOCA)
 
-   Nothing else is required.  The library can have any name, of course,
-and anyway it is not going to be installed: it just holds the
-replacement versions of the missing or broken functions so we can later
-link them in.  In many projects also include extra functions, specific
-to the project, in that library: they are simply added on the
-`_SOURCES' line.
+   The library can have any name, of course, and anyway it is not going
+to be installed: it just holds the replacement versions of the missing
+or broken functions so we can later link them in.  In many projects
+also include extra functions, specific to the project, in that library:
+they are simply added on the `_SOURCES' line.
+
+   There is a small trap here, though: `$(LIBOBJS)' and `$(ALLOCA)'
+might be empty, and building an empty library is not portable.  You
+should ensure that there is always something to put in `libcompat.a'.
+Most projects will also add some utility functions in that directory,
+and list them in `libcompat_a_SOURCES', so in practice `libcompat.a'
+cannot be empty.
 
    Finally here is how this library could be used from the `src/'
 directory.
@@ -3659,47 +3674,34 @@ File: automake.info,  Node: How the Linker is Chosen,  Up: Mixing Fortran 77 Wit
 7.11.3.1 How the Linker is Chosen
 .................................
 
-The following diagram demonstrates under what conditions a particular
-linker is chosen by Automake.
+When a program or library mixes several languages, Automake choose the
+linker according to the following priorities.  (The names in
+parentheses are the variables containing the link command.)
 
-   For example, if Fortran 77, C and C++ source code were to be compiled
-into a program, then the C++ linker will be used.  In this case, if the
-C or Fortran 77 linkers required any special libraries that weren't
-included by the C++ linker, then they must be manually added to an
-`_LDADD' or `_LIBADD' variable by the user writing the `Makefile.am'.
+  1. Native Java (`GCJLINK')
 
-                          \              Linker
-               source      \
-                code        \     C        C++     Fortran
-          -----------------  +---------+---------+---------+
-                             |         |         |         |
-          C                  |    x    |         |         |
-                             |         |         |         |
-                             +---------+---------+---------+
-                             |         |         |         |
-              C++            |         |    x    |         |
-                             |         |         |         |
-                             +---------+---------+---------+
-                             |         |         |         |
-                    Fortran  |         |         |    x    |
-                             |         |         |         |
-                             +---------+---------+---------+
-                             |         |         |         |
-          C + C++            |         |    x    |         |
-                             |         |         |         |
-                             +---------+---------+---------+
-                             |         |         |         |
-          C +       Fortran  |         |         |    x    |
-                             |         |         |         |
-                             +---------+---------+---------+
-                             |         |         |         |
-              C++ + Fortran  |         |    x    |         |
-                             |         |         |         |
-                             +---------+---------+---------+
-                             |         |         |         |
-          C + C++ + Fortran  |         |    x    |         |
-                             |         |         |         |
-                             +---------+---------+---------+
+  2. C++ (`CXXLINK')
+
+  3. Fortran 77 (`F77LINK')
+
+  4. Fortran (`FCLINK')
+
+  5. Objective C (`OBJCLINK')
+
+  6. C (`LINK')
+
+   For example, if Fortran 77, C and C++ source code is compiled into a
+program, then the C++ linker will be used.  In this case, if the C or
+Fortran 77 linkers required any special libraries that weren't included
+by the C++ linker, then they must be manually added to an `_LDADD' or
+`_LIBADD' variable by the user writing the `Makefile.am'.
+
+   Automake only looks at the filenames listed in `_SOURCES' variables
+to choose the linker, and defaults to the C linker.  Sometimes this is
+inconvenient because you are linking against a library written in
+another language and would like to set the linker more appropriately.
+*Note Libtool Convenience Libraries::, for a trick with
+`nodist_EXTRA_..._SOURCES'.
 
 
 File: automake.info,  Node: Fortran 9x Support,  Next: Java Support,  Prev: Fortran 77 Support,  Up: Programs
@@ -4541,7 +4543,8 @@ Python installation found during configuration.
 This is mandated by the GNU coding standards, so that the user can run
 `make prefix=/foo install'.  The Autoconf manual has a section with
 more details on this topic (*note Installation Directory Variables:
-(autoconf)Installation Directory Variables.).
+(autoconf)Installation Directory Variables.).  See also *Note
+Hard-Coded Install Paths::.
 
 
 File: automake.info,  Node: Documentation,  Next: Install,  Prev: Other GNU Tools,  Up: Top
@@ -5412,7 +5415,7 @@ understood options are:
 
      These options must be passed as argument to `AM_INIT_AUTOMAKE'
      (*note Macros::) because they can require additional configure
-     checks.  Automake will complain if it sees such options in a
+     checks.  Automake will complain if it sees such options in an
      `AUTOMAKE_OPTIONS' variable.
 
      `tar-v7' selects the old V7 tar format.  This is the historical
@@ -5844,10 +5847,15 @@ Note that there are no `uninstall-exec-local' or `uninstall-data-local'
 targets; just use `uninstall-local'.  It doesn't make sense to
 uninstall just data or just executables.
 
-   For instance, here is one way to install a file in `/etc':
+   For instance, here is one way to erase a subdirectory during `make
+clean' (*note Clean::).
 
-     install-data-local:
-             $(INSTALL_DATA) $(srcdir)/afile $(DESTDIR)/etc/afile
+     clean-local:
+             -rm -rf testSubDir
+
+   Older version of this manual used to show how to use
+`install-data-local' to install a file to some hard-coded location, but
+you should avoid this.  (*note Hard-Coded Install Paths::)
 
    Some rule also have a way to run another rule, called a "hook",
 after their work is done.  The hook is named after the principal target,
@@ -6194,6 +6202,7 @@ lists.
 * renamed objects::             Why are object files sometimes renamed?
 * Per-Object Flags::            How to simulate per-object flags?
 * Multiple Outputs::            Writing rules for tools with many output files
+* Hard-Coded Install Paths::    Installing to Hard-Coded Locations
 
 
 File: automake.info,  Node: CVS,  Next: maintainer-mode,  Up: FAQ
@@ -6883,7 +6892,7 @@ this file.  If a new release of Automake generates a different rule,
 your copy will need to be updated by hand.
 
 
-File: automake.info,  Node: Multiple Outputs,  Prev: Per-Object Flags,  Up: FAQ
+File: automake.info,  Node: Multiple Outputs,  Next: Hard-Coded Install Paths,  Prev: Per-Object Flags,  Up: FAQ
 
 26.8 Handling Tools that Produce Many Outputs
 =============================================
@@ -7062,6 +7071,114 @@ express rules with multiple output files using pattern rules (*note
 Pattern Rule Examples: (make)Pattern Examples.).  We do not discuss
 pattern rules here because they are not portable, but they can be
 convenient in packages that assume GNU `make'.
+
+
+File: automake.info,  Node: Hard-Coded Install Paths,  Prev: Multiple Outputs,  Up: FAQ
+
+26.9 Installing to Hard-Coded Locations
+=======================================
+
+     My package needs to install some configuration file.  I tried to use
+     the following rule, but `make distcheck' fails.  Why?
+          # Do not do this.
+          install-data-local:
+                  $(INSTALL_DATA) $(srcdir)/afile $(DESTDIR)/etc/afile
+
+     My package needs to populate the installation directory of another
+     package at install-time.  I can easily compute that installation
+     directory in `configure', but if I install files therein,
+     `make distcheck' fails.  How else should I do?
+
+   These two setups share their symptoms: `make distcheck' fails
+because they are installing files to hard-coded paths.  In the later
+case the path is not really hard-coded in the package, but we can
+consider it to be hard-coded in the system (or in whichever tool that
+supplies the path).  As long as the path does not use any of the
+standard directory variables (`$(prefix)', `$(bindir)', `$(datadir)',
+etc.), the effect will be the same: user-installations are impossible.
+
+   When a (non-root) user wants to install a package, he usually has no
+right to install anything in `/usr' or `/usr/local'.  So he does
+something like `./configure --prefix ~/usr' to install package in his
+own `~/usr' tree.
+
+   If a package attempts to install something to some hard-coded path
+(e.g., `/etc/afile'), regardless of this `--prefix' setting, then the
+installation will fail.  `make distcheck' performs such a `--prefix'
+installation, hence it will fail too.
+
+   Now, there are some easy solutions.
+
+   The above `install-data-local' example for installing `/etc/afile'
+would be better replaced by
+
+     sysconf_DATA = afile
+
+by default `sysconfdir' will be `$(prefix)/etc', because this is what
+the GNU Standards require.  When such a package is installed on a FHS
+compliant system, the installer will have to set `--sysconfdir=/etc'.
+As the maintainer of the package you should not be concerned by such
+site policies: use the appropriate standard directory variable to
+install your files so that installer can easily redefine these
+variables to match their site conventions.
+
+   Installing files that should be used by another package, is slightly
+more involved.  Let's take an example and assume you want to install
+shared library that is a Python extension module.  If you ask Python
+where to install the library, it will answer something like this:
+
+     % python -c 'from distutils import sysconfig;
+                  print sysconfig.get_python_lib(1,0)'
+     /usr/lib/python2.3/site-packages
+
+   If you indeed use this absolute path to install your shared library,
+non-root users will not be able to install the package, hence distcheck
+fails.
+
+   Let's do better.  The `sysconfig.get_python_lib()' function actually
+accepts a third argument that will replace Python's installation prefix.
+
+     % python -c 'from distutils import sysconfig;
+                  print sysconfig.get_python_lib(1,0,"${exec_prefix}")'
+     ${exec_prefix}/lib/python2.3/site-packages
+
+   You can also use this new path.  If you do
+   * root users can install your package with the same `--prefix' as
+     Python (you get the behavior of the previous attempt)
+
+   * non-root users can install your package too, they will have the
+     extension module in a place that is not searched by Python but they
+     can work around this using environment variables (and if you
+     installed scripts that use this shared library, it's easy to tell
+     Python were to look in the beginning of your script, so the script
+     works in both cases).
+
+   The `AM_PATH_PYTHON' macro uses similar commands to define
+`$(pythondir)' and `$(pyexecdir)' (*note Python::).
+
+   Of course not all tools are as advanced as Python regarding that
+substitution of PREFIX.  So another strategy is to figure the part of
+the of the installation directory that must be preserved.  For instance
+here is how `AM_PATH_LISPDIR' (*note Emacs Lisp::) computes
+`$(lispdir)':
+
+     $EMACS -batch -q -eval '(while load-path
+                               (princ (concat (car load-path) "\n"))
+                               (setq load-path (cdr load-path)))' >conftest.out
+     lispdir=`sed -n \
+       -e 's,/$,,' \
+       -e '/.*\/lib\/x*emacs\/site-lisp$/{s,.*/lib/\(x*emacs/site-lisp\)$,${libdir}/\1,;p;q;}' \
+       -e '/.*\/share\/x*emacs\/site-lisp$/{s,.*/share/\(x*emacs/site-lisp\),${datadir}/\1,;p;q;}' \
+       conftest.out`
+
+   I.e., it just picks the first directory that looks like
+`*/lib/*emacs/site-lisp' or `*/share/*emacs/site-lisp' in the search
+path of emacs, and then substitutes `${libdir}' or `${datadir}'
+appropriately.
+
+   The emacs case looks complicated because it processes a list and
+expect two possible layouts, otherwise it's easy, and the benefit for
+non-root users are really worth the extra `sed' invocation.
 
 
 File: automake.info,  Node: History,  Next: Copying This Manual,  Prev: FAQ,  Up: Top

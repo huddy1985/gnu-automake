@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2002, 2003, 2004  Free Software Foundation, Inc.
+# Copyright (C) 2005  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -18,52 +18,37 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# Make sure that --program-transform works.
+# Long lines should be wrapped.
+# Report from Albert Chin.
 
-required=gcc
 . ./defs || exit 1
 
 set -e
 
-cat >>configure.in <<'END'
-AC_PROG_CC
-AC_OUTPUT
-END
+n=1
+files=
+match=
+while test $n -le 100
+do
+  files="$files filename$n"
+  match="..........$match"
+  n=`expr $n + 1`
+done
+files2=`echo "$files" | sed s/filename/filenameb/g`
 
-cat >Makefile.am <<'EOF'
-bin_PROGRAMS = h
-bin_SCRIPTS = h.sh
-man_MANS = h.1
-
-test-install: install
-	test -f inst/bin/gnu-h$(EXEEXT)
-	test -f inst/bin/gnu-h.sh
-	test -f inst/man/man1/gnu-h.1
+cat >Makefile.am <<EOF
+FOO = $files $files2 \
+  grepme
 EOF
 
-cat >h.c <<'EOF'
-int
-main ()
-{
-  return 0;
-}
-EOF
+# The `FOO = ...' line is 2293-byte long.  More than what a POSIX
+# conforment system is expected to support.
 
-: > h.sh
-: > h.1
+# (It's OK if grep truncates the long line.)
+grep $match Makefile.am
 
 $ACLOCAL
-$AUTOCONF
 $AUTOMAKE
 
-./configure --program-prefix=gnu- --prefix `pwd`/inst --mandir `pwd`/inst/man
-$MAKE
-$MAKE test-install
-$MAKE uninstall
-test `find inst/foo -type f -print | wc -l` = 0
-
-# Opportunistically test for installdirs.
-rm -rf inst
-$MAKE installdirs
-test -d inst/bin
-test -d inst/man/man1
+grep $match Makefile.in && exit 1
+grep 'filenameb100 grepme' Makefile.in

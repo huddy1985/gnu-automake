@@ -74,6 +74,7 @@ ccnoco.test \
 check.test \
 check2.test \
 check3.test \
+check4.test \
 checkall.test \
 clean.test \
 clean2.test \
@@ -317,6 +318,7 @@ lisp6.test \
 listval.test \
 location.test \
 longline.test \
+longlin2.test \
 ltcond.test \
 ltcond2.test \
 ltconv.test \

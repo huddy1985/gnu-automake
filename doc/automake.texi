@@ -14,7 +14,7 @@ This manual is for @acronym{GNU} Automake (version @value{VERSION},
 Makefiles from template files.
 
 Copyright @copyright{} 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-2003, 2004 Free Software Foundation, Inc.
+2003, 2004, 2005 Free Software Foundation, Inc.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -254,6 +254,7 @@ Frequently Asked Questions about Automake
 * renamed objects::             Why are object files sometimes renamed?
 * Per-Object Flags::            How to simulate per-object flags?
 * Multiple Outputs::            Writing rules for tools with many output files
+* Hard-Coded Install Paths::    Installing to Hard-Coded Locations
 
 History of Automake
 
@@ -1613,7 +1614,7 @@ can be used to change or extend this search path.
 
 @subsection Modifying the macro search path: @code{--acdir}
 
-The most obvious option to modify the search path is
+The most erroneous option to modify the search path is
 @code{--acdir=@var{dir}}, which changes default directory and
 drops the @var{APIVERSION} directory.  For example, if one specifies
 @code{--acdir=/opt/private/}, then the search path becomes:
@@ -1622,9 +1623,8 @@ drops the @var{APIVERSION} directory.  For example, if one specifies
 @item @file{/opt/private/}
 @end enumerate
 
-Note that this option, @code{--acdir}, is intended for use
-by the internal automake test suite only; it is not ordinarily
-needed by end-users.
+This option, @code{--acdir}, is intended for use by the internal
+automake test suite only; it is not ordinarily needed by end-users.
 
 @subsection Modifying the macro search path: @code{-I @var{dir}}
 
@@ -1971,6 +1971,11 @@ installed in @file{$(datadir)/aclocal}.  This is as simple as writing:
 aclocaldir = $(datadir)/aclocal
 aclocal_DATA = mymacro.m4 myothermacro.m4
 @end example
+
+@noindent
+Please do use @file{$(datadir)/aclocal}, and not something based on
+the result of @code{aclocal --print-ac-dir}.  @xref{Hard-Coded Install
+Paths}, for arguments.
 
 A file of macros should be a series of properly quoted
 @code{AC_DEFUN}'s (@pxref{Macro Definitions, , , autoconf, The
@@ -2952,13 +2957,14 @@ it, you would write:
 
 @example
 noinst_LIBRARIES = libcpio.a
+libcpio_a_SOURCES = @dots{}
 @end example
 
 The sources that go into a library are determined exactly as they are
 for programs, via the @samp{_SOURCES} variables.  Note that the library
 name is canonicalized (@pxref{Canonicalization}), so the @samp{_SOURCES}
-variable corresponding to @file{liblob.a} is @samp{liblob_a_SOURCES},
-not @samp{liblob.a_SOURCES}.
+variable corresponding to @file{libcpio.a} is @samp{libcpio_a_SOURCES},
+not @samp{libcpio.a_SOURCES}.
 
 @vindex maude_LIBADD
 Extra objects can be added to a library using the
@@ -2984,6 +2990,11 @@ can override these two variables my setting them in your
 @file{Makefile.am}, by @code{AC_SUBST}ing them from your
 @file{configure.ac}, or by defining a per-library @code{maude_AR}
 variable (@pxref{Program and Library Variables}).
+
+@cindex Empty libraries
+Be careful when selecting library components conditionally.  Because
+building an empty library is not portable, you should ensure that any
+library contains always at least one object.
 
 @node A Shared Library
 @section Building a Shared Library
@@ -3708,7 +3719,7 @@ target_LDADD = libmain.a libmisc.a
 @end example
 
 @node LIBOBJS
-@section Special handling for LIBOBJS and ALLOCA
+@section Special handling for @code{LIBOBJS} and @code{ALLOCA}
 
 @cindex @code{LIBOBJS}, example
 @cindex @code{ALLOCA}, example
@@ -3790,12 +3801,21 @@ libcompat_a_SOURCES =
 libcompat_a_LIBADD = $(LIBOBJS) $(ALLOCA)
 @end example
 
-Nothing else is required.  The library can have any name, of course,
-and anyway it is not going to be installed: it just holds the
-replacement versions of the missing or broken functions so we can
-later link them in.  In many projects also include extra functions,
-specific to the project, in that library: they are simply added on
-the @code{_SOURCES} line.
+The library can have any name, of course, and anyway it is not going
+to be installed: it just holds the replacement versions of the missing
+or broken functions so we can later link them in.  In many projects
+also include extra functions, specific to the project, in that
+library: they are simply added on the @code{_SOURCES} line.
+
+@cindex Empty libraries and @code{$(LIBOBJS)}
+@cindex @code{$(LIBOBJS)} and empty libraries
+There is a small trap here, though: @code{$(LIBOBJS)} and
+@code{$(ALLOCA)} might be empty, and building an empty library is not
+portable.  You should ensure that there is always something to put in
+@file{libcompat.a}.  Most projects will also add some utility
+functions in that directory, and list them in
+@code{libcompat_a_SOURCES}, so in practice @file{libcompat.a} cannot
+be empty.
 
 Finally here is how this library could be used from the @file{src/}
 directory.
@@ -4290,50 +4310,45 @@ Automake would have issued a warning.
 @cindex Automatic linker selection
 @cindex Selecting the linker automatically
 
-The following diagram demonstrates under what conditions a particular
-linker is chosen by Automake.
+When a program or library mixes several languages, Automake choose the
+linker according to the following priorities.  (The names in
+parentheses are the variables containing the link command.)
 
-For example, if Fortran 77, C and C++ source code were to be compiled
+@enumerate
+@item
+@vindex GCJLINK
+Native Java (@code{GCJLINK})
+@item
+@vindex CXXLINK
+C++ (@code{CXXLINK})
+@item
+@vindex F77LINK
+Fortran 77 (@code{F77LINK})
+@item
+@vindex FCLINK
+Fortran (@code{FCLINK})
+@item
+@vindex OBJCLINK
+Objective C (@code{OBJCLINK})
+@item
+@vindex LINK
+C (@code{LINK})
+@end enumerate
+
+For example, if Fortran 77, C and C++ source code is compiled
 into a program, then the C++ linker will be used.  In this case, if the
 C or Fortran 77 linkers required any special libraries that weren't
 included by the C++ linker, then they must be manually added to an
 @code{_LDADD} or @code{_LIBADD} variable by the user writing the
 @file{Makefile.am}.
 
-@example
-                     \              Linker
-          source      \
-           code        \     C        C++     Fortran
-     -----------------  +---------+---------+---------+
-                        |         |         |         |
-     C                  |    x    |         |         |
-                        |         |         |         |
-                        +---------+---------+---------+
-                        |         |         |         |
-         C++            |         |    x    |         |
-                        |         |         |         |
-                        +---------+---------+---------+
-                        |         |         |         |
-               Fortran  |         |         |    x    |
-                        |         |         |         |
-                        +---------+---------+---------+
-                        |         |         |         |
-     C + C++            |         |    x    |         |
-                        |         |         |         |
-                        +---------+---------+---------+
-                        |         |         |         |
-     C +       Fortran  |         |         |    x    |
-                        |         |         |         |
-                        +---------+---------+---------+
-                        |         |         |         |
-         C++ + Fortran  |         |    x    |         |
-                        |         |         |         |
-                        +---------+---------+---------+
-                        |         |         |         |
-     C + C++ + Fortran  |         |    x    |         |
-                        |         |         |         |
-                        +---------+---------+---------+
-@end example
+Automake only looks at the filenames listed in @file{_SOURCES}
+variables to choose the linker, and defaults to the C linker.
+Sometimes this is inconvenient because you are linking against a
+library written in another language and would like to set the linker
+more appropriately.  @xref{Libtool Convenience Libraries}, for a
+trick with @code{nodist_EXTRA_@dots{}_SOURCES}.
+
 
 @node Fortran 9x Support
 @comment  node-name,  next,  previous,  up
@@ -5321,7 +5336,8 @@ fine in @file{Makefiles}, but it makes these variables hard to use in
 that the user can run @code{make prefix=/foo install}.  The Autoconf
 manual has a section with more details on this topic
 (@pxref{Installation Directory Variables, , Installation Directory
-Variables, autoconf, The Autoconf Manual}).
+Variables, autoconf, The Autoconf Manual}).  See also @ref{Hard-Coded
+Install Paths}.
 
 
 @node Documentation
@@ -6459,7 +6475,7 @@ is then compressed according to the set of @code{no-dist-gzip},
 
 These options must be passed as argument to @code{AM_INIT_AUTOMAKE}
 (@pxref{Macros}) because they can require additional configure checks.
-Automake will complain if it sees such options in a
+Automake will complain if it sees such options in an
 @code{AUTOMAKE_OPTIONS} variable.
 
 @code{tar-v7} selects the old V7 tar format.  This is the historical
@@ -7009,12 +7025,17 @@ The targets that support a local version are @code{all}, @code{info},
 use @code{uninstall-local}.  It doesn't make sense to uninstall just
 data or just executables.
 
-For instance, here is one way to install a file in @file{/etc}:
+For instance, here is one way to erase a subdirectory during
+@code{make clean} (@pxref{Clean}).
 
-@example
-install-data-local:
-        $(INSTALL_DATA) $(srcdir)/afile $(DESTDIR)/etc/afile
-@end example
+@smallexample
+clean-local:
+        -rm -rf testSubDir
+@end smallexample
+
+Older version of this manual used to show how to use
+@code{install-data-local} to install a file to some hard-coded
+location, but you should avoid this.  (@pxref{Hard-Coded Install Paths})
 
 @cindex @code{-hook} targets
 @cindex hook targets
@@ -7403,6 +7424,7 @@ lists.
 * renamed objects::             Why are object files sometimes renamed?
 * Per-Object Flags::            How to simulate per-object flags?
 * Multiple Outputs::            Writing rules for tools with many output files
+* Hard-Coded Install Paths::    Installing to Hard-Coded Locations
 @end menu
 
 @node CVS
@@ -8423,6 +8445,135 @@ express rules with multiple output files using pattern rules
 Manual}).  We do not discuss pattern rules here because they are not
 portable, but they can be convenient in packages that assume GNU
 @command{make}.
+
+
+@node Hard-Coded Install Paths
+@section Installing to Hard-Coded Locations
+
+@display
+My package needs to install some configuration file.  I tried to use
+the following rule, but @code{make distcheck} fails.  Why?
+
+@example
+# Do not do this.
+install-data-local:
+        $(INSTALL_DATA) $(srcdir)/afile $(DESTDIR)/etc/afile
+@end example
+@end display
+
+@display
+My package needs to populate the installation directory of another
+package at install-time.  I can easily compute that installation
+directory in @file{configure}, but if I install files therein,
+@code{make distcheck} fails.  How else should I do?
+@end display
+
+These two setups share their symptoms: @code{make distcheck} fails
+because they are installing files to hard-coded paths.  In the later
+case the path is not really hard-coded in the package, but we can
+consider it to be hard-coded in the system (or in whichever tool that
+supplies the path).  As long as the path does not use any of the
+standard directory variables (@code{$(prefix)}, @code{$(bindir)},
+@code{$(datadir)}, etc.), the effect will be the same:
+user-installations are impossible.
+
+When a (non-root) user wants to install a package, he usually has no
+right to install anything in @code{/usr} or @code{/usr/local}.  So he
+does something like @code{./configure --prefix ~/usr} to install
+package in his own @code{~/usr} tree.
+
+If a package attempts to install something to some hard-coded path
+(e.g., @file{/etc/afile}), regardless of this @code{--prefix} setting,
+then the installation will fail.  @code{make distcheck} performs such
+a @code{--prefix} installation, hence it will fail too.
+
+Now, there are some easy solutions.
+
+The above @code{install-data-local} example for installing
+@file{/etc/afile} would be better replaced by
+
+@smallexample
+sysconf_DATA = afile
+@end smallexample
+
+@noindent
+by default @code{sysconfdir} will be @code{$(prefix)/etc}, because
+this is what the GNU Standards require.  When such a package is
+installed on a FHS compliant system, the installer will have to set
+@code{--sysconfdir=/etc}.  As the maintainer of the package you
+should not be concerned by such site policies: use the appropriate
+standard directory variable to install your files so that installer
+can easily redefine these variables to match their site conventions.
+
+Installing files that should be used by another package, is slightly
+more involved.  Let's take an example and assume you want to install
+shared library that is a Python extension module.  If you ask Python
+where to install the library, it will answer something like this:
+
+@example
+% @kbd{python -c 'from distutils import sysconfig;
+             print sysconfig.get_python_lib(1,0)'}
+/usr/lib/python2.3/site-packages
+@end example
+
+If you indeed use this absolute path to install your shared library,
+non-root users will not be able to install the package, hence
+distcheck fails.
+
+Let's do better.  The @code{sysconfig.get_python_lib()} function
+actually accepts a third argument that will replace Python's
+installation prefix.
+
+@example
+% @kbd{python -c 'from distutils import sysconfig;
+             print sysconfig.get_python_lib(1,0,"$@{exec_prefix@}")'}
+$@{exec_prefix@}/lib/python2.3/site-packages
+@end example
+
+You can also use this new path.  If you do
+@itemize @bullet
+@item
+root users can install your package with the same @code{--prefix}
+as Python (you get the behavior of the previous attempt)
+
+@item
+non-root users can install your package too, they will have the
+extension module in a place that is not searched by Python but they
+can work around this using environment variables (and if you installed
+scripts that use this shared library, it's easy to tell Python were to
+look in the beginning of your script, so the script works in both
+cases).
+@end itemize
+
+The @code{AM_PATH_PYTHON} macro uses similar commands to define
+@code{$(pythondir)} and @code{$(pyexecdir)} (@pxref{Python}).
+
+Of course not all tools are as advanced as Python regarding that
+substitution of @var{prefix}.  So another strategy is to figure the
+part of the of the installation directory that must be preserved.  For
+instance here is how @code{AM_PATH_LISPDIR} (@pxref{Emacs Lisp})
+computes @code{$(lispdir)}:
+
+@example
+$EMACS -batch -q -eval '(while load-path
+                          (princ (concat (car load-path) "\n"))
+                          (setq load-path (cdr load-path)))' >conftest.out
+lispdir=`sed -n \
+  -e 's,/$,,' \
+  -e '/.*\/lib\/x*emacs\/site-lisp$/@{s,.*/lib/\(x*emacs/site-lisp\)$,$@{libdir@}/\1,;p;q;@}' \
+  -e '/.*\/share\/x*emacs\/site-lisp$/@{s,.*/share/\(x*emacs/site-lisp\),$@{datadir@}/\1,;p;q;@}' \
+  conftest.out`
+@end example
+
+I.e., it just picks the first directory that looks like
+@file{*/lib/*emacs/site-lisp} or @file{*/share/*emacs/site-lisp} in
+the search path of emacs, and then substitutes @code{$@{libdir@}} or
+@code{$@{datadir@}} appropriately.
+
+The emacs case looks complicated because it processes a list and
+expect two possible layouts, otherwise it's easy, and the benefit for
+non-root users are really worth the extra @command{sed} invocation.
+
 
 @node History
 @chapter History of Automake

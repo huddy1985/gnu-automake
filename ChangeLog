@@ -1,4 +1,155 @@
+2005-02-13  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.ac, NEWS: Bump version to 1.9.5.
+
+2005-02-12  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/INSTALL, lib/config-ml.in, lib/config.guess, lib/config.sub,
+	lib/texinfo.tex: New upstream versions.
+
+	* doc/automake.texi (Hard-Coded Install Paths): New node.
+	(Extending, Extending aclocal, Python): Link to it.
+	(Extending): Don't show how to install a file in /etc/ directly,
+	this is insane.
+
+	* automake.in (read_am_file): Define variables containing long
+	lines as VAR_PRETTY to work around tools with limited input width.
+	* tests/longlin2.test: New file.
+	* tests/Makefile.am (TESTS): Add it.
+	Report from Albert Chin.
+
+2005-02-09  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	Fix for PR automake/447:
+	* lib/depcomp (tru64) [libtool]: Also check for	$dir.libs/$base.o.d.
+	Report from Mathias Doreille.  Add some old comments from
+	Nicolas Joly for reference.
+
+2005-02-08  Stepan Kasal  <kasal@ucw.cz>
+
+	* lib/mdate-sh: Check the size of the word following the month to
+	catch Darwin.  This way the filename can contain spaces.
+
+	* doc/automake.texi (Options): Typo.
+
+2005-02-08  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/missing (makeinfo): Compute the output file if neither -o
+	nor @setfilename is used.
+	Reported by Miroslaw Dobrzanski-Neumann and Bruno Haible.
+
+2005-02-07  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/mdate-sh: Cope with Darwin's Day/Month/Year output.
+	Report from Peter O'Gorman.
+
+2005-02-02  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* lib/compile: Likewise.
+
+2005-02-02  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/elisp-comp: Use `(exit N); exit N', not `(exit N); exit';
+	see 2004-12-17.
+	* lib/mdate-sh, lib/py-compile, lib/ylwrap: Exit with nonzero
+	status if a write failure occurs with --help or --version option,
+	as below.
+
+2005-02-02  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* lib/depcomp: Exit with nonzero status if a write failure occurs
+	with --help or --version option.
+	* lib/elisp-comp: Likewise.
+	* lib/gnupload: Likewise.
+	* lib/install-sh: Likewise.
+	* lib/missing: Likewise.
+	* lib/mkinstalldirs: Likewise.
+
+2005-01-30  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (Macro search path): Using --acdir is not
+	obvious, it's erroneous.
+
+2005-01-27  Akim Demaille  <akim@epita.fr>
+
+	* lib/Automake/Configure_ac.pm: s/filename/file_name/g.
+	From Paul Eggert.
+
+2005-01-24  Akim Demaille  <akim@epita.fr>
+
+	* lib/Automake/FileUtils.pm: Rename filename as file_name to be
+	consistent with the terminology of the GNU coding standards.
+	From Paul Eggert.
+	(update_file): Accept a $force argument, so that --force always
+	updates the time stamps.
+
+2005-01-23  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (How the Linker is Chosen): Explain how the
+	linker is chosen without diagram, and update to match the code.
+	Suggestion from Adrian Bunk.
+
+2005-01-16  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/am/subdirs.am ($(RECURSIVE_TARGETS), mostlyclean-recursive,
+	clean-recursive, distclean-recursive, maintainer-clean-recursive):
+	Process all words of $MAKEFLAGS when checking for -k.
+	* tests/check4.test: New file.
+	* tests/Makefile.am (TESTS): Add check4.test.
+	Report from Eric Blake.
+
+2005-01-09  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* m4/amversion.in, m4/as.m4, m4/auxdir.m4, m4/ccstdc.m4,
+	m4/cond.m4, m4/depend.m4, m4/depout.m4, m4/dmalloc.m4, m4/gcj.m4,
+	m4/header.m4, m4/init.m4, m4/install-sh.m4, m4/lead-dot.m4,
+	m4/lex.m4, m4/lispdir.m4, m4/maintainer.m4, m4/make.m4,
+	m4/minuso.m4, m4/missing.m4, m4/mkdirp.m4, m4/multi.m4,
+	m4/obsol-gt.m4, m4/obsol-lt.m4, m4/obsolete.m4, m4/options.m4,
+	m4/protos.m4, m4/python.m4, m4/regex.m4, m4/runlog.m4,
+	m4/sanity.m4, m4/strip.m4, m4/tar.m4: Use the same all-permissive
+	license that is used in aclocal.m4.  Relicensing backed by RMS.
+
+	* doc/automake.texi (A Library, LIBOBJS): Mention that empty
+	libraries are not portable.
+
+2005-01-05  Akim Demaille  <akim@epita.fr>
+
+	* aclocal.in ($ac_defun_rx): Match AU_ALIAS.
+	* tests/aclocal5.test (MORE_DEFS): Rename as...
+	(AM_TEST): this so that undefined macros are caught.
+	And make it an alias of AC_SUBST.
+	Test AU_ALIAS.
+	Reported by Martin Bravenboer.
+
+2005-01-01  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/exdir2.test: Do not use `htmldir' as example of
+	undefined directory.
+
+	* aclocal.in (parse_arguments, write_aclocal): Bump copyright year.
+	* automake.in ($gen_copyright, version): Likewise.
+
+2004-12-31  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/man2.test, tests/transform.test: Specify --mandir, in order
+	not to fail when Autoconf changes its $mandir default.
+
+2004-12-27  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (Preprocessed Fortran): Fix the definition of FCLINK.
+
+	* lib/am/texinfos.am (uninstall-info-am): Hide the invocation of
+	$(PRE_UNINSTALL).
+
+2004-12-27  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* lib/am/texinfos.am (uninstall-info-am): Show change of
+	directory while uninstalling DJGPP-style info files.
+
 2004-12-18  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.ac, NEWS: Bump version to 1.9.4a.
 
 	* configure.ac, NEWS: Bump version to 1.9.4.
 
@@ -4260,7 +4411,7 @@
 
 -----
 
-Copyright (C) 2003, 2004  Free Software Foundation, Inc.
+Copyright (C) 2003, 2004, 2005  Free Software Foundation, Inc.
 
 This file is part of GNU Automake.
 
