@@ -18,6 +18,8 @@ acloca12.test \
 acloca13.test \
 acloca14.test \
 acloca15.test \
+acloca16.test \
+acloca17.test \
 acoutnoq.test \
 acoutpt.test \
 acoutpt2.test \
@@ -53,6 +55,8 @@ autohdr3.test \
 autohdr4.test \
 auxdir.test \
 auxdir2.test \
+auxdir3.test \
+auxdir4.test \
 backsl.test \
 backsl2.test \
 backsl3.test \
@@ -89,6 +93,7 @@ comment4.test \
 comment5.test \
 comment6.test \
 comment7.test \
+compile_f90_c_cxx.test \
 compile_f_c_cxx.test \
 cond.test \
 cond2.test \
@@ -125,7 +130,9 @@ cond33.test \
 cond34.test \
 cond35.test \
 cond36.test \
+cond37.test \
 condd.test \
+condhook.test \
 condinc.test \
 condinc2.test \
 condlib.test \
@@ -187,6 +194,7 @@ distcom3.test \
 distcom4.test \
 distcom5.test \
 distcom6.test \
+distcom7.test \
 distdir.test \
 distname.test \
 dollar.test \
@@ -197,7 +205,6 @@ empty.test \
 empty2.test \
 empty3.test \
 empty4.test \
-error.test \
 exdir.test \
 exdir2.test \
 exeext.test \
@@ -213,7 +220,9 @@ extra4.test \
 extra5.test \
 extra6.test \
 extra7.test \
+f90only.test \
 flibs.test \
+fn99.test \
 fnoc.test \
 fo.test	\
 fonly.test \
@@ -286,9 +295,11 @@ libtool4.test \
 libtool5.test \
 libtool6.test \
 libtool7.test \
+libtool8.test \
 license.test \
 link_c_cxx.test	\
 link_dist.test \
+link_f90_only.test \
 link_fc.test \
 link_fccxx.test \
 link_fcxx.test	\
@@ -297,8 +308,10 @@ lisp2.test \
 lisp3.test \
 lisp4.test \
 lisp5.test \
+lisp6.test \
 listval.test \
 location.test \
+longline.test \
 ltcond.test \
 ltcond2.test \
 ltconv.test \
@@ -440,6 +453,7 @@ subdir5.test \
 subdir6.test \
 subdir7.test \
 subdir8.test \
+subdir9.test \
 subdirbuiltsources.test \
 subcond.test \
 subcond2.test \
@@ -478,6 +492,9 @@ symlink3.test \
 syntax.test \
 tags.test \
 tagsub.test \
+tar.test \
+tar2.test \
+tar3.test \
 target-cflags.test \
 targetclash.test \
 txinfo.test \
@@ -521,6 +538,7 @@ vtexi.test \
 vtexi2.test \
 warnopts.test \
 werror.test \
+werror2.test \
 whoami.test \
 xsource.test \
 yacc.test \

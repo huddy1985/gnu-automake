@@ -24,6 +24,7 @@
 
 cat >> configure.in << 'END'
 AC_PROG_F77
+AC_PROG_FC
 _AM_DEPENDENCIES(OBJC)
 AC_SUBST(OBJC)
 END

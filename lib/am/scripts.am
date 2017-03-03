@@ -17,6 +17,11 @@
 ## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
+if %?INSTALL%
+if ! %?BASE%
+include inst-vars.am
+endif ! %?BASE%
+endif %?INSTALL%
 
 ## ------------ ##
 ## Installing.  ##
@@ -32,14 +37,12 @@ am__installdirs += "$(DESTDIR)$(%NDIR%dir)"
 install-%DIR%SCRIPTS: $(%DIR%_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	test -z "$(%NDIR%dir)" || $(mkdir_p) "$(DESTDIR)$(%NDIR%dir)"
-?!BASE?	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
+?!BASE?	@$(am__vpath_adj_setup) \
 ## Funny invocation because Makefile variable can be empty, leading to
 ## a syntax error in sh.
 ?!BASE?	list='$(%DIR%_SCRIPTS)'; for p in $$list; do \
 ?BASE?	@list='$(%DIR%_SCRIPTS)'; for p in $$list; do \
-?!BASE?	  case $$p in \
-?!BASE?	    $(srcdir)/*) p=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-?!BASE?	  esac; \
+?!BASE?	  $(am__vpath_adj) p=$$f; \
 ## A file can be in the source directory or the build directory.
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  if test -f $$d$$p; then \
@@ -66,12 +69,10 @@ if %?INSTALL%
 .PHONY uninstall-am: uninstall-%DIR%SCRIPTS
 uninstall-%DIR%SCRIPTS:
 	@$(NORMAL_UNINSTALL)
-?!BASE?	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
+?!BASE?	@$(am__vpath_adj_setup) \
 ?!BASE?	list='$(%DIR%_SCRIPTS)'; for p in $$list; do \
 ?BASE?	@list='$(%DIR%_SCRIPTS)'; for p in $$list; do \
-?!BASE?	  case $$p in \
-?!BASE?	    $(srcdir)/*) p=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-?!BASE?	  esac; \
+?!BASE?	  $(am__vpath_adj) p=$$f; \
 ## Remove any leading directory before applying $(transform).
 	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
 ## Prepend the directory part if nobase_ is used.

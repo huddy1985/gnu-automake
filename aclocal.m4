@@ -1,4 +1,4 @@
-# generated automatically by aclocal 1.8.5 -*- Autoconf -*-
+# generated automatically by aclocal 1.9 -*- Autoconf -*-
 
 # Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 # Free Software Foundation, Inc.
@@ -22,3 +22,4 @@ m4_include([m4/options.m4])
 m4_include([m4/runlog.m4])
 m4_include([m4/sanity.m4])
 m4_include([m4/strip.m4])
+m4_include([m4/tar.m4])

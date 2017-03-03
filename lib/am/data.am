@@ -17,6 +17,10 @@
 ## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 
+if %?INSTALL%
+include inst-vars.am
+endif %?INSTALL%
+
 ## ------------ ##
 ## Installing.  ##
 ## ------------ ##
@@ -30,7 +34,7 @@ am__installdirs += "$(DESTDIR)$(%NDIR%dir)"
 install-%DIR%%PRIMARY%: $(%DIR%_%PRIMARY%)
 	@$(NORMAL_INSTALL)
 	test -z "$(%NDIR%dir)" || $(mkdir_p) "$(DESTDIR)$(%NDIR%dir)"
-?!BASE?	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
+?!BASE?	@$(am__vpath_adj_setup) \
 ## Funny invocation because Makefile variable can be empty, leading to
 ## a syntax error in sh.
 ?!BASE?	list='$(%DIR%_%PRIMARY%)'; for p in $$list; do \
@@ -40,11 +44,8 @@ install-%DIR%%PRIMARY%: $(%DIR%_%PRIMARY%)
 ## If the _%PRIMARY% variable has an entry like foo/bar, install it as
 ## $(destdir)/bar, not $(destdir)/foo/bar.  The user can make a
 ## new dir variable or use a nobase_ target for the latter case.
-?BASE?	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-?!BASE?	  case $$p in \
-?!BASE?	    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-?!BASE?	    *) f=$$p;; \
-?!BASE?	  esac; \
+?BASE?	  f=$(am__strip_dir) \
+?!BASE?	  $(am__vpath_adj) \
 	  echo " $(%DIR%%PRIMARY%_INSTALL) '$$d$$p' '$(DESTDIR)$(%NDIR%dir)/$$f'"; \
 	  $(%DIR%%PRIMARY%_INSTALL) "$$d$$p" "$(DESTDIR)$(%NDIR%dir)/$$f"; \
 	done
@@ -59,14 +60,11 @@ if %?INSTALL%
 .PHONY uninstall-am: uninstall-%DIR%%PRIMARY%
 uninstall-%DIR%%PRIMARY%:
 	@$(NORMAL_UNINSTALL)
-?!BASE?	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
+?!BASE?	@$(am__vpath_adj_setup) \
 ?!BASE?	list='$(%DIR%_%PRIMARY%)'; for p in $$list; do \
 ?BASE?	@list='$(%DIR%_%PRIMARY%)'; for p in $$list; do \
-?BASE?	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-?!BASE?	  case $$p in \
-?!BASE?	    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-?!BASE?	    *) f=$$p;; \
-?!BASE?	  esac; \
+?BASE?	  f=$(am__strip_dir) \
+?!BASE?	  $(am__vpath_adj) \
 	  echo " rm -f '$(DESTDIR)$(%NDIR%dir)/$$f'"; \
 	  rm -f "$(DESTDIR)$(%NDIR%dir)/$$f"; \
 	done

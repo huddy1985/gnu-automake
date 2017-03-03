@@ -88,8 +88,7 @@ published by the Free Software Foundation raise funds for
 * Examples::                    Some example packages
 * Invoking Automake::           Creating a Makefile.in
 * configure::                   Scanning configure.ac or configure.in
-* Top level::                   The top-level Makefile.am
-* Alternative::                 An alternative approach to subdirectories
+* Directories::                 Declaring subdirectories
 * Programs::                    Building programs and libraries
 * Other objects::               Other derived objects
 * Other GNU Tools::             Other GNU Tools
@@ -153,6 +152,13 @@ Autoconf macros supplied with Automake
 * Public macros::               Macros that you can use.
 * Private macros::              Macros that you should not use.
 
+Directories
+
+* Subdirectories::              Building subdirectories recursively
+* Conditional Subdirectories::  Conditionally not building directories
+* Alternative::                 Subdirectories without recursion
+* Subpackages::                 Nesting packages
+
 Building Programs and Libraries
 
 * A Program::                   Building a program
@@ -167,6 +173,7 @@ Building Programs and Libraries
 * C++ Support::                 Compiling C++ sources
 * Assembly Support::            Compiling assembly sources
 * Fortran 77 Support::          Compiling Fortran 77 sources
+* Fortran 9x Support::          Compiling Fortran 9x sources
 * Java Support::                Compiling Java sources
 * Support for Other Languages::  Compiling other languages
 * ANSI::                        Automatic de-ANSI-fication
@@ -201,6 +208,10 @@ Fortran 77 Support
 Mixing Fortran 77 With C and C++
 
 * How the Linker is Chosen::    Automatic linker selection
+
+Fortran 9x Support
+
+* Compiling Fortran 9x Files::  Compiling Fortran 9x sources
 
 Other Derived Objects
 
@@ -1393,6 +1404,12 @@ languages that include Fortran 77 (@pxref{Mixing Fortran 77 With C and
 C++}).  @xref{Macros, , Autoconf macros supplied with Automake}.
 @cvindex AC_F77_LIBRARY_LDFLAGS
 
+@item AC_PROG_FC
+This is required if any Fortran 90/95 source is included.  This macro is
+distributed with Autoconf version 2.58 and later.  @xref{Particular
+Programs, , Particular Program Checks, autoconf, The Autoconf Manual}.
+@cvindex AC_PROG_FC
+
 @item AC_PROG_LIBTOOL
 Automake will turn on processing for @code{libtool} (@pxref{Top, ,
 Introduction, libtool, The Libtool Manual}).
@@ -1494,16 +1511,18 @@ file, including unused macro definitions as well as both @samp{#} and
 completely ignored by @command{aclocal}, use @samp{##} as the comment
 leader.
 
-When @command{aclocal} detects that the file containing the macro
-definition is in a subdirectory of your package, it will use
-@code{m4_include} instead of copying it; this makes the package
-smaller and eases dependency tracking.  This only works if the
-subdirectory containing the macro was specified as a relative search
-path with @command{aclocal}'s @code{-I} argument.  (@pxref{Local
-Macros} for an example.)  Any macro which is found in a system-wide
-directory, or via an absolute search path will be copied.
+When a file selected by @command{aclocal} is located in a subdirectory
+specified as a relative search path with @command{aclocal}'s @code{-I}
+argument, @command{aclocal} assumes the file belongs to the package
+and uses @code{m4_include} instead of copying it into
+@file{aclocal.m4}.  This makes the package smaller, eases dependency
+tracking, and cause the file to be distributed automatically.
+(@pxref{Local Macros} for an example.)  Any macro which is found in a
+system-wide directory, or via an absolute search path will be copied.
+So use @code{-I `pwd`/reldir} instead of @code{-I reldir} whenever
+some relative directory need to be considered outside the package.
 
-The contents of @file{acinclude.m4}, if it exists, are also
+The contents of @file{acinclude.m4}, if this file exists, are also
 automatically included in @file{aclocal.m4}.  We recommend against
 using @file{acinclude.m4} in new packages (@pxref{Local Macros}).
 
@@ -2125,9 +2144,30 @@ compatibility should be really easy provided all macros are properly
 written (@pxref{Extending aclocal}).
 
 
-@node Top level
-@chapter The top-level @file{Makefile.am}
 
+@node Directories
+@chapter Directories
+
+For simple projects that distributes all files in the same directory
+it is enough to have a single @file{Makefile.am} that builds
+everything in place.
+
+In larger projects it is common to organize files in different
+directories, in a tree.  For instance one directory per program, per
+library or per module.  The traditional approach is to build these
+subdirectory recursively: each directory contains its @file{Makefile}
+(generated from @file{Makefile.am}), and when @command{make} is run
+from the top level directory it enters each subdirectory in turn to
+build its contents.
+
+@menu
+* Subdirectories::              Building subdirectories recursively
+* Conditional Subdirectories::  Conditionally not building directories
+* Alternative::                 Subdirectories without recursion
+* Subpackages::                 Nesting packages
+@end menu
+
+@node Subdirectories
 @section Recursing subdirectories
 
 @cindex SUBDIRS, explained
@@ -2144,7 +2184,8 @@ both locally and in all specified subdirectories.  Note that the
 directories listed in @code{SUBDIRS} are not required to contain
 @file{Makefile.am}s; only @file{Makefile}s (after configuration).
 This allows inclusion of libraries from packages which do not use
-Automake (such as @code{gettext}).
+Automake (such as @code{gettext}; see also @ref{Third-Party
+Makefiles}).
 
 In packages that use subdirectories, the top-level @file{Makefile.am} is
 often very short.  For instance, here is the @file{Makefile.am} from the
@@ -2161,22 +2202,38 @@ of the @code{MAKE} variable.  It passes the value of the variable
 @file{Makefile.am} if there are flags you must always pass to
 @code{make}.
 @vindex MAKE
-@vindex MAKEFLAGS
+@vindex AM_MAKEFLAGS
 
-The directories mentioned in @code{SUBDIRS} must be direct children of
-the current directory.  For instance, you cannot put @samp{src/subdir}
-into @code{SUBDIRS}.  Instead you should put @code{SUBDIRS = subdir}
-into @file{src/Makefile.am}.  Automake can be used to construct packages
-of arbitrary depth this way.
+The directories mentioned in @code{SUBDIRS} are usually direct
+children of the current directory, each subdirectory containing its
+own @file{Makefile.am} with a @code{SUBDIRS} pointing to deeper
+subdirectories.  Automake can be used to construct packages of
+arbitrary depth this way.
 
 By default, Automake generates @file{Makefiles} which work depth-first
-(@samp{postfix}).  However, it is possible to change this ordering.
-You can do this by putting @samp{.} into @code{SUBDIRS}.  For
-instance, putting @samp{.}  first will cause a @samp{prefix} ordering
-of directories.  All @samp{clean} rules are run in reverse
-order of build rules.
+in postfix order: the subdirectories are built before the current
+directory.  However, it is possible to change this ordering.  You can
+do this by putting @samp{.} into @code{SUBDIRS}.  For instance,
+putting @samp{.}  first will cause a @samp{prefix} ordering of
+directories.
 
-@section Conditional subdirectories
+Using
+
+@example
+SUBDIRS = lib src . test
+@end example
+
+@noindent
+will cause @file{lib/} to be built before @file{src/}, then the
+current directory will be built, finally the @file{test/} directory
+will be built.  It is customary to arrange test directories to be
+built after everything else since they are meant to test what have
+been constructed.
+
+All @samp{clean} rules are run in reverse order of build rules.
+
+@node Conditional Subdirectories
+@section Conditional Subdirectories
 @cindex Subdirectories, building conditionally
 @cindex Conditional subdirectories
 @cindex @code{SUBDIRS}, conditional
@@ -2195,18 +2252,49 @@ built when the variable @code{$want_opt} was set to @code{yes}.)
 Running @code{make} should thus recurse into @file{src/} always, and
 then maybe in @file{opt/}.
 
-However @code{make dist} should always recurse into both @file{src/} and
-@file{opt/}.  Because @file{opt/} should be distributed even if it is
-not needed in the current configuration. This means @file{opt/Makefile}
-should be created unconditionally.  @footnote{Don't try seeking a
-solution where @file{opt/Makefile} is created conditionally, this is a
-lot trickier than the solutions presented here.}
+However @code{make dist} should always recurse into both @file{src/}
+and @file{opt/}.  Because @file{opt/} should be distributed even if it
+is not needed in the current configuration. This means
+@file{opt/Makefile} should be created @emph{unconditionally}.
 
 There are two ways to setup a project like this.  You can use Automake
 conditionals (@pxref{Conditionals}) or use Autoconf @code{AC_SUBST}
-variables (@pxref{Setting Output Variables, , Setting Output Variables,
-autoconf, The Autoconf Manual}).  Using Automake conditionals is the
-preferred solution.
+variables (@pxref{Setting Output Variables, , Setting Output
+Variables, autoconf, The Autoconf Manual}).  Using Automake
+conditionals is the preferred solution.  Before we illustrate these
+two possibility, let's introduce @code{DIST_SUBDIRS}.
+
+@subsection @code{SUBDIRS} vs. @code{DIST_SUBDIRS}
+@cindex @code{DIST_SUBDIRS}, explained
+
+Automake considers two sets of directories, defined by the variables
+@code{SUBDIRS} and @code{DIST_SUBDIRS}.
+
+@code{SUBDIRS} contains the subdirectories of the current directory
+that must be built (@pxref{Subdirectories}).  It must be defined
+manually; Automake will never guess a directory is to be built.  As we
+will see in the next two sections, it is possible to define it
+conditionally so that some directory will be omitted from the build.
+
+@code{DIST_SUBDIRS} is used in rules that need to recurse in all
+directories, even those which have been conditionally left out of the
+build.  Recall our example where we may not want to build subdirectory
+@file{opt/}, but yet we want to distribute it?  This is where
+@code{DIST_SUBDIRS} come into play: @code{opt} may not appear in
+@code{SUBDIRS}, but it must appear in @code{DIST_SUBDIRS}.
+
+Precisely, @code{DIST_SUBDIRS} is used by @code{make dist}, @code{make
+distclean}, and @code{make maintainer-clean}.  All other recursive
+rules use @code{SUBDIRS}.
+
+If @code{SUBDIRS} is defined conditionally using Automake
+conditionals, Automake will define @code{DIST_SUBDIRS} automatically
+from the possibles values of @code{SUBDIRS} in all conditions.
+
+If @code{SUBDIRS} contains @code{AC_SUBST} variables,
+@code{DIST_SUBDIRS} will not be defined correctly because Automake
+does not know the possible values of these variables.  In this case
+@code{DIST_SUBDIRS} needs to be defined manually.
 
 @subsection Conditional subdirectories with @code{AM_CONDITIONAL}
 @cindex @code{SUBDIRS} and @code{AM_CONDITIONAL}
@@ -2249,7 +2337,7 @@ In this case Automake will define @code{DIST_SUBDIRS = src opt}
 automatically because it knows that @code{MAYBE_OPT} can contain
 @code{opt} in some condition.
 
-@subsection Conditional subdirectories with @code{AC_SUBST}
+@subsection Conditional Subdirectories with @code{AC_SUBST}
 @cindex @code{SUBDIRS} and @code{AC_SUBST}
 @cindex @code{AC_SUBST} and @code{SUBDIRS}
 
@@ -2257,8 +2345,8 @@ automatically because it knows that @code{MAYBE_OPT} can contain
 @c     test/subdircond3.test
 @c Try to keep it in sync.
 
-Another idea is to define @code{MAYBE_OPT} from @file{./configure} using
-@code{AC_SUBST}:
+Another possibility is to define @code{MAYBE_OPT} from
+@file{./configure} using @code{AC_SUBST}:
 
 @example
 @dots{}
@@ -2283,32 +2371,63 @@ The drawback is that since Automake cannot guess what the possible
 values of @code{MAYBE_OPT} are, it is necessary to define
 @code{DIST_SUBDIRS}.
 
-@subsection How @code{DIST_SUBDIRS} is used
-@cindex @code{DIST_SUBDIRS}, explained
+@subsection Non-configured Subdirectories
 
-As shown in the above examples, @code{DIST_SUBDIRS} is used in rules
-that need to recurse in all directories, even those which have been
-conditionally left out of the build.
+The semantic of @code{DIST_SUBDIRS} is often misunderstood by some
+users that try to @emph{configure and build} subdirectories
+conditionally.  Here by configuring we mean creating the
+@file{Makefile} (it might also involve running a nested
+@command{configure} script: this is a costly operation that explains
+why people want to do it conditionally, but only the @file{Makefile}
+is relevant to the discussion).
 
-Precisely, @code{DIST_SUBDIRS} is used by @code{make dist}, @code{make
-distclean}, and @code{make maintainer-clean}.  All other recursive
-rules use @code{SUBDIRS}.
+The above examples all assume that every @file{Makefile} is created,
+even in directories that are not going to be built.  The simple reason
+is that we want @code{make dist} to distribute even the directories
+that are not being built (e.g. platform-dependent code), hence
+@file{make dist} must recurse into the subdirectory, hence this
+directory must be configured and appear in @code{DIST_SUBDIRS}.
 
-Automake will define @code{DIST_SUBDIRS} automatically from the
-possibles values of @code{SUBDIRS} in all conditions.
+Building packages that do not configure every subdirectory is a tricky
+business, and we do not recommend it to the novice as it is easy to
+produce an incomplete tarball by mistake.  We will not discuss this
+topic in depth here, yet for the adventurous there are a few rules to
+remember.
 
-If @code{SUBDIRS} contains @code{AC_SUBST} variables,
-@code{DIST_SUBDIRS} will not be defined correctly because Automake
-doesn't know the possible values of these variables.  In this case
-@code{DIST_SUBDIRS} needs to be defined manually.
+@cartouche
+@itemize
+@item @code{SUBDIRS} should always be a subset of @code{DIST_SUBDIRS}.
 
+It makes little sense to have a directory in @code{SUBDIRS} that
+is not in @code{DIST_SUBDIRS}.  Think of the former as a way to tell
+which directories listed in the latter should be built.
+@item Any directory listed in @code{DIST_SUBDIRS} and @code{SUBDIRS}
+must be configured.
+
+I.e., the @file{Makefile} must exists or the recursive @code{make}
+rules will not be able to process the directory.
+@item Any configured directory must be listed in @code{DIST_SUBDIRS}.
+
+So that the cleaning rule remove the generated @file{Makefile}s.
+It would be correct to see @code{DIST_SUBDIRS} as a variable that
+lists all the directories that have been configured.
+@end itemize
+@end cartouche
+
+In order to prevent recursion in some non-configured directory you
+must therefore ensure that this directory do not appear in
+@code{DIST_SUBDIRS} (and @code{SUBDIRS}).  For instance if you define
+@code{SUBDIRS} conditionally using @code{AC_SUBST} and do not define
+@code{DIST_SUBDIRS} explicitly, it will be default to
+@code{$(SUBDIRS)}; another possibility is to force @code{DIST_SUBDIRS
+= $(SUBDIRS)}.
 
 @node Alternative
-@chapter An Alternative Approach to Subdirectories
+@section An Alternative Approach to Subdirectories
 
 If you've ever read Peter Miller's excellent paper,
 @uref{http://www.pcug.org.au/~millerp/rmch/recu-make-cons-harm.html,
-Recursive Make Considered Harmful}, the preceding section on the use of
+Recursive Make Considered Harmful}, the preceding sections on the use of
 subdirectories will probably come as unwelcome advice.  For those who
 haven't read the paper, Miller's main thesis is that recursive
 @code{make} invocations are both slow and error-prone.
@@ -2352,6 +2471,110 @@ either @samp{dist_} or @samp{nodist_} (@pxref{Dist}).  For instance:
 nobase_dist_pkgdata_DATA = images/vortex.pgm
 @end example
 
+
+@node Subpackages
+@section Nesting Packages
+@cindex Nesting packages
+@cindex Subpackages
+@cvindex AC_CONFIG_SUBDIRS
+@cvindex AC_CONFIG_AUX_DIR
+
+
+In the GNU Build System, packages can be nested to arbitrary depth.
+This means that a package can embedded other packages with their own
+@file{configure}, @file{Makefile}s, etc.
+
+These other packages should just appear as subdirectories of their
+parent package.  They must be listed in @code{SUBDIRS} like other
+ordinary directories.  However the subpackage's @file{Makefile}s
+should be output by its own @file{configure} script, not by the
+parent's @file{configure}.  This is achieved using the
+@code{AC_CONFIG_SUBDIRS} Autoconf macro (@pxref{Subdirectories,
+AC_CONFIG_SUBDIRS, Configuring Other Packages in Subdirectories,
+autoconf, The Autoconf Manual}).
+
+Here is an example package for an @code{arm} program that links with
+an @code{hand} library that is a nested package in subdirectory
+@file{hand/}.
+
+@code{arm}'s @file{configure.ac}:
+
+@example
+AC_INIT([arm], [1.0])
+AC_CONFIG_AUX_DIR([.])
+AM_INIT_AUTOMAKE
+AC_PROG_CC
+AC_CONFIG_FILES([Makefile])
+# Call hand's ./configure script recursively.
+AC_CONFIG_SUBDIRS([hand])
+AC_OUTPUT
+@end example
+
+@code{arm}'s @file{Makefile.am}:
+
+@example
+# Build the library in the hand subdirectory first.
+SUBDIRS = hand
+
+# Include hand's header when compiling this directory.
+AM_CPPFLAGS = -I$(srcdir)/hand
+
+bin_PROGRAMS = arm
+arm_SOURCES = arm.c
+# link with the hand library.
+arm_LDADD = hand/libhand.a
+@end example
+
+Now here is @code{hand}'s @file{hand/configure.ac}:
+
+@example
+AC_INIT([hand], [1.2])
+AC_CONFIG_AUX_DIR([.])
+AM_INIT_AUTOMAKE
+AC_PROG_CC
+AC_PROG_RANLIB
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
+@end example
+
+@noindent
+and its @file{hand/Makefile.am}:
+
+@example
+lib_LIBRARIES = libhand.a
+libhand_a_SOURCES = hand.c
+@end example
+
+When @code{make dist} is run from the top-level directory it will
+create an archive @file{arm-1.0.tar.gz} that contains the @code{arm}
+code as well as the @file{hand} subdirectory.  This package can be
+built and installed like any ordinary package, with the usual
+@code{./configure && make && make install} sequence (the @code{hand}
+subpackage will be built and installed by the process).
+
+When @code{make dist} is run from the hand directory, it will create a
+self-contained @file{hand-1.2.tar.gz} archive.  So although it appears
+to be embedded in another package, it can still be used separately.
+
+The purpose of the @code{AC_CONFIG_AUX_DIR([.])} instruction is to
+force Automake and Autoconf into search auxiliary script in the
+current directory.  For instance this means that there will be two
+copies of @file{install-sh}: one in the top-level of the @code{arm}
+package, and another one in the @file{hand/} subdirectory for the
+@code{hand} package.
+
+The historical default is to search these auxiliary scripts in the
+immediate parent and grand-parent directories.  So if the
+@code{AC_CONFIG_AUX_DIR([.])} line was removed from
+@file{hand/configure.ac}, that subpackage would share the auxiliary
+script of the @code{arm} package.  This may looks like a gain in size
+(a few kilobytes), but it is actually a loss of modularity as the
+@code{hand} subpackage is no longer self-contained (@code{make dist}
+in the subdirectory will not work anymore).
+
+Packages that do not use Automake need more work to be integrated this
+way.  @xref{Third-Party Makefiles}.
+
 @node Programs
 @chapter Building Programs and Libraries
 
@@ -2371,6 +2594,7 @@ to build programs and libraries.
 * C++ Support::                 Compiling C++ sources
 * Assembly Support::            Compiling assembly sources
 * Fortran 77 Support::          Compiling Fortran 77 sources
+* Fortran 9x Support::          Compiling Fortran 9x sources
 * Java Support::                Compiling Java sources
 * Support for Other Languages::  Compiling other languages
 * ANSI::                        Automatic de-ANSI-fication
@@ -2994,7 +3218,7 @@ indicated to libtool by passing @code{-module} at link-time.
 @example
 pkglib_LTLIBRARIES = mymodule.la
 mymodule_la_SOURCES = doit.c
-mymodule_LDFLAGS = -module
+mymodule_la_LDFLAGS = -module
 @end example
 
 Ordinarily, Automake requires that a Library's name starts with
@@ -3910,6 +4134,62 @@ included by the C++ linker, then they must be manually added to an
                         +---------+---------+---------+
 @end example
 
+@node Fortran 9x Support
+@comment  node-name,  next,  previous,  up
+@section Fortran 9x Support
+
+@cindex Fortran 9x support
+@cindex Support for Fortran 9x
+
+Automake includes full support for Fortran 9x.
+
+Any package including Fortran 9x code must define the output variable
+@samp{FC} in @file{configure.ac}; the simplest way to do this is to use
+the @code{AC_PROG_FC} macro (@pxref{Particular Programs, , Particular
+Program Checks, autoconf, The Autoconf Manual}).
+
+A few additional variables are defined when a Fortran 9x source file is
+seen:
+
+@vtable @code
+
+@item FC
+The name of the Fortran 9x compiler.
+
+@item FCFLAGS
+Any flags to pass to the Fortran 9x compiler.
+
+@item AM_FCFLAGS
+The maintainer's variant of @code{FCFLAGS}.
+
+@item FCCOMPILE
+The command used to actually compile a Fortran 9x source file.  The file
+name is appended to form the complete command line.
+
+@item FCLINK
+The command used to actually link a pure Fortran 9x program or shared
+library.
+
+@end vtable
+
+@menu
+* Compiling Fortran 9x Files::  Compiling Fortran 9x sources
+@end menu
+
+@node Compiling Fortran 9x Files
+@comment  node-name,  next,  previous,  up
+@subsection Compiling Fortran 9x Files
+
+@file{N.o} is made automatically from @file{N.f90} or @file{N.f95}
+by running the Fortran 9x compiler.  The precise command used
+is as follows:
+
+@table @file
+
+@item .f9x
+@code{$(FC) -c $(AM_FCFLAGS) $(FCFLAGS)}
+
+@end table
 
 @node Java Support
 @comment  node-name,  next,  previous,  up
@@ -3954,8 +4234,9 @@ the @code{_LDFLAGS} variable for the program.
 @section Support for Other Languages
 
 Automake currently only includes full support for C, C++ (@pxref{C++
-Support}), Fortran 77 (@pxref{Fortran 77 Support}), and Java
-(@pxref{Java Support}).  There is only rudimentary support for other
+Support}), Fortran 77 (@pxref{Fortran 77 Support}),
+Fortran 9x (@pxref{Fortran 9x Support}),
+and Java (@pxref{Java Support}).  There is only rudimentary support for other
 languages, support for which will be improved based on user demand.
 
 Some limited support for adding your own languages is available via the
@@ -4417,6 +4698,14 @@ foo.c:2: bindir.h: No such file or directory
 make: *** [foo.o] Error 1
 @end example
 
+In this example @file{bindir.h} is not distributed, not installed, and
+it is not even being built on-time.  One may wonder what the
+@code{nodist_foo_SOURCES = bindir.h} line has any use at all.  This
+line simply states that @file{bindir.h} is a source of @code{foo}, so
+for instance it should be inspected while generating tags
+(@pxref{Tags}).  In other words, it does not help our present problem,
+and the build would fail identically without it.
+
 @unnumberedsubsec Using @code{BUILT_SOURCES}
 
 A solution is to require @file{bindir.h} to be built before anything
@@ -4425,6 +4714,7 @@ else.  This is what @code{BUILT_SOURCES} is meant for (@pxref{Sources}).
 @example
 bin_PROGRAMS = foo
 foo_SOURCES = foo.c
+nodist_foo_SOURCES = bindir.h
 BUILT_SOURCES = bindir.h
 CLEANFILES = bindir.h
 bindir.h: Makefile
@@ -4476,6 +4766,7 @@ the @file{Makefile.am}.
 @example
 bin_PROGRAMS = foo
 foo_SOURCES = foo.c
+nodist_foo_SOURCES = bindir.h
 foo.$(OBJEXT): bindir.h
 CLEANFILES = bindir.h
 bindir.h: Makefile
@@ -5177,10 +5468,13 @@ path is prefixed with the value of @samp{DESTDIR} before being copied
 into the install area.  Here is an example of typical DESTDIR usage:
 
 @example
+mkdir /tmp/staging &&
 make DESTDIR=/tmp/staging install
 @end example
 
-This places install objects in a directory tree built under
+The @command{mkdir} command avoids a security problem if the attacker
+creates a symbolic link from @file{/tmp/staging} to a victim area;
+then @command{make} places install objects in a directory tree built under
 @file{/tmp/staging}.  If @file{/gnu/bin/foo} and
 @file{/gnu/share/aclocal/foo.m4} are to be installed, the above command
 would install @file{/tmp/staging/gnu/bin/foo} and
@@ -5306,11 +5600,12 @@ this feature.
 
 If you define @code{SUBDIRS}, Automake will recursively include the
 subdirectories in the distribution.  If @code{SUBDIRS} is defined
-conditionally (@pxref{Conditionals}), Automake will normally include all
-directories that could possibly appear in @code{SUBDIRS} in the
+conditionally (@pxref{Conditionals}), Automake will normally include
+all directories that could possibly appear in @code{SUBDIRS} in the
 distribution.  If you need to specify the set of directories
-conditionally, you can set the variable @code{DIST_SUBDIRS} to the exact
-list of subdirectories to include in the distribution (@pxref{Top level}).
+conditionally, you can set the variable @code{DIST_SUBDIRS} to the
+exact list of subdirectories to include in the distribution
+(@pxref{Conditional Subdirectories}).
 @vindex DIST_SUBDIRS
 
 
@@ -5372,18 +5667,19 @@ will copy files from the current directory before creating the
 tarball.  If you are at the top-level directory, then @code{distdir =
 $(PACKAGE)-$(VERSION)}.  When used from subdirectory named
 @file{foo/}, then @code{distdir = ../$(PACKAGE)-$(VERSION)/foo}.
+@code{$(distdir)} can be a relative or absolute path, do not assume
+any form.
 
 @code{$(top_distdir)} always points to the root directory of the
 distributed tree.  At the top-level it's equal to @code{$(distdir)}.
 In the @file{foo/} subdirectory
 @code{top_distdir = ../$(PACKAGE)-$(VERSION)}.
+@code{$(top_distdir)} too can be a relative or absolute path.
 
 Note that when packages are nested using @code{AC_CONFIG_SUBDIRS}
-(@pxref{Subdirectories, AC_CONFIG_SUBDIRS, Configuring Other Packages
-in Subdirectories, autoconf, The Autoconf Manual}), then
-@code{$(distdir)} and @code{$(top_distdir)} are relative to the
-package where @code{make dist} was run, not to any sub-packages
-involved.
+(@pxref{Subpackages}), then @code{$(distdir)} and
+@code{$(top_distdir)} are relative to the package where @code{make
+dist} was run, not to any sub-packages involved.
 
 @section Checking the distribution
 
@@ -5770,6 +6066,16 @@ Hook @code{dist-zip} to @code{dist}.
 Hook @code{dist-tarZ} to @code{dist}.
 @trindex dist-tarZ
 
+@item @code{filename-length-max=99}
+@cindex Option, filename-length-max=99
+@trindex filename-length-max=99
+Abort if filenames longer than 99 characters are found during
+@code{make dist}.  Such long filenames are generally considered not to
+be portable in tarballs.  See the @code{tar-v7} and @code{tar-ustar}
+options below.  This option should be used in the top-level
+@file{Makefile.am} or as an argument of @code{AM_INIT_AUTOMAKE} in
+@file{configure.ac}, it will be ignored otherwise.
+
 @item @code{no-define}
 @cindex Option, no-define
 This options is meaningful only when passed as an argument to
@@ -5874,6 +6180,64 @@ the source file.  For instance if the source file is
 @file{subdir/file.cxx}, then the output file would be
 @file{subdir/file.o}.
 
+@item @code{tar-v7}
+@itemx @code{tar-ustar}
+@itemx @code{tar-pax}
+@cindex Option, tar-v7
+@cindex Option, tar-ustar
+@cindex Option, tar-pax
+@cindex tar formats
+@cindex v7 tar format
+@cindex ustar format
+@cindex pax format
+@trindex tar-v7
+@trindex tar-ustar
+@trindex tar-pax
+
+These three mutually exclusive options select the tar format to use
+when generating tarballs with @code{make dist}.  (The tar file created
+is then compressed according to the set of @code{no-dist-gzip},
+@code{dist-bzip2} and @code{dist-tarZ} options in use.)
+
+These options must be passed as argument to @code{AM_INIT_AUTOMAKE}
+(@pxref{Macros}) because they can causes new configure check to be
+performed.  Automake will complain if it sees such option in a
+@code{AUTOMAKE_OPTIONS} variable.
+
+@code{tar-v7} selects the old V7 tar format.  This is the historical
+default.  This antiquated format is understood by all tar
+implementations and supports filenames with up to 99 characters. When
+given longer filenames some tar implementations will diagnose the
+problem while other will generate broken tarballs or use non-portable
+extensions.  Furthermore, the V7 format cannot store empty
+directories.  When using this format, consider using the
+@code{filename-length-max=99} option to catch filenames too long.
+
+@code{tar-ustar} selects the ustar format defined by POSIX
+1003.1-1988.  This format is believed to be old enough to be portable.
+It fully supports empty directories.  It can stores filenames with up
+to 256 characters, provided that the filename can be split at
+directory separator in two parts, first of them being at most 155
+bytes long. So, in most cases the maximum file name length will be
+shorter than 256 characters.  However you may run against broken tar
+implementations that incorrectly handle filenames longer than 99
+characters (please report them to @email{bug-automake@@gnu.org} so we
+can document this accurately).
+
+@code{tar-pax} selects the new pax interchange format defined by POSIX
+1003.1-2001.  It does not limit the length of filenames.  However,
+this format is very young and should probably be restricted to
+packages which target only very modern platforms.  There are moves to
+change the pax format in an upward-compatible way, so this option may
+refer to a more recent version in the future.
+
+@xref{Formats, , Controlling the Archive Format, tar, GNU Tar}, for
+further discussion about tar formats.
+
+@code{configure} knows several ways to construct these formats.  It
+will not abort if it cannot find a tool up to the task (so that the
+package can still be built), but @code{make dist} will fail.
+
 @item @var{version}
 @cindex Option, version
 A version number (e.g. @samp{0.30}) can be specified.  If Automake is not
@@ -5917,9 +6281,14 @@ There are a few rules and variables that didn't fit anywhere else.
 Automake will generate rules to generate @file{TAGS} files for use with
 GNU Emacs under some circumstances.
 
+@trindex tags
 If any C, C++ or Fortran 77 source code or headers are present, then
 @code{tags} and @code{TAGS} rules will be generated for the directory.
-@trindex tags
+All files listed using the @code{_SOURCES}, @code{_HEADERS}, and
+@code{_LISP} primaries will be used to generate tags.  Note that
+generated source files that are not distributed must be declared in
+variables like @code{nodist_noinst_HEADERS} or
+@code{nodist_@var{prog}_SOURCES} or they will be ignored.
 
 At the topmost directory of a multi-directory package, a @code{tags}
 rule will be output which, when run, will generate a @file{TAGS} file
@@ -6520,7 +6889,8 @@ implement all these targets.  That way they can be added to
 
 Directories which are only listed in @code{DIST_SUBDIRS} but not in
 @code{SUBDIRS} need only the @code{distclean},
-@code{maintainer-clean}, and @code{distdir} rules (@pxref{Top level}).
+@code{maintainer-clean}, and @code{distdir} rules (@pxref{Conditional
+Subdirectories}).
 
 Usually, many of these rules are irrelevant to the third-party
 subproject, but they are required for the whole package to work.  It's
@@ -7584,4 +7954,4 @@ portable, but they can be convenient in packages that assume GNU
 @c  LocalWords:  LTLIBOBJ Libtool's libtool's libltdl dlopening itutions libbar
 @c  LocalWords:  WANTEDLIBS libhello sublibraries libtop libsub dlopened Ratfor
 @c  LocalWords:  mymodule timestamps timestamp underquoted MAKEINFOHTMLFLAGS
-@c  LocalWords:  GNUmakefile buildir
+@c  LocalWords:  GNUmakefile buildir Subpackages subpackage's subpackages

@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2003  Free Software Foundation, Inc.
+# Copyright (C) 2003, 2004  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -45,6 +45,7 @@ $AUTOCONF
 AUTOMAKE_fails
 grep ':1:.*whitespace' stderr
 grep ':5:.*whitespace' stderr
+$AUTOMAKE -Wno-error
 ./configure
 # Older versions of Automake used to produce invalid Makefiles such input.
 $MAKE ok

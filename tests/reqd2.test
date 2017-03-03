@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2002, 2003  Free Software Foundation, Inc.
+# Copyright (C) 2002, 2003, 2004  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -27,8 +27,11 @@ required='libtoolize'
 
 set -e
 
-cat >>configure.in <<'END'
+cat > configure.in << 'END'
+AC_INIT([req2], [1.0])
 AC_CONFIG_AUX_DIR([autoconf])
+AM_INIT_AUTOMAKE
+AC_CONFIG_FILES([Makefile])
 AC_PROG_CC
 AM_PROG_LIBTOOL
 AC_CONFIG_FILES([autoconf/Makefile main/Makefile])
@@ -54,9 +57,3 @@ test -f autoconf/ltmain.sh # Sanity check.
 rm -f autoconf/ltmain.sh
 AUTOMAKE_fails --add-missing --copy
 grep 'autoconf/ltmain.sh' stderr
-grep 'running more than two' stderr && exit 1
-
-# Since we are ensuring that 'running more than two' is not printed,
-# also ensure that it can be printed.  This way if someone changes the
-# wording of this message (s)he will remember to adjust this test.
-grep 'running more than two' ../../automake

@@ -1,3 +1,99 @@
+New in 1.9:
+
+* Makefile.in bloat reduction:
+
+  - Inference rules are used to compile sources in subdirectories when
+    the `subdir-objects' option is used and no per-target flags are
+    used.  This should reduce the size of some projects a lot, because
+    Automake used to output an explicit rule for each such object in
+    the past.
+
+  - Automake no longer outputs three rules (.o, .obj, .lo) for each
+    object that must be built with explicit rules.  It just outputs
+    the rules required to build the kind of object considered: either
+    the two .o and .obj rules for usual objects, or the .lo rule for
+    libtool objects.
+
+* Change to Libtool support:
+
+  - Libtool tags are used with libtool versions that support them.
+    (I.e., with Libtool 1.5 or greater.)
+
+  - Automake is now able to handle setups where a libtool library is
+    conditionally installed in different directories, as in
+
+      if COND
+        lib_LTLIBRARIES = liba.la
+      else
+        pkglib_LTLIBRARIES = liba.la
+      endif
+      liba_la_SOURCES = ...
+
+* Changes to aclocal:
+
+  - aclocal now ensures that AC_DEFUNs and AU_DEFUNs it discovers are
+    really evaluated, before it decides to include them in aclocal.m4.
+    This solves nasty problems with conditional redefinitions of
+    Autoconf macros in /usr/share/aclocal/*.m4 files causing extraneous
+    *.m4 files to be included in any project using these macros.
+    (Calls to AC_PROG_EGREP causing libtool.m4 to be included is the
+    most famous instance of this bug.)
+
+  - Do not complain about missing conditionally AC_REQUIREd macros
+    that are not actually used.  In 1.8.x aclocal would correctly
+    determine which of these macros were really needed (and include
+    only these in the package); unfortunately it would also require
+    all of them to be present in order to run.  This created
+    situations were aclocal would not work on a tarball distributing
+    all the macros it uses.  For instance running aclocal on a project
+    containing only the subset of the Gettext macros in use by the
+    project did not work, because gettext conditionally requires other
+    macros.
+
+* Portability improvements:
+
+  - Tar format can be chosen with the new options tar-v7, tar-ustar, and
+    tar-pax.  The new option filename-length-max=99 helps diagnosing
+    filenames that are too long for tar-v7.  (PR/414)
+
+  - Variables aumented with `+=' are now automatically flattened (i.e.,
+    trailing backslashes removed) and then wrapped around 80 colummns
+    (adding trailing backslashes).  In previous versions, a long series
+    of
+      VAR += value1
+      VAR += value2
+      VAR += value3
+      ...
+    would result in a single-line definition of VAR that could possibly
+    exceed the maximum line length of some make implementations.
+
+    Non-augmented variables are still output as they are defined in
+    the Makefile.am.
+
+* Miscellaneous:
+
+  - Support Fortran 90/95 with the new "fc" and "ppfc" languages.
+    Works the same as the old Fortran 77 implementation; just replace
+    F77 with FC everywhere (exception: FFLAGS becomes FCFLAGS).
+    Requires a version of autoconf which provides AC_PROG_FC (>=2.59).
+
+  - Support for conditional _LISP.
+
+  - Support for conditional -hook and -local rules (PR/428).
+
+  - Diagnose AC_CONFIG_AUX_DIR calls following AM_INIT_AUTOMAKE. (PR/49)
+
+  - Automake will not write any Makefile.ins after the first error it
+    encounters.  The previous Makefile.ins (if any) will be left in
+    place.  (Warnings will not prevent output, but remember they can
+    be turned into errors with -Werror.)
+
+  - The restriction that SUBDIRS must contain direct children is gone.
+    Do not abuse.
+
+  - The manual tells more about SUBDIRS vs. DIST_SUBDIRS.
+    It also gives an example of nested packages using AC_CONFIG_SUBDIRS.
+
 Bugs fixed in 1.8.5:
 
 * Long standing bugs:

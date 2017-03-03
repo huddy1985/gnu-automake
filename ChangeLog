@@ -1,6 +1,255 @@
-2004-05-16  Alexandre Duret-Lutz  <adl@gnu.org>
+2004-07-28  Alexandre Duret-Lutz  <adl@gnu.org>
 
-	* configure.ac, NEWS: Bump version to 1.8.5.
+	* configure.ac, NEWS: Bump version to 1.9.
+
+	* automake.in (generate_makefile): Update misleading comment about
+	libtool scripts.
+
+	* lib/texinfo.tex: New upstream version.
+
+2004-07-25  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* m4/mkdirp.m4 (AM_PROG_MKDIR_P): Remove `.' from the mkdir_p
+	definition, it causes `make install' to fails for user with no
+	right to write in the source-tree.
+	* automake.in (handle_configure): Do not use mkdir_p in the
+	definition for $(mkdir_p).
+	Report from Harlan Stenn.
+
+	* lib/am/texi-vers.am (%STAMPVTI%): Typo in comment.
+
+2004-07-22  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (Libtool Modules): Typo in example.
+	Report from Ulrich Eckhardt.
+
+2004-07-21  Andreas Schwab  <schwab@suse.de>  (tiny change)
+
+	* automake.in (check_directory): Quote $dir in regexp.
+
+2004-07-17  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.ac, NEWS: Bump version to 1.8e.
+
+	* configure.ac, NEWS: Bump version to 1.8d.
+
+	* lib/config-ml.in, lib/config.sub, lib/config.guess, lib/texinfo.tex:
+	New upstream versions.
+
+	* lib/am/texibuild.am (?GENERIC?%SOURCE_SUFFIX%.html,
+	?!GENERIC?%DEST_PREFIX%.html): Use $(X), not ${X}.
+
+	* tests/installdir.test: installdirs-local should appear three times,
+	since the change from 2004-07-11 will make it PHONY.
+
+	* lib/am/distdir.am (distdir): Always use $(DIST_SUBDIRS) now
+	that it is always defined.  This is less confusing for users
+	reading the generated Makefiles.
+	* automake.in (handle_dist): Do not substitute DIST_SUBDIR_NAME.
+
+	* lib/am/texibuild.am (?GENERIC?%SOURCE_SUFFIX%.html,
+	?!GENERIC?%DEST_PREFIX%.html): Output .htp, and then rename to .html
+	on success.  In case the target is a directory, this ensures its
+	time stamp is updated and the no files are left over inside.
+	* tests/txinfo21.test: Augment to test missing timestamp update
+	reported by Akim Demaille.
+
+	* doc/automake.texi (Top level): Rename as ...
+	(Directories): ... this, and split into ...
+	(Subdirectories, Conditional Subdirectories): ... these.
+	(Subdirectories): Illustrate the use of `.'.
+	(Conditional Subdirectories): Describe SUBDIRS and DIST_SUBDIRS
+	before the example.  Append a discussion about non-configured
+	conditional directories.
+	(Alternative): Move as a child of Directories.
+	(Subpackages): New section.
+	(Dist): Adjust links to Subdirectories, a Subpackages.
+	(Third-Party Makefiles): Link to Conditional Subdirectories.
+
+2004-07-14  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (target_hook): Accept %transform as last argument.
+	(handle_single_transform): Pass %transform to target_hook.
+	(handle_source_transform): Define DIST_SOURCE to tell whether
+	a the source of a file is distributed or not.
+	(lang_yacc_target_hook): Check DIST_SOURCE, and do not distribute
+	the generated header if the .y source is not distributed.
+	* tests/pr204.test: Use AM_YFLAGS = -d and make sure generated
+	headers are not distributed.
+
+2004-07-12  Simon Josefsson  <jas@extundo.com>  (tiny change)
+
+	* doc/automake.texi (Options): Improve ustar file name length
+	discussion.  Reference tar manual.
+
+2004-07-12  Ray Simard  <rhs.techlists@sylvan-glade.com>  (tiny change)
+
+	* lib/Automake/Variable.pm (define): Fix precondition check.
+
+2004-07-11  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	For PR automake/428:
+	Support for conditionally defined -hook and -local rules.
+	* automake.in (user_phony_rule): New function.
+	(handle_dist, handle_install, handle_all, do_check_merge_target,
+	handle_factored_dependencies): Use user_phony_rule before
+	adding a user -hook or -local rule as a dependency to ensure
+	it is always defined an phony.
+	* tests/cond37.test, tests/condhook.test: New files.
+	* tests/Makefile.am (TESTS): Add them.
+	Report from Simon Josefsson and Nik A. Melchior.
+
+2004-07-05  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* doc/automake.texi (Install): Warn that you should create
+	/tmp/staging before installing into it, to avoid security problems.
+	* lib/install-sh: Remove support for -b= and -t= options; this
+	has been moribund for a decade.
+	Add support for -t and -T options (new in coreutils install).
+	-c option now does nothing (the default is to copy), for
+	compatibility with BSD and coreutils 'install'.
+	Fix usage message; it referred to nonexistent variables.
+	Don't assume 'lasterr' is unset in environment.
+	* tests/instsh2.test: Don't assume that install-sh without -c
+	moves (it now copies).  Add tests for new -t and -T options.
+
+2004-06-16  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	For Debian Bug#254372:
+	* doc/automake.texi (Invoking aclocal): Rewrite the paragraph
+	explaining m4_include is used for relative files.
+
+2004-06-10  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	For Debian Bug #251820:
+	* aclocal.in (scan_file): Keep track of the location where each
+	file is included, and display it when reporting a missing file.
+	Pass this location to scan_file as a second argument.
+	(scan_m4_files): Adjust calls to scan_file.
+	* tests/acloca14.test: Add a test for this diagnostic.
+
+2004-06-07  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* m4/tar.m4 (_AM_PROG_TAR): Split the definition of $_am_tools
+	so it works with Solaris and Tru64 /bin/sh.
+	Report from Nicolas Joly.
+
+2004-06-06  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* m4/tar.m4 (_AM_PROG_TAR): Introduce $_am_tools to work around a
+	bug in NetBSD /bin/sh.
+	Report from Nicolas Joly.
+
+2004-06-03  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/defs.in (required=icc): Use `-V -help' instead of
+	`-V -dryrun'.  icc 8.0 fails on the latter.
+	* tests/depcomp5.test: Require depmode=icc for icc 7.x, and
+	depmod=gcc otherwise.
+	Report from Ralf Wildenhues.
+
+	* lib/am/clean.am (distclean-generic): Do no
+	`rm -f $(CONFIG_CLEAN_FILES)' if `$(CONFIG_CLEAN_FILES)' is empty.
+	Report from Nicolas Joly.
+
+2004-05-31  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* NEWS: Make clearer that we do not output partial Makefile.ins on
+	error.
+	Suggested by Akim Demaille.
+
+	* lib/depcomp (tru64) [libtool]: Use $dir$base.o.d instead
+	of $dir.libs/$base.o.d.  Libtool 1.5 causes both to be output,
+	and we will clean the second automatically during distclean.
+	Using the latter and leaving the former as we did before cause
+	"files left in build directory" failures during distcheck.
+	Suggested by Nicolas Joly.
+
+	* doc/automake.texi (Built sources example): Explain what
+	nodist_foo_SOURCES is (not) useful to, and use it in all the
+	examples.
+	(Tags): Mention nodist_noinst_HEADERS and nodist_prog_SOURCES.
+	Suggested by Akim Demaille.
+
+2004-05-23  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.ac, NEWS: Bump version to 1.8c.
+
+	* configure.ac, NEWS: Bump version to 1.8b.
+
+	* m4/tar.m4 (_AM_PROG_TAR) <cpio>: Specify -o and -i option first,
+	by POSIX; and use option -d in am_untar.
+
+	* tests/defs.in (PATH): Export it.
+
+	* lib/am/multilib.am: Add $(MAKE) comments to multido and
+	multiclean lines, to enable parallel make.  Based on a patch
+	by Alexandre Oliva applied to newlib on 2003-10-15.
+
+2004-05-22  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (scan_autoconf_traces): Trace for LT_SUPPORTED_TAG
+	instead of AC_LIBTOOL_TAGS, since that how CVS Libtool has been
+	changed.
+	* tests/libtool3.test: Do not grep for --tag=CC, since CVS
+	Libtool (unlike Libtool 1.5) does not has any CC tag.
+
+	* tests/tar2.test: Skip the test if no pax archiver were found.
+
+	* NEWS: Sync with branch-1-8, and reorganize current entry.
+
+	* automake.in (handle_libraries): Make the diagnostic about
+	non standard libraries a warning in foreign packages.  This
+	is already the case in handle_ltlibraries.
+	(handle_libraries, handle_ltlibraries): Suggest a standard
+	library name in the diagnostic, to help newcomers.
+	* tests/stdlib.test, tests/stdlib2.test: Check for these
+	suggestions.
+
+	Check directory names for unportable names.  Shaking the code
+	to check this also led to the removal of the no-"/"-in-SUBDIRS
+	restriction, and a fix to _do_recursive_traversal.
+
+	* automake.in (check_directory): New function extracted from
+	handle_subdirs, and augmented to check for reserved W32/DOS name.
+	(check_directories_in_var): New function.
+	(handle_subdirs): Call check_directories_in_var.  Doing so also
+	suppress the restriction that SUBDIRS should not contain slashes.
+	(scan_autoconf_traces) <AC_CONFIG_AUX_DIR>: Call check_directory
+	to ensure the argument exists and is safe.
+	* doc/automake.texi (Top level): Do not say that src/subdir
+	cannot be put in SUBDIRS.
+	(Dist): Mention that distdir and top_distdir can be absolute.
+	* lib/Automake/Variable.pm (_do_recursive_traversal) Support
+	undefined $fun_collect, and fix two bugs introduced with
+	skip_ac_subst on 2004-03-07.
+	* lib/am/distdir.am (distdir): Use absolute distdir and
+	top_distdir when recursing, because we can no longer prepend only
+	`..' in case of SUBDIRS with `/'.
+	* tests/auxdir4.test, tests/subdir9.test: New files.
+	* tests/Makefile.am (TESTS): Add auxdir4.test.
+	* tests/cond2.test, tests/subdir7.test: Augment to check location
+	in diagnostics.
+
+2004-05-21  Eric Blake  <ebb9@byu.net>  (tiny changes)
+
+	* tests/txinfo22.test (AC_CONFIG_AUX_DIR): Use aux1, not aux, for
+	cygwin compatibility.
+	* tests/yacc6.test (AC_CONFIG_AUX_DIR): Likewise.
+
+	* tests/conflnk3.test: Isolate checking for working `test -e' into
+	a subshell, to skip this test on broken /bin/sh of solaris.
+
+2004-05-17  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* m4/cond.m4 (AM_CONDITIONAL): Double-quote diagnostic.
+	* tests/condd.test: Define a macro with the same name as a
+	conditional.
+	* tests/pr220.test: Modernize, and make sure the diagnostics
+	contains the macro name.
+	Report from Volker Boerchers.
+
+2004-05-16  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* lib/texinfo.tex: New upstream version.
 
@@ -11,6 +260,24 @@
 	* tests/clean2.test: New file.
 	* tests/Makefile.am (TESTS): Add clean2.test.
 	Report from Daniel Jacobowitz.
+
+	* aclocal.in (add_macro): Do not error out on undefined required
+	macros.  We are not sure they are really used, and Autoconf
+	already diagnoses them.
+	(scan_configure_dep): Diagnose missing AM_ macros as warnings rather
+	than errors.
+	* tests/aclocal3.test, tests/ammissing.test: Adjust to expect a
+	warning instead of an error.
+	* tests/aclocal8.test: AC_REQUIRE an undefined macro in an unused
+	macro, and ensure aclocal works anyway.
+	* tests/acloca17.test: New file.
+	* tests/error.test: Delete, superseded by tests/acloca17.test.
+	* tests/Makefile.am (TESTS): Add acloca17.test and remove error.test.
+	Report from Jim Meyering.
+
+	* lib/am/texibuild.am (?!GENERIC_INFO?%DEST_INFO_PREFIX%%DEST_SUFFIX%):
+	Fold a few lines to reduce the output by 5 lines.
+	Suggested by Karl Berry.
 
 	* automake.in (parse_arguments, MAIN): Give more precise
 	diagnostics when no input file is found.
@@ -27,6 +294,15 @@
 	Report from Kevin Ryde.
 
 2004-05-13  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (generate_makefile): Do not output Makefile.in on
+	errors.
+	* tests/werror2.test: New file.
+	* tests/Makefile.am (TESTS): Add werror2.test.
+	* tests/substtarg.test, tests/cond36.test, tests/backsl4.test:
+	Adjust to run automake with -Wno-error when the output is expected
+	in spite of the error.
+	Report from Harlan Stenn.
 
 	* doc/automake.texi (Program and Library Variables): Remove
 	doubled word in footnote.
@@ -60,10 +336,6 @@
 
 2004-04-25  Alexandre Duret-Lutz  <adl@gnu.org>
 
-	* configure.ac, NEWS: Bump version to 1.8.4a.
-
-	* configure.ac, NEWS: Bump version to 1.8.4.
-
 	* lib/texinfo.tex: New upstream version.
 
 	* lib/depcomp (tru64): Clarify comments.  Thanks to Nicolas Joly.
@@ -71,6 +343,17 @@
 	* doc/automake.texi (Headers): Revamp.
 
 2004-04-24  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (check_typos): Clarify the diagnostic.
+	* tests/warnopts.test: Adjust.
+
+	* lib/Automake/VarDef.pm (append): Turn VAR_ASIS variables into
+	VAR_PRETTY variables to work around make implementation with
+	limited line length, such as OSF1/Tru64 make.
+	* tests/longline.test: New file.
+	* tests/Makefile.am (TESTS): Add it.
+	* tests/pluseq3.test, tests/pluseq8.test: Adjust.
+	Report from Simon Josefsson.
 
 	* lib/am/tags.am (TAGS): Pass `.' to Exuberant Ctags if
 	--etags-include is used but no other files are supplied, so it
@@ -82,20 +365,100 @@
 	Teun Burgers reported on 2004-03-30 they were in
 	$dir.libs/$base.o.d.  Try both.
 
+2004-04-23  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	For PR automake/414:
+	Introduce option filename-length-max=99.
+	* doc/automake.texi (Options): Document it.
+	* configure.ac (AM_INIT_AUTOMAKE): Use it.
+	* lib/Automake/Options.pm (_process_option_list): Recognize it.
+	* automake.in (handle_dist): Set FILENAME_FILTER.
+	* lib/am/distdir.am (distdir) [FILENAME_FILTER]: Diagnose long
+	filenames.
+	* tests/fn99.test: New file.
+	* tests/Makefile.am (TESTS): Add fn99.test.
+
+2004-04-20  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	For PR automake/414:
+	Introduce options tar-v7, tar-ustar, and tar-pax to select
+	tar format.
+	* doc/automake.texi (Options): Document them.
+	* lib/Automake/Options.pm (_process_option_list): Process
+	these new options.
+	* lib/am/distdir.am (dist-gzip, dist-bzip2, dist-tarZ, dist,
+	distcheck): Adjust to use am__tar and am__untar.
+	* m4/tar.m4: New file.
+	* m4/Makefile.am (dist_m4data_DATA): Add tar.m4.
+	* m4/init.m4 (AM_INIT_AUTOMAKE): Support the new options
+	and call _AM_PROG_TAR.
+	* tests/tar.test, tests/tar2.test, tests/tar3.test: New files.
+	* tests/Makefile.am (TESTS): Add them.
+
 2004-04-18  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* lib/am/distdir.am (distcheck): Typo in shar decompression.
 
-	* NEWS: English corrections from Eric Sunshine.
-
-	* configure.ac, NEWS: Bump version to 1.8.3c.
-
-	* configure.ac, NEWS: Bump version to 1.8.3b.
-
 	* lib/config.guess, lib/config.sub, lib/texinfo.tex: New upstream
 	versions.
 
+2004-04-17  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	Fix PR automake/49:
+	* automake.in (scan_autoconf_traces) <AC_CONFIG_AUX_DIR>: Diagnose
+	calls to AC_CONFIG_AUX_DIR followings calls to AM_INIT_AUTOMAKE.
+	* tests/auxdir.test, tests/auxdir2.test, tests/lex5.test,
+	tests/mdate3.test, tests/multlib.test, tests/reqd2.test,
+	tests/symlink.test, tests/txinfo8.test, tests/txinfo22.test,
+	tests/yacc6.test, tests/yacc8.test: Fix to call AC_CONFIG_AUX_DIR
+	before AM_INIT_AUTOMAKE.
+	* tests/auxdir3.test: New file (exercise this diagnostic).
+	* tests/Makefile.am (TESTS): Add auxdir3.test.
+
+2004-04-15  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* aclocal.in (%map_traced_defs): New variable.
+	(scan_m4_files): Normalize filenames.
+	(trace_used_macros): Trace for AC_DEFUN and AU_DEFUN, also
+	ask for the filename and the first argument.  Populate
+	%map_traced_defs.
+	(write_aclocal): Use $map_traced_defs to filter out unused
+	definitions.
+	* tests/acloca15.test: New file.
+	* tests/Makefile.am (TESTS): Add acloca15.test.
+
 2004-04-12  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in ($automake_needs_to_reprocess_all_files): Remove.
+	($automake_will_process_aux_dir): New variable.
+	(scan_autoconf_traces): Reorder @input_files so that the Makefile
+	that distributes aux files is processed last.  This way we do not
+	have to process all files twice using
+	$automake_will_process_aux_dir.
+	(require_file_internal): Suggest a full run of automake when
+	appropriate.
+	(MAIN): Remove the loop on $automake_needs_to_reprocess_all_files.
+	* tests/distcom7.test: New file.
+	* tests/reqd2.test: Do not check for the "running more than two"
+	message.
+	* tests/Makefile.am (TESTS): Add distcom7.test.
+
+	* automake.in (@config_aux_path, $config_aux_dir): Rename as ...
+	($config_aux_dir, $am_config_aux_dir): ... these.
+	($config_aux_dir_set_in_configure_in): Rename as ...
+	($config_aux_dir_set_in_configure_ac): ... this.
+	(%require_file_found): Rename as ...
+	(%required_file_not_found): ... this.
+	(handle_languages, handle_texinfo_helper, handle_dist,
+	handle_configure, handle_emacs_lisp, handle_python,
+	scan_autoconf_traces, yacc_lex_finish_helper): Adjust to new names.
+	(scan_autoconf_traces): Call locate_aux_dir.
+	(locate_aux_dir): New function.
+	(@require_file_paths): Remove, not used anymore.
+	(require_file_internal): Look files in only one directory (instead
+	of @require_file_internal) passed in argument.
+	(require_file, require_conf_file): Pass the destination directory
+	to require_file_internal.
 
 	Fix for PR automake/416:
 	* m4/depend.m4 (_AM_DEPENDENCIES): Catch `not supported' ICC 8.0
@@ -116,6 +479,18 @@
 	* tests/Makefile.am (TESTS): Add libobj14.test.
 	* tests/libobj14.test: New file.
 	Report from Bill Davidson.
+
+2004-04-02  Mike Nolta  <mike@nolta.net>
+
+	Better support for Fortran 9x.
+	* automake.in: Add "fc" and "ppfc" languages for Fortran 9x.
+	* doc/automake.texi (Fortran 9x Support): New section.
+	* lib/Automake/Variable.pm (%_ac_macro_for_var): Add AC_PROG_FC.
+	* tests/compile_f90_c_cxx.test: New file.
+	* tests/ext.test: Add AC_PROG_FC.
+	* tests/f90only.test: New file.
+	* tests/link_f90_only.test: New file.
+	* tests/Makefile.am (TESTS): Add new tests.
 
 2004-04-01  Paul Eggert  <eggert@twinsun.com>
 
@@ -152,17 +527,27 @@
 
 2004-03-07  Alexandre Duret-Lutz  <adl@gnu.org>
 
-	* configure.in, NEWS: Bump version to 1.8.3a.
-
-	* configure.in, NEWS: Bump version to 1.8.3.
-
 	* lib/config.guess: New upstream version.
+
+	Fix for PR automake/285:
+	* automake.in (handle_ltlibraries): Keep track of installation
+	directories for each condition, then define a $(am_TARGET_rpath)
+	variable to hold the -rpath flags of Libtool libraries conditionally
+	installed in different directories.
+	* lib/Automake/DisjConditions.pm (merge): New function.
+	* tests/libtool6.test: Adjust.
+	* tests/libtool8.test: New file.
+	* tests/Makefile.am (TEST): Add libtool8.test.
+
+	* lib/Automake/Variable.pm (traverse_recursively,
+	_do_recursive_traversal): Honor the skip_ac_subst option.
+	* automake.in (handle_dist): Use skip_ac_subst.
 
 2004-02-29  Alexandre Duret-Lutz  <adl@gnu.org>
 
-	* configure.in: Bump version to 1.8.2c.
-
-	* configure.in, NEWS: Bump version to 1.8.2b.
+	* Makefile.am (cvs-release): Upload to ~ftp/pub/automake, not
+	~ftp/automake.
+	* lib/gnupload (Example): Update example.
 
 	* lib/config-ml.in, lib/config.guess, lib/config.sub,
 	lib/texinfo.tex: New upstream versions.
@@ -224,11 +609,18 @@
 	definition.
 	* tests/cond34.test: New file.
 	* tests/Makefile.am (TESTS): Add cond34.test.
-	Report from Elena A. Vengerova.
+	Report from Elena A. Vengerova
 
 	* doc/automake.texi (Multiple Outputs): Typo.
 
 	* doc/automake.texi (Emacs Lisp): Typos.
+
+	Support for conditional _LISP.
+	* automake.in (handle_emacs_lisp): Define $(ELCFILES) from LISP, not
+	from $(am__ELCFILES).
+	* lib/am/lisp.am (elc-stamp): Use $(LISP) instead of $(am__ELFILES).
+	* tests/lisp6.test: New file.
+	* tests/Makefile.am (TESTS): Add it.
 
 	* automake.in (handle_emacs_lisp): Define $(ELCFILES) as
 	$(am__ELCFILES), and always push it on @all.  Do not mention
@@ -248,8 +640,6 @@
 
 2004-01-28  Alexandre Duret-Lutz  <adl@gnu.org>
 
-	* NEWS: Summarize recent changes.
-
 	* Makefile.am (maintainer-check): Check for unquoted $(DESTDIR) uses.
 	* lib/am/data.am, lib/am/distdir.am, lib/am/java.am, lib/am/libs.am,
 	lib/am/lisp.am, lib/am/ltlib.am, lib/am/mans.am, lib/am/progs.am,
@@ -266,7 +656,27 @@
 	* doc/automake.texi (Not Enough, Third-Party Makefiles): New nodes.
 	(Extending): Make it a subsection of Not Enough.
 
+	* lib/gnupload (GPG): Use an absolute path.  Suggestion from Gary
+	V. Vaughan.
+	(passphrase): Unset it this variable before using it, in case it
+	was exported.  Report from Scott James Remnant.
+
+2004-01-25  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/gnupload (usage): Fix example.
+	* Makefile.am (cvs-release): Fix call to gnupload.
+	From Jim Meyering.
+
+2004-01-24  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/gnupload: New script.
+	* lib/Makefile.am (EXTRA_DIST): Distribute gnupload.
+	* Makefile.am (cvs-release): New target.
+
 2004-01-23  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/am/python.am (uninstall-%DIR%PYTHON): Remove extra `;'s.
+	Fix python10.test.
 
 	* m4/depout.m4 (_AM_OUTPUT_DEPENDENCY_COMMANDS): Use `s/xx//p'
 	instead of `/xx/ s///p'; the latter fails when GNU sed is run with
@@ -290,16 +700,23 @@
 
 	* doc/automake.texi (Upgrading): New node.
 
+2004-01-20  Gary V. Vaughan  <gary@gnu.org>
+
+	* automake.in (scan_autoconf_traces): AC_LIBTOOL_TAGS can be
+	correctly called without arguments as evidenced by the libtool
+	demo directories.
+
 2004-01-13  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* tests/conflnk3.test: Skip if `test -e' does not work.
 	Report from Lars Hecking.
 
-	* configure.ac, NEWS: Bump version to 1.8.2a.
+2004-01-13  Jim Meyering  <jim@meyering.net>
+
+	* lib/install-sh: Change `\n \t' to `\n\t ' in `defaultIFS'
+	assignment.  Remove spurious SPACEs before TABs.
 
 2004-01-12  Alexandre Duret-Lutz  <adl@gnu.org>
-
-	* configure.ac, NEWS: Bump version to 1.8.2.
 
 	* lib/py-compile: Check input files after option processing.
 	Ensure --basedir has an argument.
@@ -317,10 +734,6 @@
 	Report from He Li.
 
 2004-01-11  Alexandre Duret-Lutz  <adl@gnu.org>
-
-	* configure.ac, NEWS: Bump version to 1.8.1a.
-
-	* configure.ac, NEWS: Bump version to 1.8.1.
 
 	* lib/config.sub, lib/config.guess, lib/texinfo.tex: New upstream
 	versions.
@@ -369,6 +782,18 @@
 	do not look like DEST:SRC.
 	* tests/conflnk3.test: Check for AC_CONFIG_LINKS($computed).
 
+2004-01-07  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	Fix for PR automake/289:
+	* automake.in (Automake::Struct::libtool_tag): New attribute.  Define
+	it for the language that have a Libtool tag.
+	(%libtool_tags): New variable.
+	(handle_languages, define_compiler_variable)
+	(define_linker_variable): Pass --tag=XXX to libtool if supported.
+	(scan_autoconf_traces): Scan for _LT_AC_TAGCONFIG and AC_LIBTOOL_TAGS.
+	* tests/libtool3.test, tests/subobj9.test: Check that --tag=XXX is
+	output.
+
 2003-01-07  Eric Sunshine  <sunshine@sunshineco.com>  (tiny change)
 
 	* lib/am/configure.am (am__CONFIG_DISTCLEAN_FILES): Add
@@ -378,15 +803,13 @@
 
 	* doc/automake.texi (Rebuilding): Typo.
 
+2004-01-07  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/am/Makefile.am (dist_am_DATA): Really add inst-vars.am.
+
 2004-01-06  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* THANKS: Add Bruce Korb.
-
-	* automake.in, aclocal.in: Bump copyright years.
-
-	* configure.ac, NEWS: Bump version to 1.8.0c.
-
-	* configure.ac, NEWS: Bump version to 1.8.0b.
 
 2004-01-05  Alexandre Duret-Lutz  <adl@gnu.org>
 
@@ -395,18 +818,29 @@
 	* lib/Automake/Makefile.am (Config.pm): Likewise.
 	* m4/Makefile.am ($(top_srcdir)/m4/amversion.m4): Likewise.
 
+	* lib/am/inst-vars.am: New file, define am__vpath_adj_setup,
+	am__vpath_adj, and am__strip_dir.
+	* lib/am/Makefile.am (dist_am_DATA): Add inst-vars.am.
 	* lib/am/data.am, lib/am/lisp.am, lib/am/python.am,
-	lib/am/scripts.am: Strip any leading $(srcdir) from nobase_ files.
-	This fixes installation of nobase_ files in VPATH setups with Sun
-	and OSF1/Tru64 Make.
-	* tests/nobase.test: Augment to check installation from VPATH
-	builds.
+	lib/am/scripts.am: Include inst-vars.am, and use $(am__vpath_adj),
+	$(am__vpath_adj_setup), and $(am__strip_dir) in install and
+	uninstall rules.  This fixes installation of nobase_ files in
+	VPATH setups with Sun and OSF1/Tru64 Make.
+	* lib/am/libs.am, lib/am/ltlib.am: Include inst-vars.am, and use
+	$(am__strip_dir) to simplify install and uninstall rules.
+	* tests/nobase.test: Augment to check installation from VPATH builds.
+
+	* automake.in (%transformed_files): New variable.
+	(initialize_per_input): Reset it.
+	(make_paragraphs): Fill %transformed_files, and define %FIRST%
+	each time a file is transformed for the first time.
+	(handle_configure): Do not define %FIRST_CONFIG_HIN%.
+	(am_install_var): Do not define %FIRST%.
+	* lib/am/remake-hdr.am: Use %?FIRST% instead of %?FIRST_CONFIG_HIN%.
 
 2004-01-04  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* lib/texinfo.tex: New upstream version.
-
-	* NEWS: Summarize recent fixes.
 
 	* m4/mkdirp.m4: Do not use `-m 0755'.  This overrides special bits
 	and break setups where 775 directories are expected.  Just obey
@@ -426,6 +860,15 @@
 	* tests/txinfo29.test: New file.
 	* tests/Makefile.am (TESTS): Add txinfo29.test.
 	Reported by Bruce Korb.
+
+2004-01-02  Tom Tromey  <tromey@redhat.com>
+
+	* automake.in (handle_source_transform): Don't generate dist
+	variables when no-dist is set.
+	(generate_makefile): Likewise.
+	* tests/nodist3.test: Ensure that DIST_SOURCES is not created,
+	and that dist target does not exist.
+        Reported by Tom Fitzsimmons.
 
 2004-01-02  Alexandre Duret-Lutz  <adl@gnu.org>
 
@@ -453,6 +896,61 @@
 	* tests/Makefile.am (TESTS): Add acloca14.test.
 	* tests/acloca14.test: New file.
 	Report from Phil Edwards.
+
+2004-01-01  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (handle_languages): Do not define DEP_FILES.
+	* m4/depout.m4 (_AM_OUTPUT_DEPENDENCY_COMMANDS): Extract included
+	files with $(DEPDIR) in their name instead of DEP_FILES.
+	* tests/depend.test, tests/depend4.test, tests/exsource.test:
+	Adjust.
+	Suggested by Tom Tromey.
+
+	Do not output .lo rules for programs and static libraries objects,
+	and do not output .o/.obj rules for libtool libraries.  This is
+	about explicit rules only, not inference rules.
+	* automake.in (handle_single_transform_list): Rename as ...
+	(handle_single_transform): ... this.  Take a single file
+	to transform (it was only called this way) and accept a new
+	%transform argument.  Fill %lang_specific_files with list
+	references instead of strings, and append %transform to each
+	of these lists.
+	(define_objects_from_sources, handle_source_transform):
+	Take a %transform argument, and forward it to &handle_single_transform.
+	(handle_languages): Adjust to the new format of
+	%lang_specific_files, and honor its %transform part.
+	(handle_programs, handle_libraries, handle_ltlibraries): Override
+	%NONLIBTOOL% and %LIBTOOL% while calling handle_source_transform.
+	(make_paragraphs): Define %NONLIBTOOL% by default.  Make sure
+	%transform settings override global settings.
+	* lib/am/depend2.am (%OBJ%, %OBJOBJ%): Define only if %NONLIBTOOL%.
+	* tests/libtool3.test: Augment to check Makefile.ins for unneeded
+	rules.
+	Suggested by Thomas Fitzsimmons.
+
+	* automake.in, aclocal.in: Bump copyright years.
+
+2003-12-31  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (generate_makefile): Update misleading comment.
+
+	* automake.in (handle_languages): Define %DEPBASE% conditionally
+	on subdir-objects.  Define SUBDIROBJ.  Do not clean *_.c files
+	here ...
+	(lang_c_finish): ... do it here.
+	(handle_single_transform_list): Do not output specific rules for
+	subdir-objects files which are not renamed.  This should reduce
+	the size of Makefiles with lots of subdirectory sources.
+	* lib/depcomp: Simplify computation of dependency output, and use
+	DEPDIR.
+	* lib/am/depend2.am (%EXT%.o, %EXT%.obj, %EXT%.lo): Adjust call
+	to depcomp.  Compute depbase on-the-fly in generic fastdep rules
+	for subdir-objects.
+	* tests/ansi9.test: Do not grep for an explicit rule that
+	we no longer expect.  Really run $MAKE to make sure the chain
+	of rules works.
+	* tests/yacc5.test: Do not grep for an explicit rule that
+	we no longer expect.  Adjust to use set -e.
 
 2003-12-27  Alexandre Duret-Lutz  <adl@gnu.org>
 
@@ -505,7 +1003,7 @@
 
 2003-12-10  Alexandre Duret-Lutz  <adl@gnu.org>
 
-	* configure.ac, NEWS: Bump version to 1.8.0a.
+	* configure.ac, NEWS: Bump version to 1.8a.
 
 	* configure.ac, NEWS: Bump version to 1.8.
 
@@ -3399,7 +3897,7 @@
 
 -----
 
-Copyright (C) 2003  Free Software Foundation, Inc.
+Copyright (C) 2003, 2004  Free Software Foundation, Inc.
 
 This file is part of GNU Automake.
 
