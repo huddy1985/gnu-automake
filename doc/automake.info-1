@@ -1,7 +1,7 @@
 This is doc/automake.info, produced by makeinfo version 4.13 from
 ./doc/automake.texi.
 
-This manual is for GNU Automake (version 1.13.2, 15 May 2013), a
+This manual is for GNU Automake (version 1.13.3, 3 June 2013), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -32,7 +32,7 @@ File: automake.info,  Node: Top,  Next: Introduction,  Up: (dir)
 GNU Automake
 ************
 
-This manual is for GNU Automake (version 1.13.2, 15 May 2013), a
+This manual is for GNU Automake (version 1.13.3, 3 June 2013), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -3471,8 +3471,8 @@ still using them, running `autoupdate' should adjust your
      `AM_PROG_MKDIR_P' macro in your `configure.ac', or its provided
      variable `$(mkdir_p)' in your `Makefile.am', you are advised to
      switch ASAP to the more modern Autoconf-provided interface
-     instead; both the macro and the variable _will be removed_ in the
-     next major Automake release.
+     instead; both the macro and the variable might be removed in a
+     future major Automake release.
 
 
 

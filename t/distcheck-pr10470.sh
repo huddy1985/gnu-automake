@@ -45,14 +45,13 @@ chmod a+x foo.test
 
 $ACLOCAL
 $AUTOCONF
-$AUTOMAKE
+$AUTOMAKE -a
 ./configure
 
 # We can build the distribution.
-$MAKE distcheck >output 2>&1 || { cat output; exit 1; }
-cat output
+run_make -M distcheck
 # Sanity check: verify that our code has hit a problem removing
 # the distdir, but has recovered from it.
-grep "rm:.*$destdir" output || fatal_ "expected code path not covered"
+$EGREP "(^| )(rm|find):.*$distdir" output || fatal_ "expected code path not covered"
 
 :

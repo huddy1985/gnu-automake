@@ -152,14 +152,12 @@ test_no_color ()
 
 # Forced colorization should take place also with non-ANSI terminals;
 # hence the "TERM=dumb" definition.
-TERM=dumb AM_COLOR_TESTS=always $MAKE check >stdout \
-  && { cat stdout; exit 1; }
-cat stdout
+AM_COLOR_TESTS=always; export AM_COLOR_TESTS
+run_make -O -e FAIL TERM=dumb check
 test_color
 
-TERM=ansi $MAKE -e check >stdout \
-  && { cat stdout; exit 1; }
-cat stdout
+unset AM_COLOR_TESTS
+run_make -O -e FAIL TERM=ansi check
 test_no_color
 
 :

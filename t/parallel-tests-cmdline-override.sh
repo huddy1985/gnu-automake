@@ -60,8 +60,7 @@ END
 
 do_check ()
 {
-  env "$@" $MAKE -e check >stdout || { cat stdout; exit 1; }
-  cat stdout
+  run_make -O -- "$@" check
   grep '^PASS:' stdout | LC_ALL=C sort > got-out
   cat got-out
   ls . | grep '\.log$' | LC_ALL=C sort > got-log

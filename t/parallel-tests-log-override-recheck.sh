@@ -47,7 +47,7 @@ END
 
 chmod a+x *.test
 
-unset BAZ_EXIT_STATUS || :
+unset BAZ_EXIT_STATUS
 
 $ACLOCAL
 $AUTOCONF
@@ -61,15 +61,12 @@ filter_stdout ()
 }
 
 ./configure
-$MAKE check >stdout && { cat stdout; exit 1; }
-cat stdout
+run_make -O -e FAIL check
 
 using_gmake || $sleep # Required by BSD make.
 
 chmod a-rw test-suite.log
-TEST_SUITE_LOG=my.log $MAKE -e recheck >stdout \
-  && { cat stdout; exit 1; }
-cat stdout
+run_make -O -e FAIL TEST_SUITE_LOG=my.log recheck
 ls -l
 filter_stdout
 count_test_results total=2 pass=0 fail=1 skip=0 xfail=0 xpass=0 error=1
@@ -82,9 +79,7 @@ done
 using_gmake || $sleep # Required by BSD make.
 
 chmod a-rw my.log
-BAZ_EXIT_STATUS=0 TEST_SUITE_LOG=my2.log $MAKE -e recheck >stdout \
-  && { cat stdout; exit 1; }
-cat stdout
+run_make -O -e FAIL BAZ_EXIT_STATUS=0 TEST_SUITE_LOG=my2.log recheck
 ls -l
 count_test_results total=2 pass=1 fail=0 skip=0 xfail=0 xpass=0 error=1
 filter_stdout

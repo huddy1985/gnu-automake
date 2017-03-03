@@ -1,7 +1,7 @@
 This is doc/automake.info, produced by makeinfo version 4.13 from
 ./doc/automake.texi.
 
-This manual is for GNU Automake (version 1.13.2, 15 May 2013), a
+This manual is for GNU Automake (version 1.13.3, 3 June 2013), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 

@@ -45,16 +45,7 @@ cd build
 ../configure --prefix="$instdir"
 $MAKE
 
-javadir=
-export javadir
-$MAKE -e install
-test ! -e "$instdir"
-$MAKE -e install DESTDIR="$destdir"
-test ! -e "$instdir"
-test ! -e "$destdir"
-$MAKE -e uninstall > stdout || { cat stdout; exit 1; }
-cat stdout
-grep 'rm -f' stdout && exit 1
-$MAKE -e uninstall DESTDIR="$destdir"
+nulldirs='javadir='
+null_install
 
 :

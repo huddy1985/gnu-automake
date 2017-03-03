@@ -27,7 +27,7 @@ AS_IF([test $success = yes && test "$sentence" = 'it works :-)'],
 AC_OUTPUT
 END
 
-unset sentence || :
+unset sentence
 
 cat > Makefile.am << 'END'
 AM_DISTCHECK_CONFIGURE_FLAGS = $(dc_flags1) $(dc_flags2)
@@ -59,8 +59,7 @@ END
 $AUTOMAKE Makefile
 ./config.status Makefile
 
-$MAKE distcheck >output 2>&1 && { cat output; exit 1; }
-cat output
+run_make -e FAIL -M distcheck
 grep "^configure:.* success='no', sentence='it works :-)'" output
 
 $MAKE distcheck DISTCHECK_CONFIGURE_FLAGS="--enable-success=yes"

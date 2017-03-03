@@ -28,10 +28,6 @@ echo 'extern int dummy;' >> lex.yy.c
 END
 chmod a+x fake-lex
 
-# Remove Lex from the environment, so that it won't interfere
-# with 'make -e' below.
-unset LEX || :
-
 cat >> configure.ac <<'END'
 AC_SUBST([CXX], [false])
 # Simulate presence of Lex using our fake-lex script.
@@ -61,7 +57,7 @@ grep '\$(LFLAGS).*\$(AM_LFLAGS)' Makefile.in && exit 1
 
 $AUTOCONF
 ./configure
-env LFLAGS=__user_flags__ $MAKE -e foo.cc bar-bar.c++
+run_make LFLAGS=__user_flags__ foo.cc bar-bar.c++
 
 cat foo.cc
 cat bar-bar.c++

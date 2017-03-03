@@ -69,19 +69,16 @@ do_check ()
   cat > summary.exp
   expect_failure=false
   xfail_tests=''
-  tests="TESTS='$*'"
+  tests="$*"
   for t in $*; do
     case $t in fail*|xpass*|error*) expect_failure=:;; esac
     case $t in xfail*|xpass*) xfail_tests="$xfail_tests $t";; esac
   done
-  test -z "$xfail_tests" || xfail_tests="XFAIL_TESTS='$xfail_tests'"
-  st=0
-  eval "env $tests $xfail_tests \$MAKE -e check > stdout || st=\$?"
-  cat stdout
+  run_make -O -e IGNORE check TESTS="$tests" XFAIL_TESTS="$xfail_tests"
   if $expect_failure; then
-    test $st -gt 0 || exit 1
+    test $am_make_rc -gt 0 || exit 1
   else
-    test $st -eq 0 || exit 1
+    test $am_make_rc -eq 0 || exit 1
   fi
   $PERL "$am_testaux_srcdir"/extract-testsuite-summary.pl stdout >summary.got \
    || fatal_ "cannot extract testsuite summary"

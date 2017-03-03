@@ -88,7 +88,7 @@ $AUTOMAKE -a
 
 ./configure
 
-TEST_SUITE_LOG=my.log $MAKE -e check && exit 1
+run_make -e FAIL TEST_SUITE_LOG=my.log check
 ls -l # For debugging.
 test ! -e test-suite.log
 test ! -e global.log
@@ -130,7 +130,7 @@ have_rst_section 'XPASS: xpass' my.log
 have_rst_section 'ERROR: error' my.log
 
 touch error2.log test-suite.log global.log
-TEST_SUITE_LOG=my.log $MAKE -e mostlyclean
+run_make TEST_SUITE_LOG=my.log mostlyclean
 ls -l # For debugging.
 test ! -e my.log
 test ! -e pass.log
@@ -146,8 +146,7 @@ test -f global.log
 
 rm -f *.log
 
-VERBOSE=yes $MAKE check >stdout && { cat stdout; exit 1; }
-cat stdout
+run_make -O -e FAIL check VERBOSE=yes
 cat global.log
 test ! -e my.log
 test ! -e test-suite.log
