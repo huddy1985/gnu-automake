@@ -5,11 +5,11 @@
 . $srcdir/defs || exit 1
 
 cat > configure.in << 'END'
-PACKAGE=nonesuch
-VERSION=nonesuch
+AM_INIT_AUTOMAKE(nonesuch, nonesuch)
 AC_ARG_PROGRAM
 AC_PROG_INSTALL
 AC_PROG_CC
+AC_PROG_MAKE_SET
 AC_SUBST(DEPS)
 AC_OUTPUT(Makefile)
 END
@@ -33,4 +33,5 @@ DEPS = @DEPS@
 TerraVision_DEPENDENCIES = $(DEPS)
 END
 
+$ACLOCAL || exit 1
 $AUTOMAKE

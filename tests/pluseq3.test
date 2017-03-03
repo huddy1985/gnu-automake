@@ -25,6 +25,13 @@ END
 : > doz
 : > dog
 
-$AUTOMAKE || exit 1
-grep '= zar  *doz' Makefile.in || exit 1
-fgrep '= dog' Makefile.in
+set -e
+
+$AUTOMAKE
+
+grep '^@CHECK_TRUE@data_DATA = zar \\$' Makefile.in
+grep '^@CHECK_TRUE@ doz$' Makefile.in
+
+grep '^@CHECK_FALSE@data_DATA = dog$' Makefile.in
+
+exit 0

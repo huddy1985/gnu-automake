@@ -5,11 +5,13 @@
 . $srcdir/defs || exit 1
 
 cat > configure.in << 'END'
+AM_INIT_AUTOMAKE(nonesuch, nonesuch)
 AM_CONFIG_HEADER(config.h two.h)
 PACKAGE=nonesuch
 VERSION=nonesuch
 AC_PROG_CC
 AC_ARG_PROGRAM
+AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_OUTPUT(Makefile)
 END
@@ -19,4 +21,5 @@ END
 : > config.h.in
 : > two.h.in
 
+$ACLOCAL || exit 1
 $AUTOMAKE

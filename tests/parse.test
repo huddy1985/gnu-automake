@@ -5,9 +5,11 @@
 . $srcdir/defs || exit 1
 
 cat > configure.in << 'END'
+AM_INIT_AUTOMAKE(nonesuch, nonesuch)
 PACKAGE=nonesuch
 VERSION=nonesuch
 AC_PROG_CC
+AC_PROG_MAKE_SET
 AC_ARG_PROGRAM
 AC_PROG_INSTALL
 AC_PROG_RANLIB
@@ -21,6 +23,7 @@ zar.c\
 doz.c
 END
 
+$ACLOCAL || exit 1
 $AUTOMAKE || exit 1
 
 fgrep zar.cdoz Makefile.in && exit 1

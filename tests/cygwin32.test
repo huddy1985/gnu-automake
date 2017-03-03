@@ -6,18 +6,20 @@
 
 cat >> configure.in << 'END'
 AC_PROG_CC
-AM_EXEEXT
+AC_EXEEXT
 END
 
 cat > Makefile.am << 'END'
 bin_PROGRAMS = www
-www_SOURCES = www.c @extra_stuff@
+www_SOURCES = www.c
 EXTRA_www_SOURCES = xtra.c
+www_LDADD = @extra_stuff@
 END
 
 : > www.c
 : > xtra.c
 
+$ACLOCAL || exit 1
 $AUTOMAKE || exit 1
 
 grep '^CYGWIN' Makefile.in && exit 1

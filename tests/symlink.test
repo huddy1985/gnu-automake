@@ -5,13 +5,13 @@
 
 . $srcdir/defs || exit 1
 
-rm install-sh
-rm mkinstalldirs
+rm -f install-sh
+rm -f mkinstalldirs
 
 : > Makefile.am
 
 cat >> configure.in << 'END'
-AC_CONFIG_AUX_DIR(aux)
+AC_CONFIG_AUX_DIR(sub)
 END
 
 $AUTOMAKE --add-missing && exit 1

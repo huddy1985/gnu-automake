@@ -8,10 +8,12 @@
 
 cat > configure.in << 'END'
 AM_CONFIG_HEADER(subdir/config.h)
+AM_INIT_AUTOMAKE(nonesuch, nonesuch)
 PACKAGE=nonesuch
 VERSION=nonesuch
 AC_PROG_CC
 AC_ARG_PROGRAM
+AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 AC_OUTPUT(Makefile)
 END
@@ -20,6 +22,7 @@ END
 mkdir subdir
 : > subdir/config.h.in
 
+$ACLOCAL || exit 1
 $AUTOMAKE || exit 1
 
 grep '^subdir/config.h:' Makefile.in
