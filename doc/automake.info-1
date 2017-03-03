@@ -1,7 +1,7 @@
 This is automake.info, produced by makeinfo version 4.7 from
 automake.texi.
 
-   This manual is for GNU Automake (version 1.9, 28 July 2004), a
+   This manual is for GNU Automake (version 1.9.1, 3 August 2004), a
 program which creates GNU standards-compliant Makefiles from template
 files.
 
@@ -36,8 +36,9 @@ File: automake.info,  Node: Top,  Next: Introduction,  Up: (dir)
 GNU Automake
 ************
 
-This manual is for GNU Automake (version 1.9, 28 July 2004), a program
-which creates GNU standards-compliant Makefiles from template files.
+This manual is for GNU Automake (version 1.9.1, 3 August 2004), a
+program which creates GNU standards-compliant Makefiles from template
+files.
 
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
 2004 Free Software Foundation, Inc.
@@ -1114,16 +1115,13 @@ their effects are:
      Required files from `AC_CONFIG_AUX_DIR' are automatically
      distributed, even if there is no `Makefile.am' in this directory.
 
+`AC_CANONICAL_BUILD'
 `AC_CANONICAL_HOST'
+`AC_CANONICAL_TARGET'
      Automake will ensure that `config.guess' and `config.sub' exist.
-     Also, the `Makefile' variables `host_alias' and `host_triplet' are
-     introduced.  See *Note Getting the Canonical System Type:
-     (autoconf)Canonicalizing.  
-
-`AC_CANONICAL_SYSTEM'
-     This is similar to `AC_CANONICAL_HOST', but also defines the
-     `Makefile' variables `build_alias' and `target_alias'.  *Note
-     Getting the Canonical System Type: (autoconf)Canonicalizing.  
+     Also, the `Makefile' variables `build_triplet', `host_triplet' and
+     `target_triplet' are introduced.  See *Note Getting the Canonical
+     System Type: (autoconf)Canonicalizing.  
 
 `AC_LIBSOURCE'
 `AC_LIBSOURCES'
@@ -3220,9 +3218,9 @@ program called `ylwrap' to run `yacc' (or `lex') in a subdirectory.
 This is necessary because yacc's output filename is fixed, and a
 parallel make could conceivably invoke more than one instance of `yacc'
 simultaneously.  The `ylwrap' program is distributed with Automake.  It
-should appear in the directory specified by `AC_CONFIG_AUX_DIR' (*note
-Finding `configure' Input: (autoconf)Input.), or the current directory
-if that macro is not used in `configure.ac'.
+should appear in the directory specified by `AC_CONFIG_AUX_DIR', or one
+of its default locations (*note Finding `configure' Input:
+(autoconf)Input.).
 
    For `yacc', simply managing locking is insufficient.  The output of
 `yacc' always uses the same symbol names internally, so it isn't

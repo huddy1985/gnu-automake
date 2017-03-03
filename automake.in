@@ -197,8 +197,9 @@ my $EXEC_DIR_PATTERN =
   '^(?:bin|sbin|libexec|sysconf|localstate|lib|pkglib|.*exec.*)' . "\$";
 
 # Values for AC_CANONICAL_*
-use constant AC_CANONICAL_HOST   => 1;
-use constant AC_CANONICAL_SYSTEM => 2;
+use constant AC_CANONICAL_BUILD  => 1;
+use constant AC_CANONICAL_HOST   => 2;
+use constant AC_CANONICAL_TARGET => 3;
 
 # Values indicating when something should be cleaned.
 use constant MOSTLY_CLEAN     => 0;
@@ -342,8 +343,9 @@ my $ac_gettext_location;
 # Lists of tags supported by Libtool.
 my %libtool_tags = ();
 
-# TRUE if we've seen AC_CANONICAL_(HOST|SYSTEM).
+# Most important AC_CANONICAL_* macro seen so far.
 my $seen_canonical = 0;
+# Location of that macro.
 my $canonical_location;
 
 # Where AM_MAINTAINER_MODE appears.
@@ -4633,8 +4635,9 @@ sub scan_autoconf_traces ($)
   # IMPORTANT: If you add a macro here, you should also add this macro
   # =========  to Automake-preselection in autoconf/lib/autom4te.in.
   my %traced = (
+		AC_CANONICAL_BUILD => 0,
 		AC_CANONICAL_HOST => 0,
-		AC_CANONICAL_SYSTEM => 0,
+		AC_CANONICAL_TARGET => 0,
 		AC_CONFIG_AUX_DIR => 1,
 		AC_CONFIG_FILES => 1,
 		AC_CONFIG_HEADERS => 1,
@@ -4685,17 +4688,25 @@ sub scan_autoconf_traces ($)
 	}
 
       # Alphabetical ordering please.
-      if ($macro eq 'AC_CANONICAL_HOST')
+      if ($macro eq 'AC_CANONICAL_BUILD')
 	{
-	  if (! $seen_canonical)
+	  if ($seen_canonical <= AC_CANONICAL_BUILD)
+	    {
+	      $seen_canonical = AC_CANONICAL_BUILD;
+	      $canonical_location = $where;
+	    }
+	}
+      elsif ($macro eq 'AC_CANONICAL_HOST')
+	{
+	  if ($seen_canonical <= AC_CANONICAL_HOST)
 	    {
 	      $seen_canonical = AC_CANONICAL_HOST;
 	      $canonical_location = $where;
 	    }
 	}
-      elsif ($macro eq 'AC_CANONICAL_SYSTEM')
+      elsif ($macro eq 'AC_CANONICAL_TARGET')
 	{
-	  $seen_canonical = AC_CANONICAL_SYSTEM;
+	  $seen_canonical = AC_CANONICAL_TARGET;
 	  $canonical_location = $where;
 	}
       elsif ($macro eq 'AC_CONFIG_AUX_DIR')
@@ -5299,22 +5310,15 @@ sub lang_lex_target_hook
 # This is a helper for both lex and yacc.
 sub yacc_lex_finish_helper
 {
-    return if defined $language_scratch{'lex-yacc-done'};
-    $language_scratch{'lex-yacc-done'} = 1;
+  return if defined $language_scratch{'lex-yacc-done'};
+  $language_scratch{'lex-yacc-done'} = 1;
 
-    # If there is more than one distinct yacc (resp lex) source file
-    # in a given directory, then the `ylwrap' program is required to
-    # allow parallel builds to work correctly.  FIXME: for now, no
-    # line number.
-    require_conf_file ($configure_ac, FOREIGN, 'ylwrap');
-    if ($config_aux_dir_set_in_configure_ac)
-    {
-	&define_variable ('YLWRAP', "$am_config_aux_dir/ylwrap", INTERNAL);
-    }
-    else
-    {
-	&define_variable ('YLWRAP', '$(top_srcdir)/ylwrap', INTERNAL);
-    }
+  # If there is more than one distinct yacc (resp lex) source file
+  # in a given directory, then the `ylwrap' program is required to
+  # allow parallel builds to work correctly.  FIXME: for now, no
+  # line number.
+  require_conf_file ($configure_ac, FOREIGN, 'ylwrap');
+  &define_variable ('YLWRAP', "$am_config_aux_dir/ylwrap", INTERNAL);
 }
 
 sub lang_yacc_finish
@@ -6097,9 +6101,9 @@ sub make_paragraphs ($%)
 		 'TOPDIR'       => backname ($relative_dir),
 		 'TOPDIR_P'     => $relative_dir eq '.',
 
-		 'BUILD'    => $seen_canonical == AC_CANONICAL_SYSTEM,
-		 'HOST'     => $seen_canonical,
-		 'TARGET'   => $seen_canonical == AC_CANONICAL_SYSTEM,
+		 'BUILD'    => ($seen_canonical >= AC_CANONICAL_BUILD),
+		 'HOST'     => ($seen_canonical >= AC_CANONICAL_HOST),
+		 'TARGET'   => ($seen_canonical >= AC_CANONICAL_TARGET),
 
 		 'LIBTOOL'      => !! var ('LIBTOOL'),
 		 'NONLIBTOOL'   => 1,
@@ -7112,8 +7116,8 @@ sub generate_makefile ($$)
   # handle_libtool.)
   if ($relative_dir eq '.')
     {
-      # AC_CANONICAL_HOST and AC_CANONICAL_SYSTEM need config.guess and
-      # config.sub.
+      # AC_CANONICAL_HOST, AC_CANONICAL_SYSTEM, and AC_CANONICAL_TARGET
+      # need config.guess and config.sub.
       require_conf_file ($canonical_location, FOREIGN,
 			 'config.guess', 'config.sub')
 	if $seen_canonical;
