@@ -14,40 +14,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Vala sources and C sources in the same program.  Functional test.
+# Vala sources, C and C++ sources and C and C++ headers in the same
+# program.  Functional test.  See automake bug#10894.
 
-required='valac cc GNUmake'
+required='valac cc c++ GNUmake'
 . ./defs || Exit 1
 
 set -e
 
 cat >> configure.in <<'END'
 AC_PROG_CC
-AM_PROG_CC_C_O
+AC_PROG_CXX
 AM_PROG_VALAC([0.7.3])
 AC_OUTPUT
 END
 
 cat > Makefile.am <<'END'
-bin_PROGRAMS = zardoz mu
+bin_PROGRAMS = zardoz
 AM_VALAFLAGS = --profile=posix
-zardoz_SOURCES = foo.vala bar.c
-mu_SOURCES = 1.vala 2.c
-mu_VALAFLAGS = $(AM_VALAFLAGS) --main=run
-mu_CFLAGS = -DHAVE_MU
+zardoz_SOURCES = zardoz.vala foo.h bar.c baz.c zen.hh master.cxx
 END
 
-if cross_compiling; then :; else
-  unindent >> Makefile.am <<'END'
-    check-local:
-	./zardoz
-	./mu
-	./zardoz | grep "foo is alive"
-	./mu | grep "Howdy, World!"
-END
-fi
-
-cat > foo.vala <<'END'
+cat > zardoz.vala <<'END'
 int main ()
 {
   stdout.printf ("foo is alive\n");
@@ -55,23 +43,30 @@ int main ()
 }
 END
 
-echo 'extern int i = 0;' > bar.c
-
-cat > 1.vala <<'END'
-int run ()
-{
-  stdout.printf ("Howdy, World!\n");
-  return 0;
-}
+cat > foo.h <<'END'
+int foo;
+int bar (void);
+int baz (void);
 END
 
-cat > 2.c <<'END'
-#ifdef HAVE_MU
-int all_is_ok = 1;
-#else
-#error "HAVE_MU no defined"
-chocke me
-#endif
+cat > bar.c <<'END'
+#include "foo.h"
+int bar (void) { return foo + baz (); }
+END
+
+cat > baz.c <<'END'
+#include "foo.h"
+extern int foo = 0;
+int baz (void) { return 0; }
+END
+
+cat > zen.hh <<'END'
+#include <iostream>
+END
+
+cat > master.cxx <<'END'
+#include "zen.hh"
+void chatty (void) { std::cout << "Hello, stranger!\n"; }
 END
 
 $ACLOCAL
@@ -82,14 +77,11 @@ $AUTOCONF
 
 $MAKE all
 ls -l # For debugging.
-$MAKE check
 
 have_generated_files ()
 {
-  test -f mu_vala.stamp
   test -f zardoz_vala.stamp
-  test -f foo.c
-  test -f 1.c
+  test -f zardoz.c
 }
 
 # Our vala-related rules must create stamp files and intermediate
@@ -100,12 +92,24 @@ have_generated_files
 $MAKE -q
 $MAKE -n | $FGREP vala.stamp && Exit 1
 
+# But are triggered when they should.
+for file in zardoz.vala foo.h bar.c baz.c zen.hh master.cxx; do
+  $sleep
+  echo '& choke me !' >> $file
+  $MAKE && Exit 1
+  $sleep
+  sed '$d' $file > t
+  mv -f t $file
+  $MAKE
+done
+
 # Check the distribution.
 $MAKE distcheck
 
 # Stamp files and intermediate C files should *not* be removed
 # by "make clean".
 $MAKE clean
+ls -l # For debugging.
 have_generated_files
 
 # But stamp files should be removed by "maintainer-clean" (the

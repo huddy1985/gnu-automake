@@ -17,6 +17,23 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+XFAIL_TESTS = \
+all.test \
+auxdir2.test \
+cond17.test \
+dist-auxfile.test \
+dist-auxfile-2.test \
+dist-pr109765.test \
+gcj6.test \
+instdir-cond2.test \
+java-nobase.test \
+objext-pr10128.test \
+pr8365-remake-timing.test \
+lex-subobj-nodep.test \
+remake-am-pr10111.test \
+remake-m4-pr10111.test \
+txinfo5.test
+
 perl_TESTS = \
 pm/Condition.pl \
 pm/Condition-t.pl \
@@ -64,6 +81,10 @@ aclocal-path-install.test \
 aclocal-path-install-serial.test \
 aclocal-path-nonexistent.test \
 aclocal-path-precedence.test \
+aclocal-install-fail.test \
+aclocal-install-mkdir.test \
+aclocal-no-install-no-mkdir.test \
+aclocal-verbose-install.test \
 acoutnoq.test \
 acoutpt.test \
 acoutpt2.test \
@@ -332,6 +353,7 @@ dist-included-parent-dir.test \
 dist-missing-am.test \
 dist-missing-included-m4.test \
 dist-missing-m4.test \
+dist-pr109765.test \
 distcleancheck.test \
 distcom2.test \
 distcom3.test \
@@ -455,6 +477,9 @@ instdat.test \
 instdat2.test \
 instdir.test \
 instdir2.test \
+instdir-cond.test \
+instdir-cond2.test \
+instdir-no-empty.test \
 instdir-java.test \
 instdir-lisp.test \
 instdir-ltlib.test \
@@ -528,6 +553,7 @@ libtoo11.test \
 license.test \
 license2.test \
 link_c_cxx.test \
+link_cond.test \
 link_dist.test \
 link_f90_only.test \
 link_fc.test \
@@ -567,6 +593,7 @@ makej.test \
 makej2.test \
 maken.test \
 maken3.test \
+make-dryrun.test \
 makevars.test \
 man.test \
 man2.test \
@@ -721,6 +748,7 @@ python9.test \
 python10.test \
 python11.test \
 python12.test \
+python-pr10995.test \
 recurs.test \
 recurs2.test \
 remake.test \
@@ -903,6 +931,7 @@ vala4.test \
 vala5.test \
 vala-vpath.test \
 vala-mix.test \
+vala-mix2.test \
 vars.test \
 vars3.test \
 vartar.test \

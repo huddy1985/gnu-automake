@@ -1,7 +1,7 @@
 This is automake.info, produced by makeinfo version 4.13 from
 automake.texi.
 
-This manual is for GNU Automake (version 1.11.3, 1 February 2012), a
+This manual is for GNU Automake (version 1.11.4, 2 April 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -34,7 +34,7 @@ File: automake.info,  Node: Top,  Next: Introduction,  Up: (dir)
 GNU Automake
 ************
 
-This manual is for GNU Automake (version 1.11.3, 1 February 2012), a
+This manual is for GNU Automake (version 1.11.4, 2 April 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -74,7 +74,7 @@ Foundation, Inc.
 * Conditionals::                Conditionals
 * Silencing Make::              Obtain less verbose output from `make'
 * Gnits::                       The effect of `--gnu' and `--gnits'
-* Cygnus::                      The effect of `--cygnus'
+* Cygnus::                      The effect of `--cygnus' (deprecated, soon to be removed)
 * Not Enough::                  When Automake is not Enough
 * Distributing::                Distributing the Makefile.in
 * API Versioning::              About compatibility between Automake versions
@@ -1674,10 +1674,14 @@ conformance.
    *Note Gnits::, for more information on the precise implications of
 the strictness level.
 
-   Automake also has a special "cygnus" mode that is similar to
-strictness but handled differently.  This mode is useful for packages
-that are put into a "Cygnus" style tree (e.g., the GCC tree).  *Note
-Cygnus::, for more information on this mode.
+   Automake also has a special (and _today deprecated_) "cygnus" mode
+that is similar to strictness but handled differently.  This mode is
+useful for packages that are put into a "Cygnus" style tree (e.g., older
+versions of the GCC and gdb trees).  *Note Cygnus::, for more
+information on this mode.  Please note that this mode is deprecated and
+_will be removed in the future automake versions_; you must avoid its
+use in new packages, and should stop using it in existing packages as
+well.
 
 
 File: automake.info,  Node: Uniform,  Next: Length Limitations,  Prev: Strictness,  Up: Generalities
@@ -2215,6 +2219,8 @@ misunderstand this paragraph: `automake' runs `autoconf' to *scan* your
 `--cygnus'
      Causes the generated `Makefile.in's to follow Cygnus rules, instead
      of GNU or Gnits rules.  For more information, see *note Cygnus::.
+     Note that _this mode of operation is deprecated, and will be
+     removed_ in a future Automake release.
 
 `-f'
 `--force-missing'
@@ -6839,10 +6845,10 @@ the `no-installinfo' option.  In this case, `.info' files are not
 installed by default, and user must request this explicitly using `make
 install-info'.
 
-   By default, `make install-info' will try to run the `install-info'
-program (if available) to update (or create) the ``${infodir}'/dir'
-index.  If this is undesired, it can be prevented by exporting the
-`AM_UPDATE_INFO_DIR' variable to "`no'".
+   By default, `make install-info' and `make install-info' will try to
+run the `install-info' program (if available) to update (or create) the
+``${infodir}'/dir' index.  If this is undesired, it can be prevented by
+exporting the `AM_UPDATE_INFO_DIR' variable to "`no'".
 
    The following variables are used by the Texinfo build rules.
 

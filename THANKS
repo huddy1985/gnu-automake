@@ -3,6 +3,7 @@ It would not be what it is today without the invaluable help of these
 people:
 
 Adam J. Richter		adam@yggdrasil.com
+Adam Sampson		ats@offog.org
 Adrian Bunk		bunk@fs.tum.de
 Akim Demaille		akim@freefriends.org
 Alan Modra		amodra@bigpond.net.au
@@ -63,6 +64,7 @@ Christina Gratorp	christina.gratorp@gmail.com
 Claudio Fontana		sick_soul@yahoo.it
 Clifford Wolf		clifford@clifford.at
 Dagobert Michelsen	dam@opencsw.org
+Daiki Ueno		ueno@unixuser.org
 Dalibor Topic		robilad@kaffe.org
 danbp			danpb@nospam.postmaster.co.uk
 Daniel Jacobowitz	drow@false.org
@@ -72,6 +74,7 @@ Dave Brolley		brolley@redhat.com
 Dave Korn		dave.korn.cygwin@googlemail.com
 Dave Morrison		dave@bnl.gov
 David A. Swierczek	swiercze@mr.med.ge.com
+David A. Wheeler	dwheeler@dwheeler.com
 David Byron		dbyron@dbyron.com
 Davyd Madeley		davyd@fugro-fsi.com.au
 David Pashley		david@davidpashley.com
@@ -146,8 +149,10 @@ James Youngman		jay@gnu.org
 Jan Engelhardt		jengelh@medozas.de
 Janos Farkas		chexum@shadow.banki.hu
 Jared Davis		abiword@aiksaurus.com
+Jason DeVinney		jasondevinney@gmail.com
 Jason Duell		jcduell@lbl.gov
 Jason Molenda		crash@cygnus.co.jp
+Javier Jardón		jjardon@gnome.org
 Jeff Bailey		Jbailey@phn.ca
 Jeff Garzik		jgarzik@pobox.com
 Jeff Squyres		jsquyres@lam-mpi.org
@@ -173,6 +178,7 @@ John Ratliff		autoconf@technoplaza.net
 John R. Cary		cary@txcorp.com
 John W. Coomes		jcoomes@eng.Sun.COM
 Jonathan Nieder		jrnieder@gmail.com
+Joseph S. Myers		joseph@codesourcery.com
 Josh MacDonald		jmacd@cs.berkeley.edu
 Joshua Cowan		jcowan@jcowan.reslife.okstate.edu
 js pendry		js.pendry@msdw.com
@@ -193,6 +199,7 @@ Klaus Reichl		Klaus.Reichl@alcatel.at
 Krzysztof Żelechowski	giecrilj@stegny.2a.pl
 L. Peter Deutsch	ghost@aladdin.com
 Ladislav Strojil	Ladislav.Strojil@seznam.cz
+Larry Daniel		larry@larrybrucedaniel.com
 Larry Jones		larry.jones@sdrc.com
 Lars Hecking		lhecking@nmrc.ucc.ie
 Lars J. Aas		larsa@sim.no
@@ -232,6 +239,7 @@ Maxim Sinev		good@goods.ru
 Maynard Johnson		maynardj@us.ibm.com
 Merijn de Jonge		M.de.Jonge@cwi.nl
 Michael Brantley	Michael-Brantley@deshaw.com
+Michael Hofmann		mhofma@googlemail.com
 Michael Ploujnikov	ploujj@gmail.com
 Michel de Ruiter	mdruiter@cs.vu.nl
 Mike Castle		dalgoda@ix.netcom.com
@@ -262,6 +270,8 @@ Olivier Louchart-Fletcher olivier@zipworld.com.au
 Olly Betts		olly@muscat.co.uk
 Oren Ben-Kiki		oren@ben-kiki.org
 Owen Taylor		otaylor@redhat.com
+Quentin Glidic		sardemff7+gnu@sardemff7.net
+Panther Martin		mrsmiley98@lycos.com
 Patrick Welche		prlw1@newn.cam.ac.uk
 Patrik Weiskircher	me@justp.at
 Paul Berrevoets		paul@swi.com
@@ -336,6 +346,7 @@ Stefano Lattarini	stefano.lattarini@gmail.com
 Stepan Kasal		kasal@math.cas.cz
 Steve M. Robbins	steve@nyongwa.montreal.qc.ca
 Steve Goetze		goetze@dovetail.com
+Steven Drake		sbd@NetBSD.org
 Steven G. Johnson	stevenj@alum.mit.edu
 Sven Verdoolaege	skimo@kotnet.org
 Tamara L. Dahlgren	dahlgren1@llnl.gov

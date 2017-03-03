@@ -1,4 +1,4 @@
-New in 1.11.3:
+New in 1.11.4:
 
 * WARNING: Future backward-incompatibilities!
 
@@ -31,6 +31,63 @@ New in 1.11.3:
   - Starting from the next Automake release (1.12), warnings in the
     `extra-portability' category will be enabled by `-Wall' (right now,
     one has to use `-Wextra-portability' explicitly).
+
+* Miscellaneous changes:
+
+  - The 'ar-lib' script now ignores the "s" (symbol index) and "S" (no
+    symbol index) modifiers as well as the "s" action, as the symbol index
+    is created unconditionally by Microsoft lib.  Also, the "q" (quick)
+    action is now a synonym for "r" (replace).  Also, the script has been
+    ignoring the "v" (verbose) modifier already since Automake 1.11.3.
+
+  - When the 'compile' script is used to wrap MSVC, it now accepts an
+    optional space between the -I, -L and -l options and their respective
+    arguments, for better POSIX compliance.
+
+  - There is an initial, experimental support for automatic dependency
+    tracking with tcc (the Tiny C Compiler).  Its associated depmode is
+    currently recognized as "icc" (but this and other details are likely
+    to change in future versions).
+
+  - Automatic dependency tracking now works also with the IBM XL C/C++
+    compilers, thanks to the new new depmode 'xlc'.
+
+Bugs fixed in 1.11.4:
+
+* Bugs introduced by 1.11.2:
+
+  - A definition of 'noinst_PYTHON' before 'python_PYTHON' (or similar)
+    don't cause spurious failures upon "make install" anymore.
+
+  - The user can now instruct the 'uninstall-info' rule not to update
+    the '${infodir}/dir' file by exporting the environment variable
+    'AM_UPDATE_INFO_DIR' to the value "no".  This is done for consistency
+    with how the 'install-info' rule operates since automake 1.11.2.
+
+* Long-standing bugs:
+
+  - It is now possible for a foo_SOURCES variable to hold Vala sources
+    together with C header files, as well as with sources and headers for
+    other supported languages (e.g., C++).  Previously, only mixing C and
+    Vala sources was supported.
+
+  - If "aclocal --install" is used, and the first directory specified with
+    '-I' is non-existent, aclocal will now create it before trying to copy
+    files in it.
+
+  - An empty declaration of a "foo_PRIMARY" don't cause anymore the
+    generated install rules to create an empty $(foodir) directory;
+    for example, if Makefile.am contains something like:
+
+      pkglibexec_SCRIPTS =
+      if FALSE
+      pkglibexec_SCRIPTS += bar.sh
+      endif
+
+    the $(pkglibexec) directory will not be created upon "make install".
+
+
+New in 1.11.3:
 
 * Miscellaneous changes:
 
