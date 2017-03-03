@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.6.2
+   This file documents GNU automake 1.6.3
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free
 Software Foundation, Inc.
@@ -1011,7 +1011,7 @@ VERSION
    Unrecognized options are diagnosed by `automake'.
 
    If you want an option to apply to all the files in the tree, you can
-use the `AM_AUTOMAKE_OPTIONS' macro in `configure.in'.  *Note Macros::.
+use the `AM_INIT_AUTOMAKE' macro in `configure.in'.  *Note Macros::.
 
 
 File: automake.info,  Node: Miscellaneous,  Next: Include,  Prev: Options,  Up: Top

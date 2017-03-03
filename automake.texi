@@ -1257,9 +1257,9 @@ requirements.
 This macro adds a @samp{--enable-maintainer-mode} option to
 @code{configure}.  If this is used, @code{automake} will cause
 @samp{maintainer-only} rules to be turned off by default in the
-generated @file{Makefile.in}s.  This macro is disallowed in @samp{Gnits}
-mode (@pxref{Gnits}).  This macro defines the @samp{MAINTAINER_MODE}
-conditional, which you can use in your own @file{Makefile.am}.
+generated @file{Makefile.in}s. This macro defines the
+@samp{MAINTAINER_MODE} conditional, which you can use in your own
+@file{Makefile.am}.
 @cvindex AM_MAINTAINER_MODE
 
 @item AC_SUBST
@@ -2873,6 +2873,10 @@ user macro @samp{GCJFLAGS}, should be used.
 @code{gcj} can be used to compile @file{.java}, @file{.class},
 @file{.zip}, or @file{.jar} files.
 
+When linking, @code{gcj} requires that the main class be specified
+using the @samp{--main=} option.  The easiest way to do this is to use
+the @code{_LDFLAGS} variable for the program.
+
 
 @node Support for Other Languages, ANSI, Java Support, Programs
 @comment  node-name,  next,  previous,  up
@@ -4214,7 +4218,7 @@ will be suppressed.
 Unrecognized options are diagnosed by @code{automake}.
 
 If you want an option to apply to all the files in the tree, you can use
-the @code{AM_AUTOMAKE_OPTIONS} macro in @file{configure.in}.
+the @code{AM_INIT_AUTOMAKE} macro in @file{configure.in}.
 @xref{Macros}.
 
 

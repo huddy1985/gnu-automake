@@ -83,6 +83,8 @@ cond18.test \
 cond19.test \
 cond20.test \
 cond22.test \
+cond23.test \
+cond24.test \
 condd.test \
 condincl.test \
 condincl2.test \
@@ -164,6 +166,8 @@ gcj.test \
 gcj2.test \
 gcj3.test \
 gcj4.test \
+gettext.test \
+gettext2.test \
 gnits.test \
 header.test \
 implicit.test \
@@ -293,6 +297,7 @@ remake2.test \
 remake3.test \
 req.test \
 required.test \
+required2.test \
 rulepat.test \
 scripts.test \
 seenc.test \

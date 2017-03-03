@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.6.2
+   This file documents GNU automake 1.6.3
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free
 Software Foundation, Inc.
@@ -1134,6 +1134,10 @@ used.
 
    `gcj' can be used to compile `.java', `.class', `.zip', or `.jar'
 files.
+
+   When linking, `gcj' requires that the main class be specified using
+the `--main=' option.  The easiest way to do this is to use the
+`_LDFLAGS' variable for the program.
 
 
 File: automake.info,  Node: Support for Other Languages,  Next: ANSI,  Prev: Java Support,  Up: Programs
