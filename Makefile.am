@@ -41,6 +41,7 @@ EXTRA_DIST = \
   ChangeLog.02 \
   ChangeLog.03 \
   ChangeLog.04 \
+  bootstrap \
   $(AUTOMAKESOURCES)
 
 ## Make versioned links.  We only run the transform on the root name;
@@ -240,13 +241,15 @@ maintainer-check: automake aclocal
 	done
 ## Overriding a Makefile macro on the command line is not portable when
 ## recursive targets are used.  Better use an envvar.  SHELL is an exception,
-## POSIX says it can't come from the environment.
+## POSIX says it can't come from the environment.  DESTDIRS is an exception,
+## too, as package authors are urged not to intitialize this anywhere.
 	@if grep -E '\$$MAKE .*(SHELL=.*=|=.*SHELL=)' $(srcdir)/tests/*.test; then \
 	  echo 'Rewrite "$$MAKE foo=bar SHELL=$$SHELL" as "foo=bar $$MAKE -e SHELL=$$SHELL"' 1>&2; \
 	  echo ' in the above lines, it is more portable.' 1>&2; \
 	  exit 1; \
 	fi
-	@if grep -v SHELL $(srcdir)/tests/*.test | grep '\$$MAKE .*=' ; then \
+	@if sed 's/DESTDIR=[^ ]*//; s/SHELL=[^ ]*//' $(srcdir)/tests/*.test | \
+	  grep '\$$MAKE .*=' ; then \
 	  echo 'Rewrite "$$MAKE foo=bar" as "foo=bar $$MAKE -e" in the above lines,' 1>&2; \
 	  echo 'it is more portable.' 1>&2; \
 	  exit 1; \
@@ -303,23 +306,18 @@ maintainer-check: automake aclocal
 
 
 git-dist: maintainer-check
-## Make sure clcommit exists (we use it at the end of git-dist).
-	@if (clcommit --version)>/dev/null 2>/dev/null; then :; else \
-	  echo "Get clcommit from module cvs-utils on Savannah."; \
-	  exit 1; \
-	fi
 ## Make sure the NEWS file is up-to-date.
 	@if sed 1q $(srcdir)/NEWS | grep -e "$(VERSION)" > /dev/null; then :; else \
 	  echo "NEWS not updated; not releasing" 1>&2; \
 	  exit 1;				\
 	fi
 ## Build the distribution
-	$(MAKE) distcheck
+	$(MAKE) $(AM_MAKEFLAGS) distcheck
 ## Finally, if anything was successful, commit the last changes and tag
 ## the release in the repository.  We don't use RCS keywords so it's OK
 ## to distribute the files before they were committed.
-	cd $(srcdir) && clcommit && \
-	  git tag -s `echo "Release-$(VERSION)" | sed 's/\./-/g'`
+	cd $(srcdir) && git commit -a -s && \
+	   git tag -s "v$(VERSION)" -m "Release $(VERSION)"
 
 git-release: git-dist
 	case $(VERSION) in \
@@ -327,24 +325,14 @@ git-release: git-dist
 	  *)      dest=ftp;; \
 	esac; \
 	$(srcdir)/lib/gnupload $(GNUPLOADFLAGS) \
-	  --to sources.redhat.com:~ftp/pub/automake \
 	  --to $$dest.gnu.org:automake $(DIST_ARCHIVES)
 
-cvs-diff:
-	thisver=`echo "Release-$(VERSION)" | sed 's/\./-/g'`; \
-	if test -z "$$OLDVERSION"; then \
-	  prevno=`echo "$(VERSION)" - 0.01 | bc | sed 's/^\./0./'`; \
-	else prevno="$$OLDVERSION"; fi; \
-	prevver=Release-`echo $$prevno | sed 's/\./-/g'`; \
-	cvs -f rdiff -c -r $$prevver -r $$thisver $(PACKAGE) \
-	    > $(PACKAGE)-$$prevno-$(VERSION).diff
-
 git-diff:
-	thisver=`echo "Release-$(VERSION)" | sed 's/\./-/g'`; \
+	thisver="v$(VERSION)"; \
 	if test -z "$$OLDVERSION"; then \
 	  prevno=`echo "$(VERSION)" - 0.01 | bc | sed 's/^\./0./'`; \
 	else prevno="$$OLDVERSION"; fi; \
-	prevver=Release-`echo $$prevno | sed 's/\./-/g'`; \
+	prevver=v$$prevno; \
 	git diff $$prevver..$$thisver $(PACKAGE) \
 	    > $(PACKAGE)-$$prevno-$(VERSION).diff
 

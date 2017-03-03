@@ -82,6 +82,7 @@ canon5.test \
 canon-name.test \
 ccnoco.test \
 ccnoco2.test \
+ccnoco3.test \
 check.test \
 check2.test \
 check3.test \
@@ -114,7 +115,9 @@ comment7.test \
 comment8.test \
 comment9.test \
 commen10.test \
+commen11.test \
 compile.test \
+compile2.test \
 compile_f90_c_cxx.test \
 compile_f_c_cxx.test \
 cond.test \
@@ -211,11 +214,13 @@ depend2.test \
 depend3.test \
 depend4.test \
 depend5.test \
+depend6.test \
 destdir.test \
 dirforbid.test \
 dirlist.test \
 dirlist2.test \
 discover.test \
+distcleancheck.test \
 distcom2.test \
 distcom3.test \
 distcom4.test \
@@ -369,6 +374,7 @@ makevars.test \
 man.test \
 man2.test \
 man3.test \
+man4.test \
 mclean.test \
 mdate.test \
 mdate2.test \
@@ -522,6 +528,7 @@ subdir6.test \
 subdir7.test \
 subdir8.test \
 subdir9.test \
+subdir10.test \
 subdirbuiltsources.test \
 subcond.test \
 subcond2.test \
@@ -595,6 +602,7 @@ txinfo28.test \
 txinfo29.test \
 txinfo30.test \
 txinfo31.test \
+txinfo32.test \
 transform.test \
 unused.test \
 upc.test \
@@ -634,5 +642,7 @@ EXTRA_DIST = ChangeLog-old $(TESTS)
 # Each test case depends on defs, aclocal, and automake.
 check_SCRIPTS = defs aclocal-$(APIVERSION) automake-$(APIVERSION)
 
-distclean-local:
+distclean-local: distclean-local-check
+.PHONY: distclean-local-check
+distclean-local-check:
 	-rm -rf testSubDir

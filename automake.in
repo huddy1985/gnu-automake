@@ -7,7 +7,8 @@ eval 'case $# in 0) exec @PERL@ -S "$0";; *) exec @PERL@ -S "$0" "$@";; esac'
 
 # automake - create Makefile.in from Makefile.am
 # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-# 2003, 2004, 2005, 2006, 2007, 2008  Free Software Foundation, Inc.
+# 2003, 2004, 2005, 2006, 2007, 2008, 2009  Free Software Foundation,
+# Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -246,7 +247,8 @@ my %standard_prefix =
 # Copyright on generated Makefile.ins.
 my $gen_copyright = "\
 # Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-# 2003, 2004, 2005, 2006, 2007, 2008  Free Software Foundation, Inc.
+# 2003, 2004, 2005, 2006, 2007, 2008, 2009  Free Software Foundation,
+# Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -435,12 +437,18 @@ my %required_targets =
    # FIXME: Not required, temporary hacks.
    # Well, actually they are sort of required: the -recursive
    # targets will run them anyway...
+   'html-am'         => 1,
    'dvi-am'          => 1,
    'pdf-am'          => 1,
    'ps-am'           => 1,
    'info-am'         => 1,
    'install-data-am' => 1,
    'install-exec-am' => 1,
+   'install-html-am' => 1,
+   'install-dvi-am'  => 1,
+   'install-pdf-am'  => 1,
+   'install-ps-am'   => 1,
+   'install-info-am' => 1,
    'installcheck-am' => 1,
    'uninstall-am' => 1,
 
@@ -1097,7 +1105,7 @@ sub handle_options
 # Return a $(variable) that contains all possible values
 # $varname can take.
 # If the VAR wasn't defined conditionally, return $(VAR).
-# Otherwise we create a am__VAR_DIST variable which contains
+# Otherwise we create an am__VAR_DIST variable which contains
 # all possible values, and return $(am__VAR_DIST).
 sub shadow_unconditionally ($$)
 {
@@ -2838,7 +2846,7 @@ sub check_typos ()
 	    {
 	      $varname =~ /^(?:nobase_)?(?:dist_|nodist_)?(.*)_[[:alnum:]]+$/;
 	      msg_var ('syntax', $var, "variable `$varname' is defined but no"
-		       . " program or\nlibrary has `$1' as canonic name"
+		       . " program or\nlibrary has `$1' as canonical name"
 		       . " (possible typo)")
 		unless $var->rdef ($cond)->seen;
 	    }
@@ -6142,7 +6150,7 @@ sub read_am_file ($$)
 	elsif (/$COMMENT_PATTERN/o)
 	{
 	    error $where, "comment following trailing backslash"
-	      if $saw_bk && $comment eq '';
+	      if $saw_bk && $prev_state != IN_COMMENT;
 
 	    # Stick comments before the incoming macro or rule.
 	    $comment .= $spacing . $_;
@@ -6440,6 +6448,7 @@ sub make_paragraphs ($%)
 
 		 'INSTALL-INFO' =>  ! option 'no-installinfo',
 		 'INSTALL-MAN'  =>  ! option 'no-installman',
+		 'HAVE-MANS'    => !! var ('MANS'),
 		 'CK-NEWS'      => !! option 'check-news',
 
 		 'SUBDIRS'      => !! var ('SUBDIRS'),
@@ -7216,7 +7225,8 @@ sub require_file_internal ($$$@)
 		      unlink ($fullfile) if -f $fullfile;
 		      if ($symlink_exists && ! $copy_missing)
 			{
-			  if (! symlink ("$libdir/$file", $fullfile))
+			  if (! symlink ("$libdir/$file", $fullfile)
+			      || ! -e $fullfile)
 			    {
 			      $suppress = 0;
 			      $trailer = "; error while making link: $!";
@@ -7686,7 +7696,7 @@ sub version ()
 {
   print <<EOF;
 automake (GNU $PACKAGE) $VERSION
-Copyright (C) 2008 Free Software Foundation, Inc.
+Copyright (C) 2009 Free Software Foundation, Inc.
 License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.

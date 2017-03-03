@@ -2,7 +2,7 @@
 # @configure_input@
 #
 # Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-# 2005, 2006, 2007, 2008  Free Software Foundation, Inc.
+# 2005, 2006, 2007, 2008, 2009  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -241,8 +241,19 @@ case "$srcdir" in
     ;;
 esac
 
-chmod -R a+rwx testSubDir > /dev/null 2>&1
-rm -rf testSubDir > /dev/null 2>&1
+# Automake 1.10a uses a trap for cleanup and an exit wrapper function.
+# We add this here, too, in order to facilitate backporting tests.
+Exit ()
+{
+  set +e
+  (exit $1)
+  exit $1
+}
+
+test ! -d testSubDir || {
+  find testSubDir -type d ! -perm -200 -exec chmod u+w {} ";"
+  rm -rf testSubDir
+}
 mkdir testSubDir
 
 # Copy in some files we need.
@@ -270,7 +281,17 @@ END
 unset MFLAGS
 unset MAKEFLAGS
 unset MAKELEVEL
+# Also unset variables that will let `make -e install' divert
+# files into unwanted directories.
 unset DESTDIR
+unset prefix exec_prefix bindir datarootdir datadir docdir dvidir
+unset htmldir includedir infodir libdir libexecdir localedir mandir
+unset oldincludedir pdfdir psdir sbindir sharedstatedir sysconfdir
+# Also unset variables that control our test driver.  While not
+# conceptually independent, they cause some changed semantics we
+# need to control (and test for) in some of the tests to ensure
+# backward-compatible behavior.
+unset TESTS
 
 echo "=== Running test $0"
 
@@ -288,8 +309,8 @@ case $required in
     if test -f $aclocaldir/dirlist; then
        extra_includes=`
        <$aclocaldir/dirlist \
-       sed -ne 's/#.*//;s/[	 ][	 ]*$//g;s/..*/ -I &/p' |
-	 tr -d '\n'`
+       sed  's/#.*//;s/[	 ][	 ]*$//g' \
+       | while read dir; do test ! -d "$dir" || echo "-I $dir"; done`
     else :; fi
 
     libtool_found=no

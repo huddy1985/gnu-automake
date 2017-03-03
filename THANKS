@@ -15,6 +15,7 @@ Alexander Turbov	zaufi@sendmail.ru
 Alexandre Duret-Lutz	duret_g@epita.fr
 Alexey Mahotkin		alexm@hsys.msk.ru
 Alfred M. Szmidt	ams@gnu.org
+Andreas Bergmeier	lcid-fire@gmx.net
 Andreas Buening		andreas.buening@nexgo.de
 Andreas Köhler		andi5.py@gmx.net
 Andreas Schwab		schwab@suse.de
@@ -50,6 +51,8 @@ Bruce Korb		bkorb@gnu.org
 Bruno Haible		haible@ilog.fr
 Carsten Lohrke		carlo@gentoo.org
 Charles Wilson		cwilson@ece.gatech.edu
+Chris Hoogendyk		hoogendyk@bio.umass.edu
+Chris Pickett		chris.pickett@mail.mcgill.ca
 Chris Provenzano	proven@io.proven.org
 Christian Cornelssen	ccorn@cs.tu-berlin.de
 Claudio Fontana		sick_soul@yahoo.it
@@ -57,7 +60,9 @@ Clifford Wolf		clifford@clifford.at
 Dalibor Topic		robilad@kaffe.org
 danbp			danpb@nospam.postmaster.co.uk
 Daniel Jacobowitz	drow@false.org
+Daniel Kahn Gillmor	dkg@fifthhorseman.net
 Dave Brolley		brolley@redhat.com
+Dave Korn		dave.korn.cygwin@googlemail.com
 Dave Morrison		dave@bnl.gov
 David A. Swierczek	swiercze@mr.med.ge.com
 David Byron		dbyron@dbyron.com
@@ -90,6 +95,7 @@ Erick Branderhorst	branderh@iaehv.nl
 Erik Lindahl		E.Lindahl@chem.rug.nl
 Esben Haabendal Soerensen bart@kom.aau.dk
 Ezra Peisach		epeisach@MED-XTAL.BU.EDU
+Fabian Alenius		fabian.alenius@gmail.com
 Flavien Astraud		flav42@yahoo.fr
 Francesco Salvestrini	salvestrini@gmail.com
 François Pinard		pinard@iro.umontreal.ca
@@ -123,6 +129,7 @@ James Amundson		amundson@users.sourceforge.net
 James Henstridge	james@daa.com.au
 James R. Van Zandt	jrv@vanzandt.mv.com
 James Youngman		jay@gnu.org
+Jan Engelhardt		jengelh@medozas.de
 Janos Farkas		chexum@shadow.banki.hu
 Jared Davis		abiword@aiksaurus.com
 Jason Duell		jcduell@lbl.gov
@@ -143,6 +150,7 @@ Joel N. Weber II	nemo@koa.iolani.honolulu.hi.us
 Joerg-Martin Schwarz	jms@jms.prima.ruhr.de
 Johan Danielsson	joda@pdc.kth.se
 Johannes Nicolai	johannes.nicolai@student.hpi.uni-potsdam.de
+John Calcote		john.calcote@gmail.com
 John Pierce		hawkfan@pyrotechnics.com
 John Ratliff		autoconf@technoplaza.net
 John W. Coomes		jcoomes@eng.Sun.COM
@@ -171,6 +179,7 @@ Laurent Morichetti	laurentm@cup.hp.com
 Leo Davis		ldavis@fonix.com
 Leonardo Boiko		leoboiko@conectiva.com.br
 Loulou Pouchet		loulou@lrde.epita.fr
+Luo Yi			luoyi.ly@gmail.com
 Maciej Stachowiak	mstachow@mit.edu
 Maciej W. Rozycki	macro@ds2.pg.gda.pl
 Manu Rouat		emmanuel.rouat@wanadoo.fr
@@ -184,6 +193,7 @@ Mark Galassi		rosalia@nis.lanl.gov
 Mark Mitchell		mark@codesourcery.com
 Mark Phillips		msp@nortelnetworks.com
 Markku Rossi		mtr@ngs.fi
+Markus Duft		Markus.Duft@salomon.at
 Markus F.X.J. Oberhumer	k3040e4@wildsau.idv-edu.uni-linz.ac.at
 Martin Bravenboer	martin@cs.uu.nl
 Martin Frydl		martin@idoox.com
@@ -197,6 +207,7 @@ Matthias Clasen		clasen@mathematik.uni-freiburg.de
 Maxim Sinev		good@goods.ru
 Merijn de Jonge		M.de.Jonge@cwi.nl
 Michael Brantley	Michael-Brantley@deshaw.com
+Michael Ploujnikov	ploujj@gmail.com
 Michel de Ruiter	mdruiter@cs.vu.nl
 Mike Castle		dalgoda@ix.netcom.com
 Mike Frysinger		vapier@gentoo.org
@@ -281,6 +292,7 @@ Sam Steingold		sds@gnu.org
 Sander Niemeijer	niemeijer@science-and-technology.nl
 Santiago Vila		sanvila@unex.es
 Scott James Remnant	scott@netsplit.com
+Sergey Poznyakoff	gray@gnu.org.ua
 Sergey Vlasov		vsu@mivlgu.murom.ru
 Seth Alves		alves@hungry.com
 Shuhei Amakawa		sa264@cam.ac.uk
@@ -304,6 +316,7 @@ Thomas Schwinge		tschwinge@gnu.org
 Thomas Tanner		tanner@ffii.org
 Tim Goodwin		tjg@star.le.ac.uk
 Tim Mooney		mooney@dogbert.cc.ndsu.NoDak.edu
+Tim Rice		tim@multitalents.net
 Tim Van Holder		tim.van.holder@pandora.be
 Toshio Kuratomi		toshio@tiki-lounge.com
 Tom Epperly		tepperly@llnl.gov
@@ -315,11 +328,13 @@ Vincent Lefevre		vincent@vinc17.org
 Volker Boerchers	vboerchers@tecon.de
 Werner John		john@oswf.de
 Werner Koch		wk@isil.d.shuttle.de
+Werner Lemberg		wl@gnu.org
 William Pursell		bill.pursell@gmail.com
 William S Fulton	wsf@fultondesigns.co.uk
 Yann Droneaud		ydroneaud@meuh.eu.org
 Younes Younes		younes@cs.tu-berlin.de
 Zack Weinberg		zack@codesourcery.com
+Zoltan Rado		z.rado@chello.hu
 
 ;; Local Variables:
 ;; mode: text

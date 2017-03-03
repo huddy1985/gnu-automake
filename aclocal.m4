@@ -1,7 +1,7 @@
-# generated automatically by aclocal 1.10.2 -*- Autoconf -*-
+# generated automatically by aclocal 1.10.3 -*- Autoconf -*-
 
 # Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-# 2005, 2006, 2007, 2008  Free Software Foundation, Inc.
+# 2005, 2006, 2007, 2008, 2009  Free Software Foundation, Inc.
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -13,8 +13,8 @@
 
 m4_ifndef([AC_AUTOCONF_VERSION],
   [m4_copy([m4_PACKAGE_VERSION], [AC_AUTOCONF_VERSION])])dnl
-m4_if(m4_defn([AC_AUTOCONF_VERSION]), [2.63],,
-[m4_warning([this file was generated for autoconf 2.63.
+m4_if(m4_defn([AC_AUTOCONF_VERSION]), [2.65],,
+[m4_warning([this file was generated for autoconf 2.65.
 You have another version of autoconf.  It may work, but is not guaranteed to.
 If you have problems, you may need to regenerate the build system entirely.
 To do so, use the procedure documented by the package, typically `autoreconf'.])])
