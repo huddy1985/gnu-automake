@@ -1,3 +1,342 @@
+2009-12-06  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* configure.ac, NEWS: Bump version to 1.11.1.
+	* doc/automake.texi (Releases): Add line for 1.10.3 and 1.11.1.
+
+	* INSTALL, lib/INSTALL, lib/config.guess, lib/config.sub:
+	Sync from upstream.
+
+	Revert "Avoid sleeping for one second most of the time in sanity check."
+	Not sleeping in the configure sanity check breaks several tests
+	on systems that provide sub-second time stamps, when only some
+	of the tools support them, some truncate them, and other round
+	them.
+	* m4/sanity.m4 (AM_SANITY_CHECK): Do sleep for a second.
+	Report by Peter Breitenlohner and others.
+
+	* NEWS: Update.
+
+2009-12-05  Antonio Diaz Diaz  <ant_diaz@teleline.es>
+
+	Replace unlzma, gunzip, bunzip2 with pack tool -d invocation.
+	* lib/am/distdir.am (distcheck): Use lzma -d, gzip -d, bzip2 -d,
+	instead of the respective un$tool invocation, to avoid depending
+	on another tool.
+	* THANKS: Update.
+
+2009-12-05  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	Use $DJDIR rather than $DJGPP to detect running on DJGPP.
+	* automake.in (Language): Use $ENV{'DJDIR'} for the
+	$ENV{'SHELL'} override.
+	* bootstrap: Use $DJDIR for setting BOOTSTRAP_SHELL, to fix
+	bootstrapping under MinGW when $DJGPP has been set.
+
+	Do not rely on Perl symlink status, for MSYS perl.
+	* automake.in (require_file_internal): Ensure presence of
+	symlink target file; MSYS perl symlink doesn't return an error
+	status when the file could not be created (copied, on this
+	system).  Fixes symlink.test failure.
+
+2009-12-04  Stefano Lattarini  <stefano.lattarini@gmail.com>
+	    Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	Avoid Solaris sh `set -e' bug in vala4.test.
+	* tests/vala4.test: New variable $cwd, holding the full path of the
+	current directory.  Use it instead of `pwd` command substitution,
+	to avoid Heirloom/Solaris Sh bug with `set -e'.
+
+2009-11-28  Jim Meyering  <meyering@redhat.com>
+
+	do not put world-writable directories in distribution tarballs
+	* lib/am/distdir.am (distdir): Do not make all directories
+	group- or world-writable.  Instead, use 755.
+	* tests/subpkg4.test (test-distdir-is-readable): Check for new,
+	more restricted permissions.
+
+2009-11-29  Karl Berry  <karl@freefriends.org>
+
+	Rewrite `gnupload --help' examples.
+	* lib/gnupload: Use GNU style version numbers, a generic package
+	name, and more useful examples.
+
+2009-11-28  Jim Meyering  <meyering@redhat.com>
+
+	avoid a warning from perl-5.11
+	* lib/Automake/Wrap.pm (_tab_length): Remove useless use of tr's
+	"/d" modifier.
+
+2009-11-14  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	Distribute the Automake bootstrap script.
+	* Makefile.am (EXTRA_DIST): Add bootstrap.
+	Report by Jan Engelhardt.
+
+2009-10-31  Jim Meyering  <meyering@redhat.com>
+	    Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	Don't let an envvar setting of "$fail" cause build failure.
+	Without this change, in a project using an automake-generated
+	Makefile, "make fail=anything" would fail inappropriately,
+	due to the `test -z "$$fail"' at the end of this emitted rule:
+	* lib/am/subdirs.am ($(RECURSIVE_TARGETS)): Initialize "fail=" to keep
+	an envvar setting of that variable from causing unwarranted failure.
+	($(RECURSIVE_CLEAN_TARGETS)): Likewise.
+	* tests/subdir10.test: New test.
+	* tests/Makefile.am: Update.
+
+2009-10-17  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	Sync auxiliary files from upstream.
+	* INSTALL, lib/INSTALL, lib/config.guess, lib/config.sub,
+	lib/texinfo.tex: Sync from upstream.
+
+	Doc and comment typos.
+	* automake.in (handle_ltlibraries): Fix typo in comment.
+	* tests/distcom7.test: Likewise.
+	* tests/lisp5.test: Likewise.
+	* doc/automake.texi (Usage of Conditionals): Fix typo.
+
+2009-10-11  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	Fix race condition in werror2.test due to sanity sleep change.
+	* tests/werror2.test: Generate Makefile.in before configure so
+	that a Makefile.am update after configure has run is guaranteed
+	to be newer than Makefile.in.
+	* tests/subdir5.test: Document why this test does not need to be
+	fixed.
+	* tests/subdir8.test: Likewise.
+
+	Improve description of the various *LINK variables.
+	* doc/automake.texi (Program and Library Variables): _LINK also
+	receives libraries to link against.  _LINK may be generated.
+	(Program Variables): Document reasons when per-target _LINK is
+	used instead of LINK.
+	(How the Linker is Chosen): Document how a per-target _LINK
+	variable and per-target link flags override linker selection.
+	* THANKS: Update.
+	Report by Dave Korn against gcc/libstdc++-v3.
+
+	Allow variable override of, rather than by, silent variables.
+	When overriding variables, check the VAR_SILENT status of the
+	old condition, not the new one: we allow non-silent overrides
+	of silent variables (these do not hit ordering bugs in the
+	automake output), but there is no use case for doing so the
+	other way round.  Fixes conditional overrides of variables
+	annotated AM_SUBST_NOTMAKE in configure.ac.
+	* lib/Automake/Variable.pm (_check_ambiguous_condition): Check
+	for VAR_SILENT in $ambig_cond not $cond.
+	* tests/cond44.test, tests/cond45.test: New tests, analogous to
+	cond23.test and cond24.test.
+	* tests/Makefile.am: Update.
+	Spotted originally in binutils/bfd.
+
+	Fix `make clean check' for the Automake package.
+	* lib/Automake/Makefile.am (SUBDIRS): Add `.' before `tests',
+	so that Config.pm is built first.
+
+	Fix in-tree `recheck' after failed test that runs `check'.
+	If a test like pr401b-p.test fails for some reason, a `make
+	recheck' would cause another reason for failure because it sets
+	AM_MAKEFLAGS which gets propagated into the test and causes its
+	`make check' to fail.
+	* tests/defs.in: Also unset AM_MAKEFLAGS.
+
+2009-10-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Updated code enabling Bourne-compatibility in test scripts.
+	* tests/defs.in: updated the code enabling Bourne-compatibility
+	mode in the shell (now it's copied from autoconf 2.64).
+
+	Avoid leaking TEST_LOG_COMPILER in environment of test scripts.
+	* tests/defs.in: Unset variable `TEST_LOG_COMPILER'.
+
+2009-10-07  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Testsuite: do not use `chmod -R' when cleaning up.
+	* tests/Makefile.am (clean-local-check): Do not use `chmod -R' on
+	the test directories, as that may change or try to change the mode
+	of installed files: the test directory may contain symlinks to
+	ltmain.sh files from a Libtool installation, and Solaris `chmod -R'
+	touches symlink targets.  Instead, use the cleanup strategy used
+	in distdir.am (which is also employed in tests/defs.in).
+
+2009-10-06  Bruno Haible  <bruno@clisp.org>
+	    Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	Fix 'compile' script to not call mv when target equals source.
+	* lib/compile: Don't attempt to move the generated file to its
+	target destination when it is already at the target destination.
+	Avoids an mv failure with subdir-objects.
+	* tests/ccnoco3.test: New test.
+	* tests/Makefile.am: Adjust.
+
+2009-10-01  Stefano Lattarini  <stefano.lattarini@gmail.com>  (tiny change)
+
+	Fix recommended way to run automake's test scripts with Zsh.
+	* tests/README (Supported shells): Changed the recommended way
+	to run automake's test scripts with Zsh.  Now we tell to use
+	the Zsh's command line option `-o no_function_argzero', not
+	`--no-function-argzero', since the latter does not work with
+	versions 3.x of Zsh.
+
+2009-09-18  Peter Johansson  <trojkan@gmail.com>  (tiny change)
+
+	Fix link to "Recursive Make Considered Harmful" paper.
+	* doc/automake.texi (Alternative): Fix broken URL.
+
+2009-09-11  Reuben Thomas <rrt@sc3d.org>  (tiny patch)
+
+	Fix outdated reference to sh-utils in the manual.
+	* doc/automake.texi (Options): The reference to `sh-utils'
+	should be to `coreutils'.
+
+2009-09-06  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	Avoid sleeping for one second most of the time in sanity check.
+	* m4/sanity.m4 (AM_SANITY_CHECK): Try sanity check first without
+	sleeping for a second, and only if that failed, sleep and try
+	again, to avoid the delay in the common case of a configure
+	script that is older than a second, or a system with sub-second
+	time stamp granularity.
+	Report and different patch by Jim Meyering.
+
+2009-09-06  Stefano Lattarini  <stefano.lattarini@gmail.com>  (tiny change)
+
+	tests/README: warn about zsh incompatibilities.
+	* tests/README (User interface, Getting details from failures):
+	Explicitly state that every test is a "shell script", not just
+	a "script", and that it's run by `/bin/sh' by default.
+	* tests/README (User interface, Supported shells): New subsection,
+	telling about expected portability of the automake test scripts,
+	describing a zsh incompatibility (w.r.t. $0), and a workaround to
+	it (with the `--no-function-argzero' option).
+
+	testsuite: fix a minor glitch.
+	* tests/defs.in (exit trap): Use `$me', not `$as_me', as the
+	name of the current test (used in error messages).
+	* THANKS: Update.
+
+2009-07-08  Jim Meyering  <meyering@redhat.com>
+
+	manual: fix a trivial grammar error.
+	* doc/automake.texi (Invoking aclocal): Fix grammar.
+
+2009-06-07  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	AM_PROG_GCJ: use AC_CHECK_TOOLS for gcj, for cross compilation.
+	* m4/gcj.m4 (AM_PROG_GCJ): Use AC_CHECK_TOOLS, rather than
+	AC_CHECK_PROGS, when searching for `gcj'.
+	* NEWS: Update.
+	Report by Jack Kelly.
+
+2009-05-24  Jack Kelly  <endgame.dos@gmail.com>  (tiny change)
+	    Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	AM_PROG_GCJ currently fails to define OBJEXT and EXEEXT.
+	* tests/gcj6.test: New test.
+	* tests/Makefile.am: Update; mark gcj6.test as XFAIL.
+	* THANKS: Update.
+
+2009-05-24  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	parallel-tests: avoid GNU make 3.80 substitution bug.
+	* lib/am/check.am [PARALLEL_TESTS] (check-TESTS): Remove any
+	`.log' entries from `$(TEST_LOGS)' even if the list is nonempty,
+	to work around GNU make 3.80 substitution reference issue with
+	trailing white space in the variable.
+	* tests/parallel-tests10.test: New test.
+	* tests/parallel-tests6.test: Update comment.
+	* tests/Makefile.am: Update.
+	* NEWS: Update.
+	Report by Bob Friesenhahn.
+
+2009-05-23  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	testsuite: unset installation directory variables.
+	* tests/defs.in: Before test execution, be sure to unset all
+	installation directory variables, so they cannot have an effect
+	on a `make -e install' command within a test.
+	Report by Dagobert Michelsen.
+
+	testsuite: do not change the mode of installed Libtool files.
+	* tests/defs.in: Do not use `chmod -R' on the test directory, as
+	that may change or try to change the mode of installed files:
+	the test directory may contain symlinks to ltmain.sh files from
+	a Libtool installation, and Solaris `chmod -R' touches symlink
+	targets.  Instead, use the cleanup strategy used in distdir.am.
+	* NEWS: Update.
+	Report by Dagobert Michelsen.
+
+	testsuite: do not fail in cleanup code.
+	* tests/defs.in: Turn off errexit in the cleanup trap, to avoid
+	a test failure due to a nonzero command.
+	* THANKS: Update.
+	Report by Dagobert Michelsen.
+
+2009-05-23  Peter O'Gorman  <peter@pogma.com>
+
+	python: do not install in system directories on Darwin 9.
+	On Darwin 9, get_python_lib returns a path below `/Library/Python'
+	regardless of the `prefix' argument it was passed, causing `make
+	install' to target the system directories regardless of `--prefix'
+	argument used.  Work around this Darwin bug by ignoring the result
+	of get_python_lib if it points outside of the passed prefix, and
+	the prefix was not a system directory.
+	* m4/python.m4 (AM_PATH_PYTHON): If the prefix does not match the
+	initial portion of the pythondir returned by get_python_lib, then
+	ignore it unless the configured prefix is `/usr' or starts with
+	`/System'.  Fixes instmany-python.test failure on Mac OS X 10.5.7.
+	* NEWS: Update.
+
+2009-05-23  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	Clarify how to enable `silent-rules' and other global options.
+	* doc/automake.texi (Options): When introducing options, be more
+	careful to note that not all of them can be specified in
+	AUTOMAKE_OPTIONS statements, and that some do not make sense in
+	subdirectories.  Note more prominently that `silent-rules' can
+	only be specified in configure.ac.
+	* lib/Automake/Options.pm (_process_option_list): Improve error
+	message for `silent-rules', `tar-v7', `tar-ustar', `tar-pax'
+	options specified in Makefile.am files.
+	Report by Bruno Haible.
+
+2009-05-21  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	Skip specflg10.test without a C++ compiler.
+	* tests/specflg10.test: Require g++.
+	Report by Thien-Thi Nguyen.
+
+2009-05-19  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	Revert last patch, IRIX has an editor named `jot'.
+	* tests/instmany-mans.test: Do not try `jot'.
+	* tests/instmany-python.test: Likewise.
+	* tests/instmany.test: Likewise.
+	Report by Peter O'Gorman.
+
+2009-05-18  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	testsuite: also try `jot' as `seq' replacement.
+	* tests/instmany-mans.test: Try BSD `jot' before resorting to a
+	slow but portable shell loop.
+	* tests/instmany-python.test: Likewise.
+	* tests/instmany.test: Likewise.
+	Suggestion by Peter O'Gorman.
+
+	Fix test failure when pkg.m4 is not found, only pkg-config.
+	* tests/vala5.test: Update comment, this test is not expected to
+	fail any more.  Require valac version 0.7.0.  Skip if configure
+	fails, could be due to unexpanded PKG_CHECK_MODULES or too old
+	valac.
+	Report by Simon Josefsson.
+
+2009-05-17  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	Post-release version bump.
+	* configure.ac, NEWS: Bump version to 1.11.0a.
+
 2009-05-17  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
 
 	Automake 1.11.

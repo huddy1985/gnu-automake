@@ -4,6 +4,7 @@ XFAIL_TESTS =					\
 all.test					\
 auxdir2.test					\
 cond17.test					\
+gcj6.test					\
 txinfo5.test
 
 include $(srcdir)/parallel-tests.am
@@ -102,6 +103,7 @@ canon5.test \
 canon-name.test \
 ccnoco.test \
 ccnoco2.test \
+ccnoco3.test \
 check.test \
 check2.test \
 check3.test \
@@ -183,6 +185,8 @@ cond40.test \
 cond41.test \
 cond42.test \
 cond43.test \
+cond44.test \
+cond45.test \
 condd.test \
 condhook.test \
 condinc.test \
@@ -303,6 +307,7 @@ gcj2.test \
 gcj3.test \
 gcj4.test \
 gcj5.test \
+gcj6.test \
 getopt.test \
 gettext.test \
 gettext2.test \
@@ -502,6 +507,7 @@ parallel-tests6.test \
 parallel-tests7.test \
 parallel-tests8.test \
 parallel-tests9.test \
+parallel-tests10.test \
 parse.test \
 percent.test \
 percent2.test \
@@ -611,6 +617,7 @@ subdir6.test \
 subdir7.test \
 subdir8.test \
 subdir9.test \
+subdir10.test \
 subdirbuiltsources.test \
 subcond.test \
 subcond2.test \
@@ -741,5 +748,11 @@ check_SCRIPTS = defs defs-p aclocal-$(APIVERSION) automake-$(APIVERSION)
 clean-local: clean-local-check
 .PHONY: clean-local-check
 clean-local-check:
-	-chmod -R u+rwx *.dir
-	-rm -rf defs-p *.dir
+	-set x *.dir; shift; \
+	 if test "$$#,$$1" = "1,*.dir"; then \
+	   : there is no test directory to clean; \
+	 else \
+	   find "$$@" -type d '!' -perm -200 -exec chmod u+w {} ';'; \
+	   rm -rf "$$@"; \
+	 fi;
+	-rm -f defs-p

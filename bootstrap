@@ -17,8 +17,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software Foundation,
-# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Find the path separator
 echo "#! /bin/sh" >boot$$.sh
@@ -57,11 +56,12 @@ fi
 VERSION=`sed -ne '/AC_INIT/s/^[^[]*\[[^[]*\[\([^]]*\)\].*$/\1/p' configure.ac`
 PACKAGE=automake
 datadir=.
+PERL_THREADS=0
 
 # Override SHELL.  This is required on DJGPP so that Perl's system()
 # uses bash, not COMMAND.COM which doesn't quote arguments properly.
 # It's not used otherwise.
-if test -n "$DJGPP"; then
+if test -n "$DJDIR"; then
     BOOTSTRAP_SHELL=/dev/env/DJDIR/bin/bash.exe
 else
     BOOTSTRAP_SHELL=/bin/sh
@@ -101,6 +101,7 @@ dosubst ()
   sed -e "s%@APIVERSION@%$APIVERSION%g" \
       -e "s%@PACKAGE@%$PACKAGE%g" \
       -e "s%@PERL@%$PERL%g" \
+      -e "s%@PERL_THREADS@%$PERL_THREADS%g" \
       -e "s%@SHELL@%$BOOTSTRAP_SHELL%g" \
       -e "s%@VERSION@%$VERSION%g" \
       -e "s%@datadir@%$datadir%g" \
@@ -122,6 +123,11 @@ dosubst m4/amversion.in m4/amversion.m4
 
 # Create temporary replacement for automake
 dosubst automake.in automake.tmp
+
+# Create tests/parallel-tests.am.
+cd tests
+$BOOTSTRAP_SHELL ./gen-parallel-tests > parallel-tests.am
+cd ..
 
 # Run the autotools.
 $PERL ./aclocal.tmp -I m4

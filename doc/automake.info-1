@@ -1,8 +1,9 @@
-This is automake.info, produced by makeinfo version 4.11.90 from
-automake.texi.
+This is ../../automake/doc/automake.info, produced by makeinfo version
+4.11.90 from ../../automake/doc/automake.texi.
 
-This manual is for GNU Automake (version 1.11, 17 May 2009), a program
-that creates GNU standards-compliant Makefiles from template files.
+This manual is for GNU Automake (version 1.11.1, 8 December 2009), a
+program that creates GNU standards-compliant Makefiles from template
+files.
 
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
@@ -32,8 +33,9 @@ File: automake.info,  Node: Top,  Next: Introduction,  Up: (dir)
 GNU Automake
 ************
 
-This manual is for GNU Automake (version 1.11, 17 May 2009), a program
-that creates GNU standards-compliant Makefiles from template files.
+This manual is for GNU Automake (version 1.11.1, 8 December 2009), a
+program that creates GNU standards-compliant Makefiles from template
+files.
 
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
@@ -2639,7 +2641,7 @@ smaller, eases dependency tracking, and cause the file to be
 distributed automatically.  (*Note Local Macros::, for an example.)
 Any macro that is found in a system-wide directory, or via an absolute
 search path will be copied.  So use `-I `pwd`/reldir' instead of `-I
-reldir' whenever some relative directory need to be considered outside
+reldir' whenever some relative directory should be considered outside
 the package.
 
    The contents of `acinclude.m4', if this file exists, are also
@@ -3739,8 +3741,7 @@ File: automake.info,  Node: Alternative,  Next: Subpackages,  Prev: Conditional 
 =============================================
 
 If you've ever read Peter Miller's excellent paper, Recursive Make
-Considered Harmful
-(http://www.pcug.org.au/~millerp/rmch/recu-make-cons-harm.html), the
+Considered Harmful (http://miller.emu.id.au/pmiller/books/rmch/), the
 preceding sections on the use of subdirectories will probably come as
 unwelcome advice.  For those who haven't read the paper, Miller's main
 thesis is that recursive `make' invocations are both slow and
@@ -4835,11 +4836,17 @@ libraries differ.
      linker is chosen according to the languages used by the program.
      For instance, a program that includes C++ source code would use
      the C++ compiler to link.  The `_LINK' variable must hold the name
-     of a command that can be passed all the `.o' file names as
-     arguments.  Note that the name of the underlying program is _not_
-     passed to `_LINK'; typically one uses `$@':
+     of a command that can be passed all the `.o' file names and
+     libraries to link against as arguments.  Note that the name of the
+     underlying program is _not_ passed to `_LINK'; typically one uses
+     `$@':
 
           maude_LINK = $(CCLD) -magic -o $@
+
+     If a `_LINK' variable is not supplied, it may still be generated
+     and used by Automake due to the use of per-target link flags such
+     as `_CFLAGS', `_LDFLAGS' or `_LIBTOOLFLAGS', in cases where they
+     apply.
 
 `maude_CCASFLAGS'
 `maude_CFLAGS'
@@ -5136,7 +5143,9 @@ some special cases.
      This is the command used to actually link a C program.  It already
      includes `-o $@' and the usual variable references (for instance,
      `CFLAGS'); it takes as "arguments" the names of the object files
-     and libraries to link in.
+     and libraries to link in.  This variable is not used when the
+     linker is overridden with a per-target `_LINK' variable or
+     per-target flags cause Automake to define such a `_LINK' variable.
 
 
 File: automake.info,  Node: Yacc and Lex,  Next: C++ Support,  Prev: Program Variables,  Up: Programs
@@ -5580,6 +5589,10 @@ inconvenient because you are linking against a library written in
 another language and would like to set the linker more appropriately.
 *Note Libtool Convenience Libraries::, for a trick with
 `nodist_EXTRA_..._SOURCES'.
+
+   A per-target `_LINK' variable will override the above selection.
+Per-target link flags will cause Automake to write a per-target `_LINK'
+variable according to the language chosen as above.
 
 
 File: automake.info,  Node: Fortran 9x Support,  Next: Java Support,  Prev: Fortran 77 Support,  Up: Programs

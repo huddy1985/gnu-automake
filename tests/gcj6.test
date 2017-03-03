@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2004, 2009  Free Software Foundation, Inc.
+# Copyright (C) 2009  Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,28 +14,40 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Test to make sure that Automake complains when an auxfile (here depcomp)
-# is installed, but the Makefile that distributes it is not processed.
+# AM_PROG_GCJ should cause OBJEXT and EXEEXT to be set.
 
+required='gcj'
 . ./defs || Exit 1
 
-cat > configure.in << 'END'
-AC_INIT(subdir/foo.c)
-AM_INIT_AUTOMAKE(nonesuch, nonesuch)
-AC_PROG_CC
-AC_OUTPUT(Makefile subdir/Makefile)
+set -e
+
+cat >> configure.in << 'END'
+AM_PROG_GCJ
+AC_OUTPUT
 END
 
 cat > Makefile.am << 'END'
-SUBDIRS = subdir
+noinst_PROGRAMS = test
+test_SOURCES = Test.java
+test_LDFLAGS = --main=Test
 END
 
-rm -f depcomp
-mkdir subdir
-
-echo bin_PROGRAMS = foo > subdir/Makefile.am
-: > subdir/foo.c
+cat >Test.java << 'END'
+public class Test {
+    public static void main(String[] argv) {
+        System.out.println("Hello, automake!");
+    }
+}
+END
 
 $ACLOCAL
-AUTOMAKE_fails --add-missing subdir/Makefile
-grep 'full run' stderr
+$AUTOMAKE
+$AUTOCONF
+./configure
+
+# These fail without e.g., AC_PROG_CC.
+$MAKE
+grep "OBJEXT = " Makefile
+grep "EXEEXT = " Makefile
+
+:

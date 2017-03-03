@@ -1,3 +1,34 @@
+New in 1.11.1:
+
+Bugs fixed in 1.11.1:
+
+  - Lots of minor bugfixes.
+
+* Bugs introduced by 1.11:
+
+  - The `parallel-tests' test driver works around a GNU make 3.80 bug with
+    trailing white space in the test list (`TESTS = foo $(EMPTY)').
+
+* Long standing bugs:
+
+  - On Darwin 9, `pythondir' and `pyexecdir' pointed below `/Library/Python'
+    even if the `--prefix' argument pointed outside of a system directory.
+    AM_PATH_PYTHON has been fixed to ignore the value returned from python's
+    `get_python_lib' function if it points outside the configured prefix,
+    unless the `--prefix' argument was either `/usr' or below `/System'.
+
+  - The testsuite does not try to change the mode of `ltmain.sh' files from
+    a Libtool installation (symlinked to test directories) any more.
+
+  - AM_PROG_GCJ uses AC_CHECK_TOOLS to look for `gcj' now, so that prefixed
+    tools are preferred in a cross-compile setup.
+
+  - The distribution is tarred up with mode 755 now by the `dist*' targets.
+    This fixes a race condition where untrusted users could modify files
+    in the $(PACKAGE)-$(VERSION) distdir before packing if the toplevel
+    build directory was world-searchable.  This is CVE-2009-4029.
+
+
 New in 1.11:
 
 * Version requirements:
