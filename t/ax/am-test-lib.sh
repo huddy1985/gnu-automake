@@ -675,13 +675,6 @@ require_tool ()
       makedepend -f- \
         || skip_all_ "required program 'makedepend' not available"
       ;;
-    makeinfo-html)
-      # Make sure we have makeinfo, and it understands '--html'.
-      echo "$me: running makeinfo --html --version"
-      makeinfo --html --version \
-        || skip_all_ "cannot find a makeinfo program that groks" \
-                     "the '--html' option"
-      ;;
     mingw)
       uname_s=$(uname -s || echo UNKNOWN)
       echo "$me: system name: $uname_s"
@@ -755,12 +748,6 @@ require_tool ()
       if test -z "$TEX"; then
         skip_all_ "TeX is required, but it wasn't found by configure"
       fi
-      ;;
-    texi2dvi-o)
-      # Texi2dvi supports '-o' since Texinfo 4.1.
-      echo "$me: running texi2dvi -o /dev/null --version"
-      texi2dvi -o /dev/null --version \
-        || skip_all_ "required program 'texi2dvi' not available"
       ;;
     lex)
       test x"$LEX" = x"false" && skip_all_ "lex not found or disabled"
@@ -843,9 +830,9 @@ am_setup_testdir ()
     {
       echo "AC_INIT([$me], [1.0])"
       if test x"$am_serial_tests" = x"yes"; then
-        echo "AM_INIT_AUTOMAKE"
+        echo "AM_INIT_AUTOMAKE([serial-tests])"
       else
-        echo "AM_INIT_AUTOMAKE([parallel-tests])"
+        echo "AM_INIT_AUTOMAKE"
       fi
       echo "AC_CONFIG_FILES([Makefile])"
     } >configure.ac || framework_failure_ "creating configure.ac skeleton"

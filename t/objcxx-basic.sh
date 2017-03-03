@@ -15,7 +15,7 @@
 # require an Objective-C++ compiler.
 # See also sister test 'objc-basic.sh'.
 
-. ./defs || exit 1
+. test-init.sh
 
 cat > Makefile.am <<'END'
 bin_PROGRAMS = hello
@@ -30,19 +30,10 @@ grep "add .*'AC_PROG_OBJCXX'" stderr
 rm -rf autom4te*.cache
 
 cat >> configure.ac <<'END'
-dnl Support for Object C++ was introduced only in Autoconf 2.65.
-AC_PREREQ([2.65])
 AC_PROG_OBJCXX
 END
 
-if $ACLOCAL; then
-  : We have a modern enough autoconf, go ahead.
-elif test $? -eq 63; then
-  skip_ "Object C++ support requires Autoconf 2.65 or later"
-else
-  exit 1 # Some other aclocal failure.
-fi
-
+$ACLOCAL
 $AUTOMAKE
 $EGREP '^\.SUFFIXES:.* \.mm( |$)' Makefile.in
 

@@ -19,7 +19,7 @@
 # with the Automake test harness".
 
 am_create_testdir=empty
-. ./defs || exit 1
+. test-init.sh
 
 cat > Makefile.am <<'END'
 TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
@@ -31,7 +31,7 @@ END
 cat > configure.ac <<'END'
 AC_INIT([GNU Try Tap], [1.0], [bug-automake@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
-AM_INIT_AUTOMAKE([foreign parallel-tests -Wall -Werror])
+AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 AC_CONFIG_FILES([Makefile])
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
 AC_PROG_AWK

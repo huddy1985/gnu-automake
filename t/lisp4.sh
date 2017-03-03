@@ -18,7 +18,7 @@
 # Report from Simon Josefsson.
 
 required=emacs
-. ./defs || exit 1
+. test-init.sh
 
 cat > Makefile.am << 'EOF'
 lisp_LISP = am-one.el am-two.el am-three.el
@@ -32,7 +32,6 @@ test:
 	test ! -f am-one.elc
 	test ! -f am-two.elc
 	test ! -f am-three.elc
-	test ! -f elc-stamp
 
 install-test: install
 	test -f "$(lispdir)/am-one.el"

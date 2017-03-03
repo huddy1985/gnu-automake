@@ -17,10 +17,10 @@
 # Test to make sure several config headers are allowed.
 # See also sister "semantic" test 'confh8.sh'.
 
-. ./defs || exit 1
+. test-init.sh
 
 cat >> configure.ac << 'END'
-AM_CONFIG_HEADER([config.h two.h])
+AC_CONFIG_HEADERS([config.h two.h])
 END
 
 : > Makefile.am

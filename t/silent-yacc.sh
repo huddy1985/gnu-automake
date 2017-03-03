@@ -15,15 +15,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Check silent-rules mode for Yacc.
-# Keep this in sync with sister test 'silent-yacc-gcc.sh'.
 
 required='cc yacc'
-. ./defs || exit 1
+. test-init.sh
 
 mkdir sub
 
 cat >>configure.ac <<'EOF'
-AM_SILENT_RULES
 AM_PROG_CC_C_O
 AC_PROG_YACC
 AC_CONFIG_FILES([sub/Makefile])

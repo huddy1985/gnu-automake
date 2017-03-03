@@ -17,7 +17,7 @@
 # Test that compiling interdependent elisp files works.
 
 required=emacs
-. ./defs || exit 1
+. test-init.sh
 
 cat > Makefile.am << 'EOF'
 lisp_LISP = am-one.el am-two.el am-three.el
@@ -47,7 +47,6 @@ $MAKE
 test -f am-one.elc
 test -f am-two.elc
 test -f am-three.elc
-test -f elc-stamp
 
 # Make sure we can recover from a deletion.
 rm -f am-one.elc
@@ -78,15 +77,6 @@ test -f _inst/$dir/site-lisp/am-three.elc
 
 $MAKE uninstall
 find _inst | $EGREP '\.elc?$' && exit 1
-
-# Make sure we build all files when any of them change.
-# (We grep a message to make sure the compilation happens.)
-unique=0a3346e2af8a689b85002b53df09142a
-$sleep
-echo "(message \"$unique\")(provide 'am-three)" > am-three.el
-$MAKE >output 2>&1 || { cat output; exit 1; }
-cat output
-grep $unique output
 
 # It should also work for VPATH-builds.
 $MAKE distcheck

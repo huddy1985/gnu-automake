@@ -17,7 +17,7 @@
 # Test missing python.
 
 # Python is not required for this test.
-. ./defs || exit 1
+. test-init.sh
 
 # We don't want to allow user overrides in this test.
 PYTHON=; unset PYTHON

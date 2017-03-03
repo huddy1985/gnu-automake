@@ -16,7 +16,7 @@
 
 # Make sure that lisp_LISP also works when emacs is not installed.
 
-. ./defs || exit 1
+. test-init.sh
 
 cat > Makefile.am << 'EOF'
 dist_lisp_LISP = am-one.el am-two.el am-three.el
@@ -39,12 +39,10 @@ $AUTOMAKE --add-missing
 
 $MAKE >stdout || { cat stdout; exit 1; }
 cat stdout
-test 1 -eq $(grep -c 'Warnings can be ignored' stdout)
 
 test ! -e am-one.elc
 test ! -e am-two.elc
 test ! -e am-three.elc
-test -f elc-stamp
 
 $MAKE distcheck
 

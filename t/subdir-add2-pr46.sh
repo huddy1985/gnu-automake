@@ -19,9 +19,10 @@
 # it works when make is run from the top-level directory.
 # PR automake/46
 
-. ./defs || exit 1
+. test-init.sh
 
 cat >> configure.ac << 'END'
+AC_CONFIG_MACRO_DIR([m4])
 m4_include([confiles.m4])
 MORE_DEFS
 AC_OUTPUT
@@ -31,7 +32,6 @@ echo 'AC_CONFIG_FILES([sub/Makefile])' > confiles.m4
 
 cat > Makefile.am << 'END'
 SUBDIRS = sub
-ACLOCAL_AMFLAGS = -I m4
 END
 
 mkdir sub
@@ -41,7 +41,7 @@ mkdir sub
 mkdir m4
 echo 'AC_DEFUN([MORE_DEFS], [])' > m4/moredefs.m4
 
-$ACLOCAL -I m4
+$ACLOCAL
 $AUTOCONF
 $AUTOMAKE
 ./configure

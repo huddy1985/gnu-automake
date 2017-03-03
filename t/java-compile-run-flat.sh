@@ -20,12 +20,12 @@
 # This test uses a "flat" setup for the source tree (i.e., everything in
 # the top-level directory), and forces the use of the old, non-parallel
 # testsuite driver.  The sister test 'java-compile-run-nested.sh' do
-# similar checks with a more usual, "nested" setup, and using the newer
-# 'parallel-tests' driver.
+# similar checks with a more usual, "nested" setup, and using the older
+# 'serial-tests' driver.
 
 required='java javac'
 am_serial_tests=yes
-. ./defs || exit 1
+. test-init.sh
 
 echo "AC_SUBST([PATH_SEPARATOR], ['$PATH_SEPARATOR'])" >> configure.ac
 

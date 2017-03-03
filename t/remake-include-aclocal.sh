@@ -19,7 +19,7 @@
 #   - remake-include-configure.sh
 #   - remake-include-makefile.sh
 
-. ./defs || exit 1
+. test-init.sh
 
 magic1=::MagicStringOne::
 magic2=__MagicStringTwo__
@@ -32,13 +32,13 @@ else
 fi
 
 cat >> configure.ac <<END
+AC_CONFIG_MACRO_DIR([m4])
 FINGERPRINT='my_fingerprint'
 AC_SUBST([FINGERPRINT])
 AC_OUTPUT
 END
 
 cat > Makefile.am <<'END'
-ACLOCAL_AMFLAGS = -I m4
 .PHONY: nil
 nil:
 ## Used by "make distcheck" later.
@@ -51,7 +51,7 @@ END
 mkdir m4
 echo 'AC_DEFUN([my_fingerprint], [BadBadBad])' > m4/foo.m4
 
-$ACLOCAL -I m4
+$ACLOCAL
 $AUTOCONF
 $AUTOMAKE
 

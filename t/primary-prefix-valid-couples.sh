@@ -17,7 +17,7 @@
 # Test for valid prefix/primary combinations.
 # See also test 'primary-prefix-invalid-couples.sh'.
 
-. ./defs || exit 1
+. test-init.sh
 
 cat >> configure.ac <<'END'
 AC_PROG_CC
@@ -41,7 +41,6 @@ END
 echo '@setfilename foo' > foo.texi
 : > texinfo.tex
 : > py-compile
-: > elisp-comp
 : > ar-lib
 
 # Setup Makefile.am.

@@ -16,7 +16,7 @@
 
 # Make sure remaking rules work when subdir Makefile.in has been removed.
 
-. ./defs || exit 1
+. test-init.sh
 
 cat >> configure.ac << 'END'
 AC_CONFIG_FILES([sub/Makefile])
@@ -39,7 +39,7 @@ do_check ()
 {
   $MAKE >stdout || { cat stdout; exit 1; }
   cat stdout
-  test $(grep -c " --run " stdout) -eq 1
+  test $(grep -c "/missing " stdout) -eq 1
 }
 
 # Now, we are set up.  Ensure that, for either missing Makefile.in,

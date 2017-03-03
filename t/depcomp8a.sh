@@ -20,7 +20,7 @@
 # same thing for libtool objects.
 
 required=cc
-. ./defs || exit 1
+. test-init.sh
 
 cat >> configure.ac << 'END'
 AC_PROG_CC
@@ -37,12 +37,15 @@ mkdir sub
 cat > foo.c << 'END'
 int main (void)
 {
-  extern int bar;
-  return bar;
+  extern int bar (void);
+  return bar ();
 }
 END
 cat > sub/bar.c << 'END'
-extern int bar = 0;
+int bar (void)
+{
+  return 0;
+}
 END
 
 $ACLOCAL

@@ -20,7 +20,7 @@
 # FIXME: performance is too low, and FAIL accordingly; it just offers
 # FIXME: an easy way verify how effective a performance optimization is.
 
-. ./defs || exit 1
+. test-init.sh
 
 count=10000
 
@@ -45,7 +45,7 @@ for i in $(seq_ 1 $count); do
   echo :test-result: PASS >> $i.trs
   echo :copy-in-global-log: yes >> $i.trs
   echo TESTS += $i.t
-done >> Makefile.am 
+done >> Makefile.am
 
 # Re-enable shell traces.
 set -x

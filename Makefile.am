@@ -73,13 +73,13 @@ EXTRA_DIST += \
   syntax-checks.mk \
   HACKING
 
-## Make versioned links.  We only run the transform on the root name;
-## then we make a versioned link with the transformed base name.  This
-## seemed like the most reasonable approach.
+# Make versioned links.  We only run the transform on the root name;
+# then we make a versioned link with the transformed base name.  This
+# seemed like the most reasonable approach.
 install-exec-hook:
 	@$(POST_INSTALL)
 	@for p in $(bin_SCRIPTS); do \
-	  f="`echo $$p|sed '$(transform)'`"; \
+	  f=`echo $$p | sed '$(transform)'`; \
 	  fv="$$f-$(APIVERSION)"; \
 	  rm -f "$(DESTDIR)$(bindir)/$$fv"; \
 	  echo " $(LN) '$(DESTDIR)$(bindir)/$$f' '$(DESTDIR)$(bindir)/$$fv'"; \
@@ -88,13 +88,13 @@ install-exec-hook:
 
 uninstall-hook:
 	@for p in $(bin_SCRIPTS); do \
-	  f="`echo $$p|sed '$(transform)'`"; \
+	  f=`echo $$p | sed '$(transform)'`; \
 	  fv="$$f-$(APIVERSION)"; \
 	  rm -f "$(DESTDIR)$(bindir)/$$fv"; \
 	done
 
-## These files depend on Makefile so they are rebuilt if $(VERSION),
-## $(datadir) or other do_subst'ituted variables change.
+# These files depend on Makefile so they are rebuilt if $(VERSION),
+# $(datadir) or other do_subst'ituted variables change.
 automake: automake.in
 aclocal: aclocal.in
 automake aclocal: Makefile
@@ -105,9 +105,9 @@ automake aclocal: Makefile
 ## comments, and that is perfectly legit.
 	$(AM_V_at)chmod a+x,a-w $@-t && mv -f $@-t $@
 
-## The master location for INSTALL is lib/INSTALL.
-## This is where "make fetch" will install new versions.
-## Make sure we also update this copy.
+# The master location for INSTALL is lib/INSTALL.
+# This is where "make fetch" will install new versions.
+# Make sure we also update this copy.
 INSTALL: lib/INSTALL
 	$(AM_V_GEN)cp $(srcdir)/lib/INSTALL $@
 
@@ -131,9 +131,9 @@ dist_pkgvdata_DATA = \
   lib/INSTALL \
   lib/texinfo.tex
 
-## These must all be executable when installed.  However, if we use
-## _SCRIPTS, then the program transform will be applied, which is not
-## what we want.  So we make them executable by hand.
+# These must all be executable when installed.  However, if we use
+# _SCRIPTS, then the program transform will be applied, which is not
+# what we want.  So we make them executable by hand.
 dist_script_DATA = \
   lib/config.guess \
   lib/config.sub \
@@ -141,7 +141,6 @@ dist_script_DATA = \
   lib/mdate-sh \
   lib/missing \
   lib/mkinstalldirs \
-  lib/elisp-comp \
   lib/ylwrap \
   lib/depcomp \
   lib/compile \
@@ -267,14 +266,13 @@ dist_automake_ac_DATA = \
   m4/ar-lib.m4 \
   m4/as.m4 \
   m4/auxdir.m4 \
-  m4/ccstdc.m4 \
   m4/cond.m4 \
   m4/cond-if.m4 \
   m4/depend.m4 \
   m4/depout.m4 \
   m4/dmalloc.m4 \
+  m4/extra-recurs.m4 \
   m4/gcj.m4 \
-  m4/header.m4 \
   m4/init.m4 \
   m4/install-sh.m4 \
   m4/lead-dot.m4 \
@@ -285,9 +283,6 @@ dist_automake_ac_DATA = \
   m4/minuso.m4 \
   m4/missing.m4 \
   m4/mkdirp.m4 \
-  m4/obsol-gt.m4 \
-  m4/obsol-lt.m4 \
-  m4/obsolete.m4 \
   m4/options.m4 \
   m4/protos.m4 \
   m4/python.m4 \
@@ -299,6 +294,9 @@ dist_automake_ac_DATA = \
   m4/tar.m4 \
   m4/upc.m4 \
   m4/vala.m4
+
+automake_internal_acdir = $(automake_acdir)/internal
+dist_automake_internal_ac_DATA = m4/internal/ac-config-macro-dirs.m4
 
 dist_system_ac_DATA = m4/acdir/README
 
@@ -336,7 +334,8 @@ AM_TAP_LOG_DRIVER_FLAGS = --merge
 
 EXTRA_DIST += t/README t/ax/is t/ax/is_newest
 
-TESTS = ## Will be updated later.
+## Will be updated later.
+TESTS =
 
 # Some testsuite-influential variables should be overridable from the
 # test scripts, but not from the environment.
@@ -392,11 +391,16 @@ $(srcdir)/t/testsuite-part.am:
 	$(AM_V_at)mv -f t/testsuite-part.tmp $@
 EXTRA_DIST += gen-testsuite-part
 
-## The dependecies declared here are not truly complete, but such
-## completeness would cause more issues than it would solve.  See
-## automake bug#11347.
+# The dependecies declared here are not truly complete, but such
+# completeness would cause more issues than it would solve.  See
+# automake bug#11347.
 $(generated_TESTS): $(srcdir)/gen-testsuite-part
 $(srcdir)/t/testsuite-part.am: $(srcdir)/gen-testsuite-part Makefile.am
+
+# Hand-written tests for stuff in 'contrib/'.
+include $(srcdir)/contrib/t/local.am
+TESTS += $(contrib_TESTS)
+EXTRA_DIST += $(contrib_TESTS)
 
 # Static dependencies valid for each test case (also further
 # extended later).  Note that use 'noinst_' rather than 'check_'
@@ -429,7 +433,8 @@ EXTRA_DIST += t/ax/test-defs.in
 CLEANFILES += t/ax/test-defs.sh
 nodist_noinst_DATA = t/ax/test-defs.sh
 
-noinst_SCRIPTS = # Will be updated soon.
+## Will be updated soon.
+noinst_SCRIPTS =
 
 t/ax/shell-no-trail-bslash: t/ax/shell-no-trail-bslash.in Makefile
 	$(AM_V_at)rm -f $@ $@-t
@@ -515,7 +520,7 @@ check-no-trailing-backslash-in-recipes:
 .PHONY: check-no-trailing-backslash-in-recipes
 
 ## Checking the list of tests.
-test_subdirs = t t/pm
+test_subdirs = t t/pm contrib/t
 include $(srcdir)/t/CheckListOfTests.am
 
 # Run the testsuite with the installed aclocal and automake.
@@ -535,13 +540,16 @@ EXTRA_DIST += $(perf_TESTS)
 clean-local: clean-local-check
 .PHONY: clean-local-check
 clean-local-check:
-	-set x t/*.dir; shift; \
-	 if test "$$#,$$1" = "1,*.dir"; then \
-	   : there is no test directory to clean; \
-	 else \
-	   find "$$@" -type d ! -perm -700 -exec chmod u+rwx {} ';'; \
-	   rm -rf "$$@"; \
-	 fi;
+## Directories candidate to be test directories match this wildcard.
+	@globs='t/*.dir t/*/*.dir */t/*.dir */t/*/*.dir'; \
+## The 'nullglob' bash option is not portable, so use perl.
+	dirs=`$(PERL) -e "print join(' ', glob('$$globs'));"` || exit 1; \
+	if test -n "$$dirs"; then \
+## Errors in find are acceptable, errors in rm are not.
+	    find $$dirs -type d ! -perm -700 -exec chmod u+rwx {} ';'; \
+	    echo " rm -rf $$dirs"; \
+	    rm -rf $$dirs || exit 1; \
+	fi
 
 
 ## ---------------- ##

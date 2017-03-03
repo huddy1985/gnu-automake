@@ -17,7 +17,7 @@
 # Colorized output from the testsuite report shouldn't end up in log files.
 
 required='grep-nonprint'
-. ./defs || exit 1
+. test-init.sh
 
 TERM=ansi; export TERM
 
@@ -27,7 +27,7 @@ END
 
 cat >Makefile.am <<'END'
 LOG_COMPILER = $(SHELL)
-AUTOMAKE_OPTIONS = color-tests parallel-tests
+AUTOMAKE_OPTIONS = color-tests
 TESTS = pass fail skip xpass xfail error
 XFAIL_TESTS = xpass xfail
 END

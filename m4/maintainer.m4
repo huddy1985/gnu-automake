@@ -33,5 +33,3 @@ AC_MSG_CHECKING([whether to enable maintainer-specific portions of Makefiles])
   AC_SUBST([MAINT])dnl
 ]
 )
-
-AU_DEFUN([jm_MAINTAINER_MODE], [AM_MAINTAINER_MODE])

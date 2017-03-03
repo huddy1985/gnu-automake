@@ -18,8 +18,8 @@
 # Also make sure we do not distribute too much foo.info* files (Report
 # from Vincent Lefevre).
 
-required='makeinfo tex texi2dvi-o'
-. ./defs || exit 1
+required='makeinfo tex texi2dvi'
+. test-init.sh
 
 echo AC_OUTPUT >> configure.ac
 

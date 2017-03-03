@@ -16,10 +16,10 @@
 
 # Test to make sure config headers in subdirectories are cleaned.
 
-. ./defs || exit 1
+. test-init.sh
 
 cat >> configure.ac << 'END'
-AM_CONFIG_HEADER([sub/config.h:sub/config.hin])
+AC_CONFIG_HEADERS([sub/config.h:sub/config.hin])
 AC_OUTPUT
 END
 

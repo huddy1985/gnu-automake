@@ -17,11 +17,9 @@
 # Automatic dependency tracking for Objective C++.
 # See also sister test 'objc-deps.sh'.
 
-. ./defs || exit 1
+. test-init.sh
 
 cat >> configure.ac << 'END'
-dnl Support for Object C++ was introduced only in Autoconf 2.65.
-AC_PREREQ([2.65])
 AC_PROG_OBJCXX
 AC_OUTPUT
 END
@@ -50,13 +48,7 @@ int main (void)
 }
 END
 
-if $ACLOCAL; then
-  : We have a modern enough autoconf, go ahead.
-elif test $? -eq 63; then
-  skip_ "Object C++ support requires Autoconf 2.65 or later"
-else
-  exit 1 # Some other aclocal failure.
-fi
+$ACLOCAL
 $AUTOCONF
 $AUTOMAKE --add-missing
 

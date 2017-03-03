@@ -14,13 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Check the testsuite summary with the parallel-tests harness.  This
+# Check the testsuite summary with the parallel test harness.  This
 # script is meant to be sourced by other test script, so that it can
 # be used to check different scenarios (colorized and non-colorized
 # testsuite output, packages with and without bug-report addresses,
 # testsuites in subdirectories, ...)
 
-. ./defs || exit 1
+. test-init.sh
 
 case $use_colors in
   yes)
@@ -28,10 +28,8 @@ case $use_colors in
     # Forced colorization should take place also with non-ANSI
     # terminals; hence this setting.
     TERM=dumb; export TERM
-    am_opts='parallel-tests color-tests'
     ;;
   no)
-    am_opts='parallel-tests'
     ;;
   *)
     fatal_ "invalid use_colors='$use_colors'";;
@@ -39,7 +37,7 @@ esac
 
 cat > configure.ac <<END
 AC_INIT([GNU AutoFoo], [7.1], [bug-automake@gnu.org])
-AM_INIT_AUTOMAKE([$am_opts])
+AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
 END

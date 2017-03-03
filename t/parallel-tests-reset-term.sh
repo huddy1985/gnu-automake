@@ -14,11 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Check that the parallel-tests driver correctly handle overrides of the
+# Check that the testsuite harness correctly handle overrides of the
 # TERM variable by either TESTS_ENVIRONMENT and AM_TESTS_ENVIRONMENT.
 
 required='grep-nonprint'
-. ./defs || exit 1
+. test-init.sh
 
 TERM=ansi; export TERM
 

@@ -17,8 +17,8 @@
 # Test support for building HTML documentation, and the many
 # install-DOC flavors.
 
-required='makeinfo-html tex texi2dvi'
-. ./defs || exit 1
+required='makeinfo tex texi2dvi'
+. test-init.sh
 
 cat >>configure.ac <<\EOF
 AC_CONFIG_FILES([rec/Makefile])
@@ -34,6 +34,7 @@ AC_OUTPUT
 EOF
 
 cat > Makefile.am << 'END'
+check-local: ps pdf dvi html # For "make distcheck".
 SUBDIRS = rec
 info_TEXINFOS = main.texi sub/main2.texi
 END
@@ -75,13 +76,15 @@ install-pdf-local:
 	:> "$(pdfdir)/hello"
 uninstall-local:
 	rm -f "$(pdfdir)/hello"
+
+check-local: ps pdf dvi html # For "make distcheck".
 END
 
 $ACLOCAL
 $AUTOMAKE --add-missing
 $AUTOCONF
 
-./configure
+./configure --prefix "$(pwd)"
 
 $MAKE
 
@@ -115,17 +118,20 @@ test ! -e sub/main2.html
 test ! -e rec/main3.html
 
 # Make sure AM_MAKEINFOHTMLFLAGS is supported, and override AM_MAKEINFO.
+
+cp Makefile.am Makefile.sav
 cat >>Makefile.am <<\EOF
 AM_MAKEINFOHTMLFLAGS = --no-headers --no-split
 AM_MAKEINFOFLAGS = --unsupported-option
 EOF
 $AUTOMAKE
-./configure --prefix "$(pwd)"
+./config.status Makefile
 
 $MAKE html
 test -f main.html
 test -f sub/main2.html
 test -d rec/main3.html
+
 $MAKE clean
 test ! -e main.html
 test ! -e sub/main2.html
@@ -173,5 +179,12 @@ test ! -e share/$me/pdf/main.pdf
 test ! -e share/$me/pdf/main2.pdf
 test ! -e share/$me/pdf/main3.pdf
 test ! -e share/$me/pdf/hello
+
+# Restore the makefile without a broken AM_MAKEINFOFLAGS definition.
+mv -f Makefile.sav Makefile.am
+$AUTOMAKE
+./config.status Makefile
+
+$MAKE distcheck
 
 :

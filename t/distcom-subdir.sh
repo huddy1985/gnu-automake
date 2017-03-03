@@ -17,7 +17,7 @@
 # Test to make sure that if an auxfile (here depcomp) is required
 # by a subdir Makefile.am, it is distributed by that Makefile.am.
 
-. ./defs || exit 1
+. test-init.sh
 
 cat >> configure.ac << 'END'
 AC_CONFIG_FILES([subdir/Makefile])
@@ -50,7 +50,7 @@ test -f depcomp
 
 # FIXME: the logic of this check and other similar ones in other
 # FIXME: 'distcom*.sh' files should be factored out in a common
-# FIXME: subroutine in 'defs'...
+# FIXME: subroutine in 'am-test-lib.sh'...
 sed -n -e "
   /^DIST_COMMON =.*\\\\$/ {
     :loop

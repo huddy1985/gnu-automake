@@ -19,8 +19,8 @@
 # (Similar to txinfo13.sh, plus DISTCLEANFILES).
 # (See also txinfo24.sh and txinfo25.sh).
 
-required='makeinfo tex texi2dvi-o'
-. ./defs || exit 1
+required='makeinfo tex texi2dvi'
+. test-init.sh
 
 cat >> configure.ac << 'END'
 AC_OUTPUT

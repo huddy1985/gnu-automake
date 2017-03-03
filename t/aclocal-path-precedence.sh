@@ -17,11 +17,11 @@
 # Check precedence rules for ACLOCAL_PATH.
 
 am_create_testdir=empty
-. ./defs || exit 1
+. test-init.sh
 
 cat > configure.ac << 'END'
 AC_INIT([foo], [1.0])
-AM_INIT_AUTOMAKE([parallel-tests])
+AM_INIT_AUTOMAKE
 FOO_MACRO
 BAR_MACRO
 AC_PROG_LIBTOOL

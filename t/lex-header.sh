@@ -18,7 +18,7 @@
 # bugs #8844 and #9933).
 
 required='cc flex'
-. ./defs || exit 1
+. test-init.sh
 
 # Here, we need to use the use flex option '--header-file', but some
 # older flex versions don't support is (see automake bug#11524 and

@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 AC_PREREQ([2.69])
-AC_INIT([GNU Automake], [1.12.6], [bug-automake@gnu.org])
+AC_INIT([GNU Automake], [1.13], [bug-automake@gnu.org])
 
 AC_CONFIG_SRCDIR([automake.in])
 AC_CONFIG_AUX_DIR([lib])
@@ -40,7 +40,7 @@ dnl We call AC_PROG_CC in an unusual way, and only for use in our
 dnl testsuite, so also use 'no-dependencies' and 'no-define' among
 dnl the automake options to avoid bloating and potential problems.
 AM_INIT_AUTOMAKE([dist-xz filename-length-max=99 color-tests
-                  parallel-tests silent-rules no-define no-dependencies])
+                  no-define no-dependencies])
 
 ## Keep this on a line of its own, since it must be found and processed
 ## by the 'update-copyright' rule in our Makefile.
@@ -139,7 +139,7 @@ AC_CHECK_PROGS([LEX], [lex flex], [false])
 # following tests, but some users were unable to figure out that their
 # installation was broken since --version appeared to work.
 
-required_autoconf_version=2.62
+required_autoconf_version=2.65
 AC_CACHE_CHECK([whether autoconf is installed], [am_cv_autoconf_installed],
 [if AM_RUN_LOG([$am_AUTOCONF --version]);
 then
@@ -605,9 +605,7 @@ AC_SUBST([EXEEXT])
 ## ---------------------- ##
 
 AC_CONFIG_FILES([Makefile])
-
 AC_CONFIG_LINKS([GNUmakefile:GNUmakefile])
-AC_CONFIG_LINKS([defs:defs])
 
 AC_CONFIG_FILES([t/wrap/aclocal-${APIVERSION}:t/wrap/aclocal.in],
                 [chmod +x t/wrap/aclocal-${APIVERSION}],

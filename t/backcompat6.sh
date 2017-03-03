@@ -18,15 +18,15 @@
 # using obsoleted forms of AC_INIT, AM_INIT_AUTOMAKE and AC_OUTPUT,
 # and 'configure.in' as autconf input file.
 # This script can also serve as mild stress-testing for Automake.
-# See also the similar test 'backcompat5.sh'.
+# See also the similar test 'backcompat5.test'.
 
 required=cc
 am_create_testdir=empty
-. ./defs || exit 1
+. test-init.sh
 
 # Anyone doing something like this in a real-life package probably
 # deserves to be killed.
-cat > configure.in <<'END'
+cat > configure.ac <<'END'
 dnl: Everything here is *deliberately* underquoted!
 AC_INIT(quux.c)
 PACKAGE=nonesuch-zardoz
@@ -98,7 +98,7 @@ $MAKE check
 distdir=nonesuch-zardoz-nonesuch-0.1
 $MAKE distdir
 test -f $distdir/quux.c
-test ! -e $distdir/foo.got
+test ! -f $distdir/foo.got
 
 $MAKE distcheck
 

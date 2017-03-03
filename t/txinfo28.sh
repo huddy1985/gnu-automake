@@ -19,8 +19,8 @@
 # references.
 # Report from Ralf Corsepius.
 
-required='makeinfo tex texi2dvi-o'
-. ./defs || exit 1
+required='makeinfo tex texi2dvi'
+. test-init.sh
 
 # This setting, when honored by GNU ls, used to cause an infinite loop
 # in mdate-sh.

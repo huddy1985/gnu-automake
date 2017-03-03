@@ -14,12 +14,16 @@ t/tap-no-merge-stdout-stderr-w.log: t/tap-no-merge-stdout-stderr.sh
 t/tap-no-merge-stdout-stderr-w.log: t/tap-no-merge-stdout-stderr.log
 t/compile5-w.log: t/compile5.sh
 t/compile5-w.log: t/compile5.log
+t/color-tests-w.log: t/color-tests.sh
+t/color-tests-w.log: t/color-tests.log
 t/tap-msg0-misc-w.log: t/tap-msg0-misc.sh
 t/tap-msg0-misc-w.log: t/tap-msg0-misc.log
 t/tap-global-result-w.log: t/tap-global-result.sh
 t/tap-global-result-w.log: t/tap-global-result.log
 t/check-subst-w.log: t/check-subst.sh
 t/check-subst-w.log: t/check-subst.log
+t/color-tests2-w.log: t/color-tests2.sh
+t/color-tests2-w.log: t/color-tests2.log
 t/tap-number-wordboundary-w.log: t/tap-number-wordboundary.sh
 t/tap-number-wordboundary-w.log: t/tap-number-wordboundary.log
 t/tap-bailout-and-logging-w.log: t/tap-bailout-and-logging.sh
@@ -54,12 +58,12 @@ t/tap-driver-stderr-w.log: t/tap-driver-stderr.sh
 t/tap-driver-stderr-w.log: t/tap-driver-stderr.log
 t/tap-bailout-w.log: t/tap-bailout.sh
 t/tap-bailout-w.log: t/tap-bailout.log
-t/missing3-w.log: t/missing3.sh
-t/missing3-w.log: t/missing3.log
 t/check2-w.log: t/check2.sh
 t/check2-w.log: t/check2.log
 t/mdate5-w.log: t/mdate5.sh
 t/mdate5-w.log: t/mdate5.log
+t/missing3-w.log: t/missing3.sh
+t/missing3-w.log: t/missing3.log
 t/tap-fancy2-w.log: t/tap-fancy2.sh
 t/tap-fancy2-w.log: t/tap-fancy2.log
 t/compile-w.log: t/compile.sh
@@ -80,8 +84,6 @@ t/tap-log-w.log: t/tap-log.sh
 t/tap-log-w.log: t/tap-log.log
 t/tap-unplanned-w.log: t/tap-unplanned.sh
 t/tap-unplanned-w.log: t/tap-unplanned.log
-t/missing2-w.log: t/missing2.sh
-t/missing2-w.log: t/missing2.log
 t/tap-merge-stdout-stderr-w.log: t/tap-merge-stdout-stderr.sh
 t/tap-merge-stdout-stderr-w.log: t/tap-merge-stdout-stderr.log
 t/tap-numbers-leading-zero-w.log: t/tap-numbers-leading-zero.sh
@@ -160,8 +162,6 @@ t/tap-todo-skip-w.log: t/tap-todo-skip.sh
 t/tap-todo-skip-w.log: t/tap-todo-skip.log
 t/tap-planskip-bailout-w.log: t/tap-planskip-bailout.sh
 t/tap-planskip-bailout-w.log: t/tap-planskip-bailout.log
-t/missing5-w.log: t/missing5.sh
-t/missing5-w.log: t/missing5.log
 t/tap-plan-malformed-w.log: t/tap-plan-malformed.sh
 t/tap-plan-malformed-w.log: t/tap-plan-malformed.log
 t/tap-escape-directive-2-w.log: t/tap-escape-directive-2.sh
@@ -180,8 +180,6 @@ t/tap-msg0-planskip-w.log: t/tap-msg0-planskip.sh
 t/tap-msg0-planskip-w.log: t/tap-msg0-planskip.log
 t/tap-bailout-suppress-later-diagnostic-w.log: t/tap-bailout-suppress-later-diagnostic.sh
 t/tap-bailout-suppress-later-diagnostic-w.log: t/tap-bailout-suppress-later-diagnostic.log
-t/color-w.log: t/color.sh
-t/color-w.log: t/color.log
 t/tap-autonumber-w.log: t/tap-autonumber.sh
 t/tap-autonumber-w.log: t/tap-autonumber.log
 t/tap-diagnostic-w.log: t/tap-diagnostic.sh
@@ -190,12 +188,8 @@ t/tap-planskip-w.log: t/tap-planskip.sh
 t/tap-planskip-w.log: t/tap-planskip.log
 t/check11-w.log: t/check11.sh
 t/check11-w.log: t/check11.log
-t/missing-w.log: t/missing.sh
-t/missing-w.log: t/missing.log
 t/check4-w.log: t/check4.sh
 t/check4-w.log: t/check4.log
-t/color2-w.log: t/color2.sh
-t/color2-w.log: t/color2.log
 t/exeext4-w.log: t/exeext4.sh
 t/exeext4-w.log: t/exeext4.log
 t/tap-more2-w.log: t/tap-more2.sh
@@ -224,6 +218,8 @@ t/tap-no-spurious-w.log: t/tap-no-spurious.sh
 t/tap-no-spurious-w.log: t/tap-no-spurious.log
 t/tap-result-comment-w.log: t/tap-result-comment.sh
 t/tap-result-comment-w.log: t/tap-result-comment.log
+t/missing-version-mismatch-w.log: t/missing-version-mismatch.sh
+t/missing-version-mismatch-w.log: t/missing-version-mismatch.log
 t/compile2-w.log: t/compile2.sh
 t/compile2-w.log: t/compile2.log
 t/built-sources-check-w.log: t/built-sources-check.sh
@@ -243,9 +239,11 @@ generated_TESTS += t/tap-signal-w.tap
 generated_TESTS += t/tap-out-of-order-w.sh
 generated_TESTS += t/tap-no-merge-stdout-stderr-w.sh
 generated_TESTS += t/compile5-w.sh
+generated_TESTS += t/color-tests-w.sh
 generated_TESTS += t/tap-msg0-misc-w.sh
 generated_TESTS += t/tap-global-result-w.sh
 generated_TESTS += t/check-subst-w.sh
+generated_TESTS += t/color-tests2-w.sh
 generated_TESTS += t/tap-number-wordboundary-w.sh
 generated_TESTS += t/tap-bailout-and-logging-w.sh
 generated_TESTS += t/check-subst-prog-w.sh
@@ -263,9 +261,9 @@ generated_TESTS += t/tap-ambiguous-directive-w.sh
 generated_TESTS += t/tap-bad-prog-w.tap
 generated_TESTS += t/tap-driver-stderr-w.sh
 generated_TESTS += t/tap-bailout-w.sh
-generated_TESTS += t/missing3-w.sh
 generated_TESTS += t/check2-w.sh
 generated_TESTS += t/mdate5-w.sh
+generated_TESTS += t/missing3-w.sh
 generated_TESTS += t/tap-fancy2-w.sh
 generated_TESTS += t/compile-w.sh
 generated_TESTS += t/tap-passthrough-w.sh
@@ -276,7 +274,6 @@ generated_TESTS += t/tap-plan-errors-w.sh
 generated_TESTS += t/compile4-w.sh
 generated_TESTS += t/tap-log-w.sh
 generated_TESTS += t/tap-unplanned-w.sh
-generated_TESTS += t/missing2-w.sh
 generated_TESTS += t/tap-merge-stdout-stderr-w.sh
 generated_TESTS += t/tap-numbers-leading-zero-w.sh
 generated_TESTS += t/tap-color-w.sh
@@ -316,7 +313,6 @@ generated_TESTS += t/tap-planskip-whitespace-w.sh
 generated_TESTS += t/tap-plan-whitespace-w.sh
 generated_TESTS += t/tap-todo-skip-w.sh
 generated_TESTS += t/tap-planskip-bailout-w.sh
-generated_TESTS += t/missing5-w.sh
 generated_TESTS += t/tap-plan-malformed-w.sh
 generated_TESTS += t/tap-escape-directive-2-w.sh
 generated_TESTS += t/tap-doc-w.sh
@@ -326,14 +322,11 @@ generated_TESTS += t/tap-planskip-badexit-w.sh
 generated_TESTS += t/check-w.sh
 generated_TESTS += t/tap-msg0-planskip-w.sh
 generated_TESTS += t/tap-bailout-suppress-later-diagnostic-w.sh
-generated_TESTS += t/color-w.sh
 generated_TESTS += t/tap-autonumber-w.sh
 generated_TESTS += t/tap-diagnostic-w.sh
 generated_TESTS += t/tap-planskip-w.sh
 generated_TESTS += t/check11-w.sh
-generated_TESTS += t/missing-w.sh
 generated_TESTS += t/check4-w.sh
-generated_TESTS += t/color2-w.sh
 generated_TESTS += t/exeext4-w.sh
 generated_TESTS += t/tap-more2-w.sh
 generated_TESTS += t/tap-empty-diagnostic-w.sh
@@ -348,6 +341,7 @@ generated_TESTS += t/posixsubst-tests-w.sh
 generated_TESTS += t/tap-escape-directive-w.sh
 generated_TESTS += t/tap-no-spurious-w.sh
 generated_TESTS += t/tap-result-comment-w.sh
+generated_TESTS += t/missing-version-mismatch-w.sh
 generated_TESTS += t/compile2-w.sh
 generated_TESTS += t/built-sources-check-w.sh
 generated_TESTS += t/tap-msg0-directive-w.sh
@@ -418,9 +412,7 @@ libtool_macros_TESTS = \
   t/pr307.sh \
   t/pr401b.sh \
   t/reqd2.sh \
-  t/silent3.sh \
-  t/silent4.sh \
-  t/silent9.sh \
+  t/silent-lt.sh \
   t/stdlib2.sh \
   t/strip3.sh \
   t/subobj9.sh \
@@ -483,9 +475,7 @@ t/pr300-ltlib.log:  t/libtool-macros.log
 t/pr307.log:  t/libtool-macros.log
 t/pr401b.log:  t/libtool-macros.log
 t/reqd2.log:  t/libtool-macros.log
-t/silent3.log:  t/libtool-macros.log
-t/silent4.log:  t/libtool-macros.log
-t/silent9.log:  t/libtool-macros.log
+t/silent-lt.log:  t/libtool-macros.log
 t/stdlib2.log:  t/libtool-macros.log
 t/strip3.log:  t/libtool-macros.log
 t/subobj9.log:  t/libtool-macros.log

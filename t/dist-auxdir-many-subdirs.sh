@@ -19,7 +19,7 @@
 
 am_create_testdir=empty
 required=cc
-. ./defs || exit 1
+. test-init.sh
 
 count=0
 ocwd=$(pwd) || fatal_ "cannot get current working directory"
@@ -41,7 +41,7 @@ do_check ()
   unindent > configure.ac << END
     AC_INIT([$me], [$count])
     AC_CONFIG_AUX_DIR([$auxdir])
-    AM_INIT_AUTOMAKE([parallel-tests])
+    AM_INIT_AUTOMAKE
     AC_PROG_CC
     # We don't want to require python or emcas in this test, so
     # the tricks below.
@@ -56,8 +56,6 @@ END
     foo_SOURCES = foo.c
     ## For py-compile.
     python_PYTHON = bar.py
-    ## For elisp-comp.
-    lisp_LISP = baz.el
     ## For test-driver.
     TESTS =
 END
@@ -67,7 +65,6 @@ END
     missing
     depcomp
     py-compile
-    elisp-comp
     test-driver
   '
 

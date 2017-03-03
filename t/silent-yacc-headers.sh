@@ -18,12 +18,11 @@
 # involved (i.e., the '-d' option is in *YFLAGS).
 
 required='cc yacc'
-. ./defs || exit 1
+. test-init.sh
 
 mkdir sub
 
 cat >>configure.ac <<'EOF'
-AM_SILENT_RULES
 AC_PROG_YACC
 AC_PROG_CC
 AC_OUTPUT

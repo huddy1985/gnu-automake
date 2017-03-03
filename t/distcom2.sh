@@ -18,7 +18,7 @@
 # Report from Pavel Roskin.  Report of problems with '--no-force' from
 # Scott James Remnant (Debian #206299)
 
-. ./defs || exit 1
+. test-init.sh
 
 cat >> configure.ac << 'END'
 AC_PROG_CC
@@ -52,7 +52,7 @@ for opt in '' --no-force; do
   for dir in . subdir; do
     # FIXME: the logic of this check and other similar ones in other
     # FIXME: 'distcom*.sh' files should be factored out in a common
-    # FIXME: subroutine in 'defs'...
+    # FIXME: subroutine in 'am-test-lib.sh'...
     sed -n -e "
       /^DIST_COMMON =.*\\\\$/ {
         :loop

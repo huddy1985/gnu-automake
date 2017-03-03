@@ -17,7 +17,7 @@
 # Make sure comment for conditional variables are output near the
 # corresponding conditional definitions.
 
-. ./defs || exit 1
+. test-init.sh
 
 cat >> configure.ac <<'EOF'
 AM_CONDITIONAL([COND], [true])
@@ -54,4 +54,4 @@ sed -n '/^#.*VAR.*COND_FALSE/ {
         }' Makefile.in |
   grep '@COND_FALSE@VAR = bar'
 
-: 
+:

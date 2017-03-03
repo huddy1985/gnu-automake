@@ -17,7 +17,7 @@
 # Check the recover rule of lisp_LISP with parallel make.
 
 required='GNUmake emacs'
-. ./defs || exit 1
+. test-init.sh
 
 cat > Makefile.am << 'EOF'
 dist_lisp_LISP = am-one.el am-two.el am-three.el
@@ -42,12 +42,10 @@ $AUTOMAKE --add-missing
 $MAKE -j >>stdout || { cat stdout; exit 1; }
 
 cat stdout
-test 1 -eq $(grep -c 'Warnings can be ignored' stdout)
 
 test -f am-one.elc
 test -f am-two.elc
 test -f am-three.elc
-test -f elc-stamp
 
 rm -f am-*.elc
 
@@ -56,10 +54,8 @@ rm -f am-*.elc
 $MAKE -j >>stdout || { cat stdout; exit 1; }
 
 cat stdout
-test 1 -eq $(grep -c 'Warnings can be ignored' stdout)
 test -f am-one.elc
 test -f am-two.elc
 test -f am-three.elc
-test -f elc-stamp
 
 :

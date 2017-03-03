@@ -20,7 +20,7 @@
 # default, but copied if the '--copy' option is used.
 
 am_create_testdir=empty
-. ./defs || exit 1
+. test-init.sh
 
 plan_ "later"
 
@@ -340,17 +340,6 @@ info_TEXINFOS = foo.texi
 END
 
 rm -f foo.texi
-
-check_ <<'END'
-== Name ==
-elisp-comp
-== Files ==
-elisp-comp
-== configure.ac ==
-AM_PATH_LISPDIR
-== Makefile.am ==
-lisp_LISP = foo.el
-END
 
 check_ <<'END'
 == Name ==

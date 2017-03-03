@@ -1,7 +1,7 @@
 This is doc/automake.info, produced by makeinfo version 4.13 from
 ./doc/automake.texi.
 
-This manual is for GNU Automake (version 1.12.6, 14 December 2012), a
+This manual is for GNU Automake (version 1.13, 28 December 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -32,7 +32,7 @@ File: automake.info,  Node: Top,  Next: Introduction,  Up: (dir)
 GNU Automake
 ************
 
-This manual is for GNU Automake (version 1.12.6, 14 December 2012), a
+This manual is for GNU Automake (version 1.13, 28 December 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -70,7 +70,6 @@ files.
 * Conditionals::                Conditionals
 * Silencing Make::              Obtain less verbose output from `make'
 * Gnits::                       The effect of `--gnu' and `--gnits'
-* Cygnus::                      The effect of `--cygnus' (deprecated, soon to be removed)
 * Not Enough::                  When Automake is not Enough
 * Distributing::                Distributing the Makefile.in
 * API Versioning::              About compatibility between Automake versions
@@ -144,7 +143,6 @@ Auto-generating aclocal.m4
 Autoconf macros supplied with Automake
 
 * Public Macros::               Macros that you can use.
-* Obsolete Macros::             Macros that will soon be removed.
 * Private Macros::              Macros that you should not use.
 
 Directories
@@ -314,9 +312,9 @@ Conditionals
 
 Silencing Make
 
-* Make verbosity::               Make is verbose by default
-* Tricks For Silencing Make::    Standard and generic ways to silence make
-* Automake silent-rules Option:: How Automake can help in silencing make
+* Make verbosity::              Make is verbose by default
+* Tricks For Silencing Make::   Standard and generic ways to silence make
+* Automake Silent Rules::       How Automake can help in silencing make
 
 When Automake Isn't Enough
 
@@ -1682,15 +1680,6 @@ conformance.
    *Note Gnits::, for more information on the precise implications of
 the strictness level.
 
-   Automake also has a special (and _today deprecated_) "cygnus" mode
-that is similar to strictness but handled differently.  This mode is
-useful for packages that are put into a "Cygnus" style tree (e.g., older
-versions of the GCC and gdb trees).  *Note Cygnus::, for more
-information on this mode.  Please note that this mode _is deprecated
-and will be removed in the next major Automake release (1.13)_; you
-must avoid its use in new packages, and should stop using it in
-existing packages as well.
-
 
 File: automake.info,  Node: Uniform,  Next: Length Limitations,  Prev: Strictness,  Up: Generalities
 
@@ -1951,9 +1940,6 @@ source in case you need more recent versions.
      information that is then used by the automatic dependency tracking
      feature (*note Dependencies::).
 
-`elisp-comp'
-     This program is used to byte-compile Emacs Lisp code.
-
 `install-sh'
      This is a replacement for the `install' program that works on
      platforms where `install' is unavailable or unusable.
@@ -1964,9 +1950,9 @@ source in case you need more recent versions.
 
 `missing'
      This wraps a number of programs that are typically only required by
-     maintainers.  If the program in question doesn't exist, `missing'
-     prints an informative warning and attempts to fix things so that
-     the build can continue.
+     maintainers.  If the program in question doesn't exist, or seems
+     to old, `missing' will print an informative warning before failing
+     out, to provide the user with more context and information.
 
 `mkinstalldirs'
      This script used to be a wrapper around `mkdir -p', which is not
@@ -2210,12 +2196,6 @@ misunderstand this paragraph: `automake' runs `autoconf' to *scan* your
      When used with `--add-missing', causes installed files to be
      copied.  The default is to make a symbolic link.
 
-`--cygnus'
-     Causes the generated `Makefile.in's to follow Cygnus rules, instead
-     of GNU or Gnits rules.  For more information, see *note Cygnus::.
-     Note that _this mode of operation is deprecated, and will be
-     removed_ in the next major Automake release (1.13).
-
 `-f'
 `--force-missing'
      When used with `--add-missing', causes standard files to be
@@ -2311,9 +2291,7 @@ misunderstand this paragraph: `automake' runs `autoconf' to *scan* your
 
      The categories output by default are `obsolete', `syntax' and
      `unsupported'.  Additionally, `gnu' and `portability' are enabled
-     in `--gnu' and `--gnits' strictness.  On the other hand, the
-     `silent-rules' options (*note Options::) turns off portability
-     warnings about recursive variable expansions.
+     in `--gnu' and `--gnits' strictness.
 
      Turning off `portability' will also turn off `extra-portability',
      and similarly turning on `extra-portability' will also turn on
@@ -2501,8 +2479,8 @@ their effects are:
      Automake will look for various helper scripts, such as
      `install-sh', in the directory named in this macro invocation.
      (The full list of scripts is: `ar-lib', `config.guess',
-     `config.sub', `depcomp', `elisp-comp', `compile', `install-sh',
-     `ltmain.sh', `mdate-sh', `missing', `mkinstalldirs', `py-compile',
+     `config.sub', `depcomp', `compile', `install-sh', `ltmain.sh',
+     `mdate-sh', `missing', `mkinstalldirs', `py-compile',
      `test-driver', `texinfo.tex', `ylwrap'.)  Not all scripts are
      always searched for; some scripts will only be sought if the
      generated `Makefile.in' requires them.
@@ -2528,8 +2506,8 @@ their effects are:
      Automake will generate rules to rebuild these headers from the
      corresponding templates (usually, the template for a `foo.h'
      header being `foo.h.in').  Older versions of Automake required the
-     use of `AM_CONFIG_HEADER' (*note Macros::); this is no longer the
-     case.
+     use of `AM_CONFIG_HEADER'; this is no longer the case, and that
+     macro has indeed been removed.
 
      As with `AC_CONFIG_FILES' (*note Requirements::), parts of the
      specification using shell variables will be ignored as far as
@@ -3102,26 +3080,16 @@ become difficult to maintain, and it will be almost impossible to share
 macros between packages.
 
    The second possibility, which we do recommend, is to write each macro
-in its own file and gather all of these files in a directory.  This
-directory is usually called `m4/'.  To build `aclocal.m4', one should
-therefore instruct `aclocal' to scan `m4/'.  From the command line,
-this is done with `aclocal -I m4'.  The top-level `Makefile.am' should
-also be updated to define
+in its own file and gather all these files in a directory.  This
+directory is usually called `m4/'.  Then it's enough to update
+`configure.ac' by adding a proper call to `AC_CONFIG_MACRO_DIRS':
 
-     ACLOCAL_AMFLAGS = -I m4
+     AC_CONFIG_MACRO_DIRS([m4])
 
-   `ACLOCAL_AMFLAGS' contains options to pass to `aclocal' when
-`aclocal.m4' is to be rebuilt by `make'.  This line is also used by
-`autoreconf' (*note Using `autoreconf' to Update `configure' Scripts:
-(autoconf)autoreconf Invocation.) to run `aclocal' with suitable
-options, or by `autopoint' (*note Invoking the `autopoint' Program:
-(gettext)autopoint Invocation.)  and `gettextize' (*note Invoking the
-`gettextize' Program: (gettext)gettextize Invocation.) to locate the
-place where Gettext's macros should be installed.  So even if you do
-not really care about the rebuild rules, you should define
-`ACLOCAL_AMFLAGS'.
+   `aclocal' will then take care of automatically adding `m4/' to its
+search path for m4 files.
 
-   When `aclocal -I m4' is run, it will build an `aclocal.m4' that
+   When `aclocal' is run, it will build an `aclocal.m4' that
 `m4_include's any file from `m4/' that defines a required macro.
 Macros not found locally will still be searched in system-wide
 directories, as explained in *note Macro Search Path::.
@@ -3147,16 +3115,14 @@ run on architectures where Guile cannot be installed, this requirement
 will hinder development.  An easy solution is to copy such third-party
 macros in your local `m4/' directory so they get distributed.
 
-   Since Automake 1.10, `aclocal' offers an option to copy these
-system-wide third-party macros in your local macro directory, solving
-the above problem.  Simply use:
+   Since Automake 1.10, `aclocal' offers the option `--install' to copy
+these system-wide third-party macros in your local macro directory,
+helping to solve the above problem.
 
-     ACLOCAL_AMFLAGS = -I m4 --install
-
-With this setup, system-wide macros will be copied to `m4/' the first
-time you run `autoreconf'.  Then the locally installed macros will have
-precedence over the system-wide installed macros each time `aclocal' is
-run again.
+   With this setup, system-wide macros will be copied to `m4/' the
+first time you run `aclocal'.  Then the locally installed macros will
+have precedence over the system-wide installed macros each time
+`aclocal' is run again.
 
    One reason why you should keep `--install' in the flags even after
 the first run is that when you later edit `configure.ac' and depend on
@@ -3222,14 +3188,12 @@ follows:
    MyPackage uses an `m4/' directory to store local macros as explained
 in *note Local Macros::, and has
 
-     ACLOCAL_AMFLAGS = -I m4 --install
+     AC_CONFIG_MACRO_DIRS([m4])
 
-in its top-level `Makefile.am'.
+in its `configure.ac'.
 
    Initially the `m4/' directory is empty.  The first time we run
-`autoreconf', it will fetch the options to pass to `aclocal' in
-`Makefile.am', and run `aclocal -I m4 --install'.  `aclocal' will
-notice that
+`aclocal --install', it will notice that
 
    * `configure.ac' uses `AX_THIRD_PARTY'
 
@@ -3243,9 +3207,8 @@ Because `/usr/share/aclocal/thirdparty.m4' is a system-wide macro and
 `m4/thirdparty.m4', and output an `aclocal.m4' that contains
 `m4_include([m4/thirdparty.m4])'.
 
-   The next time `aclocal -I m4 --install' is run (either via
-`autoreconf', by hand, or from the `Makefile' rebuild rules) something
-different happens.  `aclocal' notices that
+   The next time `aclocal --install' is run, something different
+happens.  `aclocal' notices that
 
    * `configure.ac' uses `AX_THIRD_PARTY'
 
@@ -3265,8 +3228,8 @@ the system-wide file in case of equal serial numbers.
 
    Now suppose the system-wide third-party macro is changed.  This can
 happen if the package installing this macro is updated.  Let's suppose
-the new macro has serial number 2.  The next time `aclocal -I m4
---install' is run the situation is the following:
+the new macro has serial number 2.  The next time `aclocal --install'
+is run the situation is the following:
 
    * `configure.ac' uses `AX_THIRD_PARTY'
 
@@ -3287,15 +3250,15 @@ old version.  MyPackage just had its macro updated as a side effect of
 running `aclocal'.
 
    If you are leery of letting `aclocal' update your local macro, you
-can run `aclocal -I m4 --diff' to review the changes `aclocal -I m4
---install' would perform on these macros.
+can run `aclocal --diff' to review the changes `aclocal --install'
+would perform on these macros.
 
    Finally, note that the `--force' option of `aclocal' has absolutely
 no effect on the files installed by `--install'.  For instance, if you
 have modified your local macros, do not expect `--install --force' to
 replace the local macros by their system-wide versions.  If you want to
 do so, simply erase the local macros you want to revert, and run
-`aclocal -I m4 --install'.
+`aclocal --install'.
 
 
 File: automake.info,  Node: Future of aclocal,  Prev: Serials,  Up: aclocal Invocation
@@ -3369,25 +3332,24 @@ File: automake.info,  Node: Public Macros,  Next: Obsolete Macros,  Up: Macros
      Runs many macros required for proper operation of the generated
      Makefiles.
 
-     Today, `AM_INIT_AUTOMAKE' is called with a single argument: a
+     `AM_INIT_AUTOMAKE' is called with a single argument: a
      space-separated list of Automake options that should be applied to
      every `Makefile.am' in the tree.  The effect is as if each option
      were listed in `AUTOMAKE_OPTIONS' (*note Options::).
 
-     This macro can also be called in _another, deprecated form_
-     (support for which will be _removed in the next major Automake
-     release (1.13)_): `AM_INIT_AUTOMAKE(PACKAGE, VERSION,
-     [NO-DEFINE])'.  In this form, there are two required arguments:
-     the package and the version number.  This form is obsolete because
-     the PACKAGE and VERSION can be obtained from Autoconf's `AC_INIT'
-     macro (which itself has an old and a new form).
+     This macro could once (before Automake 1.13) also be called in the
+     _now obsolete and completely unsupported_ form
+     `AM_INIT_AUTOMAKE(PACKAGE, VERSION, [NO-DEFINE])'.  In this form,
+     there were two required arguments: the package and the version
+     number.
 
      If your `configure.ac' has:
 
           AC_INIT([src/foo.c])
           AM_INIT_AUTOMAKE([mumble], [1.5])
 
-     you should modernize it as follows:
+     you must modernize it as follows in order to make it work with
+     Automake 1.13 or later:
 
           AC_INIT([mumble], [1.5])
           AC_CONFIG_SRCDIR([src/foo.c])
@@ -3467,8 +3429,8 @@ File: automake.info,  Node: Public Macros,  Next: Obsolete Macros,  Up: Macros
      script is appropriate.
 
 `AM_SILENT_RULES'
-     Enable the machinery for less verbose build output (*note
-     Options::).
+     Control the machinery for less verbose build output (*note
+     Automake Silent Rules::).
 
 `AM_WITH_DMALLOC'
      Add support for the Dmalloc package (http://dmalloc.com/).  If the
@@ -3489,17 +3451,6 @@ still using them, running `autoupdate' should adjust your
 `configure.ac' automatically (*note Using `autoupdate' to Modernize
 `configure.ac': (autoconf)autoupdate Invocation.).  _Do it NOW!_
 
-`AM_CONFIG_HEADER'
-     Automake will generate rules to automatically regenerate the config
-     header.  This obsolete macro is a synonym of `AC_CONFIG_HEADERS'
-     today (*note Optional::).
-
-`AM_HEADER_TIOCGWINSZ_NEEDS_SYS_IOCTL'
-     If the use of `TIOCGWINSZ' requires `<sys/ioctl.h>', then define
-     `GWINSZ_IN_SYS_IOCTL'.  Otherwise `TIOCGWINSZ' can be found in
-     `<termios.h>'.  This macro is obsolete, you should use Autoconf's
-     `AC_HEADER_TIOCGWINSZ' instead.
-
 `AM_PROG_MKDIR_P'
      From Automake 1.8 to 1.9.6 this macro used to define the output
      variable `mkdir_p' to one of `mkdir -p', `install-sh -d', or
@@ -3514,13 +3465,6 @@ still using them, running `autoupdate' should adjust your
      switch ASAP to the more modern Autoconf-provided interface
      instead; both the macro and the variable _will be removed_ in the
      next major Automake release.
-
-`AM_SYS_POSIX_TERMIOS'
-     Check to see if POSIX termios headers and functions are available
-     on the system.  If so, set the shell variable
-     `am_cv_sys_posix_termios' to `yes'.  If not, set the variable to
-     `no'.  This macro is obsolete, you should use Autoconf's
-     `AC_SYS_POSIX_TERMIOS' instead.
 
 
 
@@ -3647,6 +3591,32 @@ will cause `lib/' to be built before `src/', then the current directory
 will be built, finally the `test/' directory will be built.  It is
 customary to arrange test directories to be built after everything else
 since they are meant to test what has been constructed.
+
+   In addition to the built-in recursive targets defined by Automake
+(`all', `check', etc.), the developer can also define his own recursive
+targets.  That is done by passing the names of such targets as
+arguments to the m4 macro `AM_EXTRA_RECURSIVE_TARGETS' in
+`configure.ac'.  Automake generates rules to handle the recursion for
+such targets; and the developer can define real actions for them by
+defining corresponding `-local' targets.
+
+     % cat configure.ac
+     AC_INIT([pkg-name], [1.0]
+     AM_INIT_AUTOMAKE
+     AM_EXTRA_RECURSIVE_TARGETS([foo])
+     AC_CONFIG_FILES([Makefile sub/Makefile sub/src/Makefile])
+     AC_OUTPUT
+     % cat Makefile.am
+     SUBDIRS = sub
+     foo-local:
+             @echo This will be run by "make foo".
+     % cat sub/Makefile.am
+     SUBDIRS = src
+     % cat sub/src/Makefile.am
+     foo-local:
+             @echo This too will be run by a "make foo" issued either in
+             @echo the 'sub/src/' directory, the 'sub/' directory, or the
+             @echo top-level directory.
 
 
 File: automake.info,  Node: Conditional Subdirectories,  Next: Alternative,  Prev: Subdirectories,  Up: Directories
@@ -4705,7 +4675,8 @@ computed by Automake (if any), so `LIBRARY_LIBTOOLFLAGS' (or
 be set in `Makefile.am': this is a user variable (*note Flag Variables
 Ordering::.  It allows users to run `make LIBTOOLFLAGS=--silent', for
 instance.  Note that the verbosity of `libtool' can also be influenced
-with the Automake `silent-rules' option (*note Options::).
+by the Automake support for silent rules (*note Automake Silent
+Rules::).
 
 
 File: automake.info,  Node: LTLIBOBJS,  Next: Libtool Issues,  Prev: Libtool Flags,  Up: A Shared Library
@@ -5240,9 +5211,8 @@ some special cases.
      separate variable that is also passed to every compilation that
      invokes the C preprocessor.  In particular it generates `-I.',
      `-I$(srcdir)', and a `-I' pointing to the directory holding
-     `config.h' (if you've used `AC_CONFIG_HEADERS' or
-     `AM_CONFIG_HEADER').  You can disable the default `-I' options
-     using the `nostdinc' option.
+     `config.h' (if you've used `AC_CONFIG_HEADERS').  You can disable
+     the default `-I' options using the `nostdinc' option.
 
      When a file to be included is generated during the build and not
      part of a distribution tarball, its location is under
@@ -6458,7 +6428,10 @@ are `lisp_' and `noinst_'.  Note that if `lisp_LISP' is defined, then
 `dist_noinst_LISP', to indicate that these files should be distributed.
 
    Automake will byte-compile all Emacs Lisp source files using the
-Emacs found by `AM_PATH_LISPDIR', if any was found.
+Emacs found by `AM_PATH_LISPDIR', if any was found.  When performing
+such byte-compilation, the flags specified in the (developer-reserved)
+`AM_ELCFLAGS' and (user-reserved) `ELCFLAGS' make variables will be
+passed to the Emacs invocation.
 
    Byte-compiled Emacs Lisp files are not portable among all versions of
 Emacs, so it makes sense to turn this off if you expect sites to have

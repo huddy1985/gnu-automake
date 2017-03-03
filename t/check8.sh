@@ -18,7 +18,7 @@
 
 # For gen-testsuite-part: ==> try-with-serial-tests <==
 required='cc native'
-. ./defs || exit 1
+. test-init.sh
 
 cat >> configure.ac << 'END'
 AC_PROG_CC
@@ -75,7 +75,7 @@ grep '^[^X]*PASS.* bar' stdout
 grep '^[^X]*PASS.* sub/bar' stdout
 grep '^[^X]*FAIL.* baz' stdout
 grep 'XFAIL.* sub/baz' stdout
-# 'parallel-tests' should not add circular dependencies.
+# The parallel test driver should cause circular dependencies.
 # Look for known warnings from a couple of 'make' implementations.
 grep -i 'circular.*dependency' stderr && exit 1
 grep -i 'graph cycles' stderr && exit 1

@@ -11,7 +11,7 @@
 AC_DEFUN([AM_PROG_MKDIR_P],
 [AC_PREREQ([2.60])dnl
 AC_REQUIRE([AC_PROG_MKDIR_P])dnl
-dnl FIXME to be removed in Automake 1.13.
+dnl FIXME to be removed in Automake 1.14.
 AC_DIAGNOSE([obsolete],
 [$0: this macro is deprecated, and will soon be removed.
 You should use the Autoconf-provided 'AC][_PROG_MKDIR_P' macro instead,

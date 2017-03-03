@@ -16,13 +16,13 @@
 
 # Make sure that PACKAGE and VERSION are AC_DEFINEd when requested.
 
-. ./defs || exit 1
+. test-init.sh
 
 # -------------------------------------------------------------------
 # Do not upgrade this file to use the modern AC_INIT/AM_INIT_AUTOMAKE
 # forms.  The day these obsolete AC_INIT and AM_INIT_AUTOMAKE forms
 # are dropped, just erase the file.
-# nodef2.sh contains the modern version of this test.
+# nodef2.test contains the modern version of this test.
 # -------------------------------------------------------------------
 
 # First, check that PACKAGE and VERSION are output by default.
