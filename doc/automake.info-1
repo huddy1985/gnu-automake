@@ -1,7 +1,7 @@
-This is automake.info, produced by makeinfo version 4.13 from
-/home/stefano/src/am/branches/trunks/doc/automake.texi.
+This is doc/automake.info, produced by makeinfo version 4.13 from
+./doc/automake.texi.
 
-This manual is for GNU Automake (version 1.12.3, 13 August 2012), a
+This manual is for GNU Automake (version 1.12.4, 16 September 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -32,7 +32,7 @@ File: automake.info,  Node: Top,  Next: Introduction,  Up: (dir)
 GNU Automake
 ************
 
-This manual is for GNU Automake (version 1.12.3, 13 August 2012), a
+This manual is for GNU Automake (version 1.12.4, 16 September 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -368,7 +368,6 @@ on the back of the Automake maintainers).
 
    The typical Automake input file is simply a series of variable
 definitions.  Each such file is processed to create a `Makefile.in'.
-There should generally be one `Makefile.am' per directory of a project.
 
    Automake does constrain a project in certain ways; for instance, it
 assumes that the project uses Autoconf (*note Introduction:
@@ -2310,11 +2309,11 @@ misunderstand this paragraph: `automake' runs `autoconf' to *scan* your
      instance, `-Wno-syntax' will hide the warnings about unused
      variables.
 
-     The categories output by default are `syntax' and `unsupported'.
-     Additionally, `gnu' and `portability' are enabled in `--gnu' and
-     `--gnits' strictness.  On the other hand, the `silent-rules'
-     options (*note Options::) turns off portability warnings about
-     recursive variable expansions.
+     The categories output by default are `obsolete', `syntax' and
+     `unsupported'.  Additionally, `gnu' and `portability' are enabled
+     in `--gnu' and `--gnits' strictness.  On the other hand, the
+     `silent-rules' options (*note Options::) turns off portability
+     warnings about recursive variable expansions.
 
      Turning off `portability' will also turn off `extra-portability',
      and similarly turning on `extra-portability' will also turn on

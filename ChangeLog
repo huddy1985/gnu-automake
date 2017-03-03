@@ -1,3 +1,175 @@
+2012-09-17  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	release: stable release 1.12.4
+
+	* configure.ac (AC_INIT): Bump version number to 1.12.4.
+	* m4/amversion.m4: Likewise (auto-updated by "make bootstrap").
+
+2012-09-17  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	NEWS: minor fix
+
+2012-09-11  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	coverage: better exposure for automake bug#12372 (tags-related)
+
+	Alas, in contrast with what is said in the commit message of previous
+	commit 'v1.12.3-14-g94b7b8e', that bug is still present also in the
+	current maint branch (which will become automake version 1.12.4); it
+	is just that it only triggers when a _SOURCES variable contains only
+	files with custom extension.
+
+	* t/tags-pr12372.sh: Extend.
+	* t/list-of-tests.mk: Add it.
+
+	Suggested-by: Юрий Пухальский <aikipooh@gmail.com>
+
+2012-09-07  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	coverage: expose automake bug#12372 (tags-related)
+
+	That bug is somehow already been fixed in the latest automake
+	version (1.12.4); but exercise it anyway in the testsuite, to
+	ensure we won't regress.
+
+	* t/tags-pr12372.sh: New test.
+	* t/list-of-tests.mk: Add it.
+
+2012-09-05  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	sync: update files from upstream with "make fetch"
+
+	* lib/texinfo.tex: Update.
+
+2012-09-05  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: cygnus will be removed in automake 1.13
+
+	* NEWS (Future backward-incompatibilities): So document it here.
+
+2012-09-05  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: some changes for 1.13 has been "de-planned"
+
+	* NEWS (Future backward-incompatibilities): The planned Automake release
+	1.13 already has too much stuff on its plate; so we are not going to
+	In Automake 1.13, we are definitely not going to change the exact order
+	in which the directories in the aclocal macro search path are looked up.
+	Also, experience and user feedback have shown that the "obsolescent"
+	two-arguments invocation for AM_INIT_AUTOMAKE:
+
+	    AM_INIT_AUTOMAKE(PACKAGE-NAME, PACKAGE-VERSION)
+
+	is still useful (until at least Autoconf is fixed to offer better support
+	for "dynamically" package versions), so we are not going to remove
+	support for that usage in Automake 1.13.  For more details, see commit
+	v1.12.2-245-g2abe183 of 2012-08-24, "AM_INIT_AUTOMAKE: allow obsolescent
+	two-args invocation once again".
+	(New in 1.12.1): Adjust accordingly.
+
+2012-09-05  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: report that the have seen fixlets after 1.12.3
+
+	* NEWS: Here.
+
+2012-09-04  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	warns: enable category 'obsolete' by default
+
+	No surprise that our users were bitten by backward-incompatible changes
+	especially hard: the warnings in the 'obsolete' category, that might
+	have informed them of the upcoming incompatibilities, and help them to
+	prepare for the transition, where not enabled by default!
+
+	* NEWS, doc/automake.texi: Update.
+	* lib/Automake/ChannelDefs.pm: Enable warnings in the category 'obsolete'
+	by default.
+	* t/warnings-obsolete-default.sh: New test.
+	* t/list-of-tests.mk: Add it.
+	* t/backcompat.sh: Use 'configure.ac' rather than 'configure.in' as
+	autoconf input file, to avoid spurious aclocal errors.
+	* t/backcompat2.sh: Likewise.
+	* t/backcompat3.sh: Likewise.
+	* t/backcompat5.sh: Add '-Wno-obsolete' when invoking aclocal.  Adjust
+	heading comments.
+	* t/backcompat6.sh: Likewise.
+	* t/cygnus-imply-foreign.sh:  Add '-Wno-obsolete' when invoking automake.
+
+2012-08-28  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	sync: update files from upstream with "make fetch"
+
+	* lib/config.guess, lib/config.sub: Update.
+
+2012-08-27  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	automake: don't define many identical 'lang_*_rewrite' subroutines
+
+	This is just a simplifying refactoring, with no semantic change intended.
+
+	Cherry-picked from the Automake-NG commit 'v1.12.1-312-g63aa4a9' of
+	2012-06-07.
+
+2012-08-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	coverage: bugs #8844 and #9933 (already fixed by Akim's work on ylwrap)
+
+	* t/flex-header.sh: New test, show that automake bug#8844 and bug#9933
+	have already been fixed by the recent-ish improvements to ylwrap (merged
+	with commit v1.12.2-27-gec5cb49 of 2012-07-16, "Merge branch 'yacc-work'
+	into maint").
+	* t/list-of-tests.mk: Update.
+
+2012-08-21  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	docs: don't suggest to use recursive makefile setup
+
+	* doc/automake.texi (Introduction): Here, by erroneously telling that
+	"there should generally be one Makefile.am per directory of a project".
+	For reference, see commit 'v1.12.1-25-g61dfb47' of 2012-06-12, "docs:
+	recursive make considered harmful".
+
+2012-08-16  Adam Sampson  <ats@offog.org>  (tiny change)
+	    Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fix a timestamp race in python tests
+
+	Fixes automake bug#12210.
+
+	* t/python-missing.sh: Call aclocal and autoconf with the "--force"
+	option.  We need this because, on fast machines, it's possible for
+	'mypy.m4' and 'aclocal.m4' to end up with the same timestamp as configure,
+	so autoconf (without the "--force" options) wouldn't bother to rebuild it,
+	and would just rerun the previous AM_PATH_PYTHON test, succeeding rather
+	than failing as expected.
+	* t/python-am-path-iftrue.sh: Likewise.
+
+2012-08-14  Peter Rosin  <peda@lysator.liu.se>
+
+	tests: fixup: make distcheck-override-infodir pass again
+
+	Fixes Automake bug#12198.
+
+	* t/distcheck-override-infodir.sh (main.texi): Remove all leading
+	cruft added by commit v1.12.2-96-g133307b "maintcheck: fix spurious
+	warnings".
+
+2012-08-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	sync: update files from upstream with "make fetch"
+
+	* lib/config.guess, lib/config.sub, lib/gitlog-to-changelog,
+	lib/texinfo.tex: Update.
+
+2012-08-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: post-release minor version bump
+
+	* configure.ac (AC_INIT): Bump version number to 1.12.3a.
+	* m4/amversion.m4: Likewise (automatically regenerated by
+	"make bootstrap").
+
 2012-08-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
 
 	release: stable release 1.12.3
