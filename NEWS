@@ -1,3 +1,20 @@
+Bugs fixed in 1.7.7:
+* The implementation of automake's --no-force option is unreliable,
+  so this option is ignored in this version.  A real fix will appear in
+  Automake 1.8.  (Debian Bug #206299)
+* AM_PATH_PYTHON: really check the whole list of interpreters if no
+  argument is given.  (PR/399)
+* Do not warn about leading `_' in variable names, even with -Wportability.
+* Support user redefinitions of TEXINFO_TEX.
+* depcomp: support AIX Compiler version 6.
+* Fix missing rebuilds during `make dist' with BSD make.
+  (Could produce tarballs containing out-of-date files.)
+* Resurrect multilib support.
+* Noteworthy manual updates:
+  - Extending aclocal: how to write m4 macros that won't trigger warnings
+    with Automake 1.8.
+  - A Shared Library: Rewrite and split into subsections.
+
 Bugs fixed in 1.7.6:
 * Fix depcomp's icc mode for ICC 7.1.
 * Diagnose calls to AC_CONFIG_FILES and friends with not enough arguments.
@@ -91,7 +108,7 @@ Bugs fixed in 1.7.2:
   depcomp2.test, gnits2.test, gnits3.test, python3.test, texinfo13.test
 * Noteworthy manual updates:
   - Augment the section about BUILT_SOURCES.
-  - Mention that AM_PROG_CC_STDC is a relic that is beter avoided today.
+  - Mention that AM_PROG_CC_STDC is a relic that is better avoided today.
 
 Bugs fixed in 1.7.1:
 * Honor `ansi2knr' for files built in subdirectories, or using per-targets
@@ -241,7 +258,7 @@ New in 1.3:
 
 New in 1.2:
 * Bug fixes
-* Better DejaGNU support
+* Better DejaGnu support
 * Added no-installinfo option
 * Added Emacs Lisp support
 * Added --no-force option
@@ -277,7 +294,7 @@ New in 1.2:
 New in 1.0:
 * Bug fixes
 * distcheck target runs install and installcheck targets
-* Added preliminary support for DejaGNU.
+* Added preliminary support for DejaGnu.
 
 New in 0.33:
 * More bug fixes

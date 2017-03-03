@@ -18,32 +18,57 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# Check diagnostics about no-installman being disallowed in `gnu'.
+# Test to make sure that depcomp and compile required in subdirectories
+# are added to the top-level DIST_COMMON even with --no-force.
+# This is similar to distcom2.test, but with --no-force added.
+# Report from Scott James Remnant (Debian #206299).
 
 . ./defs || exit 1
 
 set -e
 
-cat > configure.in << 'END'
-AC_INIT([gnuwarn2], [1.0])
-AM_INIT_AUTOMAKE([no-installman])
-AC_CONFIG_FILES([Makefile])
+cat >> configure.in << 'END'
+AC_PROG_CC
+AC_CONFIG_FILES([subdir/Makefile])
 AC_OUTPUT
 END
 
-# --gnu files
-: > NEWS
-: > README
-: > AUTHORS
-: > ChangeLog
-: > COPYING
-: > INSTALL
-
 cat > Makefile.am << 'END'
-AUTOMAKE_OPTIONS = gnu
+SUBDIRS = subdir
 END
 
+mkdir subdir
+: > subdir/foo.c
+
+cat > subdir/Makefile.am << 'END'
+noinst_PROGRAMS = foo
+foo_SOURCES = foo.c
+foo_CFLAGS = -DBAR
+END
+
+rm -f compile depcomp
+
 $ACLOCAL
-$AUTOMAKE 2>stderr && exit 1
-cat stderr
-grep 'configure.in:2:.*no-installman' stderr
+$AUTOCONF
+$AUTOMAKE --add-missing --no-force
+
+test -f compile
+test -f depcomp
+
+sed -n -e '/^DIST_COMMON =.*\\$/ {
+   :loop
+   p
+   n
+   /\\$/ b loop
+   p
+   n
+   }' -e '/^DIST_COMMON =/ p' Makefile.in | grep compile
+
+sed -n -e '/^DIST_COMMON =.*\\$/ {
+   :loop
+   p
+   n
+   /\\$/ b loop
+   p
+   n
+   }' -e '/^DIST_COMMON =/ p' Makefile.in | grep depcomp

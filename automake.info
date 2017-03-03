@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4.
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.7.6
+   This file documents GNU automake 1.7.7
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Free
 Software Foundation, Inc.
@@ -38,7 +38,7 @@ GNU Automake
 
 This file documents the GNU Automake package.  Automake is a program
 which creates GNU standards-compliant Makefiles from template files.
-This edition documents version 1.7.6.
+This edition documents version 1.7.7.
 
 * Menu:
 
@@ -775,6 +775,9 @@ purpose.
      `Makefile.in's which are out of date with respect to one of their
      dependents.
 
+     Due to a bug in its implementation, this option is currently
+     ignored.  It will be fixed in Automake 1.8.
+
 `-o DIR'
 `--output-dir=DIR'
      Put the generated `Makefile.in' in the directory DIR.  Ordinarily
@@ -1431,20 +1434,65 @@ Writing your own aclocal macros
 The `aclocal' program doesn't have any built-in knowledge of any
 macros, so it is easy to extend it with your own macros.
 
-   This is mostly used for libraries which want to supply their own
-Autoconf macros for use by other programs.  For instance the `gettext'
-library supplies a macro `AM_GNU_GETTEXT' which should be used by any
-package using `gettext'.  When the library is installed, it installs
-this macro so that `aclocal' will find it.
-
-   A file of macros should be a series of `AC_DEFUN''s.  The `aclocal'
-programs also understands `AC_REQUIRE', so it is safe to put each macro
-in a separate file.  *Note Prerequisite Macros: (autoconf)Prerequisite
-Macros, and *Note Macro Definitions: (autoconf)Macro Definitions.
+   This can be used by libraries which want to supply their own Autoconf
+macros for use by other programs.  For instance the `gettext' library
+supplies a macro `AM_GNU_GETTEXT' which should be used by any package
+using `gettext'.  When the library is installed, it installs this macro
+so that `aclocal' will find it.
 
    A macro file's name should end in `.m4'.  Such files should be
-installed in ``aclocal --print-ac-dir`' (which usually happens to be
-`$(datadir)/aclocal').
+installed in `$(datadir)/aclocal'.  This is as simple as writing:
+
+     aclocaldir = $(datadir)/aclocal
+     aclocal_DATA = mymacro.m4 myothermacro.m4
+
+   A file of macros should be a series of properly quoted `AC_DEFUN''s
+(*note Macro Definitions: (autoconf)Macro Definitions.).  The `aclocal'
+programs also understands `AC_REQUIRE' (*note Prerequisite Macros:
+(autoconf)Prerequisite Macros.), so it is safe to put each macro in a
+separate file.  Each file should have no side effects but macro
+definitions.  Especially, any call to `AC_PREREQ' should be done inside
+the defined macro, not at the beginning of the file.
+
+   Starting with Automake 1.8, `aclocal' will warn about all
+underquoted calls to `AC_DEFUN'.  We realize this will annoy a lot of
+people, because `aclocal' was not so strict in the past and many third
+party macros are underquoted; and we have to apologize for this
+temporary inconvenience.  The reason we have to be stricter is that a
+future implementation of `aclocal' will have to temporary include all
+these third party `.m4' files, maybe several times, even those which
+are not actually needed.  Doing so should alleviate many problem of the
+current implementation, however it requires a stricter style from the
+macro authors.  Hopefully it is easy to revise the existing macros.
+For instance
+     # bad style
+     AC_PREREQ(2.57)
+     AC_DEFUN(AX_FOOBAR,
+     [AC_REQUIRE([AX_SOMETHING])dnl
+     AX_FOO
+     AX_BAR
+     ])
+
+should be rewritten as
+     AC_DEFUN([AX_FOOBAR],
+     [AC_PREREQ(2.57)dnl
+     AC_REQUIRE([AX_SOMETHING])dnl
+     AX_FOO
+     AX_BAR
+     ])
+
+   Wrapping the `AC_PREREQ' call inside the macro ensures that Autoconf
+2.57 will not be required if `AX_FOOBAR' is not actually used.  Most
+importantly, quoting the first argument of `AC_DEFUN' allows the macro
+to be redefined or included twice (otherwise this first argument would
+be expansed during the second definition).
+
+   If you have been directed here by the `aclocal' diagnostic but are
+not the maintainer of the implicated macro, you will want to contact
+the maintainer of that macro.  Please make sure you have the last
+version of the macro and that the problem already hasn't been reported
+before doing so: people tend to work faster when they aren't flooded by
+mails.
 
 
 File: automake.info,  Node: Top level,  Next: Alternative,  Prev: configure,  Up: Top
@@ -1692,7 +1740,7 @@ are part of it, and which libraries it should be linked with.
 
    This section also covers conditional compilation of sources or
 programs.  Most of the comments about these also apply to libraries
-(*note A Library::) and Libtool libraries (*note A Shared Library::).
+(*note A Library::) and libtool libraries (*note A Shared Library::).
 
 * Menu:
 
@@ -1939,7 +1987,7 @@ name of the primary is `LIBRARIES'.  Libraries can be installed in
 `libdir' or `pkglibdir'.
 
    *Note A Shared Library::, for information on how to build shared
-libraries using Libtool and the `LTLIBRARIES' primary.
+libraries using libtool and the `LTLIBRARIES' primary.
 
    Each `_LIBRARIES' variable is a list of the libraries to be built.
 For instance to create a library named `libcpio.a', but not install it,
@@ -1969,47 +2017,336 @@ File: automake.info,  Node: A Shared Library,  Next: Program and Library Variabl
 Building a Shared Library
 =========================
 
-Building shared libraries is a relatively complex matter.  For this
-reason, GNU Libtool (*note Introduction: (libtool)Top.) was created to
-help build shared libraries in a platform-independent way.
+Building shared libraries portably is a relatively complex matter.  For
+this reason, GNU Libtool (*note Introduction: (libtool)Top.) was
+created to help build shared libraries in a platform-independent way.
 
-   Automake uses Libtool to build libraries declared with the
+* Menu:
+
+* Libtool Concept::             Introducing Libtool
+* Libtool Libraries::           Declaring Libtool Libraries
+* Conditional Libtool Libraries::  Building Libtool Libraries Conditionally
+* Conditional Libtool Sources::  Choosing Library Sources Conditionally
+* Libtool Convenience Libraries::  Building Convenience Libtool Libraries
+* Libtool Modules::             Building Libtool Modules
+* Libtool Flags::               Using _LIBADD and _LDFLAGS
+* LTLIBOBJ::                    Using $(LTLIBOBJ)
+* Libtool Issues::              Common Issues Related to Libtool's Use
+
+
+File: automake.info,  Node: Libtool Concept,  Next: Libtool Libraries,  Prev: A Shared Library,  Up: A Shared Library
+
+The Libtool Concept
+-------------------
+
+Libtool abstracts shared and static libraries into a unified concept
+henceforth called "libtool libraries".  Libtool libraries are files
+using the `.la' suffix, and can designate a static library, a shared
+library, or maybe both.  Their exact nature cannot be determined until
+`./configure' is run: not all platforms support all kinds of libraries,
+and users can explicitly select which libraries should be built.
+(However the package's maintainers can tune the default, *Note The
+`AC_PROG_LIBTOOL' macro: (libtool)AC_PROG_LIBTOOL.)
+
+   Because object files for shared and static libraries must be compiled
+differently, libtool is also used during compilation.  Object files
+built by libtool are called "libtool objects": these are files using
+the `.lo' suffix.  Libtool libraries are built from these libtool
+objects.
+
+   You should not assume anything about the structure of `.la' or `.lo'
+files and how libtool constructs them: this is libtool's concern, and
+the last thing one wants is to learn about libtool's guts.  However the
+existence of these files matters, because they are used as targets and
+dependencies in `Makefile's when building libtool libraries.  There are
+situations where you may have to refer to these, for instance when
+expressing dependencies for building source files conditionally (*note
+Conditional Libtool Sources::).
+
+   People considering writing a plug-in system, with dynamically loaded
+modules, should look into `libltdl': libtool's dlopening library (*note
+Using libltdl: (libtool)Using libltdl.).  This offers a portable
+dlopening facility to load libtool libraries dynamically, and can also
+achieve static linking where unavoidable.
+
+   Before we discuss how to use libtool with Automake in details, it
+should be noted that the libtool manual also has a section about how to
+use Automake with libtool (*note Using Automake with Libtool:
+(libtool)Using Automake.).
+
+
+File: automake.info,  Node: Libtool Libraries,  Next: Conditional Libtool Libraries,  Prev: Libtool Concept,  Up: A Shared Library
+
+Building Libtool Libraries
+--------------------------
+
+Automake uses libtool to build libraries declared with the
 `LTLIBRARIES' primary.  Each `_LTLIBRARIES' variable is a list of
-shared libraries to build.  For instance, to create a library named
-`libgettext.a' and its corresponding shared libraries, and install them
-in `libdir', write:
+libtool libraries to build.  For instance, to create a libtool library
+named `libgettext.la', and install it in `libdir', write:
 
      lib_LTLIBRARIES = libgettext.la
+     libgettext_la_SOURCES = gettext.c gettext.h ...
 
-   Note that shared libraries _must_ be installed in order to work
-properly, so `check_LTLIBRARIES' is not allowed.  However,
-`noinst_LTLIBRARIES' is allowed.  This feature should be used for
-libtool "convenience libraries".
+   Automake predefines the variable `pkglibdir', so you can use
+`pkglib_LTLIBRARIES' to install libraries in `$(libdir)/@PACKAGE@/'.
 
-   For each library, the `LIBRARY_LIBADD' variable contains the names
-of extra libtool objects (`.lo' files) to add to the shared library.
-The `LIBRARY_LDFLAGS' variable contains any additional libtool flags,
-such as `-version-info' or `-static'.
+
+File: automake.info,  Node: Conditional Libtool Libraries,  Next: Conditional Libtool Sources,  Prev: Libtool Libraries,  Up: A Shared Library
 
-   Where an ordinary library might include `$(LIBOBJS)', a libtool
-library must use `$(LTLIBOBJS)'.  This is required because the object
-files that libtool operates on do not necessarily end in `.o'.  The
-libtool manual contains more details on this topic.
+Building Libtool Libraries Conditionally
+----------------------------------------
 
-   For libraries installed in some directory, Automake will
-automatically supply the appropriate `-rpath' option.  However, for
-libraries determined at configure time (and thus mentioned in
-`EXTRA_LTLIBRARIES'), Automake does not know the eventual installation
-directory; for such libraries you must add the `-rpath' option to the
-appropriate `_LDFLAGS' variable by hand.
+Like conditional programs (*note Conditional Programs::), there are two
+main ways to build conditional libraries: using Automake conditionals
+or using Autoconf `AC_SUBST'itutions.
 
-   Ordinarily, Automake requires that a shared library's name start with
-`lib'.  However, if you are building a dynamically loadable module then
-you might wish to use a "nonstandard" name.  In this case, put
-`-module' into the `_LDFLAGS' variable.
+   The important implementation detail you have to be aware of is that
+the place where a library will be installed matters to libtool: it
+needs to be indicated _at link-time_ using the `-rpath' option.
 
-   *Note Using Automake with Libtool: (libtool)Using Automake, for more
-information.
+   For libraries whose destination directory is known when Automake
+runs, Automake will automatically supply the appropriate `-rpath'
+option to libtool. This is the case for libraries listed explicitly in
+some installable `_LTLIBRARIES' variables such as `lib_LTLIBRARIES'.
+
+   However, for libraries determined at configure time (and thus
+mentioned in `EXTRA_LTLIBRARIES'), Automake does not know the final
+installation directory.  For such libraries you must add the `-rpath'
+option to the appropriate `_LDFLAGS' variable by hand.
+
+   The examples below illustrate the differences between these two
+methods.
+
+   Here is an example where `$(WANTEDLIBS)' is an `AC_SUBST'ed variable
+set at `./configure'-time to either `libfoo.la', `libbar.la', both, or
+none.  Although `$(WANTEDLIBS)' appears in the `lib_LTLIBRARIES',
+Automake cannot guess it relates to `libfoo.la' or `libbar.la' by the
+time it creates the link rule for these two libraries.  Therefore the
+`-rpath' argument must be explicitly supplied.
+
+     EXTRA_LTLIBRARIES = libfoo.la libbar.la
+     lib_LTLIBRARIES = $(WANTEDLIBS)
+     libfoo_la_SOURCES = foo.c ...
+     libfoo_la_LDFLAGS = -rpath '$(libdir)'
+     libbar_la_SOURCES = bar.c ...
+     libbar_la_LDFLAGS = -rpath '$(libdir)'
+
+   Here is how the same `Makefile.am' would look using Automake
+conditionals named `WANT_LIBFOO' and `WANT_LIBBAR'.  Now Automake is
+able to compute the `-rpath' setting itself, because it's clear that
+both libraries will end up in `$(libdir)' if they are installed.
+
+     lib_LTLIBRARIES =
+     if WANT_LIBFOO
+     lib_LTLIBRARIES += libfoo.la
+     endif
+     if WANT_LIBBAR
+     lib_LTLIBRARIES += libbar.la
+     endif
+     libfoo_la_SOURCES = foo.c ...
+     libbar_la_SOURCES = bar.c ...
+
+
+File: automake.info,  Node: Conditional Libtool Sources,  Next: Libtool Convenience Libraries,  Prev: Conditional Libtool Libraries,  Up: A Shared Library
+
+Libtool Libraries with Conditional Sources
+------------------------------------------
+
+Conditional compilation of sources in a library can be achieved in the
+same way as conditional compilation of sources in a program (*note
+Conditional Sources::).  The only difference is that `_LIBADD' should
+be used instead of `_LDADD' and that it should mention libtool objects
+(`.lo' files).
+
+   So, to mimic the `hello' example from *Note Conditional Sources::,
+we could build a `libhello.la' library using either `hello-linux.c' or
+`hello-generic.c' with the following `Makefile.am'.
+
+     lib_LTLIBRARIES = libhello.la
+     libhello_la_SOURCES = hello-common.c
+     EXTRA_libhello_la_SOURCES = hello-linux.c hello-generic.c
+     libhello_la_LIBADD = $(HELLO_SYSTEM)
+     libhello_la_DEPENDENCIES = $(HELLO_SYSTEM)
+
+And make sure `$(HELLO_SYSTEM)' is set to either `hello-linux.lo' or
+`hello-generic.lo' in `./configure'.
+
+   Or we could simply use an Automake conditional as follows.
+
+     lib_LTLIBRARIES = libhello.la
+     libhello_la_SOURCES = hello-common.c
+     if LINUX
+     libhello_la_SOURCES += hello-linux.c
+     else
+     libhello_la_SOURCES += hello-generic.c
+     endif
+
+
+File: automake.info,  Node: Libtool Convenience Libraries,  Next: Libtool Modules,  Prev: Conditional Libtool Sources,  Up: A Shared Library
+
+Libtool Convenience Libraries
+-----------------------------
+
+Sometimes you want to build libtool libraries which should not be
+installed.  These are called "libtool convenience libraries" and are
+typically used to encapsulate many sublibraries, later gathered into
+one big installed library.
+
+   Libtool convenience libraries are declared by `noinst_LTLIBRARIES',
+`check_LTLIBRARIES', or even `EXTRA_LTLIBRARIES'.  Unlike installed
+libtool libraries they do not need an `-rpath' flag at link time
+(actually this is the only difference).
+
+   Convenience libraries listed in `noinst_LTLIBRARIES' are always
+built.  Those listed in `check_LTLIBRARIES' are built only upon `make
+check'.  Finally, libraries listed in `EXTRA_LTLIBRARIES' are never
+built explicitly: Automake outputs rules to build them, but if the
+library does not appear as a Makefile dependency anywhere it won't be
+built (this is why `EXTRA_LTLIBRARIES' is used for conditional
+compilation).
+
+   Here is a sample setup merging libtool convenience libraries from
+subdirectories into one main `libtop.la' library.
+
+     # -- Top-level Makefile.am --
+     SUBDIRS = sub1 sub2 ...
+     lib_LTLIBRARIES = libtop.la
+     libtop_la_SOURCES =
+     libtop_la_LIBADD = \
+       sub1/libsub1.la \
+       sub2/libsub2.la \
+       ...
+     
+     # -- sub1/Makefile.am --
+     noinst_LTLIBRARIES = libsub1.la
+     libsub1_la_SOURCES = ...
+     
+     # -- sub2/Makefile.am --
+     # showing nested convenience libraries
+     SUBDIRS = sub2.1 sub2.2 ...
+     noinst_LTLIBRARIES = libsub2.la
+     libsub2_la_SOURCES =
+     libsub2_la_LIBADD = \
+       sub21/libsub21.la \
+       sub22/libsub22.la \
+       ...
+
+
+File: automake.info,  Node: Libtool Modules,  Next: Libtool Flags,  Prev: Libtool Convenience Libraries,  Up: A Shared Library
+
+Libtool Modules
+---------------
+
+These are libtool libraries meant to be dlopened.  They are indicated
+to libtool by passing `-module' at link-time.
+
+     pkglib_LTLIBRARIES = mymodule.la
+     mymodule_la_SOURCES = doit.c
+     mymodule_LDFLAGS = -module
+
+   Ordinarily, Automake requires that a Library's name starts with
+`lib'.  However, when building a dynamically loadable module you might
+wish to use a "nonstandard" name.
+
+
+File: automake.info,  Node: Libtool Flags,  Next: LTLIBOBJ,  Prev: Libtool Modules,  Up: A Shared Library
+
+_LIBADD and _LDFLAGS
+--------------------
+
+As shown in previous sections, the `LIBRARY_LIBADD' variable should be
+used to list extra libtool objects (`.lo' files) or libtool libraries
+(`.la') to add to LIBRARY.
+
+   The `LIBRARY_LDFLAGS' variable is the place to list additional
+libtool flags, such as `-version-info', `-static', and a lot more.  See
+*Note Using libltdl: (libtool)Link mode.
+
+
+File: automake.info,  Node: LTLIBOBJ,  Next: Libtool Issues,  Prev: Libtool Flags,  Up: A Shared Library
+
+`LTLIBOBJS'
+-----------
+
+Where an ordinary library might include `$(LIBOBJS)', a libtool library
+must use `$(LTLIBOBJS)'.  This is required because the object files
+that libtool operates on do not necessarily end in `.o'.
+
+   Nowadays, the computation of `LTLIBOBJS' from `LIBOBJS' is performed
+automatically by Autoconf (*note `AC_LIBOBJ' vs. `LIBOBJS':
+(autoconf)AC_LIBOBJ vs LIBOBJS.).
+
+
+File: automake.info,  Node: Libtool Issues,  Prev: LTLIBOBJ,  Up: A Shared Library
+
+Common Issues Related to Libtool's Use
+--------------------------------------
+
+`required file `./ltmain.sh' not found'
+.......................................
+
+Libtool comes with a tool called `libtoolize' that will install
+libtool's supporting files into a package.  Running this command will
+install `ltmain.sh'.  You should execute it before `aclocal' and
+`automake'.
+
+   People upgrading old packages to newer autotools are likely to face
+this issue because older Automake versions used to call `libtoolize'.
+Therefore old build scripts do not call `libtoolize'.
+
+   Since Automake 1.6, it has been decided that running `libtoolize'
+was none of Automake's business.  Instead, that functionality has been
+moved into the `autoreconf' command (*note Using `autoreconf':
+(autoconf)autoreconf Invocation.).  If you do not want to remember what
+to run and when, just learn the `autoreconf' command.  Hopefully,
+replacing existing `bootstrap.sh' or `autogen.sh' scripts by a call to
+`autoreconf' should also free you from any similar incompatible change
+in the future.
+
+Objects `created with both libtool and without'
+...............................................
+
+Sometimes, the same source file is used both to build a libtool library
+and to build another non-libtool target (be it a program or another
+library).
+
+   Let's consider the following `Makefile.am'.
+
+     bin_PROGRAMS = prog
+     prog_SOURCES = prog.c foo.c ...
+     
+     lib_LTLIBRARIES = libfoo.la
+     libfoo_la_SOURCES = foo.c ...
+
+(In this trivial case the issue could be avoided by linking `libfoo.la'
+with `prog' instead of listing `foo.c' in `prog_SOURCES'.  But let's
+assume we really want to keep `prog' and `libfoo.la' separate.)
+
+   Technically, it means that we should build `foo.$(OBJEXT)' for
+`prog', and `foo.lo' for `libfoo.la'.  The problem is that in the
+course of creating `foo.lo', libtool may erase (or replace)
+`foo.$(OBJEXT)' - and this cannot be avoided.
+
+   Therefore, when Automake detects this situation it will complain
+with a message such as
+     object `foo.$(OBJEXT)' created both with libtool and without
+
+   A workaround for this issue is to ensure that these two objects get
+different basenames.  As explained in *Note renamed objects::, this
+happens automatically when per-targets flags are used.
+
+     bin_PROGRAMS = prog
+     prog_SOURCES = prog.c foo.c ...
+     prog_CFLAGS = $(AM_CFLAGS)
+     
+     lib_LTLIBRARIES = libfoo.la
+     libfoo_la_SOURCES = foo.c ...
+
+Adding `prog_CFLAGS = $(AM_CFLAGS)' is almost a no-op, because when the
+`prog_CFLAGS' is defined, it is used instead of `AM_CFLAGS'.  However
+as a side effect it will cause `prog.c' and `foo.c' to be compiled as
+`prog-prog.$(OBJEXT)' and `prog-foo.$(OBJEXT)' which solves the issue.
 
 
 File: automake.info,  Node: Program and Library Variables,  Next: LIBOBJS,  Prev: A Shared Library,  Up: Programs
@@ -3883,7 +4220,7 @@ any tests are run; you can list both source and derived programs in
 To do this you would list its name in `TESTS' and also in
 `check_PROGRAMS', and then specify it as you would any other program.
 
-DejaGNU Tests
+DejaGnu Tests
 =============
 
 If `dejagnu' (ftp://ftp.gnu.org/gnu/dejagnu/) appears in
@@ -4089,7 +4426,7 @@ There are a few rules and variables that didn't fit anywhere else.
 
 * Tags::                        Interfacing to etags and mkid
 * Suffixes::                    Handling new file extensions
-* Multilibs::                   Support for multilibbing.
+* Multilibs::                   Support for multilibs.
 
 
 File: automake.info,  Node: Tags,  Next: Suffixes,  Prev: Miscellaneous,  Up: Miscellaneous
@@ -4576,7 +4913,7 @@ Background: CVS and timestamps
 ------------------------------
 
 Unless you use CVS keywords (in which case files must be updated at
-commit time), CVS preserves timestamp during `cvs commit' and `cvs
+commit time), CVS preserves timestamps during `cvs commit' and `cvs
 import -d' operations.
 
    When you check out a file using `cvs checkout' its timestamp is set
@@ -5021,11 +5358,14 @@ Macro and Variable Index
 * AC_CONFIG_AUX_DIR:                     Optional.
 * AC_CONFIG_FILES:                       Requirements.
 * AC_CONFIG_HEADERS:                     Optional.
+* AC_DEFUN:                              Extending aclocal.
 * AC_F77_LIBRARY_LDFLAGS:                Optional.
+* AC_LIBOBJ <1>:                         LTLIBOBJ.
 * AC_LIBOBJ:                             Optional.
 * AC_LIBSOURCE:                          Optional.
 * AC_LIBSOURCES:                         Optional.
 * AC_OUTPUT:                             Requirements.
+* AC_PREREQ:                             Extending aclocal.
 * AC_PROG_CXX:                           Optional.
 * AC_PROG_F77:                           Optional.
 * AC_PROG_LEX:                           Optional.
@@ -5072,7 +5412,7 @@ Macro and Variable Index
 * CCAS:                                  Assembly Support.
 * CCASFLAGS:                             Assembly Support.
 * CFLAGS:                                Program variables.
-* check_LTLIBRARIES:                     A Shared Library.
+* check_LTLIBRARIES:                     Libtool Convenience Libraries.
 * check_PROGRAMS:                        Program Sources.
 * check_SCRIPTS:                         Scripts.
 * CLASSPATH_ENV:                         Java.
@@ -5125,10 +5465,11 @@ Macro and Variable Index
 * LDADD:                                 Linking.
 * LDFLAGS:                               Program variables.
 * lib_LIBRARIES:                         A Library.
-* lib_LTLIBRARIES:                       A Shared Library.
+* lib_LTLIBRARIES:                       Libtool Libraries.
 * LIBADD:                                A Library.
 * libexec_PROGRAMS:                      Program Sources.
 * libexec_SCRIPTS:                       Scripts.
+* LIBOBJS <1>:                           LTLIBOBJ.
 * LIBOBJS:                               Optional.
 * LIBRARIES:                             Uniform.
 * LIBS:                                  Program variables.
@@ -5137,6 +5478,7 @@ Macro and Variable Index
 * LISP:                                  Uniform.
 * lisp_LISP:                             Emacs Lisp.
 * localstate_DATA:                       Data.
+* LTLIBOBJS:                             LTLIBOBJ.
 * MAINTAINERCLEANFILES:                  Clean.
 * MAKE:                                  Top level.
 * MAKEFLAGS:                             Top level.
@@ -5150,7 +5492,7 @@ Macro and Variable Index
 * noinst_HEADERS:                        Headers.
 * noinst_LIBRARIES:                      A Library.
 * noinst_LISP:                           Emacs Lisp.
-* noinst_LTLIBRARIES:                    A Shared Library.
+* noinst_LTLIBRARIES:                    Libtool Convenience Libraries.
 * noinst_PROGRAMS:                       Program Sources.
 * noinst_SCRIPTS:                        Scripts.
 * oldinclude_HEADERS:                    Headers.
@@ -5163,7 +5505,7 @@ Macro and Variable Index
 * pkginclude_HEADERS:                    Headers.
 * pkgincludedir:                         Uniform.
 * pkglib_LIBRARIES:                      A Library.
-* pkglib_LTLIBRARIES:                    A Shared Library.
+* pkglib_LTLIBRARIES:                    Libtool Libraries.
 * pkglib_PROGRAMS:                       Program Sources.
 * pkglibdir:                             Uniform.
 * pkgpyexecdir:                          Python.
@@ -5249,18 +5591,22 @@ General Index
 * -I:                                    aclocal options.
 * -i:                                    Invoking Automake.
 * -local targets:                        Extending.
+* -module, libtool:                      Libtool Modules.
 * -o:                                    Invoking Automake.
 * -v:                                    Invoking Automake.
 * -W:                                    Invoking Automake.
+* .la suffix, defined:                   Libtool Concept.
 * _DATA primary, defined:                Data.
 * _DEPENDENCIES, defined:                Linking.
 * _HEADERS primary, defined:             Headers.
 * _JAVA primary, defined:                Java.
 * _LDFLAGS, defined:                     Linking.
+* _LDFLAGS, libtool:                     Libtool Flags.
 * _LIBADD primary, defined:              A Library.
+* _LIBADD, libtool:                      Libtool Flags.
 * _LIBRARIES primary, defined:           A Library.
 * _LISP primary, defined:                Emacs Lisp.
-* _LTLIBRARIES primary, defined:         A Shared Library.
+* _LTLIBRARIES primary, defined:         Libtool Libraries.
 * _MANS primary, defined:                Man pages.
 * _PROGRAMS primary variable:            Uniform.
 * _PYTHON primary, defined:              Python.
@@ -5287,6 +5633,7 @@ General Index
 * ansi2knr and LIBOBJS:                  ANSI.
 * ansi2knr and LTLIBOBJS:                ANSI.
 * Append operator:                       General Operation.
+* autogen.sh and autoreconf:             Libtool Issues.
 * Automake constraints:                  Introduction.
 * Automake options:                      Invoking Automake.
 * Automake requirements <1>:             Requirements.
@@ -5295,8 +5642,10 @@ General Index
 * Automake, recursive operation:         General Operation.
 * Automatic dependency tracking:         Dependencies.
 * Automatic linker selection:            How the Linker is Chosen.
+* autoreconf and libtoolize:             Libtool Issues.
 * Auxiliary programs:                    Auxiliary Programs.
 * Avoiding path stripping:               Alternative.
+* bootstrap.sh and autoreconf:           Libtool Issues.
 * BUGS, reporting:                       Introduction.
 * BUILT_SOURCES, defined:                Sources.
 * C++ support:                           C++ Support.
@@ -5305,12 +5654,12 @@ General Index
 * check:                                 Extending.
 * check primary prefix, definition:      Uniform.
 * check-local:                           Extending.
-* check_LTLIBRARIES, not allowed:        A Shared Library.
 * clean:                                 Extending.
 * clean-local:                           Extending.
 * Comment, special to Automake:          General Operation.
 * Complete example:                      Complete.
 * Conditional example,  -enable-debug:   Conditionals.
+* conditional libtool libraries:         Conditional Libtool Libraries.
 * Conditional programs:                  Conditional Programs.
 * Conditional subdirectories:            Top level.
 * Conditional SUBDIRS:                   Top level.
@@ -5319,6 +5668,7 @@ General Index
 * configure.in, from GNU Hello:          Hello.
 * configure.in, scanning:                configure.
 * Constraints of Automake:               Introduction.
+* convenience libraries, libtool:        Libtool Convenience Libraries.
 * cpio example:                          Uniform.
 * CVS and generated files:               CVS.
 * CVS and third-party files:             CVS.
@@ -5361,7 +5711,7 @@ General Index
 * endif:                                 Conditionals.
 * Example conditional -enable-debug:     Conditionals.
 * Example of recursive operation:        General Operation.
-* Example of shared libraries:           A Shared Library.
+* Example of shared libraries:           Libtool Libraries.
 * Example, EXTRA_PROGRAMS:               Uniform.
 * Example, false and true:               true.
 * Example, GNU Hello:                    Hello.
@@ -5451,16 +5801,25 @@ General Index
 * lex problems with HP-UX 10:            Public macros.
 * lex, multiple lexers:                  Yacc and Lex.
 * LIBADD primary, defined:               A Library.
+* libltdl, introduction:                 Libtool Concept.
 * LIBOBJS and ansi2knr:                  ANSI.
 * LIBOBJS, special handling:             LIBOBJS.
 * LIBRARIES primary, defined:            A Library.
+* libtool convenience libraries:         Libtool Convenience Libraries.
+* libtool libraries, conditional:        Conditional Libtool Libraries.
+* libtool library, definition:           Libtool Concept.
+* libtool modules:                       Libtool Modules.
+* libtool, introduction:                 Libtool Concept.
+* libtoolize and autoreconf:             Libtool Issues.
+* libtoolize, no longer run by Automake: Libtool Issues.
 * Linking Fortran 77 with C and C++:     Mixing Fortran 77 With C and C++.
 * LISP primary, defined:                 Emacs Lisp.
 * LN_S example:                          Extending.
 * local targets:                         Extending.
 * LTLIBOBJS and ansi2knr:                ANSI.
-* LTLIBOBJS, special handling:           A Shared Library.
-* LTLIBRARIES primary, defined:          A Shared Library.
+* LTLIBOBJS, special handling:           LTLIBOBJ.
+* LTLIBRARIES primary, defined:          Libtool Libraries.
+* ltmain.sh not found:                   Libtool Issues.
 * Macro search path:                     Macro search path.
 * Macros Automake recognizes:            Optional.
 * make check:                            Tests.
@@ -5480,6 +5839,7 @@ General Index
 * Mixed language example:                Mixing Fortran 77 With C and C++.
 * Mixing Fortran 77 with C and C++:      Mixing Fortran 77 With C and C++.
 * Mixing Fortran 77 with C and/or C++:   Mixing Fortran 77 With C and C++.
+* modules, libtool:                      Libtool Modules.
 * mostlyclean:                           Extending.
 * mostlyclean-local:                     Extending.
 * Multiple configure.in files:           Invoking Automake.
@@ -5540,7 +5900,7 @@ General Index
 * Primary variable, LIBADD:              A Library.
 * Primary variable, LIBRARIES:           A Library.
 * Primary variable, LISP:                Emacs Lisp.
-* Primary variable, LTLIBRARIES:         A Shared Library.
+* Primary variable, LTLIBRARIES:         Libtool Libraries.
 * Primary variable, MANS:                Man pages.
 * Primary variable, PROGRAMS:            Uniform.
 * Primary variable, PYTHON:              Python.
@@ -5586,8 +5946,8 @@ General Index
 * SUBDIRS and AM_CONDITIONAL:            Top level.
 * SUBDIRS, conditional:                  Top level.
 * SUBDIRS, explained:                    Top level.
-* suffix .la, defined:                   A Shared Library.
-* suffix .lo, defined:                   A Shared Library.
+* suffix .la, defined:                   Libtool Concept.
+* suffix .lo, defined:                   Libtool Concept.
 * SUFFIXES, adding:                      Suffixes.
 * Support for C++:                       C++ Support.
 * Support for Fortran 77:                Fortran 77 Support.
@@ -5612,6 +5972,7 @@ General Index
 * third-party files and CVS:             CVS.
 * timestamps and CVS:                    CVS.
 * true Example:                          true.
+* underquoted AC_DEFUN:                  Extending aclocal.
 * Uniform naming scheme:                 Uniform.
 * uninstall <1>:                         Extending.
 * uninstall:                             Install.
@@ -5649,89 +6010,98 @@ Node: Complete18588
 Node: Hello20586
 Node: true23408
 Node: Invoking Automake26155
-Node: configure32642
-Node: Requirements33686
-Node: Optional34614
-Node: Invoking aclocal39950
-Node: aclocal options41559
-Node: Macro search path42531
-Node: Macros46698
-Node: Public macros47178
-Node: Private macros54097
-Node: Extending aclocal55489
-Node: Top level56519
-Ref: Top level-Footnote-161895
-Node: Alternative62037
-Ref: Alternative-Footnote-163405
-Node: Rebuilding63530
-Node: Programs64295
-Node: A Program65336
-Node: Program Sources66066
-Node: Linking68032
-Node: Conditional Sources70328
-Node: Conditional Programs73055
-Node: A Library74859
-Node: A Shared Library76128
-Node: Program and Library Variables78266
-Ref: Program and Library Variables-Footnote-187298
-Node: LIBOBJS87381
-Node: Program variables88040
-Node: Yacc and Lex90354
-Node: C++ Support95289
-Node: Assembly Support96120
-Node: Fortran 77 Support96892
-Ref: Fortran 77 Support-Footnote-198471
-Node: Preprocessing Fortran 7798674
-Node: Compiling Fortran 77 Files99264
-Node: Mixing Fortran 77 With C and C++99823
-Ref: Mixing Fortran 77 With C and C++-Footnote-1102184
-Node: How the Linker is Chosen102487
-Node: Fortran 77 and Autoconf105032
-Node: Java Support105447
-Node: Support for Other Languages106649
-Node: ANSI107202
-Node: Dependencies109627
-Ref: Dependencies-Footnote-1111346
-Node: EXEEXT111512
-Node: Other objects113705
-Node: Scripts114294
-Node: Headers115378
-Ref: Headers-Footnote-1116079
-Node: Data116312
-Node: Sources116961
-Node: Built sources example119725
-Node: Other GNU Tools126151
-Node: Emacs Lisp126636
-Node: gettext127886
-Node: Libtool128383
-Node: Java128628
-Node: Python130257
-Node: Documentation133428
-Node: Texinfo133726
-Node: Man pages137392
-Node: Install139679
-Node: Clean144045
-Node: Dist145395
-Node: Tests152790
-Node: Options156393
-Node: Miscellaneous162640
-Node: Tags163027
-Node: Suffixes165036
-Node: Multilibs166588
-Node: Include167213
-Node: Conditionals168101
-Node: Gnits170804
-Node: Cygnus172663
-Node: Extending174482
-Node: Distributing177145
-Node: API versioning177775
-Node: FAQ180406
-Node: CVS181020
-Node: maintainer-mode187749
-Node: wildcards191365
-Node: distcleancheck194614
-Node: renamed objects199299
-Node: Macro and Variable Index200802
-Node: General Index211043
+Node: configure32758
+Node: Requirements33802
+Node: Optional34730
+Node: Invoking aclocal40066
+Node: aclocal options41675
+Node: Macro search path42647
+Node: Macros46814
+Node: Public macros47294
+Node: Private macros54213
+Node: Extending aclocal55605
+Node: Top level58535
+Ref: Top level-Footnote-163911
+Node: Alternative64053
+Ref: Alternative-Footnote-165421
+Node: Rebuilding65546
+Node: Programs66311
+Node: A Program67352
+Node: Program Sources68082
+Node: Linking70048
+Node: Conditional Sources72344
+Node: Conditional Programs75071
+Node: A Library76875
+Node: A Shared Library78144
+Node: Libtool Concept79105
+Node: Libtool Libraries81169
+Node: Conditional Libtool Libraries81838
+Node: Conditional Libtool Sources84192
+Node: Libtool Convenience Libraries85526
+Node: Libtool Modules87329
+Node: Libtool Flags87887
+Node: LTLIBOBJ88388
+Node: Libtool Issues88886
+Node: Program and Library Variables91723
+Ref: Program and Library Variables-Footnote-1100755
+Node: LIBOBJS100838
+Node: Program variables101497
+Node: Yacc and Lex103811
+Node: C++ Support108746
+Node: Assembly Support109577
+Node: Fortran 77 Support110349
+Ref: Fortran 77 Support-Footnote-1111928
+Node: Preprocessing Fortran 77112131
+Node: Compiling Fortran 77 Files112721
+Node: Mixing Fortran 77 With C and C++113280
+Ref: Mixing Fortran 77 With C and C++-Footnote-1115641
+Node: How the Linker is Chosen115944
+Node: Fortran 77 and Autoconf118489
+Node: Java Support118904
+Node: Support for Other Languages120106
+Node: ANSI120659
+Node: Dependencies123084
+Ref: Dependencies-Footnote-1124803
+Node: EXEEXT124969
+Node: Other objects127162
+Node: Scripts127751
+Node: Headers128835
+Ref: Headers-Footnote-1129536
+Node: Data129769
+Node: Sources130418
+Node: Built sources example133182
+Node: Other GNU Tools139608
+Node: Emacs Lisp140093
+Node: gettext141343
+Node: Libtool141840
+Node: Java142085
+Node: Python143714
+Node: Documentation146885
+Node: Texinfo147183
+Node: Man pages150849
+Node: Install153136
+Node: Clean157502
+Node: Dist158852
+Node: Tests166247
+Node: Options169850
+Node: Miscellaneous176097
+Node: Tags176481
+Node: Suffixes178490
+Node: Multilibs180042
+Node: Include180667
+Node: Conditionals181555
+Node: Gnits184258
+Node: Cygnus186117
+Node: Extending187936
+Node: Distributing190599
+Node: API versioning191229
+Node: FAQ193860
+Node: CVS194474
+Node: maintainer-mode201204
+Node: wildcards204820
+Node: distcleancheck208069
+Node: renamed objects212754
+Node: Macro and Variable Index214257
+Node: General Index224799
 
 End Tag Table

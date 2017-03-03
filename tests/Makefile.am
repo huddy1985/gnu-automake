@@ -161,6 +161,7 @@ discover.test \
 distcom.test \
 distcom2.test \
 distcom3.test \
+distcom6.test \
 distdir.test \
 distname.test \
 dollar.test \
@@ -266,6 +267,9 @@ lisp2.test \
 lisp3.test \
 lisp4.test \
 listval.test \
+ltcond.test \
+ltcond2.test \
+ltconv.test \
 ltdeps.test \
 ltlibobjs.test \
 maintclean.test \
@@ -280,6 +284,7 @@ mdate3.test \
 mdate4.test \
 mkinst2.test \
 mkinstall.test \
+multlib.test \
 nobase.test \
 nodef.test \
 nodef2.test \
@@ -347,6 +352,7 @@ recurs2.test \
 remake.test \
 remake2.test \
 remake3.test \
+remake4.test \
 req.test \
 reqd.test \
 reqd2.test \
@@ -431,10 +437,10 @@ txinfo16.test \
 txinfo17.test \
 txinfo18.test \
 txinfo19.test \
+txinfo22.test \
 transform.test \
 unused.test \
 vars.test \
-vars2.test \
 vars3.test \
 vartar.test \
 version.test \

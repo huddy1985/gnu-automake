@@ -1,4 +1,183 @@
+2003-09-07  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.in, NEWS: Bump version to 1.7.7.
+
+2003-09-05  Paul Eggert  <eggert@twinsun.com>
+
+	* NEWS, aclocal.in, automake.in, automake.texi,
+	lib/Automake/Channels.pm, lib/am/dejagnu.am, lib/am/depend.am,
+	lib/am/lisp.am, lib/am/remake-hdr.am, lib/am/texi-vers.am,
+	lib/ansi2knr.c, lib/depcomp, lib/missing, lib/py-compile,
+	m4/obsolete.m4, m4/python.m4, tests/backsl4.test,
+	tests/cond12.test, tests/defs.in, tests/dejagnu7.test,
+	tests/depacl2.test, tests/dirlist.test, tests/error.test,
+	tests/getopt.test, tests/gnuwarn.test, tests/include2.test,
+	tests/libobj10.test, tests/libtool5.test, tests/libtool6.test,
+	tests/lisp3.test, tests/phony.test, tests/pr220.test,
+	tests/subcond2.test, tests/subcond3.test, tests/vtexi.test:
+	Spelling and minor grammar fixes.
+
+2003-09-02  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.in: Bump version to 1.7.6c.
+
+	* configure.in, NEWS: Bump version to 1.7.6b.
+
+2003-09-01  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/config.sub, lib/config.guess, lib/texinfo.tex,
+	lib/config-ml.in, lib/symlink-tree: New upstream versions.
+
+2003-08-31  Thien-Thi Nguyen  <ttn@gnu.org>  (tiny change)
+
+	* tests/yacc7.test: Require bison.
+
+2003-08-31  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.texi (Extending aclocal): Merge changes from HEAD, to
+	explain that aclocal 1.8 will warn about underquoted AC_DEFUN.
+
+2003-08-25  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	For Debian Bug #206299:
+	* automake.in (parse_arguments): Ignore --no-force.
+	* automake.texi (Invoking Automake): Document this.
+	* tests/distcom6.test: New file.  Report from Scott James Remnant.
+	* tests/Makefile.am (TESTS): Add distcom6.test.
+
+2003-08-13  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	Fix for PR automake/399:
+	* m4/python.m4: Use AC_PATH_PROGS, not AC_PATH_PROG.
+	Report from Per Cederqvist.
+
+2003-08-10  Jim Meyering  <jim@meyering.net>
+
+	* lib/depcomp: Adjust comment to match code.
+	* lib/mkinstalldirs: Revert yesterday's change; reasons here:
+	http://mail.gnu.org/archive/html/automake-patches/2003-08/msg00042.html
+
+2003-08-10  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	Revert the fix for PR automake/291:
+	* automake.in (macro_define): Do not warn about variables
+	starting with `_' which are an issue on NEWS-OS 4.2R.  According
+	to Paul Eggert, NEWS-OS 4.2R is ten years old, the latest version
+	was released on 1996 and is not in wide use.  On the other hand,
+	variables starting with `_' are mandatory in several situations,
+	so diagnosing them is more annoying than useful.
+	* tests/canon5.test: Do not use -Wno-portability.
+	* tests/vars2.test: Delete.
+	* tests/Makefile.am (TESTS): Remove vars2.test.
+	Suggested by Jim Meyering.
+
+2003-08-09  Jim Meyering  <jim@meyering.net>
+
+	* lib/mkinstalldirs: Remove each sequence of spaces before a
+	TAB character.
+	* lib/depcomp: Search for TAB-SPC, not SPC-TAB.
+
+2003-08-07  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/ltcond.test: Thinko.
+
+2003-08-05  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/ltconv.test: s/rm/rm -f/ to placate maintainer-check.
+
+	* automake.in (handle_texinfo_helper): Use the user definition
+	of TEXINFO_TEX before checking for cygnus or AC_CONFIG_AUX_DIR.
+	* tests/txinfo22.test: New file.
+	* tests/Makefile.am (TESTS): Add txinfo22.test.
+	Report from Tom Tromey.
+
+2003-07-31  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>  (tiny change)
+
+	* lib/depcomp (aix): Support AIX Compiler version 6.
+
+2003-07-31  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.texi (A Shared Library): Rewrite and split into
+	subsections.  Valuable comments from Norman Gray, Harlan Stenn,
+	Tim Van Holder, and Guido Draheim.
+	* tests/ltcond.test, tests/ltcond2.test, tests/ltconv.test: New files.
+	* tests/Makefile.am (TESTS): Add them.
+
+2003-07-30  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (handle_single_transform_list): Complain about
+	foo.$(OBJEXT) being created both with libtool and without, not
+	about foo.lo.
+	Report from Tim Van Holder.
+
+2003-07-29  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* Makefile.am (FETCHFILES, fetch): Add config-ml.in and
+	symlink-tree.
+	* lib/config.sub, lib/config-ml.in, lib/texinfo.tex: New
+	upstream versions.
+
+2003-07-25  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/remake4.test: Use `$MAKE distdir' instead of `$MAKE dist' to
+	avoid the use of tar.
+
+2003-07-24  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/gnuwarn2.test: Typo.
+
+	* tests/insthook.test: Use $MAKE, not make.
+
+	Fix missing rebuilds during `make dist' with BSD make.
+	* automake.in (generate_makefile): Do not push Makefile.in, and
+	Makefile.am into DIST_COMMON here.
+	* lib/am/configure.am (DIST_COMMON): Do it here, and use
+	%MAKEFILE-AM% and %MAKEFILE-IN% so that items in DIST_COMMON
+	actually match the targets.   Prefix `configure' with `$(srcdir)/'
+	to match the target.
+	* tests/remake4.test: New file.
+	* tests/Makefile.am (TESTS): Add remake4.test.
+	Report from Akim Demaille.
+
+2003-07-23  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (handle_multilib): Register all-multi.
+	(file_contents_internal): Insert \n when concatenating actions
+	from "factored" rules.
+	* lib/config-ml.in: New file, from GCC, including a patch
+	from Ralf Corsepius (see GCC's PR 11526).
+	* lib/symlink-tree.in: New file, from GCC.
+	* lib/Makefile.am (dist_script_DATA): Add config-ml.in and
+	symlink-tree.
+	* lib/am/clean.am (distclean-generic): Do not delete Makefile here...
+	(distclean, maintainer-clean): ... do it here.
+	* lib/am/depend.am (distclean-depend): Likewise, replace by
+	(distclean, maintainer-clean): ... these.
+	* lib/am/multilib.am (all-recursive, install-recursive,
+	mostlyclean-recursive, clean-recursive, distclean-recursive,
+	maintainer-clean-recursive): Remove these rules.
+	(mostlyclean-am, clean-am, distclean-am, maintainer-clean-am): Replace
+	by ...
+	(mostlyclean, clean, distclean, maintainer-clean): ... these.
+	(all-am): Remove, done in handle_multilib.
+	(install-am): Replace by ...
+	(install-exec-am): ... this.
+	* tests/Makefile.am (TESTS): Add multlib.test.
+	* tests/multlib.test: New file, based on a test case by
+	Ralf Corsepius
+
+2003-07-23  Tom Tromey  <tromey@redhat.com>
+
+	* lib/missing (autom4te): Typo.
+
+2003-07-15  Ralf Corsepius <corsepiu@faw.uni-ulm.de>  (tiny change)
+
+	* automake.in (scan_autoconf_traces): Trace AM_ENABLE_MULTILIB to
+	render $seen_multilib functional again.
+
 2003-07-10  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.in: Bump version to 1.7.6a.
 
 	* configure.in, NEWS: Bump version to 1.7.6.
 
