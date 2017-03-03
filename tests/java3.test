@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 1998, 2001, 2002, 2004  Free Software Foundation, Inc.
+# Copyright (C) 2004  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -18,40 +18,31 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# Minimal test of Java functionality.
+# Make sure that Java rules don't attempt to install *.java files when
+# there are none.
+# Report from Johannes Nicolai (PR/441).
 
 . ./defs || exit 1
 
 set -e
 
-cat >>configure.in <<'EOF'
-AC_CHECK_PROG([HAS_JAVAC], [javac], [:], [exit])
-$HAS_JAVAC 77
+cat >> configure.in << 'END'
+AM_CONDITIONAL([WHO_CARES], false)
 AC_OUTPUT
-EOF
-
+END
 
 cat > Makefile.am << 'END'
-javadir = $(datadir)/java
-dist_java_JAVA = a.java b.java
+if WHO_CARES
+JAVA_FILES = MyClass1.java
+endif
+
+dist_pkgdata_JAVA = $(JAVA_FILES)
 END
+
+: >MyClass1.java
 
 $ACLOCAL
 $AUTOCONF
 $AUTOMAKE
-grep '^all[-a-z]*:.*classdist_java\.stamp' Makefile.in
-
-cat >a.java <<EOF
-class a
-{
-}
-EOF
-
-cat >b.java <<EOF
-class b
-{
-}
-EOF
-
-./configure --prefix `pwd`
+./configure
 $MAKE distcheck

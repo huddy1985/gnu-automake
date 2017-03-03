@@ -247,6 +247,7 @@ gnits2.test \
 gnits3.test \
 header.test \
 help.test \
+hfs.test \
 hosts.test \
 implicit.test \
 include.test \
@@ -268,6 +269,7 @@ interp.test \
 interp2.test \
 java.test \
 java2.test \
+java3.test \
 javaprim.test \
 javasubst.test \
 ldadd.test \
@@ -416,6 +418,8 @@ python7.test \
 python8.test \
 python9.test \
 python10.test \
+python11.test \
+python12.test \
 recurs.test \
 recurs2.test \
 remake.test \

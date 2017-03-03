@@ -1,4 +1,130 @@
+2004-12-18  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.ac, NEWS: Bump version to 1.9.4.
+
+	* lib/config-ml.in, lib/config.guess, lib/config.sub,
+	lib/texinfo.tex: New upstream versions.
+
+	* doc/automake.texi (gettext): Move the paragraph about
+	dist_list_LISP...
+	(Emacs Lisp): ... here.
+	Report from Bruno Haible.
+
+	* doc/automake.texi: Bump GFDL version to 1.2, since that is
+	what we distribute.
+
+	* doc/automake.texi: Fix more misuses of @ref, @xref and @pxref,
+	including some of the "corrections" below.  Thanks to Karl Berry.
+
+	* doc/automake.texi: Correct several misuses of @xref and @pxref.
+
+2004-12-17  Jim Meyering  <jim@meyering.net>
+
+	* install-sh: Use `(exit N); exit N', not `(exit N); exit'.
+	Otherwise, install-sh could exit with improper exit status when
+	exiting via a trapped interrupt.  Thanks to a report from Bob Proulx.
+
+2004-12-14  Akim Demaille  <akim@epita.fr>
+
+	* doc/automake.texi (Options): Englishoes.
+	(Options): And another.
+
+2004-12-11  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (Per-Object Flags): New node.
+
+2004-12-09  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	Fix PR automake/441:
+	* lib/am/java.am (install-%DIR%JAVA, uninstall-%DIR%JAVA): Do
+	not install *.class if "$(%DIR%_JAVA)" is empty.
+	* tests/java3.test: New file.
+	* tests/Makefile.am (TESTS): Add it.
+	Report from Johannes Nicolai.
+
+	* doc/automake.texi (Java): Mention dist_ and add an example.
+	* tests/java.test: Do actually compile java files and run distcheck.
+
+2004-12-08  Peter O'Gorman  <peter@pogma.com>
+	    Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/Automake/FileUtils.pm (dir_has_case_matching_file,
+	reset_dir_cache): New functions.
+	* automake.in (handle_dist, require_file_internal): Use them, so
+	that CHANGELOG is not confused with ChangeLog on case-insensitive
+	case-preserving file systems.
+	* tests/hfs.test: New file.
+	* tests/Makefile.am (TESTS): Add hfs.test.
+
+2004-12-08  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* lib/mdate-sh: Don't use "set - x`$ls_command /`", as zsh mishandles
+	the spaces inside $ls_command.  Problem reported by Loulou Pouchet in
+	<http://lists.gnu.org/archive/html/autoconf/2004-12/msg00074.html>.
+	Don't use "set - x"; plain "set x" is enough, and simplifies debugging.
+
+2004-12-05  Toshio Kuratomi  <toshio@tiki-lounge.com>
+
+	* lib/py-compile: Add --destdir switch to py-compile that takes a
+	path argument that is not compiled into the file when byte compiling.
+	* lib/am/python.am: Use the new py-compile arguments to not include
+	DESTDIR in the byte compiled files.
+	* tests/python12.test: Test that DESTDIR won't be byte compiled into
+	python files.
+
+2004-12-05  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (Clean): Typo.
+
+	* doc/automake.texi: Use @acindex for Autoconf macros, and @vindex
+	for variables (@cvindex was previously used for both).  Separate
+	these two indices in the output.  Use @code, @file, and @command
+	in @cindex lines wherever appropriate so they render nicely.
+
+2004-12-05  Stepan Kasal  <kasal@ucw.cz>
+
+	* doc/automake.texi (renamed objects, CVS): Typos.
+
+2004-12-05  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (Flag Variables Ordering): New section.
+	(User Variables, Program and Library Variables): @xref it.
+
+2004-11-24  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (Conditional Subdirectories): More comments
+	about non-distributed subdirectories.
+
+2004-11-24  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* doc/automake.texi (Built sources example): Fix typo.
+
+2004-11-21  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/am/progs.am (installcheck-%DIR%PROGRAMS): Run programs with
+	/dev/null as input, so we do not hang on programs that read their
+	input without supporting --help and --version.
+	* lib/am/scripts.am (installcheck-%DIR%SCRIPTS): Likewise for scripts.
+	* tests/gnits2.test: Change scriptnok.sh to cat its input.
+	Report and fix from James Youngman.
+
+2004-11-10  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* m4/python.m4 (AM_PATH_PYTHON): Fix the invocation of
+	AC_PATH_PROGS to correctly define PYTHON as `:' when no interpreter
+	is found (this worked correctly only when a minimal version was
+	passed to AM_PATH_PYTHON).  Report from Stepan Kasal.
+	(_AM_PYTHON_INTERPRETER_LIST): Define using m4_define_default,
+	so we can easily override the list from the test suite.
+	* tests/python11.test: New file.
+	* tests/Makefile.am (TESTS): Add python11.test.
+
+	* doc/automake.texi (Libtool Modules): Make clearer that -module
+	should appear explicitly in _LDFLAGS.
+
 2004-11-01  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.ac, NEWS: Bump version to 1.9.3a.
 
 	* configure.ac, NEWS: Bump version to 1.9.3.
 

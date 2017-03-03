@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 1998, 2001, 2002, 2004  Free Software Foundation, Inc.
+# Copyright (C) 2004  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -18,40 +18,45 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# Minimal test of Java functionality.
+# Ensure DESTDIR is not included in byte-compiled files.
 
+required=python
 . ./defs || exit 1
 
 set -e
 
 cat >>configure.in <<'EOF'
-AC_CHECK_PROG([HAS_JAVAC], [javac], [:], [exit])
-$HAS_JAVAC 77
+AM_PATH_PYTHON
 AC_OUTPUT
 EOF
 
+cat >Makefile.am <<'END'
+mydir = $(datadir)/my
+my_PYTHON = my.py
 
-cat > Makefile.am << 'END'
-javadir = $(datadir)/java
-dist_java_JAVA = a.java b.java
+my.py:
+	echo 'def my(): return 1' >$@
 END
 
 $ACLOCAL
 $AUTOCONF
-$AUTOMAKE
-grep '^all[-a-z]*:.*classdist_java\.stamp' Makefile.in
+$AUTOMAKE --add-missing
 
-cat >a.java <<EOF
-class a
-{
-}
-EOF
+rm -rf inst build
+mkdir inst
+instdir=`pwd`/inst
+mkdir build
+cd build
+../configure --prefix="/usr"
+DESTDIR=$instdir $MAKE -e install
 
-cat >b.java <<EOF
-class b
-{
-}
-EOF
+# Perfunctory test that the files were created
+test -f "$instdir/usr/share/my/my.py"
+test -f "$instdir/usr/share/my/my.pyc"
+test -f "$instdir/usr/share/my/my.pyo"
 
-./configure --prefix `pwd`
-$MAKE distcheck
+# If DESTDIR has made it into the byte compiled files, fail the test
+$FGREP "$instdir" "$instdir/usr/share/my/my.pyo" \
+                  "$instdir/usr/share/my/my.pyc" && exit 1
+
+:
