@@ -18,43 +18,46 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# Check gettext support.
+# Tests that Automake understand multiple suffix rules on the same line.
+# PR/371 and PR/372: Reported by Duncan Gibson.
 
-required='gettext'
 . ./defs || exit 1
 
 set -e
 
-cat >>configure.in <<END
-AM_GNU_GETTEXT
+cat >>configure.in <<EOF
+AC_PROG_CC
 AC_OUTPUT
+EOF
+
+cat >Makefile.am << 'END'
+bin_PROGRAMS = foo bar baz
+foo_SOURCES = foo.x_
+bar_SOURCES = bar.y_
+baz_SOURCES = baz1.x_ baz2.y_
+.y_.c .x_.c:
+	cp $< $@
+  .z_.c   .w_.x_ :
+	cp $< $@
+
+
+print:
+	@echo BEGIN: $(foo_OBJECTS) :END
+	@echo BEGIN: $(bar_OBJECTS) :END
+	@echo BEGIN: $(baz_OBJECTS) :END
 END
 
-: >Makefile.am
-mkdir po intl
-
 $ACLOCAL
-
-# po/ and intl/ are required
-
-$AUTOMAKE --add-missing 2>stderr && exit 1
+$AUTOCONF
+# What we do is not portable.  Automake should warn.
+$AUTOMAKE -a 2>stderr && exit 1
 cat stderr
-grep 'AM_GNU_GETTEXT.*SUBDIRS' stderr
-
-echo 'SUBDIRS = po' >Makefile.am
-$AUTOMAKE --add-missing 2>stderr && exit 1
-cat stderr
-grep 'AM_GNU_GETTEXT.*intl' stderr
-
-echo 'SUBDIRS = intl' >Makefile.am
-$AUTOMAKE --add-missing 2>stderr && exit 1
-cat stderr
-grep 'AM_GNU_GETTEXT.*po' stderr
-
-# Ok.
-
-echo 'SUBDIRS = po intl' >Makefile.am
-$AUTOMAKE --add-missing
-
-# Make sure distcheck runs ./configure --with-included-gettext
-grep 'with-included-gettext' Makefile.in
+grep 'Inference rules can have only one target before the colon' stderr
+# But this should work anyway.
+$AUTOMAKE -a -Wno-portability
+./configure
+env OBJEXT=foo $MAKE -e SHELL=/bin/sh print >stdout
+cat stdout
+grep 'BEGIN: foo.foo :END' stdout
+grep 'BEGIN: bar.foo :END' stdout
+grep 'BEGIN: baz1.foo baz2.foo :END' stdout

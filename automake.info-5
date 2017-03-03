@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.7.1
+   This file documents GNU automake 1.7.2
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free
 Software Foundation, Inc.

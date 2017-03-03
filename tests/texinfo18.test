@@ -18,10 +18,11 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# Check for subdir Texinfo.
-# PR/343
+# Make sure we clean index files, even if they are not used at the top-level.
+# Only *new* indexes need to be declared at the top-level.
+# PR/375.
 
-required='makeinfo tex texi2dvi-o'
+required='makeinfo tex'
 . ./defs || exit 1
 
 set -e
@@ -29,37 +30,40 @@ set -e
 echo AC_OUTPUT >> configure.in
 
 cat > Makefile.am << 'END'
-info_TEXINFOS = subdir/main.texi
-subdir_main_TEXINFOS = subdir/inc.texi
-
-installcheck:
-	test -f $(infodir)/main.info
+info_TEXINFOS = main.texi
+main_TEXINFOS = sub.texi
 END
 
-mkdir subdir
-
-cat > subdir/main.texi << 'END'
+cat > main.texi << 'END'
 \input texinfo
 @setfilename main.info
 @settitle main
+@defindex au
+@defindex sa
+@defindex sb
+@synindex sa sb
 @node Top
 Hello walls.
-@include version.texi
-@include inc.texi
+@include sub.texi
 @bye
 END
 
-cat > subdir/inc.texi << 'END'
-I'm included.
+cat > sub.texi << 'END'
+@cindex foo
+foo
+@pindex bar
+bar
+@auindex baz
+baz
+@saindex sa
+sa
+@sbindex sb
+sb
 END
-
 
 $ACLOCAL
 $AUTOMAKE --add-missing
 $AUTOCONF
 
-mkdir build
-cd build
-../configure
+./configure
 $MAKE distcheck
-test -f subdir/main.info

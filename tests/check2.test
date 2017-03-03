@@ -18,48 +18,45 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# Check for subdir Texinfo.
-# PR/343
+# Test Automake style tests.
 
-required='makeinfo tex texi2dvi-o'
 . ./defs || exit 1
 
 set -e
 
-echo AC_OUTPUT >> configure.in
+cat >> configure.in << 'END'
+AC_CONFIG_FILES([dir/Makefile])
+AC_OUTPUT
+END
+
+mkdir dir
 
 cat > Makefile.am << 'END'
-info_TEXINFOS = subdir/main.texi
-subdir_main_TEXINFOS = subdir/inc.texi
-
-installcheck:
-	test -f $(infodir)/main.info
+SUBDIRS = dir
+TESTS = subrun.sh
+subrun.sh:
+	(echo '#! /bin/sh'; echo 'dir/echo.sh') > $@
+	chmod +x $@
+CLEANFILES = subrun.sh
 END
 
-mkdir subdir
-
-cat > subdir/main.texi << 'END'
-\input texinfo
-@setfilename main.info
-@settitle main
-@node Top
-Hello walls.
-@include version.texi
-@include inc.texi
-@bye
+cat > dir/Makefile.am << 'END'
+check_SCRIPTS = echo.sh
+echo.sh:
+	(echo '#! /bin/sh'; echo 'echo Hello') > $@
+	chmod +x $@
+CLEANFILES = echo.sh
 END
-
-cat > subdir/inc.texi << 'END'
-I'm included.
-END
-
 
 $ACLOCAL
-$AUTOMAKE --add-missing
 $AUTOCONF
+$AUTOMAKE
+./configure
+$MAKE check >stdout
+cat stdout
+grep 'PASS: subrun.sh' stdout
 
-mkdir build
-cd build
-../configure
-$MAKE distcheck
-test -f subdir/main.info
+# check should depend directly on check-am (similar tests are
+# in check.test and check3.test).
+grep 'check: check-recursive' Makefile.in
+grep 'check: check-am' dir/Makefile.in

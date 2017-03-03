@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.7.1
+   This file documents GNU automake 1.7.2
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free
 Software Foundation, Inc.
@@ -139,6 +139,15 @@ Public macros
      variable `am_cv_prog_cc_stdc' is set to `no'.  If you wrote your
      source code in ANSI C, you can make an un-ANSIfied copy of it by
      using the `ansi2knr' option (*note ANSI::).
+
+     This macro is a relic from the time Autoconf didn't offer such a
+     feature.  `AM_PROG_CC_STDC''s logic has now been merged into
+     Autoconf's `AC_PROG_CC' macro, therefore you should use the latter
+     instead.  Chances are you are already using `AC_PROG_CC', so you
+     can simply remove the `AM_PROG_CC_STDC' call and turn all
+     occurrences of `$am_cv_prog_cc_stdc' into `$ac_cv_prog_cc_stdc'.
+     `AM_PROG_CC_STDC' will be marked as obsolete (in the Autoconf
+     sense) in Automake 1.8.
 
 `AM_PROG_LEX'
      Like `AC_PROG_LEX' (*note Particular Program Checks:
@@ -407,7 +416,7 @@ stripping.  In this example, the header file will be installed as
 
      nobase_include_HEADERS = sys/types.h
 
-   `nobase_' should be specified first when used in conjonction with
+   `nobase_' should be specified first when used in conjunction with
 either `dist_' or `nodist_' (*note Dist::).  For instance:
 
      nobase_dist_pkgdata_DATA = images/vortex.pgm
@@ -596,9 +605,9 @@ Conditional compilation of sources
 suffice to say that it simply won't work.  Automake will give an error
 if you try to do this.
 
-   Fortunatly there are two other ways to achieve the same result.  One
-is to use configure substitutions in `_LDADD' variables, the other is
-to use an Automake conditional.
+   Fortunately there are two other ways to achieve the same result.
+One is to use configure substitutions in `_LDADD' variables, the other
+is to use an Automake conditional.
 
 Conditional compilation using `_LDADD' substitutions
 ....................................................
@@ -658,9 +667,9 @@ conditional `+='.
      bin_PROGRAMS = hello
      hello_SOURCES = hello-common.c
      if LINUX
-     hello_cond += hello-linux.c
+     hello_SOURCES += hello-linux.c
      else
-     hello_cond += hello-generic.c
+     hello_SOURCES += hello-generic.c
      endif
 
 
@@ -1250,23 +1259,4 @@ used is as follows:
 
 `.r'
      `$(F77) -F $(AM_FFLAGS) $(FFLAGS) $(AM_RFLAGS) $(RFLAGS)'
-
-
-File: automake.info,  Node: Compiling Fortran 77 Files,  Next: Mixing Fortran 77 With C and C++,  Prev: Preprocessing Fortran 77,  Up: Fortran 77 Support
-
-Compiling Fortran 77 Files
---------------------------
-
-   `N.o' is made automatically from `N.f', `N.F' or `N.r' by running
-the Fortran 77 compiler.  The precise command used is as follows:
-
-`.f'
-     `$(F77) -c $(AM_FFLAGS) $(FFLAGS)'
-
-`.F'
-     `$(F77) -c $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS)
-     $(AM_FFLAGS) $(FFLAGS)'
-
-`.r'
-     `$(F77) -c $(AM_FFLAGS) $(FFLAGS) $(AM_RFLAGS) $(RFLAGS)'
 

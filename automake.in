@@ -1418,11 +1418,15 @@ sub switch_warning ($)
     }
   elsif ($cat eq 'none')
     {
-      setup_channel_type 'warning', silent => 1 - $has_no;
+      setup_channel_type 'warning', silent => ! $has_no;
     }
   elsif ($cat eq 'error')
     {
-      $warnings_are_errors = 1 - $has_no;
+      $warnings_are_errors = ! $has_no;
+      # Set exit code if Perl warns about something
+      # (like uninitialized variables).
+      $SIG{"__WARN__"} =
+	$has_no ? 'DEFAULT' : sub { print STDERR @_; $exit_code = 1; };
     }
   elsif (channel_type ($cat) eq 'warning')
     {
@@ -2094,14 +2098,6 @@ sub handle_languages
 	{
 	    my ($derived, $source, $obj, $myext) = split (' ', $file);
 
-	    # For any specially-generated object, we must respect the
-	    # ansi2knr setting so that we don't inadvertently try to
-	    # use the default rule.
-	    if ($lang->ansi && defined $options{'ansi2knr'})
-	    {
-		$myext = '$U' . $myext;
-	    }
-
 	    # We might see a given object twice, for instance if it is
 	    # used under different conditions.
 	    next if defined $seen_files{$obj};
@@ -2134,9 +2130,99 @@ sub handle_languages
 		unless $depbase eq '';
 	    $depbase .= '$(DEPDIR)/' . basename ($obj);
 
-	    # Generate a transform which will turn suffix targets in
-	    # depend2.am into real targets for the particular objects we
-	    # are building.
+	    # Support for deansified files in subdirectories is ugly
+	    # enough to deserve an explanation.
+	    #
+	    # A Note about normal ansi2knr processing first.  On
+	    #
+	    #   AUTOMAKE_OPTIONS = ansi2knr
+	    #   bin_PROGRAMS = foo
+	    #   foo_SOURCES = foo.c
+	    #
+	    # we generate rules similar to:
+	    #
+	    #   foo: foo$U.o; link ...
+	    #   foo$U.o: foo$U.c; compile ...
+	    #   foo_.c: foo.c; ansi2knr ...
+	    #
+	    # this is fairly compact, and will call ansi2knr depending
+	    # on the value of $U (`' or `_').
+	    #
+	    # It's harder with subdir sources. On
+	    #
+	    #   AUTOMAKE_OPTIONS = ansi2knr
+	    #   bin_PROGRAMS = foo
+	    #   foo_SOURCES = sub/foo.c
+	    #
+	    # we have to create foo_.c in the current directory.
+	    # (Unless the user asks 'subdir-objects'.)  This is important
+	    # in case the same file (`foo.c') is compiled from other
+	    # directories with different cpp options: foo_.c would
+	    # be preprocessed for only one set of options if it were
+	    # put in the subdirectory.
+	    #
+	    # Because foo$U.o must be built from either foo_.c or
+	    # sub/foo.c we can't be as concise as in the first example.
+	    # Instead we output
+	    #
+	    #   foo: foo$U.o; link ...
+	    #   foo_.o: foo_.c; compile ...
+	    #   foo.o: sub/foo.c; compile ...
+	    #   foo_.c: foo.c; ansi2knr ...
+	    #
+	    # This is why we'll now transform $rule_file twice
+	    # if we detect this case.
+	    # A first time we output the compile rule with `$U'
+	    # replaced by `_' and the source directory removed,
+	    # and another time we simply remove `$U'.
+	    #
+	    # Note that at this point $source (as computed by
+	    # &handle_single_transform_list) is `sub/foo$U.c'.
+	    # This can be confusing: it can be used as-is when
+	    # subdir-objects is set, otherwise you have to know
+	    # it really means `foo_.c' or `sub/foo.c'.
+	    my $objdir = dirname ($obj);
+	    my $srcdir = dirname ($source);
+	    if ($lang->ansi && $obj =~ /\$U/)
+	      {
+		prog_error "`$obj' contains \$U, but `$source' doesn't."
+		  if $source !~ /\$U/;
+
+		(my $source_ = $source) =~ s/\$U/_/g;
+		# Explicitely clean the _.c files if they are in
+		# a subdirectory. (In the current directory they get
+		# erased by a `rm -f *_.c' rule.)
+		$clean_files{$source_} = MOSTLY_CLEAN
+		  if $objdir ne '.';
+		# Output an additional rule if _.c and .c are not in
+		# the same directory.  (_.c is always in $objdir.)
+		if ($objdir ne $srcdir)
+		  {
+		    (my $obj_ = $obj) =~ s/\$U/_/g;
+		    (my $depbase_ = $depbase) =~ s/\$U/_/g;
+		    $source_ = basename ($source_);
+
+		    $output_rules .=
+		      file_contents ($rule_file,
+				     %transform,
+				     GENERIC   => 0,
+
+				     DEPBASE   => $depbase_,
+				     BASE      => $obj_,
+				     SOURCE    => $source_,
+				     OBJ       => "$obj_$myext",
+				     OBJOBJ    => "$obj_.obj",
+				     LTOBJ     => "$obj_.lo",
+
+				     COMPILE   => $obj_compile,
+				     LTCOMPILE => $obj_ltcompile,
+				     -o        => $output_flag);
+		    $obj =~ s/\$U//g;
+		    $depbase =~ s/\$U//g;
+		    $source =~ s/\$U//g;
+		  }
+	      }
+
 	    $output_rules .=
 	      file_contents ($rule_file,
 			     (%transform,
@@ -2308,7 +2394,6 @@ sub handle_single_transform_list ($$$$@)
         my $directory = $1 || '';
         my $base = $2;
         my $extension = $3;
-	my $full_ansi = $full;	# We'll add `$U' if needed.
 
         # We must generate a rule for the object if it requires its own flags.
         my $renamed = 0;
@@ -2428,11 +2513,11 @@ sub handle_single_transform_list ($$$$@)
             {
                 my $obj_sans_ext = substr ($object, 0,
 					   - length ($this_obj_ext));
+		my $full_ansi = $full;
 		if ($lang->ansi && defined $options{'ansi2knr'})
 		  {
 		    $full_ansi =~ s/$KNOWN_EXTENSIONS_PATTERN$/\$U$&/;
-		    $full_ansi = basename $full_ansi
-		      unless defined $options{'subdir-objects'};
+		    $obj_sans_ext .= '$U';
 		  }
 
 		my $val = ("$full_ansi $obj_sans_ext "
@@ -2527,13 +2612,6 @@ sub handle_single_transform_list ($$$$@)
         {
             my @dep_list = ();
             $object_map{$object} = $full;
-
-            # If file is in subdirectory, we need explicit
-            # dependency.
-            if ($directory ne '' || $renamed)
-            {
-                push (@dep_list, $full_ansi);
-            }
 
             # If resulting object is in subdir, we need to make
             # sure the subdir exists at build time.
@@ -3526,30 +3604,24 @@ sub scan_texinfo_file
 {
     my ($filename) = @_;
 
-    # These are always created, no matter whether indexes are used or not.
-    # (Actually tmp is only created if an @macro is used and a certain e-TeX
+    # Some of the following extensions are always created, no matter
+    # whether indexes are used or not.  Other (like cps, fns, ... pgs)
+    # are only created when they are used.  We used to scan $FILENAME
+    # for their use, but that is not enough: they could be used in
+    # included files.  We can't scan included files because we don't
+    # know the include path.  Therefore we always erase these files,
+    # no matter whether they are used or not.
+    #
+    # (tmp is only created if an @macro is used and a certain e-TeX
     # feature is not available.)
-    my @clean_suffixes = qw(aux log toc tmp
-			    cp fn ky vr tp pg); # grep new.*index texinfo.tex
-
-    # There are predefined indexes which don't follow the regular rules.
-    my %predefined_index = qw(c cps
-			      f fns
-			      k kys
-			      v vrs
-			      t tps
-			      p pgs);
-
-    # There are commands which include a hidden index command.
-    my %hidden_index = (tp => 'tps');
-    $hidden_index{$_} = 'fns' foreach qw(fn un typefn typefun max spec
-					 op typeop method typemethod);
-    $hidden_index{$_} = 'vrs' foreach qw(vr var typevr typevar opt cv
-					 ivar typeivar);
-
-    # Indexes stored into another one.  In this case, the *.??s file
-    # is not created.
-    my @syncodeindexes = ();
+    my %clean_suffixes =
+      map { $_ => 1 } (qw(aux log toc tmp
+			  cp cps
+			  fn fns
+			  ky kys
+			  vr vrs
+			  tp tps
+			  pg pgs)); # grep 'new.*index' texinfo.tex
 
     my $texi = new Automake::XFile "< $filename";
     verb "reading $filename";
@@ -3559,6 +3631,11 @@ sub scan_texinfo_file
     {
       if (/^\@setfilename +(\S+)/)
       {
+	# Honor only the first @setfilename.  (It's possible to have
+	# more occurences later if the manual shows examples of how
+	# to use @setfilename...)
+	next if $outfile;
+
         $outfile = $1;
         if ($outfile =~ /\.(.+)$/ && $1 ne 'info')
           {
@@ -3573,30 +3650,20 @@ sub scan_texinfo_file
         $vfile = $1;
       }
 
-      # Try to find what are the indexes which are used.
+      # Try to find new or unused indexes.
 
       # Creating a new category of index.
       elsif (/^\@def(code)?index (\w+)/)
       {
-        push @clean_suffixes, $2;
-      }
-
-      # Storing in a predefined index.
-      elsif (/^\@([cfkvtp])index /)
-      {
-        push @clean_suffixes, $predefined_index{$1};
-      }
-      elsif (/^\@def(\w+) /)
-      {
-	push @clean_suffixes, $hidden_index{$1}
-	  if defined $hidden_index{$1};
+	$clean_suffixes{$2} = 1;
+	$clean_suffixes{"$2s"} = 1;
       }
 
       # Merging an index into an another.
       elsif (/^\@syn(code)?index (\w+) (\w+)/)
       {
-	push @syncodeindexes, "$2s";
-	push @clean_suffixes, "$3s";
+	delete $clean_suffixes{"$2s"};
+	$clean_suffixes{"$3s"} = 1;
       }
 
     }
@@ -3609,9 +3676,8 @@ sub scan_texinfo_file
 
     my $infobase = basename ($filename);
     $infobase =~ s/\.te?xi(nfo)?$//;
-    my %clean_files = map { +"$infobase.$_" => 1 } @clean_suffixes;
-    grep { delete $clean_files{"$infobase.$_"} } @syncodeindexes;
-    return ($outfile, $vfile, (sort keys %clean_files));
+    return ($outfile, $vfile,
+	    map { "$infobase.$_" } (sort keys %clean_suffixes));
 }
 
 # ($DIRSTAMP, @CLEAN_FILES)
@@ -3654,14 +3720,28 @@ sub output_texinfo_build_rules ($$@)
       $makeinfoflags = "-I $sdir -I \$(srcdir)/$sdir";
     }
 
+  # We cannot use a suffix rule to build info files with
+  # an empty extension.  Otherwise we would output a single suffix
+  # inference rule, with separate dependencies, as in
+  #    .texi:
+  #	       $(MAKEINFO) ...
+  #    foo.info: foo.texi
+  # which confuse Solaris make.  (See the Autoconf manual for details.)
+  # Therefore we use a specific rule in this case.  This applies
+  # to info files only (dvi and pdf files always have an extension).
+  my $generic_info = ($generic && $dsfx) ? 1 : 0;
+
   # If the resulting file lie into a subdirectory,
   # make sure this directory will exist.
   my $dirstamp = require_build_directory_maybe ($dest);
 
   $output_rules .= &file_contents ('texibuild',
                                    GENERIC       => $generic,
+                                   GENERIC_INFO  => $generic_info,
                                    SOURCE_SUFFIX => $ssfx,
                                    SOURCE => ($generic ? '$<' : $source),
+                                   SOURCE_INFO   => ($generic_info ?
+						     '$<' : $source),
                                    SOURCE_REAL   => $source,
                                    DEST_PREFIX   => $dpfx,
                                    DEST_SUFFIX   => $dsfx,
@@ -4137,7 +4217,7 @@ sub handle_dist
 
     # Rule to check whether a distribution is viable.
     my %transform = ('DISTCHECK-HOOK' => &target_defined ('distcheck-hook'),
-		     'GETTEXT'        => $seen_gettext);
+		     'GETTEXT' => $seen_gettext && !$seen_gettext_external);
 
     # Prepend $(distdir) to each directory given.
     my %rewritten = map { '$(distdir)/' . "$_" => 1 } keys %dist_dirs;
@@ -4783,7 +4863,11 @@ sub do_check_merge_target
 	if @check_tests;
 
     &depend ('.PHONY', 'check', 'check-am');
+    # Handle recursion.  We have to honor BUILT_SOURCES like for `all:'.
     $output_rules .= ("check: "
+		      . (variable_defined ('BUILT_SOURCES')
+			 ? "\$(BUILT_SOURCES)\n\t\$(MAKE) \$(AM_MAKEFLAGS) "
+			 : '')
 		      . (variable_defined ('SUBDIRS')
 			 ? 'check-recursive' : 'check-am')
 		      . "\n");
@@ -5520,9 +5604,7 @@ sub lang_c_finish
     {
 	if ($file =~ /^(.*)\.[cly]$/ && -f "$relative_dir/$file")
 	{
-	    $de_ansi_files{$1} = (($relative_dir eq '.' || $relative_dir eq '')
-				  ? ''
-				  : "$relative_dir/");
+	    $de_ansi_files{$1} = ''
 	}
     }
 
@@ -5545,10 +5627,10 @@ sub lang_c_finish
 			      . '; then echo $(srcdir)/' . $ansfile
 			      . '; else echo ' . $ansfile . '; fi` '
 			      . "| sed 's/^# \\([0-9]\\)/#line \\1/' "
-			      . '| $(ANSI2KNR) > ' . $base . "_.c"
+			      . '| $(ANSI2KNR) > $@'
 			      # If ansi2knr fails then we shouldn't
 			      # create the _.c file
-			      . " || rm -f ${base}_.c\n");
+			      . " || rm -f \$\@\n");
  	    push (@objects, $base . '_.$(OBJEXT)');
  	    push (@objects, $base . '_.lo')
 	      if variable_defined ('LIBTOOL');
@@ -6305,11 +6387,6 @@ sub macro_define ($$$$$$)
 	}
     }
   $var_type{$var}{$cond} = $type;
-
-  # When adding, since we rewrite, don't try to preserve the
-  # Automake continuation backslashes.
-  $value =~ s/\\$//mg
-    if $type eq '+' && $owner == VAR_AUTOMAKE;
 
   # Differentiate assignment types.
 
@@ -7255,6 +7332,11 @@ sub variable_pretty_output ($@)
       my $val = $var_value{$var}{$cond};
       my $equals = $var_type{$var}{$cond} eq ':' ? ':=' : '=';
       my $make_condition = make_condition ($cond);
+
+      # Suppress escaped new lines.  &pretty_print_internal will
+      # add them back, maybe at other places.
+      $val =~ s/\\$//mg;
+
       $output_vars .= pretty_print_internal ("$make_condition$var $equals",
 					     "$make_condition\t",
 					     split (' ' , $val));
@@ -7634,18 +7716,35 @@ sub rule_define ($$$$$)
       $target_name{$target}{$c} = $realtarget;
     }
 
-  # Check the rule for being a suffix rule. If so, store in a hash.
-  # Either it's a rule for two known extensions...
-  if ($target =~ /^($KNOWN_EXTENSIONS_PATTERN)($KNOWN_EXTENSIONS_PATTERN)$/
-      # ...or it's a rule with unknown extensions (.i.e, the rule looks like
-      # `.foo.bar:' but `.foo' or `.bar' are not declared in SUFFIXES
-      # and are not known language extensions).
-      # Automake will complete SUFFIXES from @suffixes automatically
-      # (see handle_footer).
-      || ($target =~ /$SUFFIX_RULE_PATTERN/o && accept_extensions($1)))
+  # We honor inference rules with multiple targets because many
+  # make support this and people use it.  However this is disallowed
+  # by POSIX.  We'll print a warning later.
+  my $target_count = 0;
+  my $inference_rule_count = 0;
+  for my $t (split (' ', $target))
     {
-      register_suffix_rule ($where, $1, $2);
+      ++$target_count;
+      # Check the rule for being a suffix rule. If so, store in a hash.
+      # Either it's a rule for two known extensions...
+      if ($t =~ /^($KNOWN_EXTENSIONS_PATTERN)($KNOWN_EXTENSIONS_PATTERN)$/
+	  # ...or it's a rule with unknown extensions (.i.e, the rule
+	  # looks like `.foo.bar:' but `.foo' or `.bar' are not
+	  # declared in SUFFIXES and are not known language
+	  # extensions).  Automake will complete SUFFIXES from
+	  # @suffixes automatically (see handle_footer).
+	  || ($t =~ /$SUFFIX_RULE_PATTERN/o && accept_extensions($1)))
+	{
+	  ++$inference_rule_count;
+	  register_suffix_rule ($where, $1, $2);
+	}
     }
+
+  # POSIX allow multiple targets befor the colon, but disallow
+  # definitions of multiple Inference rules.  It's also
+  # disallowed to mix plain targets with inference rules.
+  msg ('portability', $where,
+       "Inference rules can have only one target before the colon (POSIX).")
+    if $inference_rule_count > 0 && $target_count > 1;
 
   # Return "" instead of TRUE so it can be used with make_paragraphs
   # directly.
@@ -8804,10 +8903,10 @@ sub require_file_internal ($$@)
 		my $message = "required file `$errfile' not found";
 		if ($add_missing)
 		{
-		    $suppress = 1;
-
 		    if (-f ("$libdir/$file"))
 		    {
+		        $suppress = 1;
+
 			# Install the missing file.  Symlink if we
 			# can, copy if we must.  Note: delete the file
 			# first, in case it is a dangling symlink.
@@ -8857,6 +8956,12 @@ sub require_file_internal ($$@)
 		# actually found the file, then do nothing.
 		next
 		    if $found_it && $force_missing;
+
+		# If we couldn' install the file, but it is a target in
+		# the Makefile, don't print anything.  This allows files
+		# like README, AUTHORS, or THANKS to be generated.
+		next
+		  if !$suppress && target_defined ($file);
 
 		msg ($suppress ? 'note' : 'error', $where, "$message$trailer");
 	    }

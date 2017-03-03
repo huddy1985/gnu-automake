@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.7.1
+   This file documents GNU automake 1.7.2
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free
 Software Foundation, Inc.
@@ -29,6 +29,250 @@ permission notice identical to this one.
 manual into another language, under the above conditions for modified
 versions, except that this permission notice may be stated in a
 translation approved by the Foundation.
+
+
+File: automake.info,  Node: Dist,  Next: Tests,  Prev: Clean,  Up: Top
+
+What Goes in a Distribution
+***************************
+
+Basics of distribution
+======================
+
+   The `dist' target in the generated `Makefile.in' can be used to
+generate a gzip'd `tar' file and other flavors of archive for
+distribution.  The files is named based on the `PACKAGE' and `VERSION'
+variables defined by `AM_INIT_AUTOMAKE' (*note Macros::); more
+precisely the gzip'd `tar' file is named `PACKAGE-VERSION.tar.gz'.  You
+can use the `make' variable `GZIP_ENV' to control how gzip is run.  The
+default setting is `--best'.
+
+   For the most part, the files to distribute are automatically found by
+Automake: all source files are automatically included in a distribution,
+as are all `Makefile.am's and `Makefile.in's.  Automake also has a
+built-in list of commonly used files which are automatically included
+if they are found in the current directory (either physically, or as
+the target of a `Makefile.am' rule).  This list is printed by `automake
+--help'.  Also, files which are read by `configure' (i.e. the source
+files corresponding to the files specified in various Autoconf macros
+such as `AC_CONFIG_FILES' and siblings) are automatically distributed.
+
+   Still, sometimes there are files which must be distributed, but which
+are not covered in the automatic rules.  These files should be listed in
+the `EXTRA_DIST' variable.  You can mention files from subdirectories
+in `EXTRA_DIST'.
+
+   You can also mention a directory in `EXTRA_DIST'; in this case the
+entire directory will be recursively copied into the distribution.
+Please note that this will also copy _everything_ in the directory,
+including CVS/RCS version control files.  We recommend against using
+this feature.
+
+Fine-grained distribution control
+=================================
+
+   Sometimes you need tighter control over what does _not_ go into the
+distribution; for instance you might have source files which are
+generated and which you do not want to distribute.  In this case
+Automake gives fine-grained control using the `dist' and `nodist'
+prefixes.  Any primary or `_SOURCES' variable can be prefixed with
+`dist_' to add the listed files to the distribution.  Similarly,
+`nodist_' can be used to omit the files from the distribution.
+
+   As an example, here is how you would cause some data to be
+distributed while leaving some source code out of the distribution:
+
+     dist_data_DATA = distribute-this
+     bin_PROGRAMS = foo
+     nodist_foo_SOURCES = do-not-distribute.c
+
+The dist hook
+=============
+
+   Another way to to use this is for removing unnecessary files that get
+recursively included by specifying a directory in EXTRA_DIST:
+
+     EXTRA_DIST = doc
+     
+     dist-hook:
+     	rm -rf `find $(distdir)/doc -name CVS`
+
+   If you define `SUBDIRS', Automake will recursively include the
+subdirectories in the distribution.  If `SUBDIRS' is defined
+conditionally (*note Conditionals::), Automake will normally include all
+directories that could possibly appear in `SUBDIRS' in the
+distribution.  If you need to specify the set of directories
+conditionally, you can set the variable `DIST_SUBDIRS' to the exact
+list of subdirectories to include in the distribution.
+
+   Occasionally it is useful to be able to change the distribution
+before it is packaged up.  If the `dist-hook' target exists, it is run
+after the distribution directory is filled, but before the actual tar
+(or shar) file is created.  One way to use this is for distributing
+files in subdirectories for which a new `Makefile.am' is overkill:
+
+     dist-hook:
+             mkdir $(distdir)/random
+             cp -p $(srcdir)/random/a1 $(srcdir)/random/a2 $(distdir)/random
+
+Checking the distribution
+=========================
+
+   Automake also generates a `distcheck' target which can be of help to
+ensure that a given distribution will actually work.  `distcheck' makes
+a distribution, then tries to do a `VPATH' build, run the testsuite,
+and finally make another tarfile to ensure the distribution is
+self-contained.
+
+   Building the package involves running `./configure'.  If you need to
+supply additional flags to `configure', define them in the
+`DISTCHECK_CONFIGURE_FLAGS' variable, either in your top-level
+`Makefile.am', or on the command line when invoking `make'.
+
+   If the target `distcheck-hook' is defined in your `Makefile.am',
+then it will be invoked by `distcheck' after the new distribution has
+been unpacked, but before the unpacked copy is configured and built.
+Your `distcheck-hook' can do almost anything, though as always caution
+is advised.  Generally this hook is used to check for potential
+distribution errors not caught by the standard mechanism.
+
+   Speaking about potential distribution errors, `distcheck' will also
+ensure that the `distclean' target actually removes all built files.
+This is done by running `make distcleancheck' at the end of the `VPATH'
+build.  By default, `distcleancheck' will run `distclean' and then make
+sure the build tree has been emptied by running
+`$(distcleancheck_listfiles)'.  Usually this check will find generated
+files that you forgot to add to the `DISTCLEANFILES' variable (*note
+Clean::).
+
+   The `distcleancheck' behaviour should be ok for most packages,
+otherwise you have the possibility to override the definitition of
+either the `distcleancheck' target, or the
+`$(distcleancheck_listfiles)' variable.  For instance to disable
+`distcleancheck' completely, add the following rule to your top-level
+`Makefile.am':
+
+     distcleancheck:
+             @:
+
+   If you want `distcleancheck' to ignore built files which have not
+been cleaned because they are also part of the distribution, add the
+following definition instead:
+
+     distcleancheck_listfiles = \
+       find -type f -exec sh -c 'test -f $(srcdir)/{} || echo {}' ';'
+
+   The above definition is not the default because it's usually an
+error if your Makefiles cause some distributed files to be rebuilt when
+the user build the package.  (Think about the user missing the tool
+required to build the file; or if the required tool is built by your
+package, consider the cross-compilation case where it can't be run.)
+
+   `distcheck' also checks that the `uninstall' target works properly,
+both for ordinary and `DESTDIR' builds.  It does this by invoking `make
+uninstall', and then it checks the install tree to see if any files are
+left over.  This check will make sure that you correctly coded your
+`uninstall'-related targets.
+
+   By default, the checking is done by the `distuninstallcheck' target,
+and the list of files in the install tree is generated by
+`$(distuninstallcheck_listfiles') (this is a variable whose value is a
+shell command to run that prints the list of files to stdout).
+
+   Either of these can be overridden to modify the behavior of
+`distcheck'.  For instance, to disable this check completely, you would
+write:
+
+     distuninstallcheck:
+             @:
+
+The types of distributions
+==========================
+
+   Automake generates a `.tar.gz' file when asked to create a
+distribution and other archives formats, *Note Options::.  The target
+`dist-gzip' generates the `.tar.gz' file only.
+
+
+File: automake.info,  Node: Tests,  Next: Options,  Prev: Dist,  Up: Top
+
+Support for test suites
+***********************
+
+   Automake supports two forms of test suites.
+
+Simple Tests
+============
+
+   If the variable `TESTS' is defined, its value is taken to be a list
+of programs to run in order to do the testing.  The programs can either
+be derived objects or source objects; the generated rule will look both
+in `srcdir' and `.'.  Programs needing data files should look for them
+in `srcdir' (which is both an environment variable and a make variable)
+so they work when building in a separate directory (*note Build
+Directories: (autoconf)Build Directories.), and in particular for the
+`distcheck' target (*note Dist::).
+
+   The number of failures will be printed at the end of the run.  If a
+given test program exits with a status of 77, then its result is ignored
+in the final count.  This feature allows non-portable tests to be
+ignored in environments where they don't make sense.
+
+   The variable `TESTS_ENVIRONMENT' can be used to set environment
+variables for the test run; the environment variable `srcdir' is set in
+the rule.  If all your test programs are scripts, you can also set
+`TESTS_ENVIRONMENT' to an invocation of the shell (e.g.  `$(SHELL)
+-x'); this can be useful for debugging the tests.
+
+   You may define the variable `XFAIL_TESTS' to a list of tests
+(usually a subset of `TESTS') that are expected to fail.  This will
+reverse the result of those tests.
+
+   Automake ensures that each program listed in `TESTS' is built before
+any tests are run; you can list both source and derived programs in
+`TESTS'.  For instance, you might want to run a C program as a test.
+To do this you would list its name in `TESTS' and also in
+`check_PROGRAMS', and then specify it as you would any other program.
+
+DejaGNU Tests
+=============
+
+   If `dejagnu' (ftp://ftp.gnu.org/gnu/dejagnu/) appears in
+`AUTOMAKE_OPTIONS', then a `dejagnu'-based test suite is assumed.  The
+variable `DEJATOOL' is a list of names which are passed, one at a time,
+as the `--tool' argument to `runtest' invocations; it defaults to the
+name of the package.
+
+   The variable `RUNTESTDEFAULTFLAGS' holds the `--tool' and `--srcdir'
+flags that are passed to dejagnu by default; this can be overridden if
+necessary.
+
+   The variables `EXPECT' and `RUNTEST' can also be overridden to
+provide project-specific values.  For instance, you will need to do
+this if you are testing a compiler toolchain, because the default
+values do not take into account host and target names.
+
+   The contents of the variable `RUNTESTFLAGS' are passed to the
+`runtest' invocation.  This is considered a "user variable" (*note User
+Variables::).  If you need to set `runtest' flags in `Makefile.am', you
+can use `AM_RUNTESTFLAGS' instead.
+
+   Automake will generate rules to create a local `site.exp' file,
+defining various variables detected by `./configure'.  This file is
+automatically read by DejaGnu.  It is ok for the user of a package to
+edit this file in order to tune the test suite.  However this is not
+the place where the test suite author should define new variables: this
+should be done elsewhere in the real test suite code.  Especially,
+`site.exp' should not be distributed.
+
+   In either case, the testing is done via `make check'.
+
+Install Tests
+=============
+
+   The `installcheck' target is available to the user as a way to run
+any tests after the package has been installed.  You can add tests to
+this by writing an `installcheck-local' target.
 
 
 File: automake.info,  Node: Options,  Next: Miscellaneous,  Prev: Tests,  Up: Top
@@ -146,6 +390,15 @@ understood options are:
      from this test.  For instance `false' (from GNU sh-utils) is never
      successful, even for `--help' or `--version'.  You can list such
      programs in the variable `AM_INSTALLCHECK_STD_OPTIONS_EXEMPT'.
+     Programs (not scripts) listed in this variable should be suffixed
+     by `$(EXEEXT)' for the sake of Win32 or OS/2.  For instance
+     suppose we build `false' as a program but `true.sh' as a script,
+     and that neither of them support `--help' or `--version':
+
+          AUTOMAKE_OPTIONS = std-options
+          bin_PROGRAMS = false ...
+          bin_SCRIPTS = true.sh ...
+          AM_INSTALLCHECK_STD_OPTIONS_EXEMPT = false$(EXEEXT) true.sh
 
 `subdir-objects'
      If this option is specified, then objects are placed into the
@@ -261,7 +514,8 @@ suffixes in the `SUFFIXES' variable *before* you define your implicit
 rule.
 
    For instance the following definition prevents Automake to
-misinterpret `.idlC.cpp:' as an attemp to transform `.idlC' into `.cpp'.
+misinterpret `.idlC.cpp:' as an attempt to transform `.idlC' into
+`.cpp'.
 
      SUFFIXES = .idl C.cpp
      .idlC.cpp:
@@ -504,7 +758,7 @@ user-supplied targets.
 (`mostlyclean', `clean', `distclean', and `maintainer-clean').  Note
 that there are no `uninstall-exec-local' or `uninstall-data-local'
 targets; just use `uninstall-local'.  It doesn't make sense to
-uninstall just
+uninstall just data or just executables.
 
    For instance, here is one way to install a file in `/etc':
 
@@ -560,7 +814,7 @@ This means you can install several versions of Automake in the same
 `$prefix', and can select an arbitrary Automake version by running
 `automake-1.6' or `automake-1.7' without juggling with `$PATH'.
 Furthermore, `Makefile''s generated by Automake 1.6 will use
-`automake-1.6' explicitely in their rebuild rules.
+`automake-1.6' explicitly in their rebuild rules.
 
    Note that `1.6' in `automake-1.6' is Automake's API version, not
 Automake's version.  If a bug fix release is made, for instance
@@ -585,9 +839,9 @@ requested version.
 What is in the API
 ==================
 
-   Automake's programing interface is not easy to define.  Basically it
+   Automake's programming interface is not easy to define.  Basically it
 should include at least all *documented* variables and targets that a
-`Makefile.am' authors can use, the behaviours associated to them (e.g.
+`Makefile.am' author can use, any behavior associated with them (e.g.
 the places where `-hook''s are run), the command line interface of
 `automake' and `aclocal', ...
 

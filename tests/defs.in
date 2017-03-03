@@ -103,10 +103,20 @@ then
 	rm -f $priv_check_temp
 	test $overwrite_status = 0 && exit 77
 	;;
+      python)
+	# Python doesn't support --version, it has -V
+	echo "$me: running python -V"
+	( python -V ) || exit 77
+	;;
       tex)
         # No all versions of Tex support `--version', so we use
         # a configure check.
         test -n "@TEX@" || exit 77
+	;;
+      texi2dvi-o)
+        # Texi2dvi supports `-o' since Texinfo 4.1.
+	echo "$me: running texi2dvi -o /dev/null --version"
+	( texi2dvi -o /dev/null --version ) || exit 77
 	;;
       # Generic case: the tool must support --version.
       *)

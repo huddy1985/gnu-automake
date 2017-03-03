@@ -31,6 +31,7 @@ ansi6.test \
 ansi7.test \
 ansi8.test \
 ansi9.test \
+ansi10.test \
 ar.test \
 asm.test \
 autoheader.test \
@@ -49,6 +50,8 @@ canon4.test \
 canon5.test \
 ccnoco.test \
 check.test \
+check2.test \
+check3.test \
 checkall.test \
 clean.test \
 colneq.test \
@@ -199,6 +202,7 @@ insh2.test \
 install2.test \
 installdir.test \
 installsh.test \
+installsh2.test \
 instdata.test \
 instdata2.test \
 instexec.test \
@@ -293,6 +297,7 @@ pluseq6.test \
 pluseq7.test \
 pluseq8.test \
 pluseq9.test \
+pluseq10.test \
 postproc.test \
 ppf77.test \
 pr2.test \
@@ -386,6 +391,7 @@ suffix7.test \
 suffix8.test \
 suffix9.test \
 suffix10.test \
+suffix11.test \
 symlink.test \
 symlink2.test \
 symlink3.test \
@@ -407,6 +413,8 @@ texinfo9.test \
 texinfo10.test \
 texinfo13.test \
 texinfo16.test \
+texinfo17.test \
+texinfo18.test \
 transform.test \
 unused.test \
 vars.test \

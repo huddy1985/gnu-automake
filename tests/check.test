@@ -22,19 +22,23 @@
 
 . ./defs || exit 1
 
+set -e
+
 cat > Makefile.am << 'END'
 TESTS = frob.test
 END
 
 : > frob.test
 
-$ACLOCAL || exit 1
-$AUTOMAKE || exit 1
+$ACLOCAL
+$AUTOMAKE
 
-grep '^check-TESTS:' Makefile.in || exit 1
+grep '^check-TESTS:' Makefile.in
 grep '^check-DEJAGNU' Makefile.in && exit 1
 
 # check-TESTS is phony.
-sed -n '/^\.PHONY:/,/^$/p' Makefile.in | grep check-TESTS || exit 1
+sed -n '/^\.PHONY:/,/^$/p' Makefile.in | grep check-TESTS
 
-exit 0
+# check should depend directly on check-am (similar tests are
+# in check2.test and check3.test).
+grep '^check: check-am' Makefile.in
