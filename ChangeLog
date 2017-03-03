@@ -1,3 +1,118 @@
+2013-06-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	release: stable micro release 1.13.4
+
+	* configure.ac (AC_INIT): Bump version number to 1.13.4.
+	* m4/amversion.m4: Likewise (auto-updated by "make bootstrap").
+
+2013-06-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	sync: update config.guess
+
+	* lib/config.guess: This.  Actually, only the timestamp has been
+	updated (apparently, it was mistakenly not updated in the previous
+	real change to the script).
+
+2013-06-12  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'fix-pr14560' into micro
+
+	* fix-pr14560:
+	  lang, suffix rules: don't require C stuff needlessly
+	  tests: expose automake bug#14560
+
+2013-06-12  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	THANKS: update e-mall address for Ralf Corsepius
+
+2013-06-12  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	lang, suffix rules: don't require C stuff needlessly
+
+	This change fixes automake bug#14560: when two or more user-defined suffix
+	rules were present in a single Makefile.am, automake would needlessly
+	include definition of some make variables related to C compilation in the
+	generated Makefile.in.
+
+	* automake.in (handle_languages): Fix logic to decide whether or not to
+	include definitions of C compilation related variables in the generated
+	Makefile.in: instead of doing so when two or more user-defined suffix
+	rules are seen (which is a completely bogus criterion), do so when two
+	or more compiled languages are used.
+	* lib/Automake/Rule.pm (suffix_rules_count): Remove as no longer used.
+	(@EXPORT): Adjust.
+	* t/list-of-tests.mk (XFAIL_TESTS): No longer list the test script
+	'suffix-extra-c-stuff-pr14560.sh', which now passes.
+	* NEWS: Update.
+
+2013-06-12  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: expose automake bug#14560
+
+	Automake needlessly generates definition of make variables related
+	to C compilation when two or more user-defined suffix rules are
+	present in a single Makefile.am.
+
+	* t/suffix-extra-c-stuff-pr14560.sh: New test, exposing the bug.
+	This test is still xfailing.
+	* t/no-extra-c-stuff.sh: New test, check for a potential related
+	regression.  This regression is not actually present here (so this
+	test passes), but it still took place in our first attempt at
+	fixing bug#14560 -- so this test has proven to be actually useful.
+	* t/no-extra-makefile-code.sh: Improve comments, and tighten the
+	grepping checks a little.
+	* t/list-of-tests.mk (handwritten_TESTS): Add the new tests.
+	(XFAIL_TESTS): Add the new xfailing test.
+
+2013-06-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: add a missing copyright notice
+
+	* t/ax/deltree.pl: Here.  Issue revealed by "make update-copyright".
+
+2013-06-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	sync: update config.guess from upstream
+
+	* lib/config.guess: Here.
+
+2013-06-08  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: expose automake bug#13928
+
+	* t/subobj-indir-pr13928.sh: New test, still xfailing.
+	* t/subobj-vpath-pr13928.sh: Likewise.
+	* t/list-of-tests.mk (XFAIL_TESTS, handwritten_TESTS): Update.
+
+2013-06-08  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	comments: fix some out-of-sync refs to test scripts
+
+	Those script has been renamed since those comments where written.
+
+	* lib/Automake/Rule.pm: Adjust.
+	* lib/am/distdir.am: Likewise.
+
+2013-06-08  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: expose automake bug#13940
+
+	* t/override-conditional-pr13940.sh: New test, still xfailing.
+	* t/list-of-tests.mk (XFAIL_TESTS, handwritten_TESTS): Add it.
+
+2013-06-03  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	configure: remove an obsolete TODO comment
+
+	* configure.ac: Here.
+
+2013-06-03  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	post-release: micro version bump (1.13.3a)
+
+	* configure.ac: Bump version: 1.13.3 -> 1.13.3a
+	* m4/amversion.m4: Likewise (auto-updated by "make bootstrap").
+
 2013-06-03  Stefano Lattarini  <stefano.lattarini@gmail.com>
 
 	release: stable micro release 1.13.3

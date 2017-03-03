@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 AC_PREREQ([2.69])
-AC_INIT([GNU Automake], [1.13.3], [bug-automake@gnu.org])
+AC_INIT([GNU Automake], [1.13.4], [bug-automake@gnu.org])
 
 AC_CONFIG_SRCDIR([automake.in])
 AC_CONFIG_AUX_DIR([lib])
@@ -276,9 +276,6 @@ exit 77" >&AS_MESSAGE_LOG_FD 2>&1; test $? -eq 77; }
 #   $ set -x; P=1 true 2>file
 # would emit "P=1" into file with /usr/xpg4/bin/sh from Solaris 10 and
 # /bin/sh from SunOS 5.11 and OpenBSD 4.7.
-#
-# Finally, we look for weird bugs and portability problems mentioned in
-# the Autoconf manual, and reject shells that suffers from them. (TODO)
 #
 # Use '$am_score' to indicate the degree of acceptability of the shell.
 # A score of "10" means that the shell is good enough for our needs;
