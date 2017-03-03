@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2002, 2003  Free Software Foundation, Inc.
+# Copyright (C) 2002, 2003, 2004  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -61,3 +61,9 @@ $MAKE
 $MAKE test-install
 $MAKE uninstall
 test `find inst/foo -type f -print | wc -l` = 0
+
+# Opportunistically test for installdirs.
+rm -rf inst
+$MAKE installdirs
+test -d inst/bin
+test -d inst/man/man1

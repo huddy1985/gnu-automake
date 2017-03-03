@@ -6,8 +6,8 @@ eval 'case $# in 0) exec @PERL@ -S "$0";; *) exec @PERL@ -S "$0" "$@";; esac'
     if 0;
 
 # automake - create Makefile.in from Makefile.am
-# Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
-# Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+# 2003, 2004  Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -214,14 +214,15 @@ my @common_files =
     (qw(ABOUT-GNU ABOUT-NLS AUTHORS BACKLOG COPYING COPYING.DOC COPYING.LIB
 	COPYING.LESSER ChangeLog INSTALL NEWS README THANKS TODO
 	ansi2knr.1 ansi2knr.c compile config.guess config.rpath config.sub
-	configure configure.ac configure.in depcomp elisp-comp
-	install-sh libversion.in mdate-sh missing mkinstalldirs
-	py-compile texinfo.tex ylwrap),
+	depcomp elisp-comp install-sh libversion.in mdate-sh missing
+	mkinstalldirs py-compile texinfo.tex ylwrap),
      @libtool_files, @libtool_sometimes);
 
-# Commonly used files we auto-include, but only sometimes.
+# Commonly used files we auto-include, but only sometimes.  This list
+# is used for the --help output only.
 my @common_sometimes =
-    qw(aclocal.m4 acconfig.h config.h.top config.h.bot stamp-vti);
+  qw(aclocal.m4 acconfig.h config.h.top config.h.bot configure
+     configure.ac configure.in stamp-vti);
 
 # Standard directories from the GNU Coding Standards, and additional
 # pkg* directories from Automake.  Stored in a hash for fast member check.
@@ -234,8 +235,8 @@ my %standard_prefix =
 
 # Copyright on generated Makefile.ins.
 my $gen_copyright = "\
-# Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
-# Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+# 2003, 2004  Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -964,6 +965,25 @@ sub handle_options
   return 0;
 }
 
+# shadow_unconditionally ($varname, $where)
+# -----------------------------------------
+# Return a $(variable) that contains all possible values
+# $varname can take.
+# If the VAR wasn't defined conditionally, return $(VAR).
+# Otherwise we create a am__VAR_DIST variable which contains
+# all possible values, and return $(am__VAR_DIST).
+sub shadow_unconditionally ($$)
+{
+  my ($varname, $where) = @_;
+  my $var = var $varname;
+  if ($var->has_conditional_contents)
+    {
+      $varname = "am__${varname}_DIST";
+      my @files = uniq ($var->value_as_list_recursive);
+      define_pretty_variable ($varname, TRUE, $where, @files);
+    }
+  return "\$($varname)"
+}
 
 # get_object_extension ($OUT)
 # ---------------------------
@@ -1776,21 +1796,8 @@ sub handle_source_transform
 	  unless $prefix =~ /EXTRA_/;
 
 	push @sources, "\$($varname)";
-	if ($prefix !~ /^nodist_/)
-	  {
-	    # If the VAR wasn't defined conditionally, we add
-	    # it to DIST_SOURCES as is.  Otherwise we create a
-	    # am__VAR_DIST variable which contains all possible values,
-	    # and add this variable to DIST_SOURCES.
-	    my $distvar = $varname;
-	    if ($var->has_conditional_contents)
-	      {
-		$distvar = "am__${varname}_DIST";
-		my @files = uniq ($var->value_as_list_recursive);
-		define_pretty_variable ($distvar, TRUE, $where, @files);
-	      }
-	    push @dist_sources, "\$($distvar)"
-	  }
+	push @dist_sources, shadow_unconditionally ($varname, $where)
+	  unless ($prefix =~ /^nodist_/);
 
 	$needlinker |=
 	    define_objects_from_sources ($varname,
@@ -2594,7 +2601,7 @@ sub scan_texinfo_file ($)
 
     }
 
-  if ($outfile eq '')
+  if (! $outfile)
     {
       err_am "`$filename' missing \@setfilename";
       return;
@@ -3768,6 +3775,9 @@ sub handle_configure ($$$@)
   foreach my $spec (@config_links)
     {
       my ($link, $file) = split /:/, $spec;
+      # Some people do AC_CONFIG_LINKS($computed).  We only handle
+      # the DEST:SRC form.
+      next unless $file;
       my $where = $ac_config_files_location{$link};
 
       # Skip destinations that contain shell variables.
@@ -6341,6 +6351,11 @@ sub am_install_var
       # Use the location of the currently processed variable as context.
       $where->push_context ("while processing `$one_name'");
 
+      # The variable containing all file to distribute.
+      my $distvar = "\$($one_name)";
+      $distvar = shadow_unconditionally ($one_name, $where)
+	if ($dist_p && $one_var->has_conditional_contents);
+
       # Singular form of $PRIMARY.
       (my $one_primary = $primary) =~ s/S$//;
       $output_rules .= &file_contents ($file, $where,
@@ -6355,6 +6370,7 @@ sub am_install_var
 					 EXEC      => $exec_p,
 					 INSTALL   => $install_p,
 					 DIST      => $dist_p,
+				         DISTVAR   => $distvar,
 					 'CK-OPTS' => $check_options_p);
 
       $first = 0;
@@ -6434,22 +6450,52 @@ my @require_file_paths = ();
 # encodes the rules for deciding when to do so.
 sub maybe_push_required_file
 {
-    my ($dir, $file, $fullfile) = @_;
+  my ($dir, $file, $fullfile) = @_;
 
-    if ($dir eq $relative_dir)
+  if ($dir eq $relative_dir)
     {
-	push_dist_common ($file);
-	return 1;
+      push_dist_common ($file);
+      return 1;
     }
-    elsif ($relative_dir eq '.' && ! &is_make_dir ($dir))
+  elsif ($relative_dir eq '.' && ! &is_make_dir ($dir))
     {
-	# If we are doing the topmost directory, and the file is in a
-	# subdir which does not have a Makefile, then we distribute it
-	# here.
-	push_dist_common ($fullfile);
-	return 1;
+      # If we are doing the topmost directory, and the file is in a
+      # subdir which does not have a Makefile, then we distribute it
+      # here.
+
+      # If a required file is above the source tree, it is important
+      # to prefix it with `$(srcdir)' so that no VPATH search is
+      # performed.  Otherwise problems occur with Make implementations
+      # that rewrite and simplify rules whose dependencies are found in a
+      # VPATH location.  Here is an example with OSF1/Tru64 Make.
+      #
+      #   % cat Makefile
+      #   VPATH = sub
+      #   distdir: ../a
+      #	          echo ../a
+      #   % ls
+      #   Makefile a
+      #   % make
+      #   echo a
+      #   a
+      #
+      # Dependency `../a' was found in `sub/../a', but this make
+      # implementation simplified it as `a'.  (Note that the sub/
+      # directory does not even exist.)
+      #
+      # This kind of VPATH rewriting seems hard to cancel.  The
+      # distdir.am hack against VPATH rewriting works only when no
+      # simplification is done, i.e., for dependencies which are in
+      # subdirectories, not in enclosing directories.  Hence, in
+      # the latter case we use a full path to make sure no VPATH
+      # search occurs.
+      $fullfile = '$(srcdir)/' . $fullfile
+	if $dir =~ m,^\.\.(?:$|/),;
+
+      push_dist_common ($fullfile);
+      return 1;
     }
-    return 0;
+  return 0;
 }
 
 
@@ -7000,7 +7046,7 @@ sub version ()
 automake (GNU $PACKAGE) $VERSION
 Written by Tom Tromey <tromey\@redhat.com>.
 
-Copyright 2003 Free Software Foundation, Inc.
+Copyright 2004 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 EOF

@@ -16,6 +16,8 @@ acloca10.test \
 acloca11.test \
 acloca12.test \
 acloca13.test \
+acloca14.test \
+acloca15.test \
 acoutnoq.test \
 acoutpt.test \
 acoutpt2.test \
@@ -117,6 +119,7 @@ cond29.test \
 cond30.test \
 cond31.test \
 cond32.test \
+cond33.test \
 condd.test \
 condinc.test \
 condinc2.test \
@@ -493,6 +496,7 @@ txinfo25.test \
 txinfo26.test \
 txinfo27.test \
 txinfo28.test \
+txinfo29.test \
 transform.test \
 unused.test \
 vars.test \

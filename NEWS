@@ -1,3 +1,112 @@
+Bug fixed in 1.8.1:
+
+* Bugs introduced by 1.8:
+
+  - Fix Config.pm import error with old Perl versions (at least
+    5.005_03).  One symptom is that aclocal could not find its macro
+    directory.
+
+  - Automake 1.8 used `mkdir -m 0755 -p --' to ensure that directories
+    created by `make install' are always world readable, even if the
+    installer happens to have an overly restrictive umask (e.g. 077).
+    This was a mistake and has been reverted.  There are at least two
+    reasons why we must not use `-m 0755':
+      - it causes special bits like SGID to be ignored,
+      - it may be too restrictive (some setups expect 775 directories).
+
+  - Fix aclocal to honor definitions located in files which have been
+    m4_included manually.  aclocal 1.8 had been updated to check
+    m4_included files for new requirements, but forgot that these
+    m4_included files can also provide new definitions.
+
+    Note that if you have such a setup, we recommend you get rid of
+    it.  In the past, there was a reason to m4_include files manually:
+    aclocal used to duplicate entire M4 files into aclocal.m4, even
+    files that were distributed.  Some packages were therefore
+    m4_including the distributed file directly, and playing some
+    tricks to ensure aclocal would not copy that file to aclocal.m4,
+    in order to limit the amount of duplication.  Since aclocal 1.8.x
+    will precisely output m4_includes for local M4 files, we recommend
+    that you clean up your setup, removing all manual m4_includes and
+    letting aclocal output them.
+
+  - Output detailed menus in the Info version if the Automake manual,
+    so that Emacs can locate the indexes.
+
+  - configure.ac and configure were listed twice in DIST_COMMON (an
+    internal variable where Automake lists configury files to
+    distribute).  This was harmless, but unaesthetic.
+
+  - Use `chmod a-w' instead of `chmod -w' as the latter honors umask.
+    This was an issue only in the Automake package itself, not in
+    its output.
+
+  - Automake assumed that all AC_CONFIG_LINKS arguments had the form
+    DEST:SRC.  This was wrong, as some packages do
+    AC_CONFIG_LINKS($computedlinks).  This version no longer abort in
+    that situation.
+
+  - Contrary to mkinstalldirs, $(mkdir_p) was expecting exactly one
+    argument.  This caused two kinds of failures:
+      - Rules installing data in a conditionally defined directory
+        failed when that directory was undefined.  In this case no
+        argument was supplied.
+      - `make installdirs' failed, because several directories were
+        passed to $(mkdir_p).  This was an issue only on platform
+        were $(mkdir_p) is implemented with `install-sh -d'.
+    $(mkdir_p) as been changed to accept 0 or more arguments, as
+    mkinstalldirs did.
+
+* Long-standing bugs:
+
+  - Fix an unexpected diagnostic occurring when users attempt
+    to override some internal variables that Automake appends to.
+
+  - aclocal now scans configure.ac for macro definitions (PR/319).
+
+  - Fix a portability issue with OSF1/Tru64 Make.  If a directory
+    distributes files which are outside itself (this usually occurs
+    when using AC_CONFIG_AUX_DIR([../dir]) to use auxiliary files
+    from a parent package), then `make distcheck' fails due to an
+    optimization performed by OSF1/Tru64 Make in its VPATH handling.
+    (tests/subpkg2.test failure)
+
+  - Fix another portability issue with Sun and OSF1/Tru64 Make.
+    In a VPATH-build configuration, `make install' would install
+    nobase_ files to wrong locations.
+
+  - Fix a Perl `uninitialized value' diagnostic occurring when
+    automake complains that a Texinfo file does not have a
+    @setfilename statement.
+
+  - Erase config.status.lineno during `make distclean'.  This file
+    can be created by config.status.  Automake already knew about
+    configure.lineno, but forgot config.status.lineno.
+
+  - Distribute all files, even those which are built and installed
+    conditionally.  This change affects files listed in conditionally
+    defined *_HEADERS and *_PYTHON variable (unless they are nodist_*)
+    as well as those listed in conditionally defined dist_*_DATA,
+    dist_*_JAVA, dist_*_LISP, and dist_*_SCRIPTS variables.
+
+  - Fix AM_PATH_LISPDIR to avoid \? in sed regular expressions; it
+    doesn't conform to POSIX.
+
+  - Normalize help strings for configure variables and options added
+    by Automake macros.
+
+* Anticipation:
+
+  - Check for python2.4 in AM_PATH_PYTHON.
+
+* Spurious failures in test suite:
+
+  - tests/libtool5.test, tests/ltcond.test, tests/ltcond2.test,
+    tests/ltconv.test: fix failures with CVS Libtool.
+  - tests/aclocal6.test: fix failure if autom4te.cache is disabled.
+  - tests/txinfo24.test, tests/txinfo25.test, tests/txinfo28.test:
+    fix failures with old Texinfo versions.
+
 New in 1.8:
 
 * Meta-News
@@ -135,7 +244,7 @@ New in 1.8:
     installs it, and if you remove mkinstalldirs from your package,
     automake will define $(mkinstalldirs) as an alias for $(mkdir_p).
 
-    Gettext 1.12.1 still requires mkinstalldirs.  Fortunately
+    Gettext 0.12.1 still requires mkinstalldirs.  Fortunately
     gettextize and autopoint will install it when needed.  Automake
     will continue to define the $(mkinstalldirs) and to distribute
     mkinstalldirs when this script is in the source tree.

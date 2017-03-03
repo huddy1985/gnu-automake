@@ -1,4 +1,191 @@
+2004-01-11  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.ac, NEWS: Bump version to 1.8.1.
+
+	* lib/config.sub, lib/config.guess, lib/texinfo.tex: New upstream
+	versions.
+
+	* m4/as.m4, m4/depend.m4, m4/maintainer.m4, m4/multi.m4: Update
+	copyright years and serial.
+
+	* m4/python.m4 (_AM_PYTHON_INTERPRETER_LIST): Add python2.4.
+
+2004-01-10  Peter Eisentraut  <peter_e@gmx.net>  (tiny change)
+
+	* m4/as.m4 (AM_PROG_AS): Format and align help string more
+	consistently.
+	* m4/depend.m4 (AM_DEP_TRACK): Likewise.
+	* m4/lispdir.m4 (AM_PATH_LISPDIR): Likewise.
+	* m4/maintainer.m4 (AM_MAINTAINER_MODE): Likewise.
+	* m4/multi.m4 (AM_ENABLE_MULTILIB): Likewise.
+
+2004-01-10  Paul Eggert  <eggert@twinsun.com>
+
+	* m4/lispdir.m4 (AM_PATH_LISPDIR): Don't use \? in sed regular
+	expressions; it doesn't conform to POSIX.
+
+2004-01-10  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (shadow_unconditionally): New function...
+	(handle_source_transform): ... extracted from here.
+	(am_install_var): Use shadow_unconditionally to define %DISTVAR%.
+	* lib/am/data.am, lib/am/java.am, lib/am/lisp.am, lib/am/python.am,
+	lib/am/script.am: Add %DISTVAR% to DIST_COMMON.
+	* tests/cond33.test: Make sure all conditional files are distributed.
+	Report from Ralf Corsepius.
+
+2004-01-08  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* m4/mkdirp.m4 (AM_PROG_MKDIR_P): Append `.' to $(mkdir_p).
+	* lib/install-sh: Accept `install-sh -d' with 0..n arguments,
+	as well as `install-sh sources... dest' with multiple sources.
+	* tests/cond33.test: New file.
+	* tests/instsh2.test: Add more checks for install-sh.
+	* tests/transform.test: Test for installdirs.
+	* tests/Makefile.am (TESTS): Add cond33.test
+	Report from Ralf Corsepius.
+
+	* automake.in (handle_configure): Skip AC_CONFIG_LINKS items which
+	do not look like DEST:SRC.
+	* tests/conflnk3.test: Check for AC_CONFIG_LINKS($computed).
+
+2003-01-07  Eric Sunshine  <sunshine@sunshineco.com>  (tiny change)
+
+	* lib/am/configure.am (am__CONFIG_DISTCLEAN_FILES): Add
+	config.status.lineno.
+
+2004-01-07  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>  (tiny change)
+
+	* doc/automake.texi (Rebuilding): Typo.
+
+2004-01-06  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* THANKS: Add Bruce Korb.
+
+	* automake.in, aclocal.in: Bump copyright years.
+
+	* configure.ac, NEWS: Bump version to 1.8.0c.
+
+	* configure.ac, NEWS: Bump version to 1.8.0b.
+
+2004-01-05  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	Mimic Paul Eggert's changes to Autoconf.
+	* Makefile.am (automake, aclocal): Use `chmod a-w', not `chmod -w'.
+	* lib/Automake/Makefile.am (Config.pm): Likewise.
+	* m4/Makefile.am ($(top_srcdir)/m4/amversion.m4): Likewise.
+
+	* lib/am/data.am, lib/am/lisp.am, lib/am/python.am,
+	lib/am/scripts.am: Strip any leading $(srcdir) from nobase_ files.
+	This fixes installation of nobase_ files in VPATH setups with Sun
+	and OSF1/Tru64 Make.
+	* tests/nobase.test: Augment to check installation from VPATH
+	builds.
+
+2004-01-04  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/texinfo.tex: New upstream version.
+
+	* NEWS: Summarize recent fixes.
+
+	* m4/mkdirp.m4: Do not use `-m 0755'.  This overrides special bits
+	and break setups where 775 directories are expected.  Just obey
+	umask as we did in the past.
+	Report from Harlan Stenn.
+
+2004-01-03  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (scan_texinfo_file): Do not compare $outfile to ''
+	as $outfile might not be defined at all.
+
+	* lib/Automake/Variable.pm (define): Rework the way we check
+	Automake variable definition.  Ensure consistent :=/+=/=
+	definitions only for variables that have been and are defined by
+	Automake, and make it an internal error.  Ignore Automake
+	attempts to touch a user variable, even with += assignments.
+	* tests/txinfo29.test: New file.
+	* tests/Makefile.am (TESTS): Add txinfo29.test.
+	Reported by Bruce Korb.
+
+2004-01-02  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/libtool5.test, tests/ltcond.test, tests/ltcond2.test,
+	* tests/ltconv.test: Run automake with --add-missing, because
+	the CVS version of libtoolize no longer install config.sub and
+	config.guess by default.
+
+	Fix for PR automake/319:
+	* aclocal.in (scan_m4_files): Scan configure.ac.
+	(trace_used_macros, write_aclocal): Remove configure.ac from the
+	list of files to include.
+	* tests/Makefile.am (TESTS): Add acloca15.test.
+	* tests/acloca15.test: New file.
+
+	* aclocal.in (%file_includes): New variable.
+	(scan_configure_dep): Compile $m4_include_rx and $ac_require_rx once.
+	(scan_file): Scan for included files, and process these files
+	recursively.  Fill %file_includes and %file_contents.  Return the
+	list of included files, not the contents.
+	(scan_m4_files): Adjust calls to scan_files.
+	(strip_redundant_includes): New function.
+	(trace_used_macros): Call it.
+	(write_aclocal): Likewise.  Also check the mtime of included files.
+	* tests/Makefile.am (TESTS): Add acloca14.test.
+	* tests/acloca14.test: New file.
+	Report from Phil Edwards.
+
+2003-12-27  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (@common_files): Move configure, configure.ac, and
+	configure.in ...
+	(@common_sometimes): ... here so that these files do not appear
+	twice in DIST_COMMON.
+
+	* automake.in (maybe_push_required_file): Add $(srcdir) in front
+	a required files outside the current directory or its subdirectories.
+	* lib/am/distdir.am (distdir): Update comment.
+	Report from Nicolas Joly.
+
+2003-12-26  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (@copying): Do not repeat the version.
+	(Top): Use @insertcopying.  Add a @detailmenu, this works around
+	Emacs 21's inability to lookup indices in sub-nodes (reported
+	by Kevin Ryde).
+	(C++ Support, Assembly Support, Fortran 77 Support, Java Support,
+	Support for Other Languages, Preprocessing Fortran 77, Compiling
+	Fortran 77 Files, Mixing Fortran 77 With C and C++, How the Linker
+	is Chosen): Add missing descriptions in menus.
+	(Fortran 77 and Autoconf): Remove, this node was just saying "use
+	Autoconf 2.53 or greater".
+
+2003-12-26  Santiago Vila  <sanvila@unex.es>  (tiny change)
+
+	* NEWS: s/Gettext 1.12.1/Gettext 0.12.1/
+
+2003-12-25  Nicolas Joly  <njoly@pasteur.fr>  (tiny change)
+
+	* doc/automake.texi (Conditional Sources): Typo.
+
+2003-12-25  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/Automake/Config.in: Require Exporter.
+	Report from Kevin Ryde (failure with Perl 5.005_03).
+
+2003-12-15  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/aclocal6.test: Check for autom4te.cache only if it has
+	been created.
+	* tests/maintclean.test: Update comment.
+	Report from Bruno Haible.
+
+	* tests/txinfo24.test, tests/txinfo25.test, tests/txinfo28.test:
+	Require texi2dvi-o.
+	Report from Václav Haisman.
+
 2003-12-10  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.ac, NEWS: Bump version to 1.8.0a.
 
 	* configure.ac, NEWS: Bump version to 1.8.
 
