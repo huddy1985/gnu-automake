@@ -2,68 +2,91 @@
 
 AUTOMAKE_OPTIONS = gnits
 MAINT_CHARSET = latin1
-PERL = @PERL@
 
-SUBDIRS = tests
+SUBDIRS = tests m4
 
-bin_SCRIPTS = automake
+bin_SCRIPTS = automake aclocal
 info_TEXINFOS = automake.texi
-# SUBDIRS = intl po
-# CONFIG_HEADER = config.h
 
-pkgdata_DATA = clean-kr.am clean.am compile-kr.am compile-vars.am \
-compile.am data.am dejagnu.am depend.am dist-vars.am footer.am \
-header.am header-vars.am kr-vars.am libraries.am library.am \
-mans-vars.am program.am programs.am remake-hdr.am remake-subd.am \
-remake.am scripts.am subdirs.am tags.am tags-subd.am tags-clean.am \
-texi-version.am texinfos-vars.am texinfos.am libraries-clean.am \
-programs-clean.am data-clean.am COPYING INSTALL texinfo.tex ansi2knr.c \
-ansi2knr.1 aclocal.m4
+pkgdata_DATA = clean-kr.am clean.am clean-hdr.am comp-vars.am \
+compile.am data.am dejagnu.am depend.am depend2.am dist-vars.am	\
+footer.am header.am header-vars.am kr-extra.am libs.am library.am \
+libtool.am ltlib.am ltlibrary.am mans-vars.am program.am progs.am \
+remake-hdr.am remake.am scripts.am subdirs.am tags.am tags-clean.am \
+texi-vers.am texinfos.am libs-clean.am ltlib-clean.am progs-clean.am \
+data-clean.am COPYING INSTALL texinfo.tex ansi2knr.c ansi2knr.1	\
+lisp.am lisp-clean.am
 
 ## These must all be executable when installed.
-pkgdata_SCRIPTS = config.guess config.sub install-sh mdate-sh mkinstalldirs
+pkgdata_SCRIPTS = config.guess config.sub install-sh mdate-sh missing \
+mkinstalldirs elisp-comp ylwrap acinstall
 
-CLEANFILES = automake
+EXTRA_DIST = acinstall $(pkgdata_DATA)
 
 # The following requires a fixed version of the Emacs 19.30 etags.
-ETAGS_ARGS = automake.in --lang=none \
+ETAGS_ARGS = automake.in aclocal.in --lang=none \
  --regex='/^@node[ \t]+\([^,]+\)/\1/' automake.texi
-TAGS_DEPENDENCIES = automake.in automake.texi
+TAGS_DEPENDENCIES = automake.in aclocal.in automake.texi
 
 ## `test -x' is not portable.  So we use Perl instead.  If Perl
 ## doesn't exist, then this test is meaningless anyway.
 # Check to make sure some installed files are executable.
 installcheck-local:
-	$(PERL) -e "exit ! -x '$(pkgdatadir)/config.guess';"
-	$(PERL) -e "exit ! -x '$(pkgdatadir)/config.sub';"
-	$(PERL) -e "exit ! -x '$(pkgdatadir)/install-sh';"
-	$(PERL) -e "exit ! -x '$(pkgdatadir)/mdate-sh';"
-	$(PERL) -e "exit ! -x '$(pkgdatadir)/mkinstalldirs';"
+	for file in $(pkgdata_SCRIPTS); do \
+	  $(PERL) -e "exit ! -x '$(pkgdatadir)/$$file';" || exit 1; \
+	done
 
-# Some simple checks:
-# * syntax check with perl4 and perl5.
-# * make sure the scripts don't use 'true'
-# * expect no instances of '${...}'
-# These are only really guaranteed to work on my machine.
-maintainer-check: automake
-## Do syntax, etc, checks before make check.
-	$(PERL) -c -w automake
-	@if grep '^[^#].*true' $(srcdir)/[a-z]*.am; then \
-	  echo "can't use 'true' in GNU Makefile" 1>&2; \
-	  exit 1;				\
+################################################################
+##
+## Everything past here is useful to the maintainer, but probably not
+## to anybody else
+##
+
+# Run the test suite using Perl 4.
+perl4-check: automake aclocal
+	@if $(SHELL) -c 'perl4.036 -v' > /dev/null 2>&1; then \
+	  $(MAKE) PERL=perl4.036 check; \
 	else :; fi
-	@if test `fgrep '$${' $(srcdir)/[a-z]*.am | wc -l` -ne 0; then \
+
+# Some simple checks, and then ordinary check.  These are only really
+# guaranteed to work on my machine.
+maintainer-check: automake aclocal
+## This check avoids accidental configure substitutions in the source.
+## There are exactly 8 lines that should be modified.  This works out
+## to 24 lines of diffs.
+	@if test `diff automake.in automake | wc -l` -ne 24; then \
+	  echo "found too many diffs between automake.in and automake"; 1>&2; \
+	  diff -c automake.in automake; \
+	  exit 1; \
+	fi
+## Syntax check with default Perl (on my machine, Perl 5).
+	$(PERL) -c -w automake
+	$(PERL) -c -w aclocal
+## expect no instances of '${...}'.  However, $${...} is ok, since that
+## is a shell construct, not a Makefile construct.
+	@if test `fgrep '$${' $(srcdir)/[a-z]*.am | fgrep -v '$$$$' | wc -l` -ne 0; then \
 	  echo "found too many uses of '\$${'" 1>&2; \
 	  exit 1;				\
-	fi
-	if $(SHELL) -c 'perl4.036 -v' >/dev/null 2>&1; then \
-	  perl4.036 -c -w automake; \
 	else :; fi
-	$(MAKE) check
+## Make sure all invocations of mkinstalldirs are correct.
+	@if test `fgrep 'mkinstalldirs' $(srcdir)/[a-z]*.am | fgrep -v '$$(mkinstalldirs)' | wc -l` -ne 0; then \
+	  echo "found incorrect use of mkinstalldirs" 1>&2; \
+	  exit 1; \
+	else :; fi
+## Another syntax check, this time with Perl 4, if it exists.
+	@if $(SHELL) -c 'perl4.036 -v' >/dev/null 2>&1; then \
+	  perl4.036 -c -w automake; \
+	  perl4.036 -c -w aclocal; \
+	else :; fi
+## We never want to use "undef", only "delete".
+	@if grep undef $(srcdir)/automake.in > /dev/null 2>&1; then \
+	  echo "Found undef in automake.in; use delete instead" 1>&2; \
+	  exit 1; \
+	fi
 
 # Tag before making distribution.  Also, don't make a distribution if
 # checks fail.  Also, make sure the NEWS file is up-to-date.
-cvs-dist: maintainer-check
+cvs-dist: maintainer-check perl4-check distcheck
 	@if sed 1q $(srcdir)/NEWS | grep -e "$(VERSION)" > /dev/null; then :; else \
 	  echo "NEWS not updated; not releasing" 1>&2; \
 	  exit 1;				\
@@ -73,7 +96,19 @@ cvs-dist: maintainer-check
 
 cvs-diff:
 	thisver=`echo "Release-$(VERSION)" | sed 's/\./-/g'`; \
-	prevno=`echo "$(VERSION)" - 0.01 | bc | sed 's/^\./0./'`; \
+	if test -z "$$OLDVERSION"; then \
+	  prevno=`echo "$(VERSION)" - 0.01 | bc | sed 's/^\./0./'`; \
+	else prevno="$$OLDVERSION"; fi; \
 	prevver=Release-`echo $$prevno | sed 's/\./-/g'`; \
 	cvs -f rdiff -c -r $$prevver -r $$thisver $(PACKAGE) \
 	    > $(PACKAGE)-$$prevno-$(VERSION).diff
+
+## Check our path lengths.
+path-check: distdir
+	(cd $(distdir) && \
+## FIXME there's got to be a better way!  pathchk should take the list
+## of files on stdin, at least.
+	  find . -print | xargs pathchk -p); \
+	  status=$$?; \
+	  rm -rf $(distdir); \
+	  exit $$status

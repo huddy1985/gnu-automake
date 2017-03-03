@@ -1,5 +1,5 @@
 ## automake - create Makefile.in from Makefile.am
-## Copyright (C) 1994, 1995, 1996 Free Software Foundation, Inc.
+## Copyright (C) 1994, 1995, 1996, 1997 Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -15,18 +15,25 @@
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
-# This fragment is probably only useful for maintainers.  It relies on
-# GNU make and gcc.  It is only included in the generated Makefile.in
-# if `automake' is not passed the `--include-deps' flag.
 
-MKDEP = gcc -MM $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
+## This fragment is probably only useful for maintainers.  It relies
+## on GNU make and gcc.  It is only included in the generated
+## Makefile.in if `automake' is not passed the `--include-deps' flag.
 
+MKDEP = gcc -M $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
+
+## We must create the .deps directory if it doesn't exist.  We do it
+## in this strange way a buglet in make -- it won't try to create
+## .deps/.P if the .deps directory doesn't exist.
+DEPS_MAGIC := $(shell mkdir .deps > /dev/null 2>&1 || :)
 ## We use ".P" as the name of our placeholder because it can't be
 ## duplicated by any C source file.  (Well, there could be ".c", but
 ## no one does that in practice)
--include $(srcdir)/.deps/.P
-$(srcdir)/.deps/.P: $(BUILT_SOURCES)
-	cd $(srcdir) && test -d .deps || mkdir .deps
+-include .deps/.P
+## This depends on $(BUILT_SOURCES) because that lets us generate
+## dependencies for files that don't exist at the start of a fresh
+## build.
+.deps/.P: $(BUILT_SOURCES)
 ## Use ":" here and not "echo timestamp".  Otherwise GNU Make barfs:
 ## .deps/.P:1: *** missing separator.  Stop.
 ## Actually, use a plain "echo" and not ":".  Why?  From the Autoconf
@@ -37,23 +44,12 @@ $(srcdir)/.deps/.P: $(BUILT_SOURCES)
 	echo > $@
 
 -include $(DEP_FILES)
-$(DEP_FILES): $(srcdir)/.deps/.P
 
-$(srcdir)/.deps/%.P: $(srcdir)/%.c
-	@echo "mkdeps $< > $@"
-## Use funny regexp because otherwise too much can be matched when
-## srcdir begins with ".".  Can't use \< since sed doesn't recognize
-## "." as a word start.  Regexp-quote srcdir because "." is a matching
-## operator which commonly appears in filenames.  Need "//*" in
-## regexps because otherwise the regexp will fail when srcdir=. and
-## the path to the file is relative (eg ../lib/error.c matches "./*").
-	@re=`echo 's,^$(srcdir)//*,,g;s, $(srcdir)//*, ,g' | sed 's,\.,\\\\.,g'`; \
-	  $(MKDEP) $< | sed "$$re" > $@-tmp
-	@if test -n "$o"; then			\
-	  sed 's/\.o:/$$o:/' $@-tmp > $@;	\
-	  rm $@-tmp;				\
-	else					\
-	  mv $@-tmp $@;				\
-	fi
+mostlyclean-depend:
 
-# End of maintainer-only section
+clean-depend:
+
+distclean-depend:
+
+maintainer-clean-depend:
+	rm -rf .deps

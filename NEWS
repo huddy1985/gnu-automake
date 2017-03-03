@@ -1,3 +1,38 @@
+New in 1.2:
+* Bug fixes
+* Better DejaGNU support
+* Added no-installinfo option
+* Added Emacs Lisp support
+* Added --no-force option
+* Included `aclocal' program
+* Automake will now generate rules to regenerate aclocal.m4, if appropriate
+* Now uses `AM_' macro names everywhere
+* ansi2knr option can have directory prefix (eg `../lib/ansi2knr')
+  ansi2knr now works correctly on K&R sources
+* Better C++, yacc, lex support
+* Will compute _DEPENDENCIES variables automatically if not supplied
+* Will interpolate $(...) and ${...} when examining contents of a variable
+* .deps files now in build directory, not source directory; dependency
+  handling generally rewritten
+* DATA, MANS and BUILT_SOURCES no longer included in distribution
+* can now put config.h into a subdir
+* Added dist-all target
+* Support for install-info program (see texinfo 3.9)
+* Support for "yacc -d"
+* configure substitutions are automatically discovered and included
+  in generated Makefile.in
+* Special --cygnus mode
+* OMIT_DEPENDENCIES can now hold list of dependencies to be omitted
+  when making distribution.  Some dependencies are auto-ignored.
+* Changed how libraries are specified in _LIBRARIES variable
+* Full libtool support, from Gord Matzigkeit
+* No longer have to explicitly touch stamp-h when using AC_CONFIG_HEADER;
+  AM_CONFIG_HEADER handles it automatically
+* Texinfo output files no longer need .info extension
+* Added `missing' support
+* Cygwin32 support
+* Conditionals in Makefile.am, from Ian Taylor
+
 New in 1.0:
 * Bug fixes
 * distcheck target runs install and installcheck targets

@@ -44,8 +44,22 @@ pkgincludedir = $(includedir)/@PACKAGE@
 ## Location of top build directory relative to this one.
 top_builddir = @top_builddir@
 
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
+
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 transform = @program_transform_name@
+
+## These are defined because otherwise make on NetBSD V1.1 will print
+## (eg): $(NORMAL_INSTALL) expands to empty string.
+NORMAL_INSTALL = true
+PRE_INSTALL = true
+POST_INSTALL = true
+NORMAL_UNINSTALL = true
+PRE_UNINSTALL = true
+POST_UNINSTALL = true

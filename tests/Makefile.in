@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.0 from Makefile.am
+# Makefile.in generated automatically by automake 1.2 from Makefile.am
 
-# Copyright (C) 1994, 1995, 1996 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995, 1996, 1997 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy, distribute and modify it.
 
@@ -32,88 +32,125 @@ pkgincludedir = $(includedir)/@PACKAGE@
 
 top_builddir = ..
 
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
+
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 transform = @program_transform_name@
 
-AUTOMAKE_OPTIONS = gnits
-
-TESTS = mdate.test vtexi.test acoutput.test instexec.test checkall.test \
-acoutnoq.test acouttbs.test libobj.test proginst.test acoutqnl.test \
-confincl.test spelling.test prefix.test badprog.test depend.test exdir.test \
-canon.test installsh.test empty.test rulepat.test insh.test canon2.test \
-target.test extra.test noinst.test instman.test mkinstall.test auxdir.test \
-canon3.test mdate2.test subdir.test backsl.test package.test number.test \
-insh2.test outdir.test fpinstall.test fpinst2.test
-
-EXTRA_DIST = defs $(TESTS)
-mkinstalldirs = $(top_srcdir)/mkinstalldirs
-DIST_COMMON = ChangeLog Makefile.am Makefile.in
-
-
+NORMAL_INSTALL = true
+PRE_INSTALL = true
+POST_INSTALL = true
+NORMAL_UNINSTALL = true
+PRE_UNINSTALL = true
+POST_UNINSTALL = true
+MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
+PERL = @PERL@
+TAR = @TAR@
 VERSION = @VERSION@
 
-DISTFILES = $(DIST_COMMON) $(SOURCES) $(BUILT_SOURCES) $(HEADERS) \
-	$(TEXINFOS) $(INFOS) $(MANS) $(EXTRA_DIST) $(DATA)
-DEP_DISTFILES = $(DIST_COMMON) $(SOURCES) $(BUILT_SOURCES) $(HEADERS) \
-	$(TEXINFOS) $(INFO_DEPS) $(MANS) $(EXTRA_DIST) $(DATA)
+AUTOMAKE_OPTIONS = gnits
 
-TAR = tar
+TESTS = mdate.test vtexi.test acoutput.test instexec.test \
+checkall.test acoutnoq.test acouttbs.test libobj.test proginst.test \
+acoutqnl.test confincl.test spelling.test prefix.test badprog.test \
+depend.test exdir.test canon.test installsh.test empty.test \
+rulepat.test insh.test canon2.test target.test extra.test noinst.test \
+instman.test mkinstall.test auxdir.test canon3.test mdate2.test	\
+subdir.test backsl.test package.test number.test insh2.test \
+outdir.test fpinstall.test fpinst2.test texinfo.test dejagnu.test \
+yacc.test mkinst2.test texinfo2.test ansi.test depacl.test \
+depacl2.test error.test colon.test vtexi2.test tags.test comment.test \
+ansi2.test man.test info.test obsolete.test lex.test scripts.test \
+subdir2.test exsource.test canon4.test dup.test defun.test \
+cxxlink.test cxxnoc.test order.test libobj2.test interp.test \
+block.test libobj3.test dup2.test gnits.test interp2.test colneq.test \
+implicit.test spell.test spell2.test confsub.test primary.test \
+primary2.test depend2.test spell3.test comment2.test vpath.test	\
+symlink.test discover.test acinclude.test req.test acsilent.test \
+distdir.test lex2.test libobj4.test libobj5.test version.test \
+ranlib.test confvar.test confvar2.test stdlib.test cxxo.test \
+colon2.test colon3.test remake.test output.test output2.test \
+remake2.test output3.test output4.test colneq2.test subst.test \
+defun2.test yaccpp.test texinfo3.test texinfo4.test tagsub.test	\
+cxxlibobj.test seenc.test cygwin32.test lisp.test stamph.test \
+ldadd.test version2.test conf2.test cond.test cond2.test xsource.test
+
+EXTRA_DIST = defs $(TESTS)
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_CLEAN_FILES = 
+DIST_COMMON =  ChangeLog Makefile.am Makefile.in
+
+
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
+
+GZIP = --best
 default: all
 
+.SUFFIXES:
+$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+	cd $(top_srcdir) && $(AUTOMAKE) --gnits --include-deps tests/Makefile
 
-$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in
-	cd $(top_srcdir) && automake $(subdir)/Makefile
+Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
+	cd $(top_builddir) \
+	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-Makefile: $(top_builddir)/config.status Makefile.in
-	cd $(top_builddir) && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= ./config.status
 tags: TAGS
 TAGS:
 
 
-subdir = tests
 distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
-distdir: $(DEP_DISTFILES)
-	@for file in `cd $(srcdir) && echo $(DISTFILES)`; do \
+
+subdir = tests
+
+distdir: $(DISTFILES)
+	@for file in $(DISTFILES); do \
+	  d=$(srcdir); \
 	  test -f $(distdir)/$$file \
-	  || ln $(srcdir)/$$file $(distdir)/$$file 2> /dev/null \
-	  || cp -p $(srcdir)/$$file $(distdir)/$$file; \
+	  || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	  || cp -p $$d/$$file $(distdir)/$$file; \
 	done
 check-TESTS: $(TESTS)
 	@failed=0; all=0; \
 	srcdir=$(srcdir); export srcdir; \
 	for tst in $(TESTS); do \
-	  all=`expr $$all + 1`; \
 	  if test -f $$tst; then dir=.; \
 	  else dir="$(srcdir)"; fi; \
-	  if $$dir/$$tst; then \
+	  if $(TESTS_ENVIRONMENT) $$dir/$$tst; then \
+	    all=`expr $$all + 1`; \
 	    echo "PASS: $$tst"; \
-	  else \
+	  elif test $$? -ne 77; then \
+	    all=`expr $$all + 1`; \
 	    failed=`expr $$failed + 1`; \
 	    echo "FAIL: $$tst"; \
 	  fi; \
 	done; \
 	if test "$$failed" -eq 0; then \
-	  echo "========================"; \
-	  echo "All $$all tests passed"; \
-	  echo "========================"; \
+	  banner="All $$all tests passed"; \
 	else \
-	  echo "$$failed of $$all tests failed"; \
-	fi
+	  banner="$$failed of $$all tests failed"; \
+	fi; \
+	dashes=`echo "$$banner" | sed s/./=/g`; \
+	echo "$$dashes"; \
+	echo "$$banner"; \
+	echo "$$dashes"; \
+	test "$$failed" -eq 0
 info:
-
 dvi:
-
-check: all check-TESTS
-
+check: all
+	$(MAKE) check-TESTS
 installcheck:
-
 install-exec: 
+	@$(NORMAL_INSTALL)
 
 install-data: 
+	@$(NORMAL_INSTALL)
 
 install: install-exec install-data all
 	@:
@@ -123,7 +160,7 @@ uninstall:
 all: Makefile
 
 install-strip:
-	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' install
+	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' INSTALL_SCRIPT='$(INSTALL_PROGRAM)' install
 installdirs:
 
 
@@ -135,28 +172,31 @@ clean-generic:
 
 distclean-generic:
 	rm -f Makefile $(DISTCLEANFILES)
-	rm -f config.cache config.log $(CONFIG_HEADER) stamp-h
+	rm -f config.cache config.log stamp-h stamp-h[0-9]*
+	test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 
 maintainer-clean-generic:
 	test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 	test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 mostlyclean:  mostlyclean-generic
 
-clean:  clean-generic mostlyclean 
+clean:  clean-generic mostlyclean
 
-distclean:  distclean-generic clean 
+distclean:  distclean-generic clean distclean-local
 	rm -f config.status
 
-maintainer-clean:  maintainer-clean-generic distclean 
+maintainer-clean:  maintainer-clean-generic distclean
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
-.PHONY: default tags distdir check-TESTS info dvi check installcheck \
+.PHONY: default tags distdir check-TESTS info dvi installcheck \
 install-exec install-data install uninstall all installdirs \
 mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
-.SUFFIXES:
+
+distclean-local:
+	rm -rf testSubdir
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

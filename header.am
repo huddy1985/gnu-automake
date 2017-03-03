@@ -16,14 +16,17 @@
 ## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ## 02111-1307, USA.
 install-@DIR@HEADERS: $(@DIR@_HEADERS)
+	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(@DIR@dir)
 ## Funny invocation because Makefile variable can be empty, leading to
 ## a syntax error in sh.
-	list="$(@DIR@_HEADERS)"; for p in $$list; do \
+	@list='$(@DIR@_HEADERS)'; for p in $$list; do \
+	  echo " $(INSTALL_DATA) $(srcdir)/$$p $(@DIR@dir)/$$p"; \
 	  $(INSTALL_DATA) $(srcdir)/$$p $(@DIR@dir)/$$p; \
 	done
 
 uninstall-@DIR@HEADERS:
-	list="$(@DIR@_HEADERS)"; for p in $$list; do \
+	$(NORMAL_UNINSTALL)
+	list='$(@DIR@_HEADERS)'; for p in $$list; do \
 	  rm -f $(@DIR@dir)/$$p; \
 	done
