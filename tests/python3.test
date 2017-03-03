@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2001, 2002  Free Software Foundation, Inc.
+# Copyright (C) 2002  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -18,53 +18,36 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# Test for bug in conditionals.
+# Make sure we install built python files.
 
+required=python
 . ./defs || exit 1
 
 set -e
 
-cat >> configure.in << 'END'
-AC_PROG_CC
-AM_CONDITIONAL(COND1, false)
-AC_CONFIG_FILES([foo/Makefile])
-AC_CONFIG_FILES([bar/Makefile])
+cat >>configure.in <<EOF
+AM_PATH_PYTHON
 AC_OUTPUT
+EOF
+
+cat > Makefile.am <<'END'
+mydir=$(prefix)/my
+my_PYTHON = one.py
+
+one.py:
+	echo 'def one(): return 1' >$@
 END
-
-cat > Makefile.am << 'END'
-SUBDIRS = foo
-if COND1
-SUBDIRS += bar
-endif
-
-# Small example from the manual
-bin_PROGRAMS = hello
-hello_SOURCES = hello-common.c
-if COND1
-hello_SOURCES += hello-cond1.c
-else
-hello_SOURCES += hello-generic.c
-endif
-
-test: distdir
-	test -f $(distdir)/foo/Makefile.am
-	test -f $(distdir)/bar/Makefile.am
-	test -f $(distdir)/hello-common.c
-	test -f $(distdir)/hello-cond1.c
-	test -f $(distdir)/hello-generic.c
-END
-
-mkdir foo bar
-
-: > foo/Makefile.am
-: > bar/Makefile.am
-: > hello-common.c
-: > hello-cond1.c
-: > hello-generic.c
 
 $ACLOCAL
 $AUTOCONF
-$AUTOMAKE
-./configure
-$MAKE test
+$AUTOMAKE --add-missing
+
+mkdir inst
+inst=`pwd`/inst
+mkdir build
+cd build
+../configure --prefix="$inst"
+$MAKE install
+test -f $inst/my/one.py
+test -f $inst/my/one.pyc
+test -f $inst/my/one.pyo

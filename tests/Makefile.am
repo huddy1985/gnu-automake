@@ -6,6 +6,7 @@ TESTS =	\
 acinclude.test \
 aclibobj.test \
 aclocal.test \
+aclocal2.test \
 aclocali.test \
 aclocali1.test \
 aclocalii.test \
@@ -29,6 +30,7 @@ ansi5.test \
 ansi6.test \
 ansi7.test \
 ansi8.test \
+ansi9.test \
 ar.test \
 asm.test \
 autoheader.test \
@@ -91,6 +93,9 @@ cond22.test \
 cond23.test \
 cond24.test \
 cond25.test \
+cond26.test \
+cond27.test \
+cond28.test \
 condd.test \
 condincl.test \
 condincl2.test \
@@ -155,6 +160,7 @@ exdir.test \
 exdir2.test \
 exeext.test \
 exeext2.test \
+exeext3.test \
 exsource.test \
 ext.test \
 ext2.test \
@@ -313,6 +319,7 @@ primary2.test \
 proginst.test \
 python.test \
 python2.test \
+python3.test \
 ranlib.test \
 recurs.test \
 recurs2.test \

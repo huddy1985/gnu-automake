@@ -1,4 +1,136 @@
+2002-10-16  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* NEWS, configure.in: Version 1.7.1.
+
+	* automake.in (handle_single_transform_list): Strip directory name
+	from $full_ansi if subdir-objects is not set.
+
+	* lib/texinfo.tex: New version from Texinfo 4.2b.
+
+2002-10-15  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (handle_single_transform_list) <full_ansi>: New variable.
+	Use this to record correct dependencies about deansifiable files which
+	are using per-program flags or are in a subdirectory.
+	* tests/ansi9.test: New file.
+	* tests/Makefile.am (TESTS): Add ansi9.test.
+	Reported by Paul D. Smith
+
+2002-10-12  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* aclocal.in (ac_defun_rx, ac_require_rx): If the macro name is
+	quoted, accept any character but `]'.  This makes it possible
+	to define macros such as `AC_LANG_PREPROC(Fortran 90)'.
+	(scan_m4_files): Quote $key in the regex.  Don't define $expr, it's
+	not used.
+	(add_file, scan_file): Adjust to the new definitions of $ac_defun_rx
+	and $ac_require_rx.
+	* tests/aclocal2.test: New file.
+	* tests/Makefile.am (TESTS): Add aclocal2.test.
+	Reported by Tamara L. Dahlgren and Tom Epperly.
+
+2002-10-11  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* NEWS: Summarize recent bug fixes.
+
+	For Debian Bug#153697:
+	* lib/am/dejagnu.am (distclean-DEJAGNU): Remove $tool.sum and
+	$tool.log.
+	Suggested by Andrew Suffield.
+
+2002-10-10  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	For PR automake/369:
+	* lib/am/python.am: Lookup python files in build directory or
+	source directory.
+	From Mathias Doreille.
+	* tests/python3.test: New file.
+	* tests/Makefile.am (TESTS): Add python3.test.
+	* tests/defs: Handle `required=python'.
+
+	For PR automake/358:
+	* lib/am/texi-vers.am (%STAMPVTI%): Depend on configure instead of
+	configure.ac.
+	Suggested by Thien-Thi Nguyen.
+	* tests/vtexi.test: Adjust.
+
+2002-10-08  Paul Eggert  <eggert@twinsun.com>
+
+	* lib/am/texibuild.am (%DEST_PREFIX%%DEST_SUFFIX%,
+	%DEST_PREFIX%.dvi, %DEST_PREFIX%.pdf): Use "makeinfo -o output
+	input", not "makeinfo input -o output", as the latter fails if
+	POSIXLY_CORRECT=1.
+	* lib/am/texinfos.am (.dvi.ps): Likewise for dvips.
+	* m4/depend.m4 (_AM_DEPENDENCIES): Likewise for $depcc.
+
+2002-10-08  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (file_contents_internal): Fix the relationship
+	regex flags, don't use `m'.
+
+	For Debian Bug#162583:
+	* automake.in (file_contents_internal): Simplify regex to
+	separate relationship from actions in rules.
+	Reported by Sam Hocevar.
+
+2002-10-01  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (handle_source_transform): If foo_SOURCES is defined
+	conditionally, create and use am__foo_SOURCES_DIST for distribution.
+	* tests/condd.test: Extend to check distributed files.
+	* tests/substref.test: Make sure we don't use such a variable when
+	it's not needed.
+	Reported by Marcus Brinkmann.
+
+2002-09-30  Ezra Peisach  <epeisach@MED-XTAL.BU.EDU>
+
+	* tests/defs.in: Run $MAKE --version -v.
+	* tests/dollar.test: Abort on ./defs failure.
+	* tests/lex5.test: Require GNUmake, not make.
+
+2002-09-30  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* automake.in (require_variables): The fix introduced in 2002-09-19
+	is imcomplete.  Rewrite the conditional variable definition check
+	using &variable_not_always_defined_in_cond.
+	* tests/cond26.test, tests/cond27.test, tests/cond28.test: New file.
+	* tests/Makefile.am (TESTS): Add cond26.test, cond27.test, and
+	cond28.test.
+	Reported by Juergen Keil.
+
+	* lib/am/distdir.am (distdir): Create $dc_destdir right before
+	its use.
+	Reported by Akim Demaille.
+
+	Fix for PR automake/366:
+	* automake.in (handle_dist): Strip $(srcdir) and replace
+	$(top_srcdir) when computing DIST_COMMON directories.
+	* tests/include2.test: Use an obsolute $(srcdir), and check
+	for spurious directories in $(distdir)/sub.
+	* lib/am/distdir.am: Rewrite $(top_srcdir) as $(top_builddir).
+	Reported by Kevin Ryde.
+
+2002-09-29  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* tests/exeext3.test: New file.
+	* tests/Makefile.am (TESTS): Add exeext3.test.
+	* automake.in (%target_name): New hash.
+	(initialize_per_input): Reset %target_name.
+	(rule_define): Fill %target_name, and use it to detect targets
+	which have been registered with key X but really are X$(EXEEXT).
+
+2002-09-27  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* lib/mkinstalldirs: Reindent using `sh-indentation: 2'.
+	Suggested by Bruno Haible.
+
+	* Makefile.am (fetch, FETCHFILES): Don't fetch install-sh from
+	Autoconf.  Automake now has the master copy of install-sh and
+	mkinstalldirs.
+
 2002-09-25  Alexandre Duret-Lutz  <duret_g@epita.fr>
+
+	* configure.in: Bump version to 1.7.0a.
 
 	* NEWS, configure.ac: Version 1.7.
 

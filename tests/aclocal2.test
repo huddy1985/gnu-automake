@@ -18,38 +18,28 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# Make sure included files in parent directory are distributed.
+# Make sure aclocal works with macro that have parentheses in their
+# name.  Report from Tamara L. Dahlgren and Tom Epperly.
 
 . ./defs || exit 1
 
 set -e
 
-cat >> configure.in << 'END'
-AC_CONFIG_FILES([sub/Makefile])
-AC_OUTPUT
-END
+mkdir m4
+cat >m4/f90.m4 <<EOF
+AC_DEFUN([AM_LANG_PREPROC(Fortran 90)], [...something...])
+EOF
 
-cat > Makefile.am << 'END'
-SUBDIRS = sub
-test: distdir
-	test -f $(distdir)/foo
-	test -f $(distdir)/bar
-	test 2 -gt `find $(distdir)/sub -type d | wc -l`
-END
+cat >acinclude.m4 <<EOF
+AC_DEFUN([AM_FUBAR],
+[AC_REQUIRE([AM_LANG_PREPROC(Fortran 90)])])
+EOF
 
-: > foo
-: > bar
+cat >>configure.in <<EOF
+AM_FUBAR
+EOF
 
-mkdir sub
-cat > sub/Makefile.am << 'END'
-include $(top_srcdir)/foo
-include ../bar
-END
-
-$ACLOCAL
-$AUTOCONF
-$AUTOMAKE
-# Use --srcdir with an obsolute path because it's harder
-# to support in `distdir'.
-./configure --srcdir `pwd`
-$MAKE test
+$ACLOCAL -I m4 2>stderr
+cat stderr
+grep AM_LANG_PREPROC stderr && exit 1
+$FGREP 'AC_DEFUN([AM_LANG_PREPROC(Fortran 90)' aclocal.m4

@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.7
+   This file documents GNU automake 1.7.1
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free
 Software Foundation, Inc.
@@ -32,106 +32,106 @@ translation approved by the Foundation.
 
 
 Indirect:
-automake.info-1: 1145
-automake.info-2: 46187
-automake.info-3: 95710
-automake.info-4: 143225
-automake.info-5: 175883
+automake.info-1: 1147
+automake.info-2: 46191
+automake.info-3: 95714
+automake.info-4: 143229
+automake.info-5: 175887
 
 Tag Table:
 (Indirect)
-Node: Top1145
-Node: Introduction2953
-Ref: Introduction-Footnote-14419
-Ref: Introduction-Footnote-24568
-Node: Generalities4769
-Node: General Operation5376
-Node: Strictness8054
-Node: Uniform9793
-Node: Canonicalization13611
-Node: User Variables14639
-Node: Auxiliary Programs15876
-Node: Examples18216
-Node: Complete18540
-Node: Hello20539
-Node: true23166
-Node: Invoking Automake25916
-Node: configure32111
-Node: Requirements33158
-Node: Optional34235
-Node: Invoking aclocal38938
-Node: aclocal options40550
-Node: Macro search path41525
-Node: Macros45704
-Node: Public macros46187
-Node: Private macros52508
-Node: Extending aclocal53902
-Node: Top level54935
-Ref: Top level-Footnote-160326
-Node: Alternative60468
-Ref: Alternative-Footnote-161839
-Node: Rebuilding61964
-Node: Programs62732
-Node: A Program63776
-Node: Program Sources64509
-Node: Linking66478
-Node: Conditional Sources68777
-Node: Conditional Programs71507
-Node: A Library72283
-Node: A Shared Library73553
-Node: Program and Library Variables75692
-Ref: Program and Library Variables-Footnote-183823
-Node: LIBOBJS83906
-Node: Program variables84564
-Node: Yacc and Lex86881
-Node: C++ Support91164
-Node: Assembly Support91998
-Node: Fortran 77 Support92773
-Ref: Fortran 77 Support-Footnote-194354
-Node: Preprocessing Fortran 7794557
-Node: Compiling Fortran 77 Files95149
-Node: Mixing Fortran 77 With C and C++95710
-Ref: Mixing Fortran 77 With C and C++-Footnote-198074
-Node: How the Linker is Chosen98377
-Node: Fortran 77 and Autoconf100925
-Node: Java Support101343
-Node: Support for Other Languages102548
-Node: ANSI103104
-Node: Dependencies105763
-Ref: Dependencies-Footnote-1107483
-Node: EXEEXT107649
-Node: Other objects109845
-Node: Scripts110436
-Node: Headers111522
-Ref: Headers-Footnote-1112226
-Node: Data112459
-Node: Sources113111
-Node: Other GNU Tools114033
-Node: Emacs Lisp114521
-Node: gettext115578
-Node: Libtool116078
-Node: Java116326
-Node: Python117958
-Node: Documentation120672
-Node: Texinfo120973
-Node: Man pages124642
-Node: Install126933
-Node: Clean131314
-Node: Dist132511
-Node: Tests139695
-Node: Options143225
-Node: Miscellaneous149022
-Node: Tags149412
-Node: Suffixes151424
-Node: Multilibs152978
-Node: Include153606
-Node: Conditionals154496
-Node: Gnits157202
-Node: Cygnus159064
-Node: Extending160886
-Node: Distributing162612
-Node: API versioning163245
-Node: Macro and Variable Index165907
-Node: General Index175883
+Node: Top1147
+Node: Introduction2957
+Ref: Introduction-Footnote-14423
+Ref: Introduction-Footnote-24572
+Node: Generalities4773
+Node: General Operation5380
+Node: Strictness8058
+Node: Uniform9797
+Node: Canonicalization13615
+Node: User Variables14643
+Node: Auxiliary Programs15880
+Node: Examples18220
+Node: Complete18544
+Node: Hello20543
+Node: true23170
+Node: Invoking Automake25920
+Node: configure32115
+Node: Requirements33162
+Node: Optional34239
+Node: Invoking aclocal38942
+Node: aclocal options40554
+Node: Macro search path41529
+Node: Macros45708
+Node: Public macros46191
+Node: Private macros52512
+Node: Extending aclocal53906
+Node: Top level54939
+Ref: Top level-Footnote-160330
+Node: Alternative60472
+Ref: Alternative-Footnote-161843
+Node: Rebuilding61968
+Node: Programs62736
+Node: A Program63780
+Node: Program Sources64513
+Node: Linking66482
+Node: Conditional Sources68781
+Node: Conditional Programs71511
+Node: A Library72287
+Node: A Shared Library73557
+Node: Program and Library Variables75696
+Ref: Program and Library Variables-Footnote-183827
+Node: LIBOBJS83910
+Node: Program variables84568
+Node: Yacc and Lex86885
+Node: C++ Support91168
+Node: Assembly Support92002
+Node: Fortran 77 Support92777
+Ref: Fortran 77 Support-Footnote-194358
+Node: Preprocessing Fortran 7794561
+Node: Compiling Fortran 77 Files95153
+Node: Mixing Fortran 77 With C and C++95714
+Ref: Mixing Fortran 77 With C and C++-Footnote-198078
+Node: How the Linker is Chosen98381
+Node: Fortran 77 and Autoconf100929
+Node: Java Support101347
+Node: Support for Other Languages102552
+Node: ANSI103108
+Node: Dependencies105767
+Ref: Dependencies-Footnote-1107487
+Node: EXEEXT107653
+Node: Other objects109849
+Node: Scripts110440
+Node: Headers111526
+Ref: Headers-Footnote-1112230
+Node: Data112463
+Node: Sources113115
+Node: Other GNU Tools114037
+Node: Emacs Lisp114525
+Node: gettext115582
+Node: Libtool116082
+Node: Java116330
+Node: Python117962
+Node: Documentation120676
+Node: Texinfo120977
+Node: Man pages124646
+Node: Install126937
+Node: Clean131318
+Node: Dist132515
+Node: Tests139699
+Node: Options143229
+Node: Miscellaneous149026
+Node: Tags149416
+Node: Suffixes151428
+Node: Multilibs152982
+Node: Include153610
+Node: Conditionals154500
+Node: Gnits157206
+Node: Cygnus159068
+Node: Extending160890
+Node: Distributing162616
+Node: API versioning163249
+Node: Macro and Variable Index165911
+Node: General Index175887
 
 End Tag Table

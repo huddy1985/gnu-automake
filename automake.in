@@ -516,13 +516,19 @@ my %content_seen;
 
 # This holds the names which are targets.  These also appear in
 # %contents.  $targets{TARGET}{COND} is the location of the definition
-# of TARGET for condition COND.
+# of TARGET for condition COND.  TARGETs should not include
+# a trailing $(EXEEXT), we record this in %target_name.
 my %targets;
 
 # $target_source{TARGET}{COND} is the filename where TARGET
 # were defined for condition COND.  Note this must be a
 # filename, *without* any line number.
 my %target_source;
+
+# $target_name{TARGET}{COND} is the real name of TARGET (in condition COND).
+# The real name is often TARGET or TARGET$(EXEEXT), and TARGET never
+# contain $(EXEEXT)
+my %target_name;
 
 # $target_owner{TARGET}{COND} the owner of TARGET in condition COND.
 my %target_owner;
@@ -728,6 +734,7 @@ sub initialize_per_input ()
 
     %targets = ();
     %target_source = ();
+    %target_name = ();
     %target_owner = ();
 
     @cond_stack = ();
@@ -2301,6 +2308,7 @@ sub handle_single_transform_list ($$$$@)
         my $directory = $1 || '';
         my $base = $2;
         my $extension = $3;
+	my $full_ansi = $full;	# We'll add `$U' if needed.
 
         # We must generate a rule for the object if it requires its own flags.
         my $renamed = 0;
@@ -2420,7 +2428,14 @@ sub handle_single_transform_list ($$$$@)
             {
                 my $obj_sans_ext = substr ($object, 0,
 					   - length ($this_obj_ext));
-		my $val = ("$full $obj_sans_ext "
+		if ($lang->ansi && defined $options{'ansi2knr'})
+		  {
+		    $full_ansi =~ s/$KNOWN_EXTENSIONS_PATTERN$/\$U$&/;
+		    $full_ansi = basename $full_ansi
+		      unless defined $options{'subdir-objects'};
+		  }
+
+		my $val = ("$full_ansi $obj_sans_ext "
 			   # Only use $this_obj_ext in the derived
 			   # source case because in the other case we
 			   # *don't* want $(OBJEXT) to appear here.
@@ -2517,7 +2532,7 @@ sub handle_single_transform_list ($$$$@)
             # dependency.
             if ($directory ne '' || $renamed)
             {
-                push (@dep_list, $full);
+                push (@dep_list, $full_ansi);
             }
 
             # If resulting object is in subdir, we need to make
@@ -2781,8 +2796,23 @@ sub handle_source_transform
 	  unless $prefix =~ /EXTRA_/;
 
 	push @sources, "\$($var)";
-	push @dist_sources, "\$($var)"
-	  unless $prefix =~ /^nodist_/;
+	if ($prefix !~ /^nodist_/)
+	  {
+	    # If the VAR wasn't definined conditionally, we add
+	    # it to DIST_SOURCES as is.  Otherwise we create a
+	    # am__VAR_DIST variable which contains all possible values,
+	    # and add this variable to DIST_SOURCES.
+	    my $distvar = "$var";
+	    my @conds = variable_conditions_recursive ($var);
+	    if (@conds && $conds[0] ne 'TRUE')
+	      {
+		$distvar = "am__${var}_DIST";
+		my @files =
+		  uniq (variable_value_as_list_recursive ($var, 'all'));
+		define_pretty_variable ($distvar, '', @files);
+	      }
+	    push @dist_sources, "\$($distvar)"
+	  }
 
 	@substfroms = ();
 	@substtos = ();
@@ -4094,9 +4124,12 @@ sub handle_dist
 
     # We have to check DIST_COMMON for extra directories in case the
     # user put a source used in AC_OUTPUT into a subdir.
+    my $topsrcdir = backname ($relative_dir);
     foreach (&variable_value_as_list_recursive ('DIST_COMMON', 'all'))
     {
 	next if /^\@.*\@$/;
+	s/\$\(top_srcdir\)/$topsrcdir/;
+	s/\$\(srcdir\)/./;
 	next unless s,/+[^/]+$,,;
 	$dist_dirs{$_} = 1
 	    unless $_ eq '.';
@@ -7426,7 +7459,10 @@ sub rule_define ($$$$$)
   # For now `foo:' will override `foo$(EXEEXT):'.  This is temporary,
   # though, so we emit a warning.
   (my $noexe = $target) =~ s,\$\(EXEEXT\)$,,;
-  if ($noexe ne $target && exists $targets{$noexe}{$cond})
+  if ($noexe ne $target
+      && exists $targets{$noexe}
+      && exists $targets{$noexe}{$cond}
+      && $target_name{$noexe}{$cond} ne $target)
     {
       # The no-exeext option enables this feature.
       if (! defined $options{'no-exeext'})
@@ -7439,6 +7475,9 @@ sub rule_define ($$$$$)
       return ();
     }
 
+  # For now on, strip off $(EXEEXT) from $target, so we can diagnose
+  # a clash if `ctags$(EXEEXT):' is redefined after `ctags:'.
+  my $realtarget = $target;
   $target = $noexe;
 
   # A GNU make-style pattern rule has a single "%" in the target name.
@@ -7456,6 +7495,9 @@ sub rule_define ($$$$$)
       prog_error ("\$target_source{$target}{$cond} exists, but \$targets"
 		  . " doesn't.")
 	unless exists $targets{$target}{$cond};
+      prog_error ("\$target_source{$target}{$cond} exists, but \$target_name"
+		  . " doesn't.")
+	unless exists $target_name{$target}{$cond};
 
       my $oldowner  = $target_owner{$target}{$cond};
 
@@ -7589,6 +7631,7 @@ sub rule_define ($$$$$)
       $targets{$target}{$c} = $where;
       $target_source{$target}{$c} = $source;
       $target_owner{$target}{$c} = $owner;
+      $target_name{$target}{$c} = $realtarget;
     }
 
   # Check the rule for being a suffix rule. If so, store in a hash.
@@ -8160,10 +8203,8 @@ sub file_contents_internal ($$%)
 	  # Separate relationship from optional actions: the first
 	  # `new-line tab" not preceded by backslash (continuation
 	  # line).
-	  # I'm quite shoked!  It seems that (\\\n|[^\n]) is not the
-	  # same as `([^\n]|\\\n)!!!  Don't swap it, it breaks.
 	  my $paragraph = $_;
-	  /^((?:\\\n|[^\n])*)(?:\n(\t.*))?$/som;
+	  /^(.*?)(?:(?<!\\)\n(\t.*))?$/s;
 	  my ($relationship, $actions) = ($1, $2 || '');
 
 	  # Separate targets from dependencies: the first colon.
@@ -9013,20 +9054,19 @@ sub require_variables ($$$@)
 	if ((exists $var_value{$var} && exists $var_value{$var}{$cond})
 	    || exists $configure_vars{$var});
 
-      # If the variable exists but was not defined in $cond,
-      # look for any definition implied by $cond.
-      if (exists $var_value{$var})
+      my @undef_cond = variable_not_always_defined_in_cond $var, $cond;
+      next VARIABLE
+	unless @undef_cond;
+
+      my $text = "$reason`$var' is undefined\n";
+      if (@undef_cond && $undef_cond[0] ne 'TRUE')
 	{
-	  for my $vcond (keys %{$var_value{$var}})
-	    {
-	      next VARIABLE
-		if (conditional_true_when ($vcond, $cond));
-	    }
+	  $text .= ("in the following conditions:\n  "
+		    . join ("\n  ", @undef_cond));
 	}
 
       ++$res;
 
-      my $text = "$reason`$var' is undefined.";
       if (exists $am_macro_for_var{$var})
 	{
 	  $text .= "\nThe usual way to define `$var' is to add "

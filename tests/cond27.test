@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 # Copyright (C) 2002  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
@@ -18,38 +18,26 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# Make sure included files in parent directory are distributed.
+# Check that non-conditional primaries cannot use directories defined
+# in some conditions (but not others).
 
-. ./defs || exit 1
+. ./defs
 
 set -e
 
-cat >> configure.in << 'END'
-AC_CONFIG_FILES([sub/Makefile])
-AC_OUTPUT
-END
+cat >>configure.in << 'EOF'
+AM_CONDITIONAL([USE_FOO], [true])
+EOF
 
-cat > Makefile.am << 'END'
-SUBDIRS = sub
-test: distdir
-	test -f $(distdir)/foo
-	test -f $(distdir)/bar
-	test 2 -gt `find $(distdir)/sub -type d | wc -l`
-END
-
-: > foo
-: > bar
-
-mkdir sub
-cat > sub/Makefile.am << 'END'
-include $(top_srcdir)/foo
-include ../bar
-END
+cat >Makefile.am << 'EOF'
+if USE_FOO
+mydir = /foo
+endif
+my_DATA = foo
+EOF
 
 $ACLOCAL
-$AUTOCONF
-$AUTOMAKE
-# Use --srcdir with an obsolute path because it's harder
-# to support in `distdir'.
-./configure --srcdir `pwd`
-$MAKE test
+$AUTOMAKE 2>stderr && exit 1
+cat stderr
+grep USE_FOO_TRUE stderr && exit 1
+grep USE_FOO_FALSE stderr
