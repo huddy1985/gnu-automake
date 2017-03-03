@@ -1,3 +1,107 @@
+2012-04-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	release: stable maintenance release 1.11.5
+
+	* configure.ac (AC_INIT): Bump version number to 1.11.5.
+	* m4/amversion.m4 (AM_AUTOMAKE_VERSION): Likewise (autoupdated
+	by ./bootstrap).
+
+2012-04-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'maint' into branch-1.11
+
+	* maint:
+	  install: shell parameter expansions can be used in directory names
+
+2012-04-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'fix-pr11232' into maint
+
+	* fix-pr11232:
+	  install: shell parameter expansions can be used in directory names
+
+2012-04-13  Dmitry V. Levin  <ldv@altlinux.org>
+
+	install: shell parameter expansions can be used in directory names
+
+	Fixes automake bug#11232.
+
+	GNU automake used to support shell parameter expansion and command
+	substitutions in installation directories, but that was inadvertently
+	broken by commit v1.11-759-g368f1c4 "install: don't create empty dirs
+	when an empty 'foo_PRIMARY' is used" of 18-03-2012, where shell quoting
+	of generated MKDIR_P command was changed from double to single quotes
+	in 3 places, while some 21 other places still use double quotes for
+	generated MKDIR_P commands.
+
+	* lib/am/data.am: Use double quotes for generated "mkdir -p" commands.
+	* lib/am/libs.am: Likewise.
+	* lib/am/ltlib.am: Likewise.
+
+2012-04-12  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: document fixes for bug#11222 and bug#11229
+
+	* NEWS (Bugs fixed in 1.11.5): New, documenting the fixes.
+
+2012-04-12  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'maint' into branch-1.11
+
+	* maint:
+	  vala: fix distcheck with c/vala mixed projects
+	  vala: fix vapi files handling
+	  vala: test vapi files handling (still failing)
+
+2012-04-12  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branches 'vala-fix-pr11222' and 'vala-fix-pr11229' into maint
+
+	* vala-fix-pr11222:
+	  vala: fix vapi files handling
+	  vala: test vapi files handling (still failing)
+
+	* vala-fix-pr11229:
+	  vala: fix distcheck with c/vala mixed projects
+
+2012-04-12  Marc-Antoine Perennou  <Marc-Antoine@Perennou.com>  (tiny change)
+
+	vala: fix distcheck with c/vala mixed projects
+
+	Fixes automake bug#11229.
+
+	* automake.in (lang_vala_finish_target): Return early if the
+	current '_SOURCES' variable does not contain any '.vala' nor
+	'.vapi' source.  Otherwise, the vala compiler will be called
+	without arguments, causing an error.
+	* tests/vala-mix.test: Enhance to catch the fixed bug.
+
+2012-04-12  Marc-Antoine Perennou  <Marc-Antoine@Perennou.com>  (tiny change)
+
+	vala: fix vapi files handling
+
+	Fixes automake bug#11222.
+
+	Issue introduced in commit 'v1.11-696-g51f61df' of 27-02-2012,
+	"vala: fix 'valac' calls for projects with mixed Vala/C", which
+	fixed automake bug#10894.
+
+	* automake.in (lang_vala_finish_target): Also recognize '.vapi'
+	as an extension for vala input files.
+	* tests/list-of-tests.mk (XFAIL_TESTS): Remove 'vala-vapi.test'.
+
+2012-04-12  Stefano Lattarini  <stefano.lattarini@gmail.com>  (tiny change)
+	    Marc-Antoine Perennou  <Marc-Antoine@Perennou.com>
+
+	vala: test vapi files handling (still failing)
+
+	Exposes automake bug#11222.
+
+	* tests/vala-vapi.test: New test, still failing.
+	* tests/list-of-tests.mk (handwritten_TESTS): Add it.
+	(XFAIL_TESTS): Likewise.
+	* THANKS: Update.
+
 2012-04-02  Stefano Lattarini  <stefano.lattarini@gmail.com>
 
 	release: stable maintenance release 1.11.4
