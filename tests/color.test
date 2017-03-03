@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2007, 2008  Free Software Foundation, Inc.
+# Copyright (C) 2007, 2008, 2010 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Test Automake TESTS color output.
+# Test Automake TESTS color output, by forcing it.
+# Keep this in sync with the sister test `color2.test'.
 
 . ./defs || Exit 1
 
@@ -33,8 +34,8 @@ std='[m'
 # BSD 'grep' works from a pipe, but not a seekable file.
 # GNU or BSD 'grep -a' works on files, but is not portable.
 case `echo "$std" | grep .` in
-  $std) ;;
-  *) Exit 77 ;;
+  "$std") ;;
+  *) echo "$me: grep can't parse nonprinting characters" >&2; Exit 77;;
 esac
 
 cat >>configure.in <<END
@@ -93,23 +94,6 @@ test_no_color ()
   :
 }
 
-cat >expect-make <<'END'
-#! /usr/bin/expect -f
-spawn $env(MAKE) -e check
-expect eof
-END
-
-unset TESTS || :
-
 AM_COLOR_TESTS=always $MAKE -e check >stdout && { cat stdout; Exit 1; }
 cat stdout
 test_color
-
-MAKE=$MAKE expect -f expect-make >stdout || { cat stdout; Exit 77; }
-cat stdout
-test_color
-
-AM_COLOR_TESTS=no MAKE=$MAKE expect -f expect-make >stdout || { cat stdout; Exit 77; }
-cat stdout
-test_no_color
-:

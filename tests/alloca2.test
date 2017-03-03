@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2003  Free Software Foundation, Inc.
+# Copyright (C) 2003, 2011 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,13 +20,23 @@
 
 set -e
 
+cat >> configure.in <<'END'
+AC_PROG_CC
+AM_PROG_AR
+END
+
 cat > Makefile.am << 'END'
 noinst_LTLIBRARIES = libtu.la
 libtu_la_SOURCES =
 libtu_la_LIBADD = @LTALLOCA@
 END
 
+: > alloca.c
+: > ar-lib
+
 $ACLOCAL
 AUTOMAKE_fails
-grep 'Makefile.am:1:.*AC_PROG_LIBTOOL' stderr
-grep 'Makefile.am:3:.*ALLOCA' stderr
+grep '^Makefile\.am:1:.*define.*LIBTOOL.* add .*LT_INIT' stderr
+grep '^Makefile\.am:3:.*LTALLOCA' stderr
+
+:

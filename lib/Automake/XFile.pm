@@ -1,5 +1,5 @@
-# Copyright (C) 2001, 2003, 2004, 2006, 2008, 2009 Free Software Foundation,
-# Inc.
+# Copyright (C) 2001, 2003, 2004, 2006, 2008, 2009, 2010 Free Software
+# Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 # Written by Akim Demaille <akim@freefriends.org>.
 
 ###############################################################
-# The main copy of this file is in Automake's CVS repository. #
+# The main copy of this file is in Automake's git repository. #
 # Updates should be sent to automake-patches@gnu.org.         #
 ###############################################################
 

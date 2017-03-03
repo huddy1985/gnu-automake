@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2001, 2002  Free Software Foundation, Inc.
+# Copyright (C) 2001, 2002, 2010 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,9 +19,12 @@
 
 . ./defs || Exit 1
 
+set -e
+
 cat >> configure.in << 'END'
 AC_PROG_CC
 AC_PROG_CXX
+AM_PROG_AR
 AC_PROG_RANLIB
 AM_CONDITIONAL(COND1, true)
 AM_CONDITIONAL(COND2, true)
@@ -31,7 +34,7 @@ cat > Makefile.am << 'END'
 noinst_LIBRARIES = libtest.a
 
 if COND1
-SOURCEVAR1 = 
+SOURCEVAR1 =
 SOURCEVAR2 = habla.cpp espanol.cpp
 else
 SOURCEVAR1 = dummy.cpp
@@ -47,7 +50,9 @@ endif
 libtest_a_SOURCES = $(TESTSOURCES)
 END
 
-$ACLOCAL || Exit 1
-$AUTOMAKE || Exit 1
+: > ar-lib
+
+$ACLOCAL
+$AUTOMAKE
 
 grep 'am_libtest_a_OBJECTS = .*$' Makefile.in

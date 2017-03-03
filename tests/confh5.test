@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2003  Free Software Foundation, Inc.
+# Copyright (C) 2003, 2010 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,19 +18,24 @@
 
 . ./defs || Exit 1
 
+set -e
+
 cat >> configure.in << 'END'
-AC_SUBST([FOO], [name])
-AC_CONFIG_FILES(include/config.h.in)
-AC_CONFIG_HEADERS(config.h)
-AC_CONFIG_HEADERS(include/config.h)
+AC_SUBST([FOO], [NameToBeGrepped])
+AC_CONFIG_FILES([include/config.h.in])
+AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_HEADERS([include/config.h])
 AC_OUTPUT
 END
 
 cat > Makefile.am << 'END'
+.PHONY: test
 test: distdir
 	test -f $(distdir)/config.h.in
 	test -f $(distdir)/include/config.h.in.in
-	test ! -e $(distdir)/include/config.h.in
+	: # Solaris Sh does not support 'test -e'
+	test ! -f $(distdir)/include/config.h.in
+	test ! -r $(distdir)/include/config.h.in
 END
 
 mkdir include
@@ -47,6 +52,10 @@ $MAKE
 $sleep
 echo '#undef @FOO@' > include/config.h.in.in
 $MAKE include/config.h
-grep '/\*.*#undef.*name' include/config.h
+# Don't try to be too strict in this grepping, since the substutition
+# is done by config.status, and we don't have too much control on it.
+grep '/\*.*#undef.*NameToBeGrepped' include/config.h
 $MAKE test
 $MAKE distcheck
+
+:

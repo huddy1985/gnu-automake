@@ -24,7 +24,7 @@
 # Please keep this test in sync with sister test maken3.test.
 
 required=GNUmake
-. ./defs-p || Exit 1
+parallel_tests=yes; . ./defs || Exit 1
 
 set -e
 

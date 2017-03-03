@@ -1,12 +1,13 @@
-This is ../../automake/doc/automake.info, produced by makeinfo version
-4.11.90 from ../../automake/doc/automake.texi.
+This is automake.info, produced by makeinfo version 4.13 from
+automake.texi.
 
-This manual is for GNU Automake (version 1.11.1, 8 December 2009), a
+This manual is for GNU Automake (version 1.11.2, 21 December 2011), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software
+Foundation, Inc.
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -33,12 +34,13 @@ File: automake.info,  Node: Top,  Next: Introduction,  Up: (dir)
 GNU Automake
 ************
 
-This manual is for GNU Automake (version 1.11.1, 8 December 2009), a
+This manual is for GNU Automake (version 1.11.2, 21 December 2011), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
    Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software
+Foundation, Inc.
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -55,7 +57,7 @@ files.
 * Generalities::                General ideas
 * Examples::                    Some example packages
 * Invoking Automake::           Creating a Makefile.in
-* configure::                   Scanning configure.ac or configure.in
+* configure::                   Scanning configure.ac, using aclocal
 * Directories::                 Declaring subdirectories
 * Programs::                    Building programs and libraries
 * Other Objects::               Other derived objects
@@ -70,6 +72,7 @@ files.
 * Miscellaneous::               Miscellaneous rules
 * Include::                     Including extra files in an Automake template
 * Conditionals::                Conditionals
+* Silencing Make::              Obtain less verbose output from `make'
 * Gnits::                       The effect of `--gnu' and `--gnits'
 * Cygnus::                      The effect of `--cygnus'
 * Not Enough::                  When Automake is not Enough
@@ -109,15 +112,16 @@ Use Cases for the GNU Build System
 A Small Hello World
 
 * Creating amhello::            Create `amhello-1.0.tar.gz' from scratch
-* amhello Explained::           `configure.ac' and `Makefile.am' explained
+* amhello's configure.ac Setup Explained::
+* amhello's Makefile.am Setup Explained::
 
 General ideas
 
 * General Operation::           General operation of Automake
 * Strictness::                  Standards conformance checking
 * Uniform::                     The Uniform Naming Scheme
-* Canonicalization::            How derived variables are named
 * Length Limitations::          Staying below the command line length limit
+* Canonicalization::            How derived variables are named
 * User Variables::              Variables reserved for the user
 * Auxiliary Programs::          Programs automake might require
 
@@ -126,7 +130,7 @@ Some example packages
 * Complete::                    A simple example, start to finish
 * true::                        Building true and false
 
-Scanning `configure.ac'
+Scanning `configure.ac', using `aclocal'
 
 * Requirements::                Configuration requirements
 * Optional::                    Other things Automake recognizes
@@ -179,10 +183,10 @@ Building Programs and Libraries
 * Assembly Support::            Compiling assembly sources
 * Fortran 77 Support::          Compiling Fortran 77 sources
 * Fortran 9x Support::          Compiling Fortran 9x sources
-* Java Support::                Compiling Java sources
+* Java Support with gcj::       Compiling Java sources using gcj
 * Vala Support::                Compiling Vala sources
 * Support for Other Languages::  Compiling other languages
-* ANSI::                        Automatic de-ANSI-fication (obsolete)
+* ANSI::                        Automatic de-ANSI-fication (deprecated, soon to be removed)
 * Dependencies::                Automatic dependency tracking
 * EXEEXT::                      Support for executable extensions
 
@@ -191,7 +195,7 @@ Building a program
 * Program Sources::             Defining program sources
 * Linking::                     Linking with libraries or extra objects
 * Conditional Sources::         Handling conditional sources
-* Conditional Programs::        Building program conditionally
+* Conditional Programs::        Building a program conditionally
 
 Building a Shared Library
 
@@ -204,6 +208,11 @@ Building a Shared Library
 * Libtool Flags::               Using _LIBADD, _LDFLAGS, and _LIBTOOLFLAGS
 * LTLIBOBJS::                   Using $(LTLIBOBJS) and $(LTALLOCA)
 * Libtool Issues::              Common Issues Related to Libtool's Use
+
+Common Issues Related to Libtool's Use
+
+* Error required file ltmain.sh not found::  The need to run libtoolize
+* Objects created both with libtool and without::  Avoid a specific build race
 
 Fortran 77 Support
 
@@ -235,7 +244,7 @@ Other GNU Tools
 * Emacs Lisp::                  Emacs Lisp
 * gettext::                     Gettext
 * Libtool::                     Libtool
-* Java::                        Java
+* Java::                        Java bytecode compilation (deprecated)
 * Python::                      Python
 
 Building documentation
@@ -243,7 +252,7 @@ Building documentation
 * Texinfo::                     Texinfo
 * Man Pages::                   Man pages
 
-Installation
+What Gets Installed
 
 * Basics of Installation::      What gets installed where
 * The Two Parts of Install::    Installing data and programs separately
@@ -251,7 +260,7 @@ Installation
 * Staged Installs::             Installation in a temporary location
 * Install Rules for the User::  Useful additional rules
 
-Distribution
+What Goes in a Distribution
 
 * Basics of Distribution::      Files distributed by default
 * Fine-grained Distribution Control::  `dist_' and `nodist_' prefixes
@@ -259,7 +268,7 @@ Distribution
 * Checking the Distribution::   `make distcheck' explained
 * The Types of Distributions::  A variety of formats and compression methods
 
-Support for Test Suites
+Support for test suites
 
 * Simple Tests::                Listing programs and scripts in `TESTS'
 * Simple Tests using parallel-tests::  More powerful test driver
@@ -276,6 +285,12 @@ Conditionals
 
 * Usage of Conditionals::       Declaring conditional content
 * Limits of Conditionals::      Enclosing complete statements
+
+Silencing Make
+
+* Make verbosity::               Make is verbose by default
+* Tricks For Silencing Make::    Standard and generic ways to silence make
+* Automake silent-rules Option:: How Automake can help in silencing make
 
 When Automake Isn't Enough
 
@@ -295,6 +310,7 @@ Frequently Asked Questions about Automake
 * Multiple Outputs::            Writing rules for tools with many output files
 * Hard-Coded Install Paths::    Installing to hard-coded locations
 * Debugging Make Rules::        Strategies when things don't work as expected
+* Reporting Bugs::              Feedback on bugs and feature requests
 
 History of Automake
 
@@ -302,12 +318,12 @@ History of Automake
 * Dependency Tracking Evolution::  Evolution of Automatic Dependency Tracking
 * Releases::                    Statistics about Automake Releases
 
-Dependency Tracking Evolution
+Dependency Tracking in Automake
 
 * First Take on Dependencies::  Precomputed dependency tracking
 * Dependencies As Side Effects::  Update at developer compile time
 * Dependencies for the User::   Update at user compile time
-* Techniques for Dependencies:: Alternative approaches
+* Techniques for Dependencies::  Alternative approaches
 * Recommendations for Tool Writers::  What tool writers can do to help
 * Future Directions for Dependencies::  Languages Automake does not know
 
@@ -352,8 +368,7 @@ assumes that the project uses Autoconf (*note Introduction:
 However, the distributions created by Automake are fully GNU
 standards-compliant, and do not require `perl' in order to be built.
 
-   Mail suggestions and bug reports for Automake to
-<bug-automake@gnu.org>.
+   For more information on bug reports, *Note Reporting Bugs::.
 
    ---------- Footnotes ----------
 
@@ -401,19 +416,19 @@ File: automake.info,  Node: GNU Build System,  Next: Use Cases,  Up: Autotools I
 2.1 Introducing the GNU Build System
 ====================================
 
-It is a truth universally acknowledged, that a developer in possession
-of a new package, must be in want of a build system.
+It is a truth universally acknowledged, that as a developer in
+possession of a new package, you must be in want of a build system.
 
    In the Unix world, such a build system is traditionally achieved
-using the command `make' (*note Overview: (make)Top.).  The developer
-expresses the recipe to build his package in a `Makefile'.  This file
-is a set of rules to build the files in the package.  For instance the
-program `prog' may be built by running the linker on the files
-`main.o', `foo.o', and `bar.o'; the file `main.o' may be built by
-running the compiler on `main.c'; etc.  Each time `make' is run, it
-reads `Makefile', checks the existence and modification time of the
-files mentioned, decides what files need to be built (or rebuilt), and
-runs the associated commands.
+using the command `make' (*note Overview: (make)Top.).  You express the
+recipe to build your package in a `Makefile'.  This file is a set of
+rules to build the files in the package.  For instance the program
+`prog' may be built by running the linker on the files `main.o',
+`foo.o', and `bar.o'; the file `main.o' may be built by running the
+compiler on `main.c'; etc.  Each time `make' is run, it reads
+`Makefile', checks the existence and modification time of the files
+mentioned, decides what files need to be built (or rebuilt), and runs
+the associated commands.
 
    When a package needs to be built on a different platform than the one
 it was developed on, its `Makefile' usually needs to be adjusted.  For
@@ -643,8 +658,8 @@ different value when calling `configure'.  Also the file `README' will
 be installed into DOCDIR, which defaults to
 `/usr/local/share/doc/amhello'.
 
-   A user who wishes to install a package on his own account could
-proceed as follows:
+   As a user, if you wish to install a package on your own account, you
+could proceed as follows:
 
      ~/amhello-1.0 % ./configure --prefix ~/usr
      ...
@@ -784,7 +799,7 @@ build tree shadows the source tree, it is not about some concurrency in
 the way build commands are run.  For this reason we refer to such
 setups using the name _VPATH builds_ in the following.  _VPATH_ is the
 name of the `make' feature used by the `Makefile's to allow these
-builds (*note `VPATH': Search Path for All Prerequisites: (make)General
+builds (*note `VPATH' Search Path for All Prerequisites: (make)General
 Search.).
 
    VPATH builds have other interesting uses.  One is to build the same
@@ -1099,6 +1114,10 @@ dependencies (in C these are the header files included by the source
 being compiled).  Later, any time `make' is run and a dependency
 appears to have changed, the dependent files will be rebuilt.
 
+   Automake generates code for automatic dependency tracking by default,
+unless the developer chooses to override it; for more information,
+*note Dependencies::.
+
    When `configure' is executed, you can see it probing each compiler
 for the dependency mechanism it supports (several mechanisms can be
 used):
@@ -1151,7 +1170,7 @@ run the `configure' script of B as part of its execution, building and
 installing A will also build and install B.  Generating a distribution
 for A will also include B.
 
-   It is possible to gather several package like this.  GCC is a heavy
+   It is possible to gather several packages like this.  GCC is a heavy
 user of this feature.  This gives installers a single package to
 configure, build and install, while it allows developers to work on
 subpackages independently.
@@ -1218,10 +1237,11 @@ GNU Build System, while the second explains the meaning of the
 * Menu:
 
 * Creating amhello::            Create `amhello-1.0.tar.gz' from scratch
-* amhello Explained::           `configure.ac' and `Makefile.am' explained
+* amhello's configure.ac Setup Explained::
+* amhello's Makefile.am Setup Explained::
 
 
-File: automake.info,  Node: Creating amhello,  Next: amhello Explained,  Up: Hello World
+File: automake.info,  Node: Creating amhello,  Next: amhello's configure.ac Setup Explained,  Up: Hello World
 
 2.4.1 Creating `amhello-1.0.tar.gz'
 -----------------------------------
@@ -1352,10 +1372,10 @@ that `autoconf' is in charge of creating `configure' from
 least direct you to the right manual when seeking answers.
 
 
-File: automake.info,  Node: amhello Explained,  Prev: Creating amhello,  Up: Hello World
+File: automake.info,  Node: amhello's configure.ac Setup Explained,  Next: amhello's Makefile.am Setup Explained,  Prev: Creating amhello,  Up: Hello World
 
-2.4.2 `amhello-1.0' Explained
------------------------------
+2.4.2 `amhello''s `configure.ac' Setup Explained
+------------------------------------------------
 
 Let us begin with the contents of `configure.ac'.
 
@@ -1447,7 +1467,13 @@ command `autoscan' can also suggest a few of the tests your package may
 need (*note Using `autoscan' to Create `configure.ac':
 (autoconf)autoscan Invocation.).
 
-   We now turn to `src/Makefile.am'.  This file contains Automake
+
+File: automake.info,  Node: amhello's Makefile.am Setup Explained,  Prev: amhello's configure.ac Setup Explained,  Up: Hello World
+
+2.4.3 `amhello''s `Makefile.am' Setup Explained
+-----------------------------------------------
+
+We now turn to `src/Makefile.am'.  This file contains Automake
 instructions to build and install `hello'.
 
      bin_PROGRAMS = hello
@@ -1509,6 +1535,11 @@ distributed is presented by `automake --help').  The only important
 effect of this second line is therefore to install `README' during
 `make install'.
 
+   One thing not covered in this example is accessing the installation
+directory values (*note Standard Directory Variables::) from your
+program code, that is, converting them into defined macros.  For this,
+*note Defining Directories: (autoconf)Defining Directories.
+
 
 File: automake.info,  Node: Generalities,  Next: Examples,  Prev: Autotools Introduction,  Up: Top
 
@@ -1523,8 +1554,8 @@ understand how Automake works.
 * General Operation::           General operation of Automake
 * Strictness::                  Standards conformance checking
 * Uniform::                     The Uniform Naming Scheme
-* Canonicalization::            How derived variables are named
 * Length Limitations::          Staying below the command line length limit
+* Canonicalization::            How derived variables are named
 * User Variables::              Variables reserved for the user
 * Auxiliary Programs::          Programs automake might require
 
@@ -1541,11 +1572,12 @@ instance, a `bin_PROGRAMS' variable definition will cause rules for
 compiling and linking programs to be generated.
 
    The variable definitions and rules in the `Makefile.am' are copied
-verbatim into the generated file.  This allows you to add arbitrary
-code into the generated `Makefile.in'.  For instance, the Automake
-distribution includes a non-standard rule for the `git-dist' target,
-which the Automake maintainer uses to make distributions from his
-source control system.
+mostly verbatim into the generated file, with all variable definitions
+preceding all rules.  This allows you to add almost arbitrary code into
+the generated `Makefile.in'.  For instance, the Automake distribution
+includes a non-standard rule for the `git-dist' target, which the
+Automake maintainer uses to make distributions from the source control
+system.
 
    Note that most GNU make extensions are not recognized by Automake.
 Using such extensions in a `Makefile.am' will lead to errors or
@@ -1557,12 +1589,22 @@ variable specified on the left.  Automake will translate the operator
 into an ordinary `=' operator; `+=' will thus work with any make
 program.
 
-   Further note that variable assignments should not be indented with
-<TAB> characters, use spaces if necessary.  On the other hand, rule
-commands should be indented with a leading <TAB> character.
-
    Automake tries to keep comments grouped with any adjoining rules or
 variable definitions.
+
+   Generally, Automake is not particularly smart in the parsing of
+unusual Makefile constructs, so you're advised to avoid fancy
+constructs or "creative" use of whitespaces.  For example, <TAB>
+characters cannot be used between a target name and the following "`:'"
+character, and variable assignments shouldn't be indented with <TAB>
+characters.  Also, using more complex macro in target names can cause
+trouble:
+
+     % cat Makefile.am
+     $(FOO:=x): bar
+     % automake
+     Makefile.am:1: bad characters in variable name `$(FOO'
+     Makefile.am:1: `:='-style assignments are not portable
 
    A rule defined in `Makefile.am' generally overrides any such rule of
 a similar name that would be automatically generated by `automake'.
@@ -1638,7 +1680,7 @@ that are put into a "Cygnus" style tree (e.g., the GCC tree).  *Note
 Cygnus::, for more information on this mode.
 
 
-File: automake.info,  Node: Uniform,  Next: Canonicalization,  Prev: Strictness,  Up: Generalities
+File: automake.info,  Node: Uniform,  Next: Length Limitations,  Prev: Strictness,  Up: Generalities
 
 3.3 The Uniform Naming Scheme
 =============================
@@ -1689,8 +1731,9 @@ variable names; thus one writes `bin_PROGRAMS' and not
 `bindir_PROGRAMS'.
 
    Not every sort of object can be installed in every directory.
-Automake will flag those attempts it finds in error.  Automake will
-also diagnose obvious misspellings in directory names.
+Automake will flag those attempts it finds in error (but see below how
+to override the check if you really need to).  Automake will also
+diagnose obvious misspellings in directory names.
 
    Sometimes the standard directories--even as augmented by
 Automake--are not enough.  In particular it is sometimes useful, for
@@ -1706,6 +1749,27 @@ valid if a variable of the same name with `dir' appended is defined
      xmldir = $(datadir)/xml
      xml_DATA = file.xml
 
+   This feature can also be used to override the sanity checks Automake
+performs to diagnose suspicious directory/primary couples (in the
+unlikely case these checks are undesirable, and you really know what
+you're doing).  For example, Automake would error out on this input:
+
+     # Forbidden directory combinations, automake will error out on this.
+     pkglib_PROGRAMS = foo
+     doc_LIBRARIES = libquux.a
+
+but it will succeed with this:
+
+     # Work around forbidden directory combinations.  Do not use this
+     # without a very good reason!
+     my_execbindir = $(pkglibdir)
+     my_doclibdir = $(docdir)
+     my_execbin_PROGRAMS = foo
+     my_doclib_LIBRARIES = libquux.a
+
+   The `exec' substring of the `my_execbindir' variable lets the files
+be installed at the right time (*note The Two Parts of Install::).
+
    The special prefix `noinst_' indicates that the objects in question
 should be built but not installed at all.  This is usually used for
 objects required to build the rest of your package, for instance static
@@ -1715,8 +1779,9 @@ libraries (*note A Library::), or helper scripts.
 should not be built until the `make check' command is run.  Those
 objects are not installed either.
 
-   The current primary names are `PROGRAMS', `LIBRARIES', `LISP',
-`PYTHON', `JAVA', `SCRIPTS', `DATA', `HEADERS', `MANS', and `TEXINFOS'.  
+   The current primary names are `PROGRAMS', `LIBRARIES',
+`LTLIBRARIES', `LISP', `PYTHON', `JAVA', `SCRIPTS', `DATA', `HEADERS',
+`MANS', and `TEXINFOS'.  
 
    Some primaries also allow additional prefixes that control other
 aspects of `automake''s behavior.  The currently defined prefixes are
@@ -1725,7 +1790,7 @@ explained later (*note Program and Library Variables::) (*note Man
 Pages::).
 
 
-File: automake.info,  Node: Length Limitations,  Next: User Variables,  Prev: Canonicalization,  Up: Generalities
+File: automake.info,  Node: Length Limitations,  Next: Canonicalization,  Prev: Uniform,  Up: Generalities
 
 3.4 Staying below the command line length limit
 ===============================================
@@ -1776,7 +1841,7 @@ archives may be used as intermediates in order to limit the object list
 length (*note Libtool Convenience Libraries::).
 
 
-File: automake.info,  Node: Canonicalization,  Next: Length Limitations,  Prev: Uniform,  Up: Generalities
+File: automake.info,  Node: Canonicalization,  Next: User Variables,  Prev: Length Limitations,  Up: Generalities
 
 3.5 How derived variables are named
 ===================================
@@ -1799,7 +1864,7 @@ listed in the `libmumble___a_SOURCES' variable.
 substitutions in variable names less obfuscating.
 
 
-File: automake.info,  Node: User Variables,  Next: Auxiliary Programs,  Prev: Length Limitations,  Up: Generalities
+File: automake.info,  Node: User Variables,  Next: Auxiliary Programs,  Prev: Canonicalization,  Up: Generalities
 
 3.6 Variables reserved for the user
 ===================================
@@ -1843,15 +1908,24 @@ Automake, a couple of them are maintained separately.  The Automake
 copies are updated before each release, but we mention the original
 source in case you need more recent versions.
 
+`ar-lib'
+     This is a wrapper primarily for the Microsoft lib archiver, to make
+     it more POSIX-like.
+
 `ansi2knr.c'
 `ansi2knr.1'
-     These two files are used for de-ANSI-fication support (obsolete
-     *note ANSI::).
+     These two files are used for de-ANSI-fication support (they are
+     deprecated now, and _will be removed_ in the next major Automake
+     release; *note ANSI::).
 
 `compile'
      This is a wrapper for compilers that do not accept options `-c'
      and `-o' at the same time.  It is only used when absolutely
-     required.  Such compilers are rare.
+     required.  Such compilers are rare, with the Microsoft C/C++
+     Compiler as the most notable exception. This wrapper also makes
+     the following common options available for that compiler, while
+     performing file name translation where needed: `-I', `-L', `-l',
+     `-Wl,' and `-Xlinker'.
 
 `config.guess'
 `config.sub'
@@ -2044,21 +2118,11 @@ and `-o'.  The simplest fix for this is to introduce a bogus dependency
      false.o: true.c
              $(COMPILE) -DEXIT_CODE=1 -c true.c && mv true.o false.o
 
-   Also, these explicit rules do not work if the obsolete
-de-ANSI-fication feature is used (*note ANSI::).  Supporting
-de-ANSI-fication requires a little more work:
-
-     true_.o: true_.c false_.o
-             $(COMPILE) -DEXIT_CODE=0 -c true_.c
-
-     false_.o: true_.c
-             $(COMPILE) -DEXIT_CODE=1 -c true_.c && mv true_.o false_.o
-
    As it turns out, there is also a much easier way to do this same
-task.  Some of the above techniques are useful enough that we've kept
-the example in the manual.  However if you were to build `true' and
-`false' in real life, you would probably use per-program compilation
-flags, like so:
+task.  Some of the above technique is useful enough that we've kept the
+example in the manual.  However if you were to build `true' and `false'
+in real life, you would probably use per-program compilation flags,
+like so:
 
      bin_PROGRAMS = false true
 
@@ -2069,10 +2133,9 @@ flags, like so:
      true_CPPFLAGS = -DEXIT_CODE=0
 
    In this case Automake will cause `true.c' to be compiled twice, with
-different flags.  De-ANSI-fication will work automatically.  In this
-instance, the names of the object files would be chosen by automake;
-they would be `false-true.o' and `true-true.o'.  (The name of the
-object files rarely matters.)
+different flags.  In this instance, the names of the object files would
+be chosen by automake; they would be `false-true.o' and `true-true.o'.
+(The name of the object files rarely matters.)
 
 
 File: automake.info,  Node: Invoking Automake,  Next: configure,  Prev: Examples,  Up: Top
@@ -2217,6 +2280,10 @@ misunderstand this paragraph: `automake' runs `autoconf' to *scan* your
           portability issues (e.g., use of `make' features that are
           known to be not portable)
 
+    `extra-portability'
+          extra portability issues related to obscure tools.  One
+          example of such a tool is the Microsoft `lib' archiver.
+
     `syntax'
           weird syntax, unused variables, typos
 
@@ -2242,6 +2309,11 @@ misunderstand this paragraph: `automake' runs `autoconf' to *scan* your
      options (*note Options::) turns off portability warnings about
      recursive variable expansions.
 
+     Turning off `portability' will also turn off `extra-portability',
+     and similarly turning on `extra-portability' will also turn on
+     `portability'.  However, turning on `portability' or turning off
+     `extra-portability' will not affect the other category.
+
      The environment variable `WARNINGS' can contain a comma separated
      list of categories to enable.  It will be taken into account
      before the command-line switches, this way `-Wnone' will also
@@ -2258,8 +2330,8 @@ This is an experimental feature.
 
 File: automake.info,  Node: configure,  Next: Directories,  Prev: Invoking Automake,  Up: Top
 
-6 Scanning `configure.ac'
-*************************
+6 Scanning `configure.ac', using `aclocal'
+******************************************
 
 Automake scans the package's `configure.ac' to determine certain
 information about the package.  Some `autoconf' macros are required and
@@ -2422,9 +2494,9 @@ their effects are:
 `AC_CONFIG_AUX_DIR'
      Automake will look for various helper scripts, such as
      `install-sh', in the directory named in this macro invocation.
-     (The full list of scripts is: `config.guess', `config.sub',
-     `depcomp', `elisp-comp', `compile', `install-sh', `ltmain.sh',
-     `mdate-sh', `missing', `mkinstalldirs', `py-compile',
+     (The full list of scripts is: `ar-lib', `config.guess',
+     `config.sub', `depcomp', `elisp-comp', `compile', `install-sh',
+     `ltmain.sh', `mdate-sh', `missing', `mkinstalldirs', `py-compile',
      `texinfo.tex', and `ylwrap'.)  Not all scripts are always searched
      for; some scripts will only be sought if the generated
      `Makefile.in' requires them.
@@ -2451,7 +2523,7 @@ their effects are:
      versions of Automake required the use of `AM_CONFIG_HEADER' (*note
      Macros::); this is no longer the case.
 
-     As for `AC_CONFIG_FILES' (*note Requirements::), parts of the
+     As with `AC_CONFIG_FILES' (*note Requirements::), parts of the
      specification using shell variables will be ignored as far as
      cleaning, distributing, and rebuilding is concerned.
 
@@ -2551,8 +2623,9 @@ their effects are:
      `Makefile.am' if `AC_PATH_XTRA' is called.
 
 `AM_C_PROTOTYPES'
-     This is required when using the obsolete de-ANSI-fication feature;
-     see *note ANSI::.
+     This is required when using the deprecated de-ANSI-fication
+     feature; *note ANSI::.  _It will be removed_ in the next major
+     Automake release.
 
 `AM_CONDITIONAL'
      This introduces an Automake conditional (*note Conditionals::).
@@ -2673,9 +2746,18 @@ File: automake.info,  Node: aclocal Options,  Next: Macro Search Path,  Up: Invo
 
 `aclocal' accepts the following options:
 
+`--automake-acdir=DIR'
+     Look for the automake-provided macro files in DIR instead of in
+     the installation directory.  This is typically used for debugging.
+
+`--system-acdir=DIR'
+     Look for the system-wide third-party macro files (and the special
+     `dirlist' file) in DIR instead of in the installation directory.
+     This is typically used for debugging.
+
 `--acdir=DIR'
-     Look for the macro files in DIR instead of the installation
-     directory.  This is typically used for debugging.
+     _Deprecated_ shorthand for "`--automake-acdir=DIR
+     --system-acdir=DIR'".  Will be removed in future aclocal versions.
 
 `--diff[=COMMAND]'
      Run COMMAND on M4 file that would be installed or overwritten by
@@ -2719,8 +2801,13 @@ File: automake.info,  Node: aclocal Options,  Next: Macro Search Path,  Up: Invo
 `--print-ac-dir'
      Prints the name of the directory that `aclocal' will search to
      find third-party `.m4' files.  When this option is given, normal
-     processing is suppressed.  This option can be used by a package to
-     determine where to install a macro file.
+     processing is suppressed.  This option was used _in the past_ by
+     third-party packages to determine where to install `.m4' macro
+     files, but _this usage is today discouraged_, since it causes
+     `$(prefix)' not to be thoroughly honoured (which violates the GNU
+     Coding Standards), and a similar semantics can be better obtained
+     with the `ACLOCAL_PATH' environment variable; *note Extending
+     aclocal::.
 
 `--verbose'
      Print the names of the files it examines.
@@ -2766,7 +2853,7 @@ directories, in this order:
 `ACDIR-APIVERSION'
      This is where the `.m4' macros distributed with Automake itself
      are stored.  APIVERSION depends on the Automake release used; for
-     Automake 1.6.x, APIVERSION = `1.6'.
+     example, for Automake 1.11.x, APIVERSION = `1.11'.
 
 `ACDIR'
      This directory is intended for third party `.m4' files, and is
@@ -2775,28 +2862,22 @@ directories, in this order:
      `${prefix}/share/aclocal/'.  To find the compiled-in value of
      ACDIR, use the `--print-ac-dir' option (*note aclocal Options::).
 
-   As an example, suppose that `automake-1.6.2' was configured with
+   As an example, suppose that `automake-1.11.2' was configured with
 `--prefix=/usr/local'.  Then, the search path would be:
 
-  1. `/usr/local/share/aclocal-1.6/'
+  1. `/usr/local/share/aclocal-1.11.2/'
 
   2. `/usr/local/share/aclocal/'
 
+   The paths for the ACDIR and ACDIR-APIVERSION directories can be
+changed respectively through aclocal options `--system-acdir' and
+`--automake-acdir' (*note aclocal Options::).  Note however that these
+options are only intended for use by the internal Automake test suite,
+or for debugging under highly unusual situations; they are not
+ordinarily needed by end-users.
+
    As explained in (*note aclocal Options::), there are several options
 that can be used to change or extend this search path.
-
-Modifying the Macro Search Path: `--acdir'
-..........................................
-
-The most erroneous option to modify the search path is `--acdir=DIR',
-which changes default directory and drops the APIVERSION directory.
-For example, if one specifies `--acdir=/opt/private/', then the search
-path becomes:
-
-  1. `/opt/private/'
-
-   This option, `--acdir', is intended for use by the internal Automake
-test suite only; it is not ordinarily needed by end-users.
 
 Modifying the Macro Search Path: `-I DIR'
 .........................................
@@ -2846,18 +2927,15 @@ Then, the search path would be
 
 and all directories with path names starting with `/test3'.
 
-   If the `--acdir=DIR' option is used, then `aclocal' will search for
-the `dirlist' file in DIR.  In the `--acdir=/opt/private/' example
-above, `aclocal' would look for `/opt/private/dirlist'.  Again,
-however, the `--acdir' option is intended for use by the internal
-Automake test suite only; `--acdir' is not ordinarily needed by
-end-users.
+   If the `--system-acdir=DIR' option is used, then `aclocal' will
+search for the `dirlist' file in DIR; but remember the warnings  above
+against the use of `--system-acdir'.
 
    `dirlist' is useful in the following situation: suppose that
-`automake' version `1.6.2' is installed with `--prefix=/usr' by the
+`automake' version `1.11.2' is installed with `--prefix=/usr' by the
 system vendor.  Thus, the default search directories are
 
-  1. `/usr/share/aclocal-1.6/'
+  1. `/usr/share/aclocal-1.11/'
 
   2. `/usr/share/aclocal/'
 
@@ -2874,7 +2952,7 @@ single line
 
    Now, the "default" search path on the affected system is
 
-  1. `/usr/share/aclocal-1.6/'
+  1. `/usr/share/aclocal-1.11/'
 
   2. `/usr/share/aclocal/'
 
@@ -2887,6 +2965,37 @@ work around local system-dependent tool installation directories.
    Similarly, `dirlist' can be handy if you have installed a local copy
 of Automake in your account and want `aclocal' to look for macros
 installed at other places on the system.
+
+Modifying the Macro Search Path: `ACLOCAL_PATH'
+...............................................
+
+The fourth and last mechanism to customize the macro search path is
+also the simplest.  Any directory included in the colon-separated
+environment variable `ACLOCAL_PATH' is added to the search path and
+takes precedence over system directories (including those found via
+`dirlist'), with the exception of the versioned directory
+ACDIR-APIVERSION (*note Macro Search Path::).  However, directories
+passed via `-I' will take precedence over directories in `ACLOCAL_PATH'.
+
+   Also note that, if the `--install' option is used, any `.m4' file
+containing a required macro that is found in a directory listed in
+`ACLOCAL_PATH' will be installed locally.  In this case, serial numbers
+in `.m4' are honoured too, *note Serials::.
+
+   Conversely to `dirlist', `ACLOCAL_PATH' is useful if you are using a
+global copy of Automake and want `aclocal' to look for macros somewhere
+under your home directory.
+
+Planned future incompatibilities
+................................
+
+The order in which the directories in the macro search path are
+currently looked up is confusing and/or suboptimal in various aspects,
+and is probably going to be changed in the future Automake release.  In
+particular, directories in `ACLOCAL_PATH' and `ACDIR' might end up
+taking precedence over `ACDIR-APIVERSION', and directories in
+`ACDIR/dirlist' might end up taking precedence over `ACDIR'.  _This is
+a possible future incompatibility!_
 
 
 File: automake.info,  Node: Extending aclocal,  Next: Local Macros,  Prev: Macro Search Path,  Up: Invoking aclocal
@@ -2910,8 +3019,11 @@ installed in `$(datadir)/aclocal'.  This is as simple as writing:
      aclocal_DATA = mymacro.m4 myothermacro.m4
 
 Please do use `$(datadir)/aclocal', and not something based on the
-result of `aclocal --print-ac-dir'.  *Note Hard-Coded Install Paths::,
-for arguments.
+result of `aclocal --print-ac-dir' (*note Hard-Coded Install Paths::,
+for arguments).  It might also be helpful to suggest to the user to add
+the `$(datadir)/aclocal' directory to his `ACLOCAL_PATH' variable
+(*note ACLOCAL_PATH::) so that `aclocal' will find the `.m4' files
+installed by your package automatically.
 
    A file of macros should be a series of properly quoted `AC_DEFUN''s
 (*note Macro Definitions: (autoconf)Macro Definitions.).  The `aclocal'
@@ -2932,6 +3044,7 @@ several times, including even files that are not actually needed.
 Doing so should alleviate many problems of the current implementation,
 however it requires a stricter style from the macro authors.  Hopefully
 it is easy to revise the existing macros.  For instance,
+
      # bad style
      AC_PREREQ(2.57)
      AC_DEFUN(AX_FOOBAR,
@@ -2939,7 +3052,9 @@ it is easy to revise the existing macros.  For instance,
      AX_FOO
      AX_BAR
      ])
-   should be rewritten as
+
+should be rewritten as
+
      AC_DEFUN([AX_FOOBAR],
      [AC_PREREQ([2.57])dnl
      AC_REQUIRE([AX_SOMETHING])dnl
@@ -3315,6 +3430,13 @@ File: automake.info,  Node: Public Macros,  Next: Obsolete Macros,  Up: Macros
      explicitly set the correct path (if you're sure you have an
      `emacs' that supports Emacs Lisp).
 
+`AM_PROG_AR([ACT-IF-FAIL])'
+     You must use this macro when you use the archiver in your project,
+     if you want support for unusual archivers such as Microsoft `lib'.
+     The content of the optional argument is executed if the archiver
+     interface is not recognized; the default action is to abort
+     configure with an error message.
+
 `AM_PROG_AS'
      Use this macro when you have assembly code in your project.  This
      will choose the assembler for you (by default the C compiler) and
@@ -3375,8 +3497,11 @@ Invocation.).
      Check to see if function prototypes are understood by the
      compiler.  If so, define `PROTOTYPES' and set the output variables
      `U' and `ANSI2KNR' to the empty string.  Otherwise, set `U' to `_'
-     and `ANSI2KNR' to `./ansi2knr'.  Automake uses these values to
-     implement the obsolete de-ANSI-fication feature.
+     and `ANSI2KNR' to `./ansi2knr'.  Automake used these values to
+     implement the deprecated de-ANSI-fication feature; however,
+     support for _that feature will be removed_ in the next major
+     Automake release, and then _these macros and variables will go
+     away as well_.
 
 `AM_CONFIG_HEADER'
      Automake will generate rules to automatically regenerate the config
@@ -3841,6 +3966,7 @@ AC_CONFIG_SUBDIRS: (autoconf)Subdirectories.).
      AC_CONFIG_AUX_DIR([.])
      AM_INIT_AUTOMAKE
      AC_PROG_CC
+     AM_PROG_AR
      AC_PROG_RANLIB
      AC_CONFIG_FILES([Makefile])
      AC_OUTPUT
@@ -3904,10 +4030,10 @@ to build programs and libraries.
 * Assembly Support::            Compiling assembly sources
 * Fortran 77 Support::          Compiling Fortran 77 sources
 * Fortran 9x Support::          Compiling Fortran 9x sources
-* Java Support::                Compiling Java sources
+* Java Support with gcj::       Compiling Java sources using gcj
 * Vala Support::                Compiling Vala sources
 * Support for Other Languages::  Compiling other languages
-* ANSI::                        Automatic de-ANSI-fication (obsolete)
+* ANSI::                        Automatic de-ANSI-fication (deprecated, soon to be removed)
 * Dependencies::                Automatic dependency tracking
 * EXEEXT::                      Support for executable extensions
 
@@ -3940,8 +4066,8 @@ File: automake.info,  Node: Program Sources,  Next: Linking,  Up: A Program
 In a directory containing source that gets built into a program (as
 opposed to a library or a script), the `PROGRAMS' primary is used.
 Programs can be installed in `bindir', `sbindir', `libexecdir',
-`pkglibdir', `pkglibexecdir', or not at all (`noinst_').  They can also
-be built only for `make check', in which case the prefix is `check_'.
+`pkglibexecdir', or not at all (`noinst_').  They can also be built
+only for `make check', in which case the prefix is `check_'.
 
    For instance:
 
@@ -4216,11 +4342,13 @@ Sources::).
 by invoking `$(AR) $(ARFLAGS)' followed by the name of the library and
 the list of objects, and finally by calling `$(RANLIB)' on that
 library.  You should call `AC_PROG_RANLIB' from your `configure.ac' to
-define `RANLIB' (Automake will complain otherwise).  `AR' and `ARFLAGS'
-default to `ar' and `cru' respectively; you can override these two
-variables my setting them in your `Makefile.am', by `AC_SUBST'ing them
-from your `configure.ac', or by defining a per-library `maude_AR'
-variable (*note Program and Library Variables::).
+define `RANLIB' (Automake will complain otherwise).  You should also
+call `AM_PROG_AR' to define `AR', in order to support unusual archivers
+such as Microsoft lib.  `ARFLAGS' will default to `cru'; you can
+override this variable by setting it in your `Makefile.am' or by
+`AC_SUBST'ing it from your `configure.ac'.  You can override the `AR'
+variable by defining a per-library `maude_AR' variable (*note Program
+and Library Variables::).
 
    Be careful when selecting library components conditionally.  Because
 building an empty library is not portable, you should ensure that any
@@ -4608,8 +4736,8 @@ File: automake.info,  Node: Libtool Issues,  Prev: LTLIBOBJS,  Up: A Shared Libr
 
 * Menu:
 
-* Error required file ltmain.sh not found::      The need to run libtoolize
-* Objects created both with libtool and without:: Avoid a specific build race
+* Error required file ltmain.sh not found::  The need to run libtoolize
+* Objects created both with libtool and without::  Avoid a specific build race
 
 
 File: automake.info,  Node: Error required file ltmain.sh not found,  Next: Objects created both with libtool and without,  Up: Libtool Issues
@@ -5115,6 +5243,18 @@ some special cases.
      `AM_CONFIG_HEADER').  You can disable the default `-I' options
      using the `nostdinc' option.
 
+     When a file to be included is generated during the build and not
+     part of a distribution tarball, its location is under
+     `$(builddir)', not under `$(srcdir)'.  This matters especially for
+     packages that use header files placed in sub-directories and want
+     to allow builds outside the source tree (*note VPATH Builds::). In
+     that case we recommend to use a pair of `-I' options, such as,
+     e.g., `-Isome/subdir -I$(srcdir)/some/subdir' or
+     `-I$(top_builddir)/some/subdir -I$(top_srcdir)/some/subdir'.  Note
+     that the reference to the build tree should come before the
+     reference to the source tree, so that accidentally leftover
+     generated files in the source directory are ignored.
+
      `AM_CPPFLAGS' is ignored in preference to a per-executable (or
      per-library) `_CPPFLAGS' variable if it is defined.
 
@@ -5180,13 +5320,13 @@ define the variable `YACC'.  This is most easily done by invoking the
 macro `AC_PROG_YACC' (*note Particular Program Checks:
 (autoconf)Particular Programs.).
 
-   When `yacc' is invoked, it is passed `YFLAGS' and `AM_YFLAGS'.  The
-former is a user variable and the latter is intended for the
+   When `yacc' is invoked, it is passed `AM_YFLAGS' and `YFLAGS'.  The
+latter is a user variable and the former is intended for the
 `Makefile.am' author.
 
    `AM_YFLAGS' is usually used to pass the `-d' option to `yacc'.
 Automake knows what this means and will automatically adjust its rules
-to update and distribute the header file built by `yacc -d'.  What
+to update and distribute the header file built by `yacc -d'(1).  What
 Automake cannot guess, though, is where this header will be used: it is
 up to you to ensure the header gets built before it is first used.
 Typically this is necessary in order for dependency tracking to work
@@ -5203,8 +5343,8 @@ the variable `LEX'.  You can use `AC_PROG_LEX' to do this (*note
 Particular Program Checks: (autoconf)Particular Programs.), but using
 `AM_PROG_LEX' macro (*note Macros::) is recommended.
 
-   When `lex' is invoked, it is passed `LFLAGS' and `AM_LFLAGS'.  The
-former is a user variable and the latter is intended for the
+   When `lex' is invoked, it is passed `AM_LFLAGS' and `LFLAGS'.  The
+latter is a user variable and the former is intended for the
 `Makefile.am' author.
 
    When `AM_MAINTAINER_MODE' (*note maintainer-mode::) is used, the
@@ -5270,6 +5410,13 @@ possible to link two `yacc' parsers into the same executable.
 These defines work for `bison', `byacc', and traditional `yacc's.  If
 you find a parser generator that uses a symbol not covered here, please
 report the new name so it can be added to the list.
+
+   ---------- Footnotes ----------
+
+   (1) Please note that `automake' recognizes `-d' in `AM_YFLAGS' only
+if it is not clustered with other options; for example, it won't be
+recognized if `AM_YFLAGS' is `-dt', but it will be if `AM_YFLAGS' is
+`-d -t' or `-d -t'
 
 
 File: automake.info,  Node: C++ Support,  Next: Objective C Support,  Prev: Yacc and Lex,  Up: Programs
@@ -5595,7 +5742,7 @@ Per-target link flags will cause Automake to write a per-target `_LINK'
 variable according to the language chosen as above.
 
 
-File: automake.info,  Node: Fortran 9x Support,  Next: Java Support,  Prev: Fortran 77 Support,  Up: Programs
+File: automake.info,  Node: Fortran 9x Support,  Next: Java Support with gcj,  Prev: Fortran 77 Support,  Up: Programs
 
 8.14 Fortran 9x Support
 =======================
@@ -5638,9 +5785,9 @@ File: automake.info,  Node: Compiling Fortran 9x Files,  Up: Fortran 9x Support
 8.14.1 Compiling Fortran 9x Files
 ---------------------------------
 
-`N.o' is made automatically from `N.f90', `N.f95', `N.f03', or `N.f08'
-by running the Fortran 9x compiler.  The precise command used is as
-follows:
+`FILE.o' is made automatically from `FILE.f90', `FILE.f95', `FILE.f03',
+or `FILE.f08' by running the Fortran 9x compiler.  The precise command
+used is as follows:
 
 `.f90'
      `$(FC) $(AM_FCFLAGS) $(FCFLAGS) -c $(FCFLAGS_f90) $<'
@@ -5656,13 +5803,15 @@ follows:
 
 
 
-File: automake.info,  Node: Java Support,  Next: Vala Support,  Prev: Fortran 9x Support,  Up: Programs
+File: automake.info,  Node: Java Support with gcj,  Next: Vala Support,  Prev: Fortran 9x Support,  Up: Programs
 
-8.15 Java Support
-=================
+8.15 Compiling Java sources using gcj
+=====================================
 
-Automake includes support for compiled Java, using `gcj', the Java
-front end to the GNU Compiler Collection.
+Automake includes support for natively compiled Java, using `gcj', the
+Java front end to the GNU Compiler Collection (rudimentary support for
+compiling Java to bytecode using the `javac' compiler is also present,
+_albeit deprecated_; *note Java::).
 
    Any package including Java code to be compiled must define the output
 variable `GCJ' in `configure.ac'; the variable `GCJFLAGS' must also be
@@ -5687,7 +5836,7 @@ the `--main=' option.  The easiest way to do this is to use the
 `_LDFLAGS' variable for the program.
 
 
-File: automake.info,  Node: Vala Support,  Next: Support for Other Languages,  Prev: Java Support,  Up: Programs
+File: automake.info,  Node: Vala Support,  Next: Support for Other Languages,  Prev: Java Support with gcj,  Up: Programs
 
 8.16 Vala Support
 =================
@@ -5740,9 +5889,9 @@ File: automake.info,  Node: Support for Other Languages,  Next: ANSI,  Prev: Val
 Automake currently only includes full support for C, C++ (*note C++
 Support::), Objective C (*note Objective C Support::), Fortran 77
 (*note Fortran 77 Support::), Fortran 9x (*note Fortran 9x Support::),
-and Java (*note Java Support::).  There is only rudimentary support for
-other languages, support for which will be improved based on user
-demand.
+and Java (*note Java Support with gcj::).  There is only rudimentary
+support for other languages, support for which will be improved based
+on user demand.
 
    Some limited support for adding your own languages is available via
 the suffix rule handling (*note Suffixes::).
@@ -5750,12 +5899,13 @@ the suffix rule handling (*note Suffixes::).
 
 File: automake.info,  Node: ANSI,  Next: Dependencies,  Prev: Support for Other Languages,  Up: Programs
 
-8.18 Automatic de-ANSI-fication
-===============================
+8.18 Automatic de-ANSI-fication (deprecated, soon to be removed)
+================================================================
 
-The features described in this section are obsolete; you should not
-used any of them in new code, and they may be withdrawn in future
-Automake releases.
+_The features described in this section are deprecated; you must not
+use any of them in new code, and remove their use from older but still
+maintained code: they will be withdrawn in the next major Automake
+release._
 
    When the C language was standardized in 1989, there was a long
 transition period where package developers needed to worry about
@@ -5817,7 +5967,7 @@ File: automake.info,  Node: Dependencies,  Next: EXEEXT,  Prev: ANSI,  Up: Progr
 ==================================
 
 As a developer it is often painful to continually update the
-`Makefile.in' whenever the include-file dependencies change in a
+`Makefile.am' whenever the include-file dependencies change in a
 project.  Automake supplies a way to automatically track dependency
 changes (*note Dependency Tracking::).
 
@@ -5937,7 +6087,7 @@ looks as follows:
      # Install my_script in $(bindir) and distribute it.
      dist_bin_SCRIPTS = my_script
 
-   Script are not distributed by default; as we have just seen, those
+   Scripts are not distributed by default; as we have just seen, those
 that should be distributed can be specified using a `dist_' prefix as
 with other primaries.
 
@@ -6316,7 +6466,7 @@ in GNU programs, it tries hard to interoperate with other GNU tools.
 * Emacs Lisp::                  Emacs Lisp
 * gettext::                     Gettext
 * Libtool::                     Libtool
-* Java::                        Java
+* Java::                        Java bytecode compilation (deprecated)
 * Python::                      Python
 
 
@@ -6347,15 +6497,17 @@ installation less nice for everybody else.
 
    There are two ways to avoid byte-compiling.  Historically, we have
 recommended the following construct.
+
      lisp_LISP = file1.el file2.el
      ELCFILES =
-   `ELCFILES' is an internal Automake variable that normally lists all
+
+`ELCFILES' is an internal Automake variable that normally lists all
 `.elc' files that must be byte-compiled.  Automake defines `ELCFILES'
 automatically from `lisp_LISP'.  Emptying this variable explicitly
 prevents byte-compilation.
 
-   Since Automake 1.8, we now recommend using `lisp_DATA' instead.  As
-in
+   Since Automake 1.8, we now recommend using `lisp_DATA' instead:
+
      lisp_DATA = file1.el file2.el
 
    Note that these two constructs are not equivalent.  `_LISP' will not
@@ -6391,11 +6543,17 @@ Library::.
 
 File: automake.info,  Node: Java,  Next: Python,  Prev: Libtool,  Up: Other GNU Tools
 
-10.4 Java
-=========
+10.4 Java bytecode compilation (deprecated)
+===========================================
 
-Automake provides some minimal support for Java compilation with the
-`JAVA' primary.
+Automake provides some minimal support for Java bytecode compilation
+with the `JAVA' primary (in addition to the support for compiling Java
+to native machine code; *note Java Support with gcj::).  Note however
+that _the interface and most features described here are deprecated_;
+the next automake release will strive to provide a better and cleaner
+interface, which however _won't be backward-compatible_; the present
+interface will probably be removed altogether in future automake
+releases (1.13 or later), so don't use it in new code.
 
    Any `.java' files listed in a `_JAVA' variable will be compiled with
 `JAVAC' at build time.  By default, `.java' files are not included in
@@ -6467,7 +6625,8 @@ files installed (see the definitions of `pythondir' and `pkgpythondir'
 below).
 
  -- Macro: AM_PATH_PYTHON ([VERSION], [ACTION-IF-FOUND],
-          [ACTION-IF-NOT-FOUND])
+     [ACTION-IF-NOT-FOUND])
+
      Search for a Python interpreter on the system.  This macro takes
      three optional arguments.  The first argument, if present, is the
      minimum version of Python required for this package:
@@ -6487,6 +6646,9 @@ below).
 
           AM_PATH_PYTHON([2.5],, [:])
 
+     If the `PYTHON' variable is set when `AM_PATH_PYTHON' is called,
+     then that will be the only Python interpreter that is tried.
+
      `AM_PATH_PYTHON' creates the following output variables based on
      the Python installation found during configuration.
 
@@ -6499,8 +6661,8 @@ below).
      setup a conditional in order to disable the relevant part of a
      build as follows.
 
-            AM_PATH_PYTHON(,, [:])
-            AM_CONDITIONAL([HAVE_PYTHON], [test "$PYTHON" != :])
+          AM_PATH_PYTHON(,, [:])
+          AM_CONDITIONAL([HAVE_PYTHON], [test "$PYTHON" != :])
 
 `PYTHON_VERSION'
      The Python version number, in the form MAJOR.MINOR (e.g., `2.5').
@@ -6536,7 +6698,7 @@ below).
      could be declared as follows to Automake:
 
           pyexec_LTLIBRARIES = quaternion.la
-          quaternion_SOURCES = quaternion.c support.c support.h
+          quaternion_la_SOURCES = quaternion.c support.c support.h
           quaternion_la_LDFLAGS = -avoid-version -module
 
 `pkgpyexecdir'
@@ -6623,11 +6785,11 @@ version file.
 
    Sometimes an info file actually depends on more than one `.texi'
 file.  For instance, in GNU Hello, `hello.texi' includes the file
-`gpl.texi'.  You can tell Automake about these dependencies using the
+`fdl.texi'.  You can tell Automake about these dependencies using the
 `TEXI_TEXINFOS' variable.  Here is how GNU Hello does it: 
 
      info_TEXINFOS = hello.texi
-     hello_TEXINFOS = gpl.texi
+     hello_TEXINFOS = fdl.texi
 
    By default, Automake requires the file `texinfo.tex' to appear in
 the same directory as the `Makefile.am' file that lists the `.texi'
@@ -6650,6 +6812,11 @@ running `make install-info' is pointless.  This can be prevented via
 the `no-installinfo' option.  In this case, `.info' files are not
 installed by default, and user must request this explicitly using `make
 install-info'.
+
+   By default, `make install-info' will try to run the `install-info'
+program (if available) to update (or create) the ``${infodir}'/dir'
+index.  If this is undesired, it can be prevented by exporting the
+`AM_UPDATE_INFO_DIR' variable to "`no'".
 
    The following variables are used by the Texinfo build rules.
 
@@ -7014,14 +7181,18 @@ setting is `--best'.
 
    For the most part, the files to distribute are automatically found by
 Automake: all source files are automatically included in a distribution,
-as are all `Makefile.am's and `Makefile.in's.  Automake also has a
+as are all `Makefile.am' and `Makefile.in' files.  Automake also has a
 built-in list of commonly used files that are automatically included if
 they are found in the current directory (either physically, or as the
-target of a `Makefile.am' rule).  This list is printed by `automake
---help'.  Also, files that are read by `configure' (i.e. the source
-files corresponding to the files specified in various Autoconf macros
-such as `AC_CONFIG_FILES' and siblings) are automatically distributed.
-Files included in `Makefile.am's (using `include') or in `configure.ac'
+target of a `Makefile.am' rule); this list is printed by `automake
+--help'.  Note that some files in this list are actually distributed
+only if other certain conditions hold (for example, the `config.h.top'
+and `config.h.bot' files are automatically distributed only if, e.g.,
+`AC_CONFIG_HEADERS([config.h])' is used in `configure.ac').  Also,
+files that are read by `configure' (i.e. the source files corresponding
+to the files specified in various Autoconf macros such as
+`AC_CONFIG_FILES' and siblings) are automatically distributed.  Files
+included in a `Makefile.am' (using `include') or in `configure.ac'
 (using `m4_include'), and helper scripts installed with `automake
 --add-missing' are also distributed.
 
@@ -7033,8 +7204,8 @@ in `EXTRA_DIST'.
    You can also mention a directory in `EXTRA_DIST'; in this case the
 entire directory will be recursively copied into the distribution.
 Please note that this will also copy _everything_ in the directory,
-including CVS/RCS version control files.  We recommend against using
-this feature.
+including, e.g., Subversion's `.svn' private directories or CVS/RCS
+version control files.  We recommend against using this feature.
 
    If you define `SUBDIRS', Automake will recursively include the
 subdirectories in the distribution.  If `SUBDIRS' is defined
@@ -7088,7 +7259,7 @@ recursively included by specifying a directory in EXTRA_DIST:
      EXTRA_DIST = doc
 
      dist-hook:
-             rm -rf `find $(distdir)/doc -name CVS`
+             rm -rf `find $(distdir)/doc -type d -name .svn`
 
    Two variables that come handy when writing `dist-hook' rules are
 `$(distdir)' and `$(top_distdir)'.
@@ -7108,200 +7279,4 @@ distributed tree.  At the top-level it's equal to `$(distdir)'.  In the
    Note that when packages are nested using `AC_CONFIG_SUBDIRS' (*note
 Subpackages::), then `$(distdir)' and `$(top_distdir)' are relative to
 the package where `make dist' was run, not to any sub-packages involved.
-
-
-File: automake.info,  Node: Checking the Distribution,  Next: The Types of Distributions,  Prev: The dist Hook,  Up: Dist
-
-14.4 Checking the Distribution
-==============================
-
-Automake also generates a `distcheck' rule that can be of help to
-ensure that a given distribution will actually work.  `distcheck' makes
-a distribution, then tries to do a `VPATH' build (*note VPATH
-Builds::), run the test suite, and finally make another tarball to
-ensure the distribution is self-contained.
-
-   Building the package involves running `./configure'.  If you need to
-supply additional flags to `configure', define them in the
-`DISTCHECK_CONFIGURE_FLAGS' variable, either in your top-level
-`Makefile.am', or on the command line when invoking `make'.
-
-   If the `distcheck-hook' rule is defined in your top-level
-`Makefile.am', then it will be invoked by `distcheck' after the new
-distribution has been unpacked, but before the unpacked copy is
-configured and built.  Your `distcheck-hook' can do almost anything,
-though as always caution is advised.  Generally this hook is used to
-check for potential distribution errors not caught by the standard
-mechanism.  Note that `distcheck-hook' as well as
-`DISTCHECK_CONFIGURE_FLAGS' are not honored in a subpackage
-`Makefile.am', but the `DISTCHECK_CONFIGURE_FLAGS' are passed down to
-the `configure' script of the subpackage.
-
-   Speaking of potential distribution errors, `distcheck' also ensures
-that the `distclean' rule actually removes all built files.  This is
-done by running `make distcleancheck' at the end of the `VPATH' build.
-By default, `distcleancheck' will run `distclean' and then make sure
-the build tree has been emptied by running
-`$(distcleancheck_listfiles)'.  Usually this check will find generated
-files that you forgot to add to the `DISTCLEANFILES' variable (*note
-Clean::).
-
-   The `distcleancheck' behavior should be OK for most packages,
-otherwise you have the possibility to override the definition of either
-the `distcleancheck' rule, or the `$(distcleancheck_listfiles)'
-variable.  For instance, to disable `distcleancheck' completely, add
-the following rule to your top-level `Makefile.am':
-
-     distcleancheck:
-             @:
-
-   If you want `distcleancheck' to ignore built files that have not
-been cleaned because they are also part of the distribution, add the
-following definition instead:
-
-     distcleancheck_listfiles = \
-       find . -type f -exec sh -c 'test -f $(srcdir)/$$1 || echo $$1' \
-            sh '{}' ';'
-
-   The above definition is not the default because it's usually an
-error if your Makefiles cause some distributed files to be rebuilt when
-the user build the package.  (Think about the user missing the tool
-required to build the file; or if the required tool is built by your
-package, consider the cross-compilation case where it can't be run.)
-There is an entry in the FAQ about this (*note distcleancheck::), make
-sure you read it before playing with `distcleancheck_listfiles'.
-
-   `distcheck' also checks that the `uninstall' rule works properly,
-both for ordinary and `DESTDIR' builds.  It does this by invoking `make
-uninstall', and then it checks the install tree to see if any files are
-left over.  This check will make sure that you correctly coded your
-`uninstall'-related rules.
-
-   By default, the checking is done by the `distuninstallcheck' rule,
-and the list of files in the install tree is generated by
-`$(distuninstallcheck_listfiles)' (this is a variable whose value is a
-shell command to run that prints the list of files to stdout).
-
-   Either of these can be overridden to modify the behavior of
-`distcheck'.  For instance, to disable this check completely, you would
-write:
-
-     distuninstallcheck:
-             @:
-
-
-File: automake.info,  Node: The Types of Distributions,  Prev: Checking the Distribution,  Up: Dist
-
-14.5 The Types of Distributions
-===============================
-
-Automake generates rules to provide archives of the project for
-distributions in various formats.  Their targets are:
-
-`dist-bzip2'
-     Generate a bzip2 tar archive of the distribution.  bzip2 archives
-     are frequently smaller than gzipped archives.  
-
-`dist-gzip'
-     Generate a gzip tar archive of the distribution.  
-
-`dist-lzma'
-     Generate an `lzma' tar archive of the distribution.  `lzma'
-     archives are frequently smaller than `bzip2'-compressed archives.  
-
-`dist-shar'
-     Generate a shar archive of the distribution.  
-
-`dist-xz'
-     Generate an `xz' tar archive of the distribution.  `xz' archives
-     are frequently smaller than `bzip2'-compressed archives.  The `xz'
-     format will soon (early 2009) displace the `lzma' format.  
-
-`dist-zip'
-     Generate a zip archive of the distribution.  
-
-`dist-tarZ'
-     Generate a compressed tar archive of the distribution.  
-
-   The rule `dist' (and its historical synonym `dist-all') will create
-archives in all the enabled formats, *note Options::.  By default, only
-the `dist-gzip' target is hooked to `dist'.
-
-
-File: automake.info,  Node: Tests,  Next: Rebuilding,  Prev: Dist,  Up: Top
-
-15 Support for test suites
-**************************
-
-Automake supports three forms of test suites, the first two of which
-are very similar.
-
-* Menu:
-
-* Simple Tests::                Listing programs and scripts in `TESTS'
-* Simple Tests using parallel-tests::  More powerful test driver
-* DejaGnu Tests::               Interfacing with the external testing framework
-* Install Tests::               Running tests on installed packages
-
-
-File: automake.info,  Node: Simple Tests,  Next: Simple Tests using parallel-tests,  Up: Tests
-
-15.1 Simple Tests
-=================
-
-If the variable `TESTS' is defined, its value is taken to be a list of
-programs or scripts to run in order to do the testing.  Programs
-needing data files should look for them in `srcdir' (which is both an
-environment variable and a make variable) so they work when building in
-a separate directory (*note Build Directories: (autoconf)Build
-Directories.), and in particular for the `distcheck' rule (*note
-Checking the Distribution::).
-
-   For each of the `TESTS', the result of execution is printed along
-with the test name, where `PASS' denotes a successful test, `FAIL'
-denotes a failed test, `XFAIL' an expected failure, `XPASS' an
-unexpected pass for a test that is supposed to fail, and `SKIP' denotes
-a skipped test.
-
-   The number of failures will be printed at the end of the run.  If a
-given test program exits with a status of 77, then its result is ignored
-in the final count.  This feature allows non-portable tests to be
-ignored in environments where they don't make sense.
-
-   If the Automake option `color-tests' is used (*note Options::) and
-standard output is connected to a capable terminal, then the test
-results and the summary are colored appropriately.  The user can disable
-colored output by setting the `make' variable `AM_COLOR_TESTS=no', or
-force colored output even without a connecting terminal with
-`AM_COLOR_TESTS=always'.
-
-   The variable `TESTS_ENVIRONMENT' can be used to set environment
-variables for the test run; the environment variable `srcdir' is set in
-the rule.  If all your test programs are scripts, you can also set
-`TESTS_ENVIRONMENT' to an invocation of the shell (e.g.  `$(SHELL) -x'
-can be useful for debugging the tests), or any other interpreter.  For
-instance the following setup is used by the Automake package to run
-four tests in Perl.
-     TESTS_ENVIRONMENT = $(PERL) -Mstrict -I $(top_srcdir)/lib -w
-     TESTS = Condition.pl DisjConditions.pl Version.pl Wrap.pl
-
-   You may define the variable `XFAIL_TESTS' to a list of tests
-(usually a subset of `TESTS') that are expected to fail.  This will
-reverse the result of those tests.  
-
-   Automake ensures that each file listed in `TESTS' is built before
-any tests are run; you can list both source and derived programs (or
-scripts) in `TESTS'; the generated rule will look both in `srcdir' and
-`.'.  For instance, you might want to run a C program as a test.  To do
-this you would list its name in `TESTS' and also in `check_PROGRAMS',
-and then specify it as you would any other program.
-
-   Programs listed in `check_PROGRAMS' (and `check_LIBRARIES',
-`check_LTLIBRARIES'...) are only built during `make check', not during
-`make all'.  You should list there any program needed by your tests
-that does not need to be built by `make all'.  Note that
-`check_PROGRAMS' are _not_ automatically added to `TESTS' because
-`check_PROGRAMS' usually lists programs used by the tests, not the
-tests themselves.  Of course you can set `TESTS = $(check_PROGRAMS)' if
-all your programs are test cases.
 

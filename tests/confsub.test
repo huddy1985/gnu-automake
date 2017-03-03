@@ -1,6 +1,6 @@
 #! /bin/sh
-# Copyright (C) 1996, 1997, 1998, 2000, 2001, 2002, 2003
-# Free Software Foundation, Inc.
+# Copyright (C) 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2010 Free
+# Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
 
 . ./defs || Exit 1
 
+set -e
+
 cat > configure.in << 'END'
 AC_INIT
 AM_INIT_AUTOMAKE(nonesuch, nonesuch)
@@ -37,8 +39,8 @@ END
 
 echo 'Before.' > subdir/config.hin
 
-$ACLOCAL || Exit 1
-$AUTOMAKE || Exit 1
+$ACLOCAL
+$AUTOMAKE
 
 # Make sure subdir Makefile.in doesn't itself look in the subdir.
 # One line is allowed though:
@@ -47,13 +49,13 @@ $AUTOMAKE || Exit 1
 ($FGREP 'subdir/config.h' subdir/Makefile.in |
    $FGREP -v 'cd $(top_builddir)') && Exit 1
 
-$AUTOCONF || Exit 1
-./configure || Exit 1
+$AUTOCONF
+./configure
 $FGREP 'Before.' subdir/config.h
 
 $sleep
 echo 'After.' > subdir/config.hin
-$MAKE || Exit 1
-$FGREP 'After.' subdir/config.h || Exit 1
+$MAKE
+$FGREP 'After.' subdir/config.h
 
-Exit 0
+:

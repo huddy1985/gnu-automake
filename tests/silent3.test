@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2009  Free Software Foundation, Inc.
+# Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,10 +16,10 @@
 
 # Check silent-rules mode, with libtool, standard depmode case.
 
-# Please keep this file in sync with silent4.test.
+# Please keep this file in sync with silent4.test and silent9.test.
 
 required=libtoolize
-. ./defs
+. ./defs || Exit 1
 
 set -e
 
@@ -29,6 +29,7 @@ cat >>configure.in <<'EOF'
 AM_SILENT_RULES
 AC_CONFIG_FILES([sub/Makefile])
 AC_PROG_CC
+AM_PROG_AR
 AM_PROG_CC_C_O
 AC_PROG_LIBTOOL
 AC_OUTPUT
@@ -66,9 +67,8 @@ $AUTOCONF
 ./configure --enable-silent-rules
 $MAKE >stdout || { cat stdout; Exit 1; }
 cat stdout
-grep ' -c' stdout && Exit 1
-grep ' -o libfoo' stdout && Exit 1
-grep mv stdout && Exit 1
+$EGREP ' (-c|-o)' stdout && Exit 1
+grep 'mv ' stdout && Exit 1
 grep ' CC .*foo\.' stdout
 grep ' CC .*bar\.' stdout
 grep ' CC .*baz\.' stdout
@@ -83,13 +83,7 @@ $MAKE V=1 >stdout || { cat stdout; Exit 1; }
 cat stdout
 grep ' -c' stdout
 grep ' -o libfoo' stdout
-grep ' CC .*foo\.' stdout && Exit 1
-grep ' CC .*bar\.' stdout && Exit 1
-grep ' CC .*baz\.' stdout && Exit 1
-grep ' CC .*bla\.' stdout && Exit 1
-grep ' CCLD .*foo' stdout && Exit 1
-grep ' CCLD .*bar' stdout && Exit 1
-grep ' CCLD .*baz' stdout && Exit 1
-grep ' CCLD .*bla' stdout && Exit 1
+# The libtool command line can contain e.g. a `--tag=CC' option.
+sed 's/--tag=[^ ]*/--tag=x/g' stdout | $EGREP '(CC|LD) ' && Exit 1
 
 :

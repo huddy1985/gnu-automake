@@ -1,4 +1,5 @@
-# Copyright (C) 2002, 2004, 2006, 2008 Free Software Foundation, Inc.
+# Copyright (C) 2002, 2004, 2006, 2008, 2010 Free Software Foundation,
+# Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ###############################################################
-# The main copy of this file is in Automake's CVS repository. #
+# The main copy of this file is in Automake's git repository. #
 # Updates should be sent to automake-patches@gnu.org.         #
 ###############################################################
 
@@ -170,7 +171,7 @@ C<$warnings_are_errors> is set.
 
 The value to update C<$exit_code> with when a fatal or error message
 is emitted.  C<$exit_code> is also updated for warnings output
-when @<$warnings_are_errors> is set.
+when C<$warnings_are_errors> is set.
 
 =item C<file =E<gt> \*STDERR>
 
@@ -427,7 +428,7 @@ sub _format_message ($$%)
 }
 
 # _enqueue ($QUEUE, $KEY, $UNIQ_SCOPE, $TO_FILTER, $MSG, $FILE)
-# ------------------------------------------------------------
+# -------------------------------------------------------------
 # Push message on a queue, to be processed by another thread.
 sub _enqueue ($$$$$$)
 {
@@ -499,7 +500,7 @@ sub _print_message ($$%)
   my $msg = _format_message ($location, $message, %opts);
   if ($opts{'partial'})
     {
-      # Incomplete message.   Store, don't print.
+      # Incomplete message.  Store, don't print.
       $partial .= $msg;
       return;
     }
@@ -709,8 +710,9 @@ entry, while C<drop_channel_setup ()> just deletes it.
 
 =cut
 
-use vars qw (@_saved_channels);
+use vars qw (@_saved_channels @_saved_werrors);
 @_saved_channels = ();
+@_saved_werrors = ();
 
 sub dup_channel_setup ()
 {
@@ -720,12 +722,14 @@ sub dup_channel_setup ()
       $channels_copy{$k1} = {%{$channels{$k1}}};
     }
   push @_saved_channels, \%channels_copy;
+  push @_saved_werrors, $warnings_are_errors;
 }
 
 sub drop_channel_setup ()
 {
   my $saved = pop @_saved_channels;
   %channels = %$saved;
+  $warnings_are_errors = pop @_saved_werrors;
 }
 
 =item C<buffer_messages (@types)>, C<flush_messages ()>

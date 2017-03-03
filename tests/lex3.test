@@ -1,5 +1,6 @@
 #! /bin/sh
-# Copyright (C) 1999, 2001, 2002, 2003, 2004  Free Software Foundation, Inc.
+# Copyright (C) 1999, 2001, 2002, 2003, 2004, 2010, 2011 Free Software
+# Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +18,7 @@
 # Test associated with PR 19.
 # From Matthew D. Langston.
 
-required='gcc gzip flex GNUmake'
+required='gcc flex GNUmake'
 . ./defs || Exit 1
 
 # Ignore user CFLAGS.
@@ -38,9 +39,7 @@ AC_OUTPUT(Makefile)
 END
 
 cat > Makefile.am << 'END'
-AUTOMAKE_OPTIONS  = foreign
 LDADD             = @LEXLIB@
-
 noinst_PROGRAMS   = foo
 foo_SOURCES       = foo.l
 END
@@ -57,6 +56,12 @@ main ()
     ;
 
   return 0;
+}
+
+/* Avoid possible link errors. */
+int yywrap (void)
+{
+  return 1;
 }
 END
 

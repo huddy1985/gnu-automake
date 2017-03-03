@@ -1,5 +1,6 @@
 #! /bin/sh
-# Copyright (C) 1996, 1997, 2000, 2001, 2002  Free Software Foundation, Inc.
+# Copyright (C) 1996, 1997, 2000, 2001, 2002, 2010, 2011 Free Software
+# Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +21,7 @@
 
 cat >> configure.in << 'END'
 AC_PROG_RANLIB
+AM_PROG_AR
 AC_PROG_CC
 AC_LIBOBJ([fsusage])
 AC_OUTPUT
@@ -32,7 +34,11 @@ libtu_a_LIBADD = @LIBOBJS@
 END
 
 : > fsusage.c
+: > ar-lib
 
-$ACLOCAL || Exit 1
-$AUTOMAKE 2>&1 | $FGREP fsusage.c || Exit 1
+$ACLOCAL
+AUTOMAKE_fails
+
+grep 'automatically discovered.*fsusage\.c.*explicitly mentioned' stderr
+
 Exit 0

@@ -17,7 +17,7 @@
 # Test for PR 400: XFAIL_TESTS delimited by TABs.
 # Also test that Solaris make VPATH rewriting is honored
 
-. ./defs-p || Exit 1
+parallel_tests=yes; . ./defs || Exit 1
 
 set -e
 

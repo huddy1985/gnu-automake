@@ -1,4 +1,5 @@
-# Copyright (C) 2003, 2004, 2005, 2006, 2008, 2009  Free Software Foundation, Inc.
+# Copyright (C) 2003, 2004, 2005, 2006, 2008, 2009, 2010 Free Software
+# Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -161,7 +162,7 @@ my %_am_macro_for_var =
    EMACS => 'AM_PATH_LISPDIR',
    GCJ => 'AM_PROG_GCJ',
    LEX => 'AM_PROG_LEX',
-   LIBTOOL => 'AC_PROG_LIBTOOL',
+   LIBTOOL => 'LT_INIT',
    lispdir => 'AM_PATH_LISPDIR',
    pkgpyexecdir => 'AM_PATH_PYTHON',
    pkgpythondir => 'AM_PATH_PYTHON',
@@ -192,7 +193,7 @@ my %_ac_macro_for_var =
    );
 
 # The name of the configure.ac file.
-my $configure_ac = find_configure_ac;
+my $configure_ac;
 
 # Variables that can be overridden without complaint from -Woverride
 my %_silent_variable_override =
@@ -353,7 +354,7 @@ sub reset ()
 =item C<var ($varname)>
 
 Return the C<Automake::Variable> object for the variable
-named C<$varname> if defined.   Return 0 otherwise.
+named C<$varname> if defined.  Return 0 otherwise.
 
 =cut
 
@@ -1131,6 +1132,9 @@ sub require_variables ($$$@)
   my $res = 0;
   $reason .= ' but ' unless $reason eq '';
 
+  $configure_ac = find_configure_ac
+    unless defined $configure_ac;
+
  VARIABLE:
   foreach my $var (@vars)
     {
@@ -1515,7 +1519,7 @@ sub _hash_values (@)
 }
 # ($VARNAME, $GENERATED)
 # _gen_varname ($BASE, @DEFINITIONS)
-# ---------------------------------
+# ----------------------------------
 # Return a variable name starting with $BASE, that will be
 # used to store definitions @DEFINITIONS.
 # @DEFINITIONS is a list of pair [$COND, @OBJECTS].

@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005, 2006, 2007  Free Software Foundation, Inc.
+# Copyright (C) 2005, 2006, 2007, 2010 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 # Check support for AC_CONFIG_LIBOBJ_DIR vs LTLIBOBJS.
 # (pr401.test and pr401c.test do the same for LIBOBJS and ALLOCA)
 
+parallel_tests=no
 required='gcc libtoolize'
 . ./defs || Exit 1
 
@@ -81,7 +82,7 @@ EOF
 libtoolize
 $ACLOCAL
 $AUTOCONF
-$AUTOMAKE -a
+$AUTOMAKE -Wno-extra-portability -a
 ./configure
 $MAKE distcheck
 
@@ -98,7 +99,7 @@ mv -f configure.int configure.in
 
 $ACLOCAL
 $AUTOCONF
-$AUTOMAKE -a
+$AUTOMAKE -Wno-extra-portability -a
 ./configure
 test ! -d lib/lib
 $MAKE distcheck
@@ -109,7 +110,7 @@ $MAKE distcheck
 
 mv -f src/Makefile.am src/t
 sed 's/LDADD = .*/LDADD = @LTLIBOBJS@/' src/t > src/Makefile.am
-AUTOMAKE_fails
+AUTOMAKE_fails -Wno-extra-portability
 grep 'cannot be used outside.*lib' stderr
 mv -f src/t src/Makefile.am
 
@@ -139,7 +140,7 @@ EOF
 
 $ACLOCAL
 $AUTOCONF
-$AUTOMAKE --add-missing
+$AUTOMAKE -Wno-extra-portability --add-missing
 ./configure
 test ! -d src/lib
 test ! -d 'src/$(top_builddir)'
@@ -176,6 +177,8 @@ EOF
 
 $ACLOCAL
 $AUTOCONF
-$AUTOMAKE
+$AUTOMAKE -Wno-extra-portability
 ./configure
 $MAKE distcheck
+
+:

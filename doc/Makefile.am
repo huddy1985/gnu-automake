@@ -2,20 +2,20 @@
 
 ## Makefile for Automake.
 
-## Copyright (C) 2003, 2006, 2008  Free Software Foundation, Inc.
+# Copyright (C) 2003, 2006, 2008, 2009  Free Software Foundation, Inc.
 
-## This program is free software; you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation; either version 2, or (at your option)
-## any later version.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
 
-## This program is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 
-## You should have received a copy of the GNU General Public License
-## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 info_TEXINFOS = automake.texi
 automake_TEXINFOS = fdl.texi
@@ -73,8 +73,14 @@ $(srcdir)/amhello-1.0.tar.gz: $(amhello_sources) $(top_srcdir)/configure.ac
 	PATH="`pwd`/../tests$(PATH_SEPARATOR)$$PATH" && \
 	export PATH && \
 	cd $(srcdir)/amhello && \
-	ACLOCAL=aclocal-$(APIVERSION) AUTOMAKE=automake-$(APIVERSION) \
-	autoreconf -vfi && \
+	ACLOCAL=aclocal-$(APIVERSION) && export ACLOCAL && \
+	AUTOMAKE=automake-$(APIVERSION) && export AUTOMAKE && \
+	AUTOCONF='$(am_AUTOCONF)' && export AUTOCONF && \
+	AUTOM4TE='$(am_AUTOM4TE)' && export AUTOM4TE && \
+	AUTORECONF='$(am_AUTORECONF)' && export AUTORECONF && \
+	AUTOHEADER='$(am_AUTOHEADER)' && export AUTOHEADER && \
+	AUTOUPDATE='$(am_AUTOUPDATE)' && export AUTOUPDATE && \
+	$(am_AUTORECONF) -vfi && \
 	./configure && \
 	$(MAKE) $(AM_MAKEFLAGS) distcheck && \
 	$(MAKE) $(AM_MAKEFLAGS) distclean && \

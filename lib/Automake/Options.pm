@@ -1,4 +1,5 @@
-# Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009  Free Software Foundation, Inc.
+# Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009, 2010 Free Software
+# Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -234,7 +235,7 @@ Return 1 on error, 0 otherwise.
 
 # $BOOL
 # _process_option_list (\%OPTIONS, $WHERE, @OPTIONS)
-# -------------------------------------------------
+# --------------------------------------------------
 # Process a list of options.  Return 1 on error, 0 otherwise.
 # \%OPTIONS is the hash to fill with options data, $WHERE is
 # the location where @OPTIONS occurred.
@@ -251,6 +252,10 @@ sub _process_option_list (\%$@)
 	}
       elsif (/^(.*\/)?ansi2knr$/)
 	{
+          # This feature is deprecated, will be removed in the next
+          # Automake major release.
+          msg 'obsolete', $where,
+              "automatic de-ANSI-fication support is deprecated\n";
 	  # An option like "../lib/ansi2knr" is allowed.  With no
 	  # path prefix, we assume the required programs are in this
 	  # directory.  We save the actual option for later.

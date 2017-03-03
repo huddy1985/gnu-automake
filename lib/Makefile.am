@@ -2,20 +2,21 @@
 
 ## Makefile for Automake lib.
 
-## Copyright (C) 2001, 2003, 2004 Free Software Foundation, Inc.
+# Copyright (C) 2001, 2003, 2004, 2009, 2010 Free Software Foundation,
+# Inc.
 
-## This program is free software; you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation; either version 2, or (at your option)
-## any later version.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
 
-## This program is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 
-## You should have received a copy of the GNU General Public License
-## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SUBDIRS = Automake am
 
@@ -28,7 +29,7 @@ dist_pkgvdata_DATA = COPYING INSTALL texinfo.tex ansi2knr.c ansi2knr.1 \
 scriptdir = $(pkgvdatadir)
 dist_script_DATA = config.guess config.sub install-sh mdate-sh missing \
   mkinstalldirs elisp-comp ylwrap acinstall depcomp compile py-compile \
-  symlink-tree
+  symlink-tree ar-lib
 
 EXTRA_DIST = gnupload
 
