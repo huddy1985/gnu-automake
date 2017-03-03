@@ -1,4 +1,4 @@
-This is automake.info, produced by makeinfo version 4.3d from
+This is automake.info, produced by makeinfo version 4.5 from
 automake.texi.
 
 INFO-DIR-SECTION GNU programming tools
@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.7.3
+   This file documents GNU automake 1.7.4
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Free
 Software Foundation, Inc.
@@ -32,112 +32,112 @@ translation approved by the Foundation.
 
 
 Indirect:
-automake.info-1: 1154
-automake.info-2: 47058
-automake.info-3: 95908
-automake.info-4: 144112
-automake.info-5: 192363
+automake.info-1: 1153
+automake.info-2: 47109
+automake.info-3: 96047
+automake.info-4: 144499
+automake.info-5: 193663
 
 Tag Table:
 (Indirect)
-Node: Top1154
-Node: Introduction3023
-Ref: Introduction-Footnote-14489
-Ref: Introduction-Footnote-24638
-Node: Generalities4839
-Node: General Operation5446
-Node: Strictness8124
-Node: Uniform9863
-Node: Canonicalization13681
-Node: User Variables14709
-Node: Auxiliary Programs15946
-Node: Examples18288
-Node: Complete18612
-Node: Hello20613
-Node: true23240
-Node: Invoking Automake25990
-Node: configure32480
-Node: Requirements33527
-Node: Optional34604
-Node: Invoking aclocal39809
-Node: aclocal options41421
-Node: Macro search path42396
-Node: Macros46575
-Node: Public macros47058
-Node: Private macros53888
-Node: Extending aclocal55283
-Node: Top level56316
-Ref: Top level-Footnote-161707
-Node: Alternative61849
-Ref: Alternative-Footnote-163220
-Node: Rebuilding63345
-Node: Programs64113
-Node: A Program65157
-Node: Program Sources65890
-Node: Linking67859
-Node: Conditional Sources70158
-Node: Conditional Programs72894
-Node: A Library74707
-Node: A Shared Library75979
-Node: Program and Library Variables78120
-Ref: Program and Library Variables-Footnote-186299
-Node: LIBOBJS86382
-Node: Program variables87044
-Node: Yacc and Lex89361
-Node: C++ Support94299
-Node: Assembly Support95133
-Node: Fortran 77 Support95908
-Ref: Fortran 77 Support-Footnote-197490
-Node: Preprocessing Fortran 7797693
-Node: Compiling Fortran 77 Files98286
-Node: Mixing Fortran 77 With C and C++98848
-Ref: Mixing Fortran 77 With C and C++-Footnote-1101212
-Node: How the Linker is Chosen101515
-Node: Fortran 77 and Autoconf104063
-Node: Java Support104481
-Node: Support for Other Languages105686
-Node: ANSI106242
-Node: Dependencies108663
-Ref: Dependencies-Footnote-1110383
-Node: EXEEXT110549
-Node: Other objects112745
-Node: Scripts113336
-Node: Headers114422
-Ref: Headers-Footnote-1115126
-Node: Data115359
-Node: Sources116011
-Node: Built sources example118738
-Node: Other GNU Tools125174
-Node: Emacs Lisp125662
-Node: gettext126719
-Node: Libtool127219
-Node: Java127467
-Node: Python129099
-Node: Documentation132273
-Node: Texinfo132574
-Node: Man pages136243
-Node: Install138534
-Node: Clean142915
-Node: Dist144112
-Node: Tests151447
-Node: Options155062
-Node: Miscellaneous161312
-Node: Tags161702
-Node: Suffixes163714
-Node: Multilibs165269
-Node: Include165897
-Node: Conditionals166787
-Node: Gnits169493
-Node: Cygnus171355
-Node: Extending173177
-Node: Distributing174929
-Node: API versioning175562
-Node: FAQ178202
-Node: CVS178748
-Node: maintainer-mode185491
-Node: wildcards189113
-Node: distcleancheck192363
-Node: Macro and Variable Index197022
-Node: General Index207102
+Node: Top1153
+Node: Introduction3022
+Ref: Introduction-Footnote-14488
+Ref: Introduction-Footnote-24637
+Node: Generalities4838
+Node: General Operation5445
+Node: Strictness8123
+Node: Uniform9862
+Node: Canonicalization13680
+Node: User Variables14708
+Node: Auxiliary Programs15945
+Node: Examples18287
+Node: Complete18611
+Node: Hello20612
+Node: true23437
+Node: Invoking Automake26187
+Node: configure32677
+Node: Requirements33724
+Node: Optional34655
+Node: Invoking aclocal39860
+Node: aclocal options41472
+Node: Macro search path42447
+Node: Macros46626
+Node: Public macros47109
+Node: Private macros54027
+Node: Extending aclocal55422
+Node: Top level56455
+Ref: Top level-Footnote-161846
+Node: Alternative61988
+Ref: Alternative-Footnote-163359
+Node: Rebuilding63484
+Node: Programs64252
+Node: A Program65296
+Node: Program Sources66029
+Node: Linking67998
+Node: Conditional Sources70297
+Node: Conditional Programs73033
+Node: A Library74846
+Node: A Shared Library76118
+Node: Program and Library Variables78259
+Ref: Program and Library Variables-Footnote-186438
+Node: LIBOBJS86521
+Node: Program variables87183
+Node: Yacc and Lex89500
+Node: C++ Support94438
+Node: Assembly Support95272
+Node: Fortran 77 Support96047
+Ref: Fortran 77 Support-Footnote-197629
+Node: Preprocessing Fortran 7797832
+Node: Compiling Fortran 77 Files98425
+Node: Mixing Fortran 77 With C and C++98987
+Ref: Mixing Fortran 77 With C and C++-Footnote-1101351
+Node: How the Linker is Chosen101654
+Node: Fortran 77 and Autoconf104202
+Node: Java Support104620
+Node: Support for Other Languages105825
+Node: ANSI106381
+Node: Dependencies108802
+Ref: Dependencies-Footnote-1110522
+Node: EXEEXT110688
+Node: Other objects112884
+Node: Scripts113475
+Node: Headers114561
+Ref: Headers-Footnote-1115265
+Node: Data115498
+Node: Sources116150
+Node: Built sources example118917
+Node: Other GNU Tools125365
+Node: Emacs Lisp125853
+Node: gettext127106
+Node: Libtool127606
+Node: Java127854
+Node: Python129486
+Node: Documentation132660
+Node: Texinfo132961
+Node: Man pages136630
+Node: Install138921
+Node: Clean143302
+Node: Dist144499
+Node: Tests151834
+Node: Options155449
+Node: Miscellaneous161699
+Node: Tags162089
+Node: Suffixes164101
+Node: Multilibs165656
+Node: Include166284
+Node: Conditionals167174
+Node: Gnits169880
+Node: Cygnus171742
+Node: Extending173564
+Node: Distributing176230
+Node: API versioning176863
+Node: FAQ179503
+Node: CVS180048
+Node: maintainer-mode186791
+Node: wildcards190412
+Node: distcleancheck193663
+Node: Macro and Variable Index198327
+Node: General Index208568
 
 End Tag Table

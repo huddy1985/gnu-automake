@@ -1,6 +1,5 @@
 #! /bin/sh
-# Copyright (C) 1997, 1998, 2000, 2001, 2002, 2003
-#   Free Software Foundation, Inc.
+# Copyright (C) 2003  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -19,35 +18,46 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# Test to make sure tags and subdirs work correctly.  Bug report by
-# François Pinard, and later by Akim Demaille.
+# Check that "make check" fails, when we invoke DejaGnu tests with --status
+# (to detect TCL errors) on a file with TCL errors.
 
-required=etags
+required=runtest
 . ./defs || exit 1
 
-set -e
-
-cat >> configure.in << 'END'
-AC_CONFIG_FILES([sub/Makefile])
-AC_OUTPUT
+cat > failtcl << 'END'
+#! /bin/sh
+echo whatever
 END
 
-echo 'SUBDIRS = sub' > Makefile.am
-mkdir sub
-echo 'noinst_HEADERS = iguana.h' > sub/Makefile.am
-: > sub/iguana.h
+chmod +x failtcl
+
+echo AC_OUTPUT >> configure.in
+
+cat > Makefile.am << 'END'
+AUTOMAKE_OPTIONS = dejagnu
+
+DEJATOOL = failtcl
+
+AM_RUNTESTFLAGS = --status FAILTCL=$(srcdir)/failtcl
+END
+
+mkdir failtcl.test
+
+cat > failtcl.test/failtcl.exp << 'END'
+set test test
+spawn $FAILTCL
+expect {
+    default { pass "$test" }
+# Oops, no closing brace.
+END
 
 $ACLOCAL
 $AUTOCONF
-$AUTOMAKE
+$AUTOMAKE --add-missing
 
 ./configure
-$MAKE tags
-test -f sub/TAGS
-test -f TAGS
-$FGREP sub/TAGS TAGS
-$FGREP iguana.h sub/TAGS
 
-$MAKE distclean
-test ! -f sub/TAGS
-test ! -f TAGS
+$MAKE check && exit 1
+test -f failtcl.log
+test -f failtcl.sum
+$FGREP 'missing close-brace' failtcl.sum

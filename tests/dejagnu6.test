@@ -1,6 +1,5 @@
 #! /bin/sh
-# Copyright (C) 1997, 1998, 2000, 2001, 2002, 2003
-#   Free Software Foundation, Inc.
+# Copyright (C) 2003  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -19,35 +18,47 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# Test to make sure tags and subdirs work correctly.  Bug report by
-# François Pinard, and later by Akim Demaille.
+# Check that "make check" fails, when a DejaGnu test fails.
 
-required=etags
+required=runtest
 . ./defs || exit 1
 
 set -e
 
-cat >> configure.in << 'END'
-AC_CONFIG_FILES([sub/Makefile])
-AC_OUTPUT
+cat > faildeja << 'END'
+#! /bin/sh
+echo whatever
 END
 
-echo 'SUBDIRS = sub' > Makefile.am
-mkdir sub
-echo 'noinst_HEADERS = iguana.h' > sub/Makefile.am
-: > sub/iguana.h
+chmod +x faildeja
+
+echo AC_OUTPUT >> configure.in
+
+cat > Makefile.am << 'END'
+AUTOMAKE_OPTIONS = dejagnu
+
+DEJATOOL = faildeja
+
+AM_RUNTESTFLAGS = FAILDEJA=$(srcdir)/faildeja
+END
+
+mkdir faildeja.test
+
+cat > faildeja.test/faildeja.exp << 'END'
+set test test
+spawn $FAILDEJA
+expect {
+    default { fail "$test" }
+}
+END
 
 $ACLOCAL
 $AUTOCONF
-$AUTOMAKE
+$AUTOMAKE --add-missing
 
 ./configure
-$MAKE tags
-test -f sub/TAGS
-test -f TAGS
-$FGREP sub/TAGS TAGS
-$FGREP iguana.h sub/TAGS
 
-$MAKE distclean
-test ! -f sub/TAGS
-test ! -f TAGS
+$MAKE check && exit 1
+test -f faildeja.log
+test -f faildeja.sum
+$FGREP 'FAIL: test' faildeja.sum

@@ -1,4 +1,4 @@
-This is automake.info, produced by makeinfo version 4.3d from
+This is automake.info, produced by makeinfo version 4.5 from
 automake.texi.
 
 INFO-DIR-SECTION GNU programming tools
@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.7.3
+   This file documents GNU automake 1.7.4
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Free
 Software Foundation, Inc.
@@ -781,7 +781,27 @@ with `-hook' appended.  The targets allowing hooks are `install-data',
 program:
 
      install-exec-hook:
-             ln $(DESTDIR)$(bindir)/program $(DESTDIR)$(bindir)/proglink
+             ln $(DESTDIR)$(bindir)/program$(EXEEXT) \
+                $(DESTDIR)$(bindir)/proglink$(EXEEXT)
+
+   Although cheaper and more portable than symbolic links, hard links
+will not work everywhere (for instance OS/2 does not have `ln').
+Ideally you should fall back to `cp -p' when `ln' does not work.  An
+easy way, if symbolic links are acceptable to you, is to add
+`AC_PROG_LN_S' to `configure.in' (*note Particular Program Checks:
+(autoconf)Particular Programs.) and use `$(LN_S)' in `Makefile.am'.
+
+   For instance, here is how you could install a versioned copy of a
+program using `$(LN_S)':
+
+     install-exec-hook:
+             cd $(DESTDIR)$(bindir) && \
+               mv -f prog$(EXEEXT) prog-$(VERSION)$(EXEEXT) && \
+               $(LN_S) prog-$(VERSION)$(EXEEXT) prog$(EXEEXT)
+
+   Note that we rename the program so that a new version will erase the
+symbolic link, not the real binary.  Also we `cd' into the destination
+directory in order to create relative links.
 
 
 File: automake.info,  Node: Distributing,  Next: API versioning,  Prev: Extending,  Up: Top
@@ -870,7 +890,7 @@ File: automake.info,  Node: FAQ,  Next: Macro and Variable Index,  Prev: API ver
 Frequently Asked Questions about Automake
 *****************************************
 
-   This chapters covers some questions that often come up on the mailing
+   This chapter covers some questions that often come up on the mailing
 lists.
 
 * Menu:
@@ -1014,7 +1034,7 @@ using (hence testing) their own generated files, instead of the
 generated files that will be released actually.  The developer who
 prepares the tarball might be using a version of the tool that produces
 bogus output (for instance a non-portable C file), something other
-developers could have noticed if they weren't using there own versions
+developers could have noticed if they weren't using their own versions
 of this tool.
 
 Third-party files
@@ -1062,7 +1082,7 @@ development: developers love fixing failures.  However, users with
 wrong versions of maintainer tools may get an error when the rebuild
 rule is spuriously triggered, halting the build.  This failure to let
 the build continue is one of the arguments of the `AM_MAINTAINER_MODE'
-advocators.
+advocates.
 
 `AM_MAINTAINER_MODE'
 --------------------
@@ -1089,7 +1109,7 @@ that need exotic tools that users may not have available.
    Several years ago François Pinard pointed out several arguments
 against `AM_MAINTAINER_MODE'.  Most of them relate to insecurity.  By
 removing dependencies you get non-dependable builds: change to sources
-files can have no-effect on generated files and this can be very
+files can have no effect on generated files and this can be very
 confusing when unnoticed.  He adds that security shouldn't be reserved
 to maintainers (what `--enable-maintainer-mode' suggests), on the
 contrary.  If one user has to modify a `Makefile.am', then either
@@ -1145,10 +1165,10 @@ Why doesn't Automake support wildcards?
      `Makefile.am', because if you don't add it, it doesn't get
      compiled nor installed, so you can't even test it.
 
-   Still, these are philosophic objections, and as such you may
+   Still, these are philosophical objections, and as such you may
 disagree, or find enough value in wildcards to dismiss all of them.
 Before you start writing a patch against Automake to teach it about
-wildcards, let's see the the main technical issue: portability.
+wildcards, let's see the main technical issue: portability.
 
    Although `$(wildcard ...)' works with GNU `make', it is not portable
 to other `make' implementations.
@@ -1160,7 +1180,7 @@ not use `$(wildcard ...)'.  However that means developers need to
 remember they must run `automake' each time they add, delete, or rename
 files.
 
-   Compared to editing `Makefile.am', this really little win.  Sure,
+   Compared to editing `Makefile.am', this is really little win.  Sure,
 it's easier and faster to type `automake; make' than to type `emacs
 Makefile.am; make'.  But nobody bothered enough to write a patch add
 support for this syntax.  Some people use scripts to generated file

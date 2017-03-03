@@ -1,4 +1,4 @@
-This is automake.info, produced by makeinfo version 4.3d from
+This is automake.info, produced by makeinfo version 4.5 from
 automake.texi.
 
 INFO-DIR-SECTION GNU programming tools
@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.7.3
+   This file documents GNU automake 1.7.4
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Free
 Software Foundation, Inc.
@@ -571,9 +571,9 @@ dependency information.
 
    The `BUILT_SOURCES' variable is a workaround for this problem.  A
 source file listed in `BUILT_SOURCES' is made on `make all' or `make
-check' before other targets are processed.  However, such a source file
-is not _compiled_ unless explicitly requested by mentioning it in some
-other `_SOURCES' variable.
+check' (or even `make install') before other targets are processed.
+However, such a source file is not _compiled_ unless explicitly
+requested by mentioning it in some other `_SOURCES' variable.
 
    So, to conclude our introductory example, we could use
 `BUILT_SOURCES = foo.h' to ensure `foo.h' gets built before any other
@@ -587,10 +587,10 @@ need to appear in `BUILT_SOURCES' (unless it is included by another
 source), because it's a known dependency of the associated object.
 
    It might be important to emphasize that `BUILT_SOURCES' is honored
-only by `make all' and `make check'.  This means you cannot build a
-specific target (e.g., `make foo') in a clean tree if it depends on a
-built source.  However it will succeed if you have run `make all'
-earlier, because accurate dependencies are already available.
+only by `make all', `make check' and `make install'.  This means you
+cannot build a specific target (e.g., `make foo') in a clean tree if it
+depends on a built source.  However it will succeed if you have run
+`make all' earlier, because accurate dependencies are already available.
 
    The next section illustrates and discusses the handling of built
 sources on a toy example.
@@ -670,9 +670,9 @@ else.  This is what `BUILT_SOURCES' is meant for (*note Sources::).
      gcc  -g -O2   -o foo  foo.o
      make[1]: Leaving directory `/home/adl/tmp'
 
-   However, as said earlier, `BUILT_SOURCES' applies only to the `all'
-and `check' targets.  It still fails if you try to run `make foo'
-explicitly:
+   However, as said earlier, `BUILT_SOURCES' applies only to the `all',
+`check', and `install' targets.  It still fails if you try to run `make
+foo' explicitly:
 
      % make clean
      test -z "bindir.h" || rm -f bindir.h
@@ -815,6 +815,10 @@ don't actually benefit from byte-compilation.  Still, we recommend that
 you leave it enabled by default.  It is probably better for sites with
 strange setups to cope for themselves than to make the installation less
 nice for everybody else.
+
+   Lisp sources are not distributed by default.  You can prefix the
+`LISP' primary with `dist_', as in `dist_lisp_LISP' or
+`dist_noinst_LISP', to indicate that these files should be distributed.
 
 
 File: automake.info,  Node: gettext,  Next: Libtool,  Prev: Emacs Lisp,  Up: Other GNU Tools

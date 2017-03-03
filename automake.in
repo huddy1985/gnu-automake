@@ -1717,7 +1717,7 @@ sub generate_makefile
 	$output_rules .= "install-binPROGRAMS: install-libLTLIBRARIES\n\n";
     }
 
-    &handle_installdirs;
+    &handle_install;
     &handle_clean;
     &handle_factored_dependencies;
 
@@ -4346,6 +4346,13 @@ sub scan_aclocal_m4
 {
     my $regen_aclocal = 0;
 
+    if (-f 'aclocal.m4')
+    {
+       # When using aclocal.m4, define this variable even in subdirectories,
+       # because every Makefile.in depends on $(ACLOCAL_M4).
+       &define_variable ("ACLOCAL_M4", '$(top_srcdir)/aclocal.m4');
+    }
+
     return (0, ())
       unless $relative_dir eq '.';
 
@@ -4354,7 +4361,6 @@ sub scan_aclocal_m4
 
     if (-f 'aclocal.m4')
     {
-	&define_variable ("ACLOCAL_M4", '$(top_srcdir)/aclocal.m4');
 	&push_dist_common ('aclocal.m4');
 
 	my $aclocal = new Automake::XFile "< aclocal.m4";
@@ -4476,8 +4482,7 @@ sub handle_configure
 		       'MAKEFILE-DEPS'
 		       => "@rewritten",
 		       'CONFIG-MAKEFILE'
-		       => ((($relative_dir eq '.') ? '$@' : '$(subdir)/$@')
-			   . $colon_infile),
+		       => ($relative_dir eq '.') ? '$@' : '$(subdir)/$@',
 		       'MAKEFILE-IN'
 		       => $infile,
 		       'MAKEFILE-IN-DEPS'
@@ -4794,16 +4799,19 @@ sub handle_footer
     $output_trailer .= file_contents ('footer');
 }
 
-# Deal with installdirs target.
-sub handle_installdirs ()
+
+# Generate `make install' rules.
+sub handle_install ()
 {
-    $output_rules .=
-      &file_contents ('install',
-		      ('am__installdirs'
-		       => variable_value ('am__installdirs') || '',
-		       'installdirs-local'
-		       => (target_defined ('installdirs-local')
-			   ? ' installdirs-local' : '')));
+  $output_rules .= &file_contents
+    ('install',
+     maybe_BUILT_SOURCES => (variable_defined ('BUILT_SOURCES')
+			     ? (" \$(BUILT_SOURCES)\n"
+				. "\t\$(MAKE) \$(AM_MAKEFLAGS)")
+			     : ''),
+     'installdirs-local' => (target_defined ('installdirs-local')
+			     ? ' installdirs-local' : ''),
+     am__installdirs => variable_value ('am__installdirs') || '');
 }
 
 
@@ -5099,11 +5107,17 @@ sub handle_emacs_lisp
 
   define_pretty_variable ('am__ELFILES', '', @elfiles);
 
-  # It's important that all depends on elc-stamp so that
-  # all .elc files get recompiled whenever a .el changes.
-  # It's important that all depends on $(ELCFILES) so that
-  # we can recover if any of them is deleted.
-  push (@all, 'elc-stamp', '$(ELCFILES)');
+  # Do not depend on the build rules if ELCFILES is empty.
+  # This is necessary because overriding ELCFILES= is a documented
+  # idiom to disable byte-compilation.
+  if (variable_value ('ELCFILES'))
+    {
+      # It's important that all depends on elc-stamp so that
+      # all .elc files get recompiled whenever a .el changes.
+      # It's important that all depends on $(ELCFILES) so that
+      # we can recover if any of them is deleted.
+      push (@all, 'elc-stamp', '$(ELCFILES)');
+    }
 
   require_variables ("$am_file.am", "Emacs Lisp sources seen", 'TRUE',
 		     'EMACS', 'lispdir');
@@ -5399,7 +5413,11 @@ sub scan_autoconf_files
 
     if (! $seen_init_automake)
       {
-	err_ac "`AM_INIT_AUTOMAKE' must be used";
+	err_ac ("no proper invocation of AM_INIT_AUTOMAKE was found.\nYou "
+		. "should verify that $configure_ac invokes AM_INIT_AUTOMAKE,"
+		. "\nthat aclocal.m4 is present in the top-level directory,\n"
+		. "and that aclocal.m4 was recently regenerated "
+		. "(using aclocal).");
       }
     else
       {
@@ -7330,7 +7348,7 @@ sub variable_value_as_list_recursive_worker ($$$)
 
 # &variable_output ($VAR, [@CONDS])
 # ---------------------------------
-# Output all the values of $VAR is @COND is not specified, else only
+# Output all the values of $VAR if @COND is not specified, else only
 # that corresponding to @COND.
 sub variable_output ($@)
 {
@@ -7813,6 +7831,25 @@ sub target_defined
 
 ################################################################
 
+# &check_trailing_slash ($WHERE, $LINE)
+# --------------------------------------
+# Return 1 iff $LINE ends with a slash.
+# Might modify $LINE.
+sub check_trailing_slash ($\$)
+{
+  my ($where, $line) = @_;
+
+  # Ignore `##' lines.
+  return 0 if $$line =~ /$IGNORE_PATTERN/o;
+
+  # Catch and fix a common error.
+  msg "syntax", $where, "whitespace following trailing backslash"
+    if $$line =~ s/\\\s+\n$/\\\n/;
+
+  return $$line =~ /\\$/;
+}
+
+
 # &append_comments ($VARIABLE, $SPACING, $COMMENT)
 # ------------------------------------------------
 # Apped $COMMENT to the other comments for $VARIABLE, using
@@ -7884,7 +7921,7 @@ sub read_am_file ($)
 	{
 	    last;
 	}
-	$saw_bk = /\\$/ && ! /$IGNORE_PATTERN/o;
+	$saw_bk = check_trailing_slash ("$amfile:$.", $_);
     }
 
     # We save the conditional stack on entry, and then check to make
@@ -7910,7 +7947,7 @@ sub read_am_file ($)
 	$_ =~ s/\@MAINT\@//g
 	    unless $seen_maint_mode;
 
-	my $new_saw_bk = /\\$/ && ! /$IGNORE_PATTERN/o;
+	my $new_saw_bk = check_trailing_slash ($here, $_);
 
 	if (/$IGNORE_PATTERN/o)
 	{
@@ -8079,6 +8116,9 @@ sub read_am_file ($)
     }
 
     $output_trailer .= $comment;
+
+    err_am ("trailing backslash on last line")
+      if $saw_bk;
 
     err_am (@cond_stack ? "unterminated conditionals: @cond_stack"
 	    : "too many conditionals closed in include file")

@@ -1,4 +1,4 @@
-This is automake.info, produced by makeinfo version 4.3d from
+This is automake.info, produced by makeinfo version 4.5 from
 automake.texi.
 
 INFO-DIR-SECTION GNU programming tools
@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.7.3
+   This file documents GNU automake 1.7.4
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Free
 Software Foundation, Inc.
@@ -66,8 +66,14 @@ Public macros
      Runs many macros required for proper operation of the generated
      Makefiles.
 
-     This macro has two forms, the second of which has two required
-     arguments: the package and the version number.  This latter form is
+     This macro has two forms, the first of which is preferred.  In
+     this form, `AM_INIT_AUTOMAKE' is called with a single argument --
+     a space-separated list of Automake options which should be applied
+     to every `Makefile.am' in the tree.  The effect is as if each
+     option were listed in `AUTOMAKE_OPTIONS'.
+
+     The second, deprecated, form of `AM_INIT_AUTOMAKE' has two required
+     arguments: the package and the version number.  This form is
      obsolete because the PACKAGE and VERSION can be obtained from
      Autoconf's `AC_INIT' macro (which itself has an old and a new
      form).
@@ -75,7 +81,7 @@ Public macros
      If your `configure.in' has:
           AC_INIT(src/foo.c)
           AM_INIT_AUTOMAKE(mumble, 1.5)
-     you can modernize it as follow:
+     you can modernize it as follows:
           AC_INIT(mumble, 1.5)
           AC_CONFIG_SRCDIR(src/foo.c)
           AM_INIT_AUTOMAKE
@@ -83,19 +89,14 @@ Public macros
      Note that if you're upgrading your `configure.in' from an earlier
      version of Automake, it is not always correct to simply move the
      package and version arguments from `AM_INIT_AUTOMAKE' directly to
-     `AC_INIT', as in the example above.  The first argument of
-     `AC_INIT' is the name of your package (e.g. `GNU Automake'), not
-     the tarball name (e.g. `automake') you used to pass to
-     `AM_INIT_AUTOMAKE'.  Autoconf's rule to derive a tarball name from
-     the package name should work for most but not all packages.
-     Especially, if your tarball name is not all lower case, you will
-     have to use the four-argument form of `AC_INIT' (supported in
-     Autoconf versions greater than 2.52g).
-
-     When `AM_INIT_AUTOMAKE' is called with a single argument, it is
-     interpreted as a space-separated list of Automake options which
-     should be applied to every `Makefile.am' in the tree.  The effect
-     is as if each option were listed in `AUTOMAKE_OPTIONS'.
+     `AC_INIT', as in the example above.  The first argument to
+     `AC_INIT' should be the name of your package (e.g. `GNU Automake'),
+     not the tarball name (e.g. `automake') that you used to pass to
+     `AM_INIT_AUTOMAKE'.  Autoconf tries to derive a tarball name from
+     the package name, which should work for most but not all package
+     names.  (If it doesn't work for yours, you can use the
+     four-argument form of `AC_INIT' -- supported in Autoconf versions
+     greater than 2.52g -- to provide the tarball name explicitly).
 
      By default this macro `AC_DEFINE''s `PACKAGE' and `VERSION'.  This
      can be avoided by passing the `no-define' option, as in:

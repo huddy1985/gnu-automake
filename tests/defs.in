@@ -71,6 +71,14 @@ then
 	echo "$me: running bison --version"
 	( bison --version ) || exit 77
 	;;
+      etags)
+	# Exuberant Ctags will create a TAGS file even
+	# when asked for --help or --version.  (Emacs's etags
+	# does not have such problem.)  Use -o /dev/null
+	# to make sure we do not pollute the tests/ directory.
+	echo "$me: running etags --version -o /dev/null"
+	( etags --version -o /dev/null ) || exit 77
+	;;
       GNUmake)
 	# Use --version and -v, because SGI Make doesn't fail on --version.
 	echo "$me: running $MAKE --version -v"
@@ -132,6 +140,11 @@ then
 	create_status=$?
 	rm -rf $ro_dir_temp
 	test $create_status = 0 && exit 77
+	;;
+      runtest)
+	# DejaGnu's runtest program.
+	echo "$me: running runtest --version"
+	(runtest --version) || exit 77
 	;;
       tex)
         # No all versions of Tex support `--version', so we use

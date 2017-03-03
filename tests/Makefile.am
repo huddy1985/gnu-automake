@@ -10,6 +10,7 @@ aclocal2.test \
 aclocal.test \
 aclocal2.test \
 aclocal3.test \
+aclocal4.test \
 acoutnoq.test \
 acoutpt.test \
 acoutpt2.test \
@@ -40,6 +41,8 @@ auxdir.test \
 auxdir2.test \
 backsl.test \
 backsl2.test \
+backsl3.test \
+backsl4.test \
 badline.test \
 badprog.test \
 block.test \
@@ -108,6 +111,7 @@ condman2.test \
 conf2.test \
 confdeps.test \
 confdist.test \
+conff.test \
 confh.test \
 confh4.test \
 config.test \
@@ -131,6 +135,11 @@ defun.test \
 defun2.test \
 dejagnu.test \
 dejagnu2.test \
+dejagnu3.test \
+dejagnu4.test \
+dejagnu5.test \
+dejagnu6.test \
+dejagnu7.test \
 depacl.test \
 depacl2.test \
 depcomp.test \
@@ -252,6 +261,7 @@ link_f_only.test \
 lisp.test \
 lisp2.test \
 lisp3.test \
+lisp4.test \
 listval.test \
 ltdeps.test \
 ltlibobjs.test \

@@ -1,4 +1,4 @@
-This is automake.info, produced by makeinfo version 4.3d from
+This is automake.info, produced by makeinfo version 4.5 from
 automake.texi.
 
 INFO-DIR-SECTION GNU programming tools
@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.7.3
+   This file documents GNU automake 1.7.4
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Free
 Software Foundation, Inc.
@@ -61,8 +61,8 @@ proceed with an example.  Suppose our package contains a program for
 which we want to build a man page using `help2man'.  GNU `help2man'
 produces simple manual pages from the `--help' and `--version' output
 of other commands (*note Overview: (help2man)Top.).  Because we don't
-want our users to install `help2man', we decide to distribute the
-generated man page using the following setup.
+to force want our users to install `help2man', we decide to distribute
+the generated man page using the following setup.
 
      # This Makefile.am is bogus.
      bin_PROGRAMS = foo
@@ -149,7 +149,7 @@ cross-compilation does not matter.
 setting `distcleancheck_listfiles' as documented in *Note Dist::.  Make
 sure you do understand the reason why `make distcheck' complains before
 you do this.  `distcleancheck_listfiles' is a way to _hide_ errors, not
-to fix them.  There is always better to do.
+to fix them.  You can always do better.
 
 
 File: automake.info,  Node: Macro and Variable Index,  Next: General Index,  Prev: FAQ,  Up: Top
@@ -167,6 +167,7 @@ Macro and Variable Index
 * AC_CANONICAL_HOST:                     Optional.
 * AC_CANONICAL_SYSTEM:                   Optional.
 * AC_CONFIG_AUX_DIR:                     Optional.
+* AC_CONFIG_FILE:                        Requirements.
 * AC_CONFIG_HEADERS:                     Optional.
 * AC_F77_LIBRARY_LDFLAGS:                Optional.
 * AC_LIBOBJ:                             Optional.
@@ -237,6 +238,8 @@ Macro and Variable Index
 * DEJATOOL:                              Tests.
 * DESTDIR:                               Install.
 * dist_:                                 Dist.
+* dist_lisp_LISP:                        Emacs Lisp.
+* dist_noinst_LISP:                      Emacs Lisp.
 * DIST_SUBDIRS <1>:                      Dist.
 * DIST_SUBDIRS:                          Top level.
 * DISTCHECK_CONFIGURE_FLAGS:             Dist.
@@ -413,7 +416,6 @@ General Index
 * _SOURCES and header files:             Program Sources.
 * _SOURCES primary, defined:             Program Sources.
 * _TEXINFOS primary, defined:            Texinfo.
-* AC_OUTPUT, scanning:                   Requirements.
 * AC_SUBST and SUBDIRS:                  Top level.
 * acinclude.m4, defined:                 Complete.
 * aclocal program, introduction:         Complete.
@@ -588,6 +590,7 @@ General Index
 * installdirs-local:                     Extending.
 * Installing headers:                    Headers.
 * Installing scripts:                    Scripts.
+* installing versioned binaries:         Extending.
 * Invoking aclocal:                      Invoking aclocal.
 * Invoking Automake:                     Invoking Automake.
 * JAVA primary, defined:                 Java.
@@ -601,6 +604,7 @@ General Index
 * LIBRARIES primary, defined:            A Library.
 * Linking Fortran 77 with C and C++:     Mixing Fortran 77 With C and C++.
 * LISP primary, defined:                 Emacs Lisp.
+* LN_S example:                          Extending.
 * local targets:                         Extending.
 * LTLIBOBJS and ansi2knr:                ANSI.
 * LTLIBOBJS, special handling:           A Shared Library.
@@ -766,6 +770,7 @@ General Index
 * Variables, overriding:                 General Operation.
 * variables, reserved for the user:      User Variables.
 * VERSION Texinfo flag:                  Texinfo.
+* versioned binaries, installing:        Extending.
 * wildcards:                             wildcards.
 * Windows:                               EXEEXT.
 * yacc, multiple parsers:                Yacc and Lex.

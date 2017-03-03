@@ -1,4 +1,201 @@
+2003-04-23  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.in, NEWS: Bump version to 1.7.4.
+
+	* lib/texinfo.tex: New upstream version.
+
+2003-04-19  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	Fix for PR automake/389:
+	* automake.in (handle_configure): Don't put $colon_infile in
+	CONFIG-MAKEFILE.
+	* tests/conff.test: New file.
+	* tests/Makefile.am (TESTS): Add conff.test.
+	Reported by Alexander Turbov.
+
+2003-04-18  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.in: Bump version to 1.7.3c.
+
+	* tests/defs.in: Handle required=etags to work around
+	Exuberant Ctags.
+
+	* configure.in: Bump version to 1.7.3b.
+
+	* lib/config.guess, lib/config.sub, lib/texinfo.tex: New upstream
+	versions.
+
+	* tests/dejagnu3.test, tests/dejagnu4.test, tests/dejagnu5.test:
+	Distribute dejagnu test cases, so that distcheck actually runs them.
+
+2003-04-18  Richard Dawe  <rich@phekda.freeserve.co.uk>
+
+	* lib/am/dejagnu.am (site.exp): Don't define tool in site.exp,
+	because we set that by invoking runtest with --tool.
+	* tests/Makefile.am (TESTS): Add dejagnu4.test, dejagnu5.test,
+	dejagnu6.test, dejagnu7.test.
+	* tests/dejagnu4.test: New test.
+	* tests/dejagnu5.test: New test.
+	* tests/dejagnu6.test: New test.
+	* tests/dejagnu7.test: New test.
+
+	* tests/dejagnu3.test: Make sure the DejaGnu test is actually run.
+
+2003-04-18  Jim Meyering  <jim@meyering.net>
+
+	* automake.in (variable_output): Fix typo in comment s/is/if/.
+
+2003-04-17  Jim Meyering  <jim@meyering.net>
+
+	* lib/am/yacc.am (?GENERIC?%EXT%%DERIVED-EXT% aka .y.c): Don't redirect
+	directly to $@.  Instead, redirect to $@t and rename upon success.
+	Also, move the commands that update $@ so they are last.  Otherwise,
+	this rule could leave the user with an up to date target (.c file)
+	but with a missing or corrupted corresponding .h file.
+	Add (C) and `2002' to Copyright line, at Alexandre's request.
+
+2003-04-17  Richard Dawe  <rich@phekda.freeserve.co.uk>
+
+	* tests/defs.in: Handle required=runtest, to detect runtest
+	from DejaGnu.
+	* tests/Makefile.am (TESTS): Add dejagnu3.test.
+	* tests/dejagnu3.test: New test.
+
+2003-04-15  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/am/distdir.am (distuninstallcheck, distcleancheck): Silence
+	these rules, so that we don't confuse users by echoing
+	"echo ERROR:..." commands which are not run.
+
+2003-04-12  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (scan_autoconf_files): Augment the error message
+	about AM_INIT_AUTOMAKE not found.
+	Suggested by Bruno Haible.
+
+2003-04-11  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* NEWS: Summarize recent fixes.
+
+2003-04-10  Eric Siegerman  <eric_97@pobox.com>  (tiny change)
+
+	* automake.texi (Public macros): Clarify that the new
+	AM_INIT_AUTOMAKE variant is preferred, and the old one
+	deprecated.  Copy-edit the rest of the AM_INIT_AUTOMAKE item.
+	(Hello): Caution that the example uses the deprecated
+	AC_INIT/AM_INIT_AUTOMAKE syntax, and xref to the discussion.
+
+2003-04-06  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (handle_installdirs): Rename as ...
+	(handle_install): ... this.  Define maybe_BUILT_SOURCES.
+	(generate_makefile): Adjust call to handle_install.
+	* lib/am/install.am (install): Use %maybe_BUILT_SOURCES%.
+	* automake.texi (Sources, Built sources example): BUILT_SOURCES
+	is honored by `make install' too.
+	* tests/check3.test: Make sure that `make install' also depends
+	upon BUILT_SOURCES.
+	Report from Alexander Turbov.
+
+2003-04-03  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (check_trailing_slash): New function (variation on
+	a patch by Peter Muir).  Diagnose whitespaces following trailing
+	backslash.
+	(read_am_file): Use it.
+	* tests/backsl4.test: New file.
+	* tests/Makefile.am (TESTS): Add backsl4.test.
+	Reported by Peter Muir.
+
+2003-03-29  Raja R Harinath  <harinath@cs.umn.edu>
+
+	* tests/yacc8.test: Add a $sleep before modifying Makefile.am so
+        that timestamp will change.
+
+2003-03-23  Akim Demaille  <akim@epita.fr>
+	    Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/am/tags.am (TAGS): Use --etags-include instead of --include,
+	when supported by etags (Exuberant Ctags).
+	* tests/tagsub.test: Rewrite to _run_ the `tags' rule.
+
+2003-03-20  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	For Debian Bug #185388:
+	* automake.texi (Extending): Augment the install-exec-hook
+	discussion with an example how to symlink a versioned binary.
+	* tests/insthook.test: Rewrite to test the above example.
+	Report from James R. Van Zandt.
+
+2003-03-19  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/aclocal4.test: Require GNU make.
+
+2003-03-14  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/aclocal4.test: New file.  Test for the ACLOCAL_M4 bug below.
+	* tests/Makefile.am (TESTS): Add aclocal4.test.
+
+2003-03-14  Jim Meyering  <jim@meyering.net>
+
+	* automake.in (scan_aclocal_m4): Define ACLOCAL_M4 even in
+	subdirectories.  Makefile.in depends on that variable.
+
+2003-03-13  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* m4/init.m4: Remove a leftover comment from the pre-1.7 era.
+
+	Fix for PR automake/386:
+	* tests/ansi10.test: Require Autoconf 2.55.  Skip the test otherwise.
+	Reported by Owen Taylor.
+
+	* lib/am/depend2.am (?GENERIC?%EXT%.o, ?GENERIC?%EXT%.obj)
+	(?GENERIC?%EXT%.lo): Use `mv -f' instead of `mv' in FASTDEP mode.
+	Suggested by Matthias Andree.
+
+	* tests/README: Typo.
+
+2003-03-05  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.texi (Requirements) <AC_CONFIG_FILES>: Files listed
+	with AC_CONFIG_FILES are cleaned by `make distclean'.  Don't
+	pretend otherwise.
+	Reported by Rafael Laboissiere.
+
+2003-03-04  Andreas Buening  <andreas.buening@nexgo.de>
+
+	* lib/mdate-sh: Find out which column of the ls -l output contains
+	the month. Do not assume it is at least the fifth column.
+
+2003-02-26  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.texi (Emacs Lisp): Mention that `dist_' can be used.
+
+	* automake.in (handle_emacs_lisp): Don't build *.elc files
+	if ELCFILES was set empty.
+	* tests/lisp4.test: New file.
+	* tests/Makefile.am (TESTS): Add lisp4.test.
+	Reported by Simon Josefsson.
+
+	* tests/lex3.test, tests/lex5.test: Require flex.
+	Reported by Leo Davis.
+
+2003-02-25  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.in (read_am_file): Catch trailing backslashes on last line.
+	* tests/backsl3.test: New file.
+	* tests/Makefile.am (TESTS): Add backsl3.test.
+	Reported by Akim Demaille.
+
+2003-02-23  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.texi (FAQ, CVS, maintainer-mode, wildcards)
+	(distcleancheck): Fix typos and other errors reported by Karl
+	Berry.
+
 2003-02-20  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.in: Bump version to 1.7.3a.
 
 	* configure.in, NEWS: Bump version to 1.7.3.
 

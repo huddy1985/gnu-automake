@@ -1,4 +1,4 @@
-This is automake.info, produced by makeinfo version 4.3d from
+This is automake.info, produced by makeinfo version 4.5 from
 automake.texi.
 
 INFO-DIR-SECTION GNU programming tools
@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.7.3
+   This file documents GNU automake 1.7.4
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Free
 Software Foundation, Inc.
@@ -38,7 +38,7 @@ GNU Automake
 
    This file documents the GNU Automake package.  Automake is a program
 which creates GNU standards-compliant Makefiles from template files.
-This edition documents version 1.7.3.
+This edition documents version 1.7.4.
 
 * Menu:
 
@@ -521,7 +521,10 @@ maintainer-only code stripped out, as well as all copyright comments.
 traditional two-liner.  GNU Hello is internationalized, does option
 processing, and has a manual and a test suite.
 
-   Here is the `configure.in' from GNU Hello:
+   Here is the `configure.in' from GNU Hello.  *Please note:* The calls
+to `AC_INIT' and `AM_INIT_AUTOMAKE' in this example use a deprecated
+syntax.  For the current approach, see the description of
+`AM_INIT_AUTOMAKE' in *Note Public macros::.
 
      dnl Process this file with autoconf to produce a configure script.
      AC_INIT(src/hello.c)
@@ -883,9 +886,7 @@ run by `AM_INIT_AUTOMAKE':
      Typically, `AC_CONFIG_FILES([foo/Makefile])' will cause Automake to
      generate `foo/Makefile.in' if `foo/Makefile.am' exists.
 
-     Other listed files are treated differently.  Currently the only
-     difference is that an Automake `Makefile' is removed by `make
-     distclean', while other files are removed by `make clean'.
+     These files are all removed by `make distclean'.
 
 
 File: automake.info,  Node: Optional,  Next: Invoking aclocal,  Prev: Requirements,  Up: configure

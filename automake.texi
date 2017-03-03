@@ -703,8 +703,12 @@ has a manual and a test suite.
 @cindex GNU Hello, configure.in
 @cindex Hello, configure.in
 
-Here is the @file{configure.in} from GNU Hello:
-@c FIXME: This definitively requires an update.
+Here is the @file{configure.in} from GNU Hello.
+@strong{Please note:} The calls to @code{AC_INIT} and @code{AM_INIT_AUTOMAKE}
+in this example use a deprecated syntax.  For the current approach,
+see the description of @code{AM_INIT_AUTOMAKE} in @ref{Public macros}.
+
+@c FIXME: This definitely requires an update, e.g. to GNU Hello 2.1.1.
 
 @example
 dnl Process this file with autoconf to produce a configure script.
@@ -1125,8 +1129,6 @@ required for proper Automake operation (@pxref{Macros}).
 Here are the other macros which Automake requires but which are not run
 by @code{AM_INIT_AUTOMAKE}:
 
-@cindex AC_OUTPUT, scanning
-
 @table @code
 @item AC_CONFIG_FILES
 @itemx AC_OUTPUT
@@ -1137,10 +1139,8 @@ exists a file with the same name and the @file{.am} extension appended.
 Typically, @code{AC_CONFIG_FILES([foo/Makefile])} will cause Automake to
 generate @file{foo/Makefile.in} if @file{foo/Makefile.am} exists.
 
-Other listed files are treated differently.  Currently the only
-difference is that an Automake @file{Makefile} is removed by @code{make
-distclean}, while other files are removed by @code{make clean}.
-@c FIXME: this is in violation of standards!
+These files are all removed by @code{make distclean}.
+@cvindex AC_CONFIG_FILE
 @cvindex AC_OUTPUT
 @end table
 
@@ -1576,8 +1576,14 @@ found in @file{<termios.h>}.
 @itemx AM_INIT_AUTOMAKE(PACKAGE, VERSION, [NO-DEFINE])
 Runs many macros required for proper operation of the generated Makefiles.
 
-This macro has two forms, the second of which has two required
-arguments: the package and the version number.  This latter form is
+This macro has two forms, the first of which is preferred.
+In this form, @code{AM_INIT_AUTOMAKE} is called with a
+single argument --- a space-separated list of Automake options which should
+be applied to every @file{Makefile.am} in the tree.  The effect is as if
+each option were listed in @code{AUTOMAKE_OPTIONS}.
+
+The second, deprecated, form of @code{AM_INIT_AUTOMAKE} has two required
+arguments: the package and the version number.  This form is
 obsolete because the @var{package} and @var{version} can be obtained
 from Autoconf's @code{AC_INIT} macro (which itself has an old and a new
 form).
@@ -1587,7 +1593,7 @@ If your @file{configure.in} has:
 AC_INIT(src/foo.c)
 AM_INIT_AUTOMAKE(mumble, 1.5)
 @end example
-you can modernize it as follow:
+you can modernize it as follows:
 @example
 AC_INIT(mumble, 1.5)
 AC_CONFIG_SRCDIR(src/foo.c)
@@ -1597,19 +1603,14 @@ AM_INIT_AUTOMAKE
 Note that if you're upgrading your @file{configure.in} from an earlier
 version of Automake, it is not always correct to simply move the package
 and version arguments from @code{AM_INIT_AUTOMAKE} directly to
-@code{AC_INIT}, as in the example above.  The first argument of
-@code{AC_INIT} is the name of your package (e.g. @samp{GNU Automake}),
-not the tarball name (e.g. @samp{automake}) you used to pass to
-@code{AM_INIT_AUTOMAKE}.  Autoconf's rule to derive a tarball name from
-the package name should work for most but not all packages.  Especially,
-if your tarball name is not all lower case, you will have to use the
-four-argument form of @code{AC_INIT} (supported in Autoconf versions
-greater than 2.52g).
-
-When @code{AM_INIT_AUTOMAKE} is called with a single argument, it is
-interpreted as a space-separated list of Automake options which should
-be applied to every @file{Makefile.am} in the tree.  The effect is as if
-each option were listed in @code{AUTOMAKE_OPTIONS}.
+@code{AC_INIT}, as in the example above.  The first argument to
+@code{AC_INIT} should be the name of your package (e.g. @samp{GNU Automake}),
+not the tarball name (e.g. @samp{automake}) that you used to pass to
+@code{AM_INIT_AUTOMAKE}.  Autoconf tries to derive a tarball name from
+the package name, which should work for most but not all package names.
+(If it doesn't work for yours, you can use the
+four-argument form of @code{AC_INIT} --- supported in Autoconf versions
+greater than 2.52g --- to provide the tarball name explicitly).
 
 By default this macro @code{AC_DEFINE}'s @samp{PACKAGE} and
 @samp{VERSION}.  This can be avoided by passing the @samp{no-define}
@@ -3562,10 +3563,11 @@ rule to build @file{foo.h} first by lack of dependency information.
 @cindex BUILT_SOURCES, defined
 
 The @code{BUILT_SOURCES} variable is a workaround for this problem.  A
-source file listed in @code{BUILT_SOURCES} is made on @code{make all} or
-@code{make check} before other targets are processed.  However, such a
-source file is not @emph{compiled} unless explicitly requested by
-mentioning it in some other @samp{_SOURCES} variable.
+source file listed in @code{BUILT_SOURCES} is made on @code{make all}
+or @code{make check} (or even @code{make install}) before other
+targets are processed.  However, such a source file is not
+@emph{compiled} unless explicitly requested by mentioning it in some
+other @samp{_SOURCES} variable.
 
 So, to conclude our introductory example, we could use
 @code{BUILT_SOURCES = foo.h} to ensure @file{foo.h} gets built before
@@ -3580,12 +3582,12 @@ doesn't need to appear in @code{BUILT_SOURCES} (unless it is included by
 another source), because it's a known dependency of the associated
 object.
 
-It might be important to emphasize that @code{BUILT_SOURCES} is honored
-only by @code{make all} and @code{make check}.  This means you cannot
-build a specific target (e.g., @code{make foo}) in a clean tree if it
-depends on a built source.  However it will succeed if you have run
-@code{make all} earlier, because accurate dependencies are already
-available.
+It might be important to emphasize that @code{BUILT_SOURCES} is
+honored only by @code{make all}, @code{make check} and @code{make
+install}.  This means you cannot build a specific target (e.g.,
+@code{make foo}) in a clean tree if it depends on a built source.
+However it will succeed if you have run @code{make all} earlier,
+because accurate dependencies are already available.
 
 The next section illustrates and discusses the handling of built sources
 on a toy example.
@@ -3670,8 +3672,8 @@ make[1]: Leaving directory `/home/adl/tmp'
 @end example
 
 However, as said earlier, @code{BUILT_SOURCES} applies only to the
-@code{all} and @code{check} targets.  It still fails if you try to run
-@code{make foo} explicitly:
+@code{all}, @code{check}, and @code{install} targets.  It still fails
+if you try to run @code{make foo} explicitly:
 
 @example
 % make clean
@@ -3827,6 +3829,12 @@ you leave it enabled by default.  It is probably better for sites with
 strange setups to cope for themselves than to make the installation less
 nice for everybody else.
 
+@vindex dist_lisp_LISP
+@vindex dist_noinst_LISP
+Lisp sources are not distributed by default.  You can prefix the
+@code{LISP} primary with @code{dist_}, as in @code{dist_lisp_LISP} or
+@code{dist_noinst_LISP}, to indicate that these files should be
+distributed.
 
 @node gettext, Libtool, Emacs Lisp, Other GNU Tools
 @section Gettext
@@ -5317,8 +5325,35 @@ For instance, here is how to create a hard link to an installed program:
 
 @example
 install-exec-hook:
-        ln $(DESTDIR)$(bindir)/program $(DESTDIR)$(bindir)/proglink
+        ln $(DESTDIR)$(bindir)/program$(EXEEXT) \
+           $(DESTDIR)$(bindir)/proglink$(EXEEXT)
 @end example
+
+Although cheaper and more portable than symbolic links, hard links
+will not work everywhere (for instance OS/2 does not have
+@command{ln}).  Ideally you should fall back to @code{cp -p} when
+@code{ln} does not work.  An easy way, if symbolic links are
+acceptable to you, is to add @code{AC_PROG_LN_S} to
+@file{configure.in} (@pxref{Particular Programs, , Particular Program
+Checks, autoconf, The Autoconf Manual}) and use @code{$(LN_S)} in
+@file{Makefile.am}.
+
+@cindex versioned binaries, installing
+@cindex installing versioned binaries
+@cindex LN_S example
+For instance, here is how you could install a versioned copy of a
+program using @code{$(LN_S)}:
+
+@example
+install-exec-hook:
+        cd $(DESTDIR)$(bindir) && \
+          mv -f prog$(EXEEXT) prog-$(VERSION)$(EXEEXT) && \
+          $(LN_S) prog-$(VERSION)$(EXEEXT) prog$(EXEEXT)
+@end example
+
+Note that we rename the program so that a new version will erase the
+symbolic link, not the real binary.  Also we @code{cd} into the
+destination directory in order to create relative links.
 
 @c FIXME should include discussion of variables you can use in these
 @c rules
@@ -5405,7 +5440,7 @@ the test-suite.
 @node FAQ, Macro and Variable Index, API versioning, Top
 @chapter Frequently Asked Questions about Automake
 
-This chapters covers some questions that often come up on the mailing
+This chapter covers some questions that often come up on the mailing
 lists.
 
 @menu
@@ -5559,7 +5594,7 @@ using (hence testing) their own generated files, instead of the
 generated files that will be released actually.  The developer who
 prepares the tarball might be using a version of the tool that
 produces bogus output (for instance a non-portable C file), something
-other developers could have noticed if they weren't using there own
+other developers could have noticed if they weren't using their own
 versions of this tool.
 
 @subsection Third-party files
@@ -5607,7 +5642,7 @@ development: developers love fixing failures.  However, users with
 wrong versions of maintainer tools may get an error when the rebuild
 rule is spuriously triggered, halting the build.  This failure to let
 the build continue is one of the arguments of the
-@code{AM_MAINTAINER_MODE} advocators.
+@code{AM_MAINTAINER_MODE} advocates.
 
 @subsection @code{AM_MAINTAINER_MODE}
 @cindex AM_MAINTAINER_MODE, purpose
@@ -5636,7 +5671,7 @@ rules that need exotic tools that users may not have available.
 Several years ago François Pinard pointed out several arguments
 against @code{AM_MAINTAINER_MODE}.  Most of them relate to insecurity.
 By removing dependencies you get non-dependable builds: change to
-sources files can have no-effect on generated files and this can be
+sources files can have no effect on generated files and this can be
 very confusing when unnoticed.  He adds that security shouldn't be
 reserved to maintainers (what @code{--enable-maintainer-mode}
 suggests), on the contrary.  If one user has to modify a
@@ -5700,10 +5735,10 @@ Finally it's really hard to @file{forget} adding a file to
 compiled nor installed, so you can't even test it.
 @end itemize
 
-Still, these are philosophic objections, and as such you may disagree,
+Still, these are philosophical objections, and as such you may disagree,
 or find enough value in wildcards to dismiss all of them.  Before you
 start writing a patch against Automake to teach it about wildcards,
-let's see the the main technical issue: portability.
+let's see the main technical issue: portability.
 
 Although @code{$(wildcard ...)} works with GNU @command{make}, it is
 not portable to other @command{make} implementations.
@@ -5715,7 +5750,7 @@ list all files and not use @code{$(wildcard ...)}.  However that
 means developers need to remember they must run @code{automake} each
 time they add, delete, or rename files.
 
-Compared to editing @file{Makefile.am}, this really little win.  Sure,
+Compared to editing @file{Makefile.am}, this is really little win.  Sure,
 it's easier and faster to type @code{automake; make} than to type
 @code{emacs Makefile.am; make}.  But nobody bothered enough to write a
 patch add support for this syntax.  Some people use scripts to
@@ -5769,9 +5804,9 @@ proceed with an example.  Suppose our package contains a program for
 which we want to build a man page using @command{help2man}.  GNU
 @command{help2man} produces simple manual pages from the @code{--help}
 and @code{--version} output of other commands (@pxref{Top, , Overview,
-help2man, The Help2man Manual}).  Because we don't want our users to
-install @command{help2man}, we decide to distribute the generated man
-page using the following setup.
+help2man, The Help2man Manual}).  Because we don't to force want our
+users to install @command{help2man}, we decide to distribute the
+generated man page using the following setup.
 
 @example
 # This Makefile.am is bogus.
@@ -5878,8 +5913,7 @@ For desperate cases, it's always possible to disable this check by
 setting @code{distcleancheck_listfiles} as documented in @ref{Dist}.
 Make sure you do understand the reason why @code{make distcheck}
 complains before you do this.  @code{distcleancheck_listfiles} is a
-way to @emph{hide} errors, not to fix them.  There is always better to
-do.
+way to @emph{hide} errors, not to fix them.  You can always do better.
 
 @page
 @node Macro and Variable Index, General Index, FAQ, Top
