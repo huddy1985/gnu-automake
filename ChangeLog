@@ -1,3 +1,651 @@
+2012-11-17  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	release: stable release 1.12.5
+
+	* configure.ac (AC_INIT): Bump version number to 1.12.5.
+	* m4/amversion.m4: Likewise (auto-updated by "make bootstrap").
+
+2012-11-16  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maintcheck: avoid failures, sync with 'ng/master' more
+
+	* syntax-checks.mk (sc_diff_aclocal_in_aclocal,
+	sc_diff_automake_in_automake): Rename ...
+	(sc_diff_aclocal, sc_diff_automake): ... respectively to these, rewrite
+	to use static pattern rules and 'diff -u' instead of bare 'diff'.  This
+	makes the rules more robust in the face of edits to 'automake.in' and
+	'aclocal.in', and get them in sync with the corresponding checks in the
+	'ng/master' branch.
+	(syntax_check_rules): Adjust.
+
+2012-11-16  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maintcheck: remove 'sc_perl_syntax'
+
+	It is quite useless, since a "make bootstrap" or "make check" would
+	immediately catch a breakage in the 'aclocal' or 'automake' scripts
+	anyway.  In addition, the recent removal of the 'perllibdir' environment
+	variable hack has broken this check.
+
+	* syntax-checks.mk (sc_perl_syntax): Remove.
+	(syntax_check_rules): No longer list it.
+
+2012-11-16  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	sync: update files from upstream with "make fetch"
+
+	* lib/texinfo.tex, lib/config.sub: Update.
+
+2012-11-16  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: get rid of $perllibdir environment variable hack
+
+	That was needed when the automake-$APIVERSION and aclocal-$APIVERSION
+	wrapper scripts used by the testsuite were shell script, rather than
+	perl scripts acting as a thin layers.
+
+	* aclocal.in (BEGIN): Update @INC based on the contents of the array
+	'@Aclocal::perl_libdirs', rather than of the environment variable
+	'perllibdir'.
+	* t/wrap/aclocal.in (BEGIN): Initialize '@Aclocal::perl_libdirs'
+	rather than $ENV{'perllibdir'}.
+	* automake.in (BEGIN): Update @INC based on the contents of the array
+	'@Automake::perl_libdirs', rather than of the environment variable
+	'perllibdir'.
+	* t/wrap/automake.in (BEGIN): Initialize '@Automake::perl_libdirs'
+	rather than $ENV{'perllibdir'}.
+	* NEWS: Update.
+
+2012-11-16  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	configure: respect the '-q' option better
+
+	* configure.ac: Here, by avoiding to print the warnings about
+	using a non-stable Automake version if the '$silent' variable
+	is set to "yes".
+
+2012-11-16  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	cosmetics: de-tabify configure.ac
+
+2012-11-07  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: new variable $am_testaux_builddir
+
+	And a related fix that solves a spurious testsuite failures in
+	VPATH builds.
+
+	* t/ax/test-defs.in ($am_testaux_builddir): New, counterpart of
+	$am_testaux_srcdir, but pointing inside the build directory.
+	* t/self-check-shell-no-trail-bslash.sh: Use $am_testaux_builddir,
+	not $am_testaux_srcdir, when fetching the 'shell-no-trail-bslash'
+	script.
+
+2012-11-07  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: rename $am_testauxdir -> $am_testaux_srcdir
+
+	This is just a preparatory change in view of a future commit.
+
+	* t/ax/test-defs.in: Here.
+	* t/ax/tap-summary-aux.sh: And here.
+	* t/ax/testsuite-summary-checks.sh: And here.
+	* t/distcheck-missing-m4.sh: And here.
+	* t/distcheck-outdated-m4.sh: And here.
+	* t/self-check-shell-no-trail-bslash.sh: And here.
+	* t/test-driver-acsubst.sh: And here.
+	* t/test-driver-cond.sh: And here.
+	* t/test-driver-custom-multitest.sh: And here.
+	* t/test-driver-custom-multitest-recheck.sh: And here.
+	* t/test-driver-custom-multitest-recheck2.sh: And here.
+	* t/testsuite-summary-count-many.sh: And here.
+
+2012-10-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	vala tests: source test-init.sh, not ./defs
+
+	This will avoid spurious errors when the new vala tests (introduced
+	in the 'vala-work' branch) will be merged back to master.
+
+	* t/vala-headers.sh: Adjust as said.
+	* t/vala-libs.sh: Likewise.
+	* t/vala-mix.sh: Likewise.
+	* t/vala-mix2.sh: Likewise.
+	* t/vala-parallel.sh: Likewise.
+	* t/vala-vapi.sh: Likewise.
+	* t/vala-vpath.sh: Likewise.
+	* t/vala.sh: Likewise.
+	* t/vala2.sh: Likewise.
+	* t/vala3.sh: Likewise.
+	* t/vala4.sh: Likewise.
+	* t/vala5.sh: Likewise.
+
+2012-10-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: fix a spurious typo-related failure
+
+	* t/self-check-shell-no-trail-bslash.sh: Here, due to a mistaken
+	use of "||" instead of "&&".
+
+2012-10-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	Merge branch 'vala-work' into maint
+
+	* vala-work:
+	  vala: improve comments to AM_PROG_VALAC
+	  news: update w.r.t. recent vala changes
+	  vala: if no proper compiler found, set $(VALAC) to 'valac'
+	  vala: AM_PROG_VALAC should not produce an error for tool-old valac
+	  docs: document recent changes to AM_PROG_VALAC
+	  tests: enhance tests on AM_PROG_VALAC
+	  vala: style fixes in vala.m4
+	  vala: add action arguments, for when no proper vala compiler is found
+
+2012-10-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: remove spurious leftover use of 'Exit'
+
+	Issue revealed by the 'sc_tests_Exit_not_exit' maintainer check.
+
+	Commit 'v1.12.4-184-g9fed1c8' in master made the same fix basically,
+	but we mistakenly applied it to master only, rather than to maint.
+
+	* t/per-target-flags.sh: Here.
+
+2012-10-31  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: can check our recipes avoid trailing backslashes
+
+	This is related to commit v1.11-1704-g254227b of 2012-05-01,
+	"parallel-tests: avoid trailing backslashes in make recipes",
+	and automake bug#10436.
+
+	Recipes with a trailing backslash character (possibly followed by
+	blank characters only) can cause spurious syntax errors with at
+	least older bash versions (e.g., bash 2.05b), and can be potentially
+	be unportable to other weaker shells.
+
+	So provide a target that runs the testsuite looking for this kind
+	of breakage (without requiring a real bugged shell).
+
+	* t/ax/shell-no-trail-bslash.in: New, a "shell" that chokes on '-c'
+	commands having a trailing '\' (possibly followed by whitespace only).
+	* Makefile (t/ax/shell-no-trail-bslash): Generate this script from it.
+	(noinst_SCRIPTS, CLEANFILES): Add it.
+	(EXTRA_DIST): Add 't/ax/shell-no-trail-bslash.in'.
+	(check-no-trailing-backslash-in-recipes): New target, runs the testsuite
+	with 'shell-no-trail-bslash' as the CONFIG_SHELL, to catch possible
+	recipes having a trailing backslash character (possibly followed by
+	* .gitignore: Update.
+	* t/self-check-shell-no-trail-bslash.sh: New testsuite self-check.
+	* t/parallel-tests-trailing-bslash.sh: Remove as obsolete.
+	* t/list-of-tests.mk: Adjust.
+
+2012-10-27  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	configure: correctly identify missing GNU compilers as such
+
+	* configure.ac: Here, instead of mistakenly diagnose them as "botched".
+
+2012-10-27  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: merge, tweak and modernize few test scripts
+
+	Basically an adjusted-and-improved cherry-pick from Automake-NG
+	commit v1.12.1-343-gff30f83.
+
+	* t/specflg.sh, t/specflg2.sh, t/specflg3.sh: Merged into ...
+	* t/per-target-flags.sh: ... this test.
+	* t/fo.sh: Remove, its weak grepping checks well superseded by
+	the semantic checks in 't/fort4.sh'.
+	* t/cxxo.sh: Remove, its weak grepping checks well superseded
+	by the semantic checks in 't/cxx-demo.sh'.
+	* t/cxxcpp.sh: Enhance a little.
+	* t/empty.sh: Renamed ...
+	* t/empty-data-primary.sh: ... to this.  Add trailing ':' command.
+	* t/empty2.sh, t/empty3.sh, t/empty4.sh: Merged ...
+	* t/empty-sources-primary.tap: ... into this new test.
+	* t/no-outdir-option.sh: Remove.  A test to check than an obsolete
+	and now deleted option ("--output-dir") stays deleted is way too
+	much even for the most test-infected person ;-)
+	* t/list-of-tests.mk: Adjust.
+
+2012-10-27  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: move coverage about BUILT_SOURCES
+
+	Basically a backport of some tests from Automake-NG.
+
+	* t/built-sources-check.sh: Sync it with the version in the ng/master
+	branch.  Accordingly, move part of the checks out ...
+	* t/built-sources-install.sh: ... into this new test, synced from
+	ng/master as well.
+	* t/built-sources-subdir.sh: Minor tweaks and enhancements to sync it
+	with the version in ng/master.
+	* t/built-sources-cond.sh: New test, synced from ng/master.
+	* t/built-sources.sh: Likewise, with minor edits to avoid a spurious
+	failure.
+	* t/built-sources-fork-bomb.sh: Likewise.
+	* t/list-of-tests.mk: Update.
+
+2012-10-27  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: more meaningful names for some test cases
+
+	* t/yacc5.sh: Renamed ...
+	* t/yacc-grepping2.sh: ... like this.
+	* t/yacc7.sh: Renamed ...
+	* t/yacc-headers-and-pr47.sh: ... like this.
+	* t/yacc8.sh: Renamed ...
+	* t/yacc-subdir.sh: ... like this.
+	* t/subdir10.sh: Rename ...
+	* t/subdir-env-interference.sh: ... like this.
+	* t/specflg10.sh: Rename ...
+	* t/am-default-source-ext.sh: ... like this.
+	* t/suffix12.sh: Rename ...
+	* t/suffix-custom-subobj.sh: ... like this.
+	* t/suffix13.sh: Rename ...
+	* t/suffix-custom-subobj-and-specflg.sh: ... like this.
+	* t/check3.sh: Rename ...
+	* t/built-sources-check.sh: ... like this.
+	* t/subdirbuiltsources.sh: Rename ...
+	* t/built-sources-subdir.sh: ... like this.
+	* t/bsource.sh: Rename ...
+	* t/no-spurious-install-recursive.sh: ... like this.
+	* t/list-of-tests.mk: Adjust.
+
+2012-10-27  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: merge some grepping tests on Yacc support
+
+	* t/yacc.sh, t/yacc2.sh: Merge ...
+	* t/yacc-grepping.sh: ... into this test.
+	* t/list-of-tests.mk: Adjust.
+
+2012-10-27  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: prepare to move ./defs to t/ax/test-init.sh
+
+	We don't do this in a sweeping passage, because that would cause
+	endless headaches in the synchronization between the maint, master
+	and ng/master branches.  Instead, we setup our framework to allow
+	test scripts to work by sourcing either './defs' or 'test-init.sh',
+	so that we'll be able to make the transition gradual and painless.
+
+	* t/ax/test-init.sh: New, copied from the previous ./defs file.
+	* defs: Simply work by sourcing the new file.
+	* Makefile.am (dist_noinst_DATA): List the new file.
+	* t/README: Adjust to mandate the sourcing of 'test-init.sh' rather
+	than of './defs'.
+	* t/c-demo.sh: Source 'test-init.sh' instead of ./defs.  This is
+	done to verify our new setup actually works.
+	* t/ac-output-old.tap: Likewise.
+
+2012-10-27  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	depcomp: avoid potential interferences from the environment
+
+	* lib/depcomp (gccflag, dashmflag): By explicitly initializing these
+	variables to the empty string by default.
+
+2012-10-27  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	depcomp: improve comments about the 'gcc' depmode
+
+	It is not only needed by obsolescent gcc compilers (pre-3.x),
+	but also by modern compiler like IBM C/C++.  State that ...
+
+	* lib/depcomp: ... here...
+	* gen-testsuite-part: ... and here, where we generate the
+	'depcomp*.tap' tests.
+
+2012-10-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	vala: improve comments to AM_PROG_VALAC
+
+	* m4/vala.m4 (AM_PROG_VALAC): Here.
+
+2012-10-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: update w.r.t. recent vala changes
+
+	* NEWS: Here.
+
+2012-10-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	vala: if no proper compiler found, set $(VALAC) to 'valac'
+
+	This is better than setting it to ':' (as is currently done), because
+	a triggered makefile rule invoking a vala compilation will then clearly
+	fail with an informative error message like "valac: command not found",
+	rather than silently, with the error possibly going unnoticed, or
+	triggering harder-to-diagnose fallout failures in later steps.
+
+	For a precedent of a similar behaviour, see the AC_PROG_YACC macro.
+
+	* m4/valac.m4: Implement the new semantic.
+	* doc/automake.texi (Vala Support): Document it.
+	* t/vala4.sh: Adjust.
+
+2012-10-26  Sébastien Wilmet  <swilmet@gnome.org>  (tiny change)
+	    Matthieu Baerts  <matttbe@glx-dock.org>
+	    Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	vala: AM_PROG_VALAC should not produce an error for tool-old valac
+
+	This change fixes automake bug#12688.
+
+	In the AM_PROG_VALAC macro, when the optional parameter specifying the
+	minimum release number is not provided, and/or if the Vala compiler is
+	not found, then there is a _warning_ message.
+
+	On the other hand, when the version number is specified and if the Vala
+	compiler is too old, there is an _error_ message.
+
+	This error message is problematic, because for a tarball, the Vala
+	compiler is not required: the generated C code is included in the
+	tarball.  So if a user wants to compile the software, he shouldn't
+	need the valac program with the right version.
+
+	* m4/vala.m4 (AM_PROG_VALAC): Modify to use AC_MSG_WARN instead
+	of AC_MSG_ERROR.
+	* t/vala4.sh: Adjust and enhance.
+	* doc/automake.texi (Vala Support): Likewise.
+	* THANKS: Update.
+
+2012-10-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	docs: document recent changes to AM_PROG_VALAC
+
+	* doc/automake.texi (Vala Support): Here.  This is a follow-up to
+	recent commit 'v1.12.4-20-gdf202a3', "vala: add action arguments,
+	for when no proper vala compiler is found".
+
+2012-10-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: enhance tests on AM_PROG_VALAC
+
+	* t/vala4.sh: Here.
+
+2012-10-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	vala: style fixes in vala.m4
+
+	* m4/vala.m4 (AM_PROG_VALAC): Here.
+
+2012-10-26  Daiki Ueno  <ueno@unixuser.org>  (tiny change)
+
+	vala: add action arguments, for when no proper vala compiler is found
+
+	* m4/vala.m4 (AM_PROG_VALAC): Add optional action arguments to
+	control the behavior if specified version of valac is not found.
+	This emulates the behaviour of AM_PATH_PYTHON.
+	* t/vala4.sh: Enhance.
+
+2012-10-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	sync: update files from upstream with "make fetch"
+
+	* lib/config.guess, lib/config.sub: Update.
+
+2012-10-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maintcheck: remove an obsolescent check
+
+	* syntax-checks.mk (sc_test_names): Remove this check, which verified
+	that no test name contained an m4/m4sugar builtin or macro name.  Since
+	most tests use their own name as the first argument to AC_INIT, doing
+	that would have tickled a bug in Autoconf 2.62; but the bug was fixed
+	in Autoconf 2.63 already; and we are going to soon require Autoconf
+	2.65 anyway (in automake 1.13), so this check has become more annoying
+	than useful.
+	(syntax_check_rules): Don't list the removed check.
+
+2012-10-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: rename some tests to more expressive names, again
+
+	* t/parallel-tests.sh: Rename ...
+	* t/parallel-tests-basics.sh: ... like this.
+	* t/parallel-tests3.sh: Rename ...
+	* t/parallel-tests-concurrency.sh: ... like this.
+	* t/parallel-tests5.sh: Rename ...
+	* t/parallel-tests-concurrency-2.sh: ... like this.
+	* t/parallel-tests6.sh: Rename ...
+	* t/parallel-tests-empty.sh: ... like this.  Adjust comments.
+	* t/parallel-tests8.sh: Rename ...
+	* t/parallel-tests-generated-and-distributed.sh: ... like this.
+	* t/parallel-tests9.sh: Rename ...
+	* t/parallel-tests-recheck.sh: ... like this.
+	* t/parallel-tests10.sh: Rename ...
+	* t/parallel-tests-trailing-whitespace.sh: ... like this.
+	* t/remake3a.sh: Rename ...
+	* t/remake-subdir-no-makefile.sh: ... like this.
+	* t/remake4.sh: Rename ...
+	* t/remake-not-after-make-dist.sh: ... like this.
+	* t/remake5.sh: Rename ...
+	* t/remake-maintainer-mode.sh: ... like this.
+	* t/remake6.sh: Rename ...
+	* t/remake-subdir3.sh: ... like this.
+	* t/remake7.sh: Rename ...
+	* t/remake-fail.sh: ... like this.
+	* t/remake11.sh: Rename ...
+	* t/remake-deeply-nested.sh: ... like this
+	* t/remake12.sh: Rename ...
+	* t/remake-mild-stress.sh: ... like this
+	* t/pr8365-remake-timing.sh: Rename ...
+	* t/remake-timing-bug-pr8365.sh: ... like this.
+	* t/list-of-tests.mk: Adjust.
+
+2012-10-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: remove an obsolescent grepping check
+
+	* t/remake3.sh: This one, superseded by ...
+	* t/remake3a.sh: ... this semantic test, whose comments have been
+	djusted accordingly.
+	* t/list-of-tests.mk: Adjust.
+
+2012-10-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: merge two tests on automatic remake functionality
+
+	* t/remake2.sh: Merge ...
+	* t/remake-subdir-grepping.sh: ... in here.
+	* t/list-of-tests.mk: Adjust.
+
+2012-10-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: rename some test to more expressive names
+
+	* t/remake.sh: Rename ...
+	* t/remake-subdir-grepping.sh: ... like this.
+	* t/remake8a.sh: Rename ...
+	* t/remake-makefile-intree.sh: ... like this, and adjust comments.
+	* t/remake8b.sh: Rename ...
+	* t/remake-makefile-vpath.sh: ... like this, and adjust comments.
+	* t/remake9a.sh: Rename ...
+	* t/remake-after-configure-ac.sh: ... like this, and adjust comments.
+	* t/remake9b.sh: Rename ...
+	* t/remake-after-makefile-am.sh: ... like this, and adjust comments.
+	* t/remake9c.sh: Rename ...
+	* t/remake-after-acinclude-m4.sh: ... like this, and adjust comments.
+	* t/remake9d.sh: Rename ...
+	* t/remake-after-aclocal-m4.sh: ... like this, and adjust comments.
+	* t/remake10a.sh: Rename ...
+	* t/remake-include-configure.sh: ... like this, and adjust comments.
+	* t/remake10b.sh: Rename ...
+	* t/remake-include-makefile.sh: ... like this, and adjust comments.
+	* t/remake10c.sh: Rename ...
+	* t/remake-include-aclocal.sh: ... like this, and adjust comments.
+	* t/list-of-tests.mk: Adjust.
+
+2012-10-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	news: 'compile' supports libfoo.a naming when wrapping Microsoft tools
+
+	This is a follow-up to commit 'v1.12.4-10-g3c5c939' of 2012-10-04,
+	"compile: support libfoo.a naming when wrapping Microsoft tools".
+
+	* NEWS (Bugs fixed in 1.12.5): Update.
+
+2012-10-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: ensure generation of wrapper tests matching multiple conditions
+
+	* gen-testsuite-part: Our old code to generate wrapper tests had a
+	severe limitation, in that if a test matched two or more conditions
+	calling for generation of wrapper tests, still only one wrapper test
+	was generated, instead of the three that would have been expected --
+	that is, one using the setup code triggered by the first condition,
+	one using the setup code triggered by the second condition, and one
+	using both this setup code fragments.
+	Admittedly, this was only a theoretical limitation for the moment,
+	since since so far no test exists that matches two or more conditions
+	for wrapping.  Still, this might change in the future, and easily in
+	an unnoticed way, so better fix the issue now, before it might become
+	a real problem.
+
+2012-10-26  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	tests: simplify a loop in gen-testsuite-part
+
+	* gen-testsuite-part: No need to loop on the (key, value) entries
+	of the %test_generators has: we only use the value, and never the
+	key.  So loop simply on the values.
+
+2012-10-14  Peter Rosin  <peda@lysator.liu.se>
+
+	compile: support libfoo.a naming when wrapping Microsoft tools
+
+	There is a future plan to provide some means to have Automake
+	create static libraries that are named differently depending
+	on the system [1].
+
+	The background is that everyone has always named static libraries
+	libfoo.a, except the Redmond crowd who names them foo.lib, and
+	you have to jump through hoops to have Automake create libraries
+	named foo.lib in the land of non-GNU Windows while still creating
+	libfoo.a everywhere else.
+
+	However, there is probably no sane way to accomplish that system
+	dependent naming discussed in [1] without user intervention,
+	which makes it necessary to support the classic libfoo.a naming
+	when using Microsoft tools in the best possible way, for the
+	benefit of all projects today and for future projects not
+	opting in to whatever scheme is selected for the problem at
+	hand.
+
+	[1] http://lists.gnu.org/archive/html/automake/2012-09/msg00028.html
+
+	* lib/compile (func_cl_dashl): As a last resort, match -lfoo with
+	libfoo.a, if that file exist on the library search path.
+	* t/compile4.sh: Remove obsolescent workaround for the above.
+	* t/compile6.sh: Extend to check that libbaz.a is indeed found
+	when baz.lib and baz.dll.lib does not exist and that bar.lib
+	and bar.dll.lib are preferred over libbar.a.
+
+2012-10-14  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	NEWS: fix wording and grammaros, re-wrap text accordingly
+
+	Reported-by: Peter Rosin <peda@lysator.liu.se>
+
+2012-10-14  Paul Eggert  <eggert@cs.ucla.edu>
+
+	cosmetics: fix typo in 'lib/depcomp' comments
+
+	Fixes automake bug#12578.
+
+2012-10-02  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	config headers: remove stale comment in makefile fragment
+
+	* lib/am/remake-hdr.am: Here.
+
+2012-10-02  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	NEWS: wording and quoting fixlets in few older entries
+
+2012-10-02  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	config headers: don't emit rules for headers not generated by autoheader
+
+	This change fixed automake bug#12495.
+
+	Even if an AC_CONFIG_HEADERS invocation is passed a list of several files
+	as the first argument, only the first one of those file is considered by
+	autoheader for automatic generation of the corresponding '.in' template.
+	This is done on purpose, and is clearly documented in the Autoconf manual,
+	which (as of the 2.69 version) reads something like this:
+
+	    The autoheader program searches for the first invocation of
+	    AC_CONFIG_HEADERS in configure sources to determine the name of
+	    the template.  If the first call of AC_CONFIG_HEADERS specifies
+	    more than one input file name, autoheader uses the first one.
+
+	That is, an invocation like:
+
+	    AC_CONFIG_HEADERS([config.h config2.h])
+
+	should cause autoheader to generate only a 'config.h.in' template,
+	and not also a 'config2.h.in' one.
+
+	Accordingly, automake, when tracing AC_CONFIG_HEADERS, should generate
+	remake rules only for the template associated to the first input file
+	name passed to that macro.  In some situations, however, automake failed
+	to properly limit itself in this way; for example, with an input like:
+
+	    AC_CONFIG_HEADERS([config.h sub/foo.h])
+
+	in configure.ac, and with the 'sub' directory listed in the SUBDIRS
+	variable of the top-level Makefile, automake would erroneously generate
+	in 'sub/Makefile.in' a rule to remake the 'foo.h.in' template by
+	invoking autoheader.
+
+	This issue was likely introduced in commit 'Release-1-8-23-g262bb92'
+	of 2004-01-05.
+
+	* NEWS: Update.
+	* doc/automake.texi (Optional): Improve wording in the description of
+	hat rules automake generates in response to an 'AC_CONFIG_HEADERS'
+	invocation.
+	* lib/am/remake-hdr.am: Only emit autoheader-invoking remake rules for
+	the %CONFIG_HIN% template if that corresponds to the first argument of
+	AC_CONFIG_HEADERS, as explaned above.  Do so using the automake-time
+	conditional %?FIRST-HDR%, that is properly passed ...
+	* automake.in (handle_configure): ... from a 'file_contents' invocation
+	in here.
+	* t/autohdr-subdir-pr12495.sh: New test.
+	* t/list-of-tests.mk: Add it.
+	* THANKS: Update.
+
+	Helped-by: Hib Eris <hib@hiberis.nl>
+
+2012-10-02  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	docs: fix minor typo: s/expending/expanding/
+
+	* doc/automake.texi (Wildcards): Here.  Fixes automake bug#12516.
+
+2012-10-02  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	sync: update files from upstream with "make fetch"
+
+	* lib/texinfo.tex: Update.
+
+2012-10-02  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	maint: post-release minor version bump
+
+	* configure.ac (AC_INIT): Bump version number to 1.12.4a.
+	* m4/amversion.m4: Likewise (automatically regenerated by
+	"make bootstrap").
+
+2012-09-23  Jim Meyering  <meyering@redhat.com>
+
+	maint: typo fixes s/lies into/lies in/
+
 2012-09-17  Stefano Lattarini  <stefano.lattarini@gmail.com>
 
 	release: stable release 1.12.4

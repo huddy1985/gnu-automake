@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 AC_PREREQ([2.69])
-AC_INIT([GNU Automake], [1.12.4], [bug-automake@gnu.org])
+AC_INIT([GNU Automake], [1.12.5], [bug-automake@gnu.org])
 
 AC_CONFIG_SRCDIR([automake.in])
 AC_CONFIG_AUX_DIR([lib])
@@ -40,7 +40,7 @@ dnl We call AC_PROG_CC in an unusual way, and only for use in our
 dnl testsuite, so also use 'no-dependencies' and 'no-define' among
 dnl the automake options to avoid bloating and potential problems.
 AM_INIT_AUTOMAKE([dist-xz filename-length-max=99 color-tests
-		  parallel-tests silent-rules no-define no-dependencies])
+                  parallel-tests silent-rules no-define no-dependencies])
 
 ## Keep this on a line of its own, since it must be found and processed
 ## by the 'update-copyright' rule in our Makefile.
@@ -89,11 +89,11 @@ AC_CACHE_CHECK([whether $PERL supports ithreads], [am_cv_prog_PERL_ithreads],
     use Config;
     if ($Config{useithreads})
       {
-	require threads;
-	import threads;
-	require Thread::Queue;
-	import Thread::Queue;
-	exit 0;
+        require threads;
+        import threads;
+        require Thread::Queue;
+        import Thread::Queue;
+        exit 0;
       }
     exit 1;' >&AS_MESSAGE_LOG_FD 2>&1
 then
@@ -523,9 +523,11 @@ if test $am_CC_is_GNU = yes; then
 else
   AC_CHECK_TOOLS([GNU_CC], [gcc], [false])
 fi
-AS_IF([AM_RUN_LOG([$GNU_CC --version && $GNU_CC -v])], [],
-      [AC_MSG_WARN([botched installation for GNU C compiler])
-       _AM_SKIP_COMP_TESTS([GNU C])])
+if test "$GNU_CC" != false; then
+  AS_IF([AM_RUN_LOG([$GNU_CC --version && $GNU_CC -v])], [],
+        [AC_MSG_WARN([botched installation for GNU C compiler])
+         _AM_SKIP_COMP_TESTS([GNU C])])
+fi
 
 # GNU C++ compiler.
 AC_ARG_VAR([GNU_CXX],      [GNU C++ compiler])
@@ -537,9 +539,11 @@ if test $am_CXX_is_GNU = yes; then
 else
   AC_CHECK_TOOLS([GNU_CXX], [g++ gpp], [false])
 fi
-AS_IF([AM_RUN_LOG([$GNU_CXX --version && $GNU_CXX -v])], [],
-      [AC_MSG_WARN([botched installation for GNU C++ compiler])
-       _AM_SKIP_COMP_TESTS([GNU C++])])
+if test "$GNU_CXX" != false; then
+  AS_IF([AM_RUN_LOG([$GNU_CXX --version && $GNU_CXX -v])], [],
+        [AC_MSG_WARN([botched installation for GNU C++ compiler])
+         _AM_SKIP_COMP_TESTS([GNU C++])])
+fi
 
 # GNU Fortran compiler.
 AC_ARG_VAR([GNU_FC],      [GNU Fortran compiler])
@@ -551,9 +555,11 @@ if test $am_FC_is_GNU = yes; then
 else
   AC_CHECK_TOOLS([GNU_FC], [gfortran], [false])
 fi
-AS_IF([AM_RUN_LOG([$GNU_FC --version && $GNU_FC -v])], [],
-      [AC_MSG_WARN([botched installation for GNU Fortran compiler])
-       _AM_SKIP_COMP_TESTS([GNU Fortran])])
+if test "$GNU_FC" != false; then
+  AS_IF([AM_RUN_LOG([$GNU_FC --version && $GNU_FC -v])], [],
+        [AC_MSG_WARN([botched installation for GNU Fortran compiler])
+         _AM_SKIP_COMP_TESTS([GNU Fortran])])
+fi
 
 # GNU Fortran 77 compiler.
 AC_ARG_VAR([GNU_F77],    [GNU Fortran 77 compiler])
@@ -565,17 +571,21 @@ if test $am_F77_is_GNU = yes; then
 else
   AC_CHECK_TOOLS([GNU_F77], [g77 gfortran], [false])
 fi
-AS_IF([AM_RUN_LOG([$GNU_F77 --version && $GNU_F77 -v])], [],
-      [AC_MSG_WARN([botched installation for GNU Fortran 77 compiler])
-      _AM_SKIP_COMP_TESTS([GNU Fortran 77])])
+if test "$GNU_F77" != false; then
+  AS_IF([AM_RUN_LOG([$GNU_F77 --version && $GNU_F77 -v])], [],
+        [AC_MSG_WARN([botched installation for GNU Fortran 77 compiler])
+        _AM_SKIP_COMP_TESTS([GNU Fortran 77])])
+fi
 
 # GNU Java compiler.
 AC_ARG_VAR([GNU_GCJ], [GNU Java compiler])
 AC_ARG_VAR([GNU_GCJFLAGS], [GNU Java compiler flags])
 AC_CHECK_TOOLS([GNU_GCJ], [gcj], [false])
-AS_IF([AM_RUN_LOG([$GNU_GCJ --version && $GNU_GCJ -v])], [],
-      [AC_MSG_WARN([botched installation for GNU Java compiler])
-      _AM_SKIP_COMP_TESTS([GNU Java])])
+if test "$GNU_GCJ" != false; then
+  AS_IF([AM_RUN_LOG([$GNU_GCJ --version && $GNU_GCJ -v])], [],
+        [AC_MSG_WARN([botched installation for GNU Java compiler])
+        _AM_SKIP_COMP_TESTS([GNU Java])])
+fi
 
 # If we have been able to find at least a working compiler above, we
 # know what the object and executable extensions for this platform are.
@@ -597,10 +607,10 @@ AC_CONFIG_LINKS([defs:defs])
 
 AC_CONFIG_FILES([t/wrap/aclocal-${APIVERSION}:t/wrap/aclocal.in],
                 [chmod +x t/wrap/aclocal-${APIVERSION}],
-	        [APIVERSION=$APIVERSION])
+                [APIVERSION=$APIVERSION])
 AC_CONFIG_FILES([t/wrap/automake-${APIVERSION}:t/wrap/automake.in],
                 [chmod +x t/wrap/automake-${APIVERSION}],
-	        [APIVERSION=$APIVERSION])
+                [APIVERSION=$APIVERSION])
 
 AC_OUTPUT
 
@@ -618,7 +628,8 @@ am_release_type=`AS_ECHO(["$PACKAGE_VERSION"]) | LC_ALL=C awk ["
   /^$am_beta_version_rx$/ { print \"beta version\"; exit(0); }
   { print \"development snapshot\"; }"]`
 
-test "$am_release_type" = stable || cat <<EOF
+# '$silent' is set to yes if configure is passed the '--quiet' option.
+test "$am_release_type" = stable || test "$silent" = yes || cat <<EOF
 
 WARNING: You are about to use a $am_release_type of automake.
 WARNING: It might easily suffer from new bugs or regressions.

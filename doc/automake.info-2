@@ -1,7 +1,7 @@
 This is doc/automake.info, produced by makeinfo version 4.13 from
 ./doc/automake.texi.
 
-This manual is for GNU Automake (version 1.12.4, 16 September 2012), a
+This manual is for GNU Automake (version 1.12.5, 17 November 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -2992,7 +2992,7 @@ wildcards, let's see the main technical issue: portability.
 to other `make' implementations.
 
    The only way Automake could support `$(wildcard ...)' is by
-expending `$(wildcard ...)' when `automake' is run.  The resulting
+expanding `$(wildcard ...)' when `automake' is run.  The resulting
 `Makefile.in's would be portable since they would list all files and
 not use `$(wildcard ...)'.  However that means developers would need to
 remember to run `automake' each time they add, delete, or rename files.
@@ -4480,49 +4480,49 @@ B.1 Macro Index
 * AC_CONFIG_HEADERS:                     Optional.            (line  46)
 * AC_CONFIG_LIBOBJ_DIR <1>:              LIBOBJS.             (line  51)
 * AC_CONFIG_LIBOBJ_DIR:                  Optional.            (line  41)
-* AC_CONFIG_LINKS:                       Optional.            (line  55)
+* AC_CONFIG_LINKS:                       Optional.            (line  57)
 * AC_CONFIG_SUBDIRS:                     Subpackages.         (line   6)
 * AC_DEFUN:                              Extending aclocal.   (line  36)
-* AC_F77_LIBRARY_LDFLAGS:                Optional.            (line 101)
-* AC_FC_SRCEXT:                          Optional.            (line 107)
+* AC_F77_LIBRARY_LDFLAGS:                Optional.            (line 103)
+* AC_FC_SRCEXT:                          Optional.            (line 109)
 * AC_INIT:                               Public Macros.       (line  15)
 * AC_LIBOBJ <1>:                         LIBOBJS.             (line  11)
 * AC_LIBOBJ <2>:                         LTLIBOBJS.           (line   6)
-* AC_LIBOBJ:                             Optional.            (line  65)
+* AC_LIBOBJ:                             Optional.            (line  67)
 * AC_LIBSOURCE <1>:                      LIBOBJS.             (line  17)
-* AC_LIBSOURCE:                          Optional.            (line  66)
-* AC_LIBSOURCES:                         Optional.            (line  67)
+* AC_LIBSOURCE:                          Optional.            (line  68)
+* AC_LIBSOURCES:                         Optional.            (line  69)
 * AC_OUTPUT:                             Requirements.        (line  15)
 * AC_PREREQ:                             Extending aclocal.   (line  36)
 * AC_PROG_CC_C_O:                        Public Macros.       (line  78)
-* AC_PROG_CXX:                           Optional.            (line  85)
-* AC_PROG_F77:                           Optional.            (line  97)
-* AC_PROG_FC:                            Optional.            (line 112)
+* AC_PROG_CXX:                           Optional.            (line  87)
+* AC_PROG_F77:                           Optional.            (line  99)
+* AC_PROG_FC:                            Optional.            (line 114)
 * AC_PROG_LEX <1>:                       Public Macros.       (line  84)
-* AC_PROG_LEX:                           Optional.            (line 127)
-* AC_PROG_LIBTOOL:                       Optional.            (line 117)
-* AC_PROG_OBJC:                          Optional.            (line  89)
-* AC_PROG_OBJCXX:                        Optional.            (line  93)
-* AC_PROG_RANLIB:                        Optional.            (line  81)
-* AC_PROG_YACC:                          Optional.            (line 121)
-* AC_REQUIRE_AUX_FILE:                   Optional.            (line 131)
-* AC_SUBST:                              Optional.            (line 140)
+* AC_PROG_LEX:                           Optional.            (line 129)
+* AC_PROG_LIBTOOL:                       Optional.            (line 119)
+* AC_PROG_OBJC:                          Optional.            (line  91)
+* AC_PROG_OBJCXX:                        Optional.            (line  95)
+* AC_PROG_RANLIB:                        Optional.            (line  83)
+* AC_PROG_YACC:                          Optional.            (line 123)
+* AC_REQUIRE_AUX_FILE:                   Optional.            (line 133)
+* AC_SUBST:                              Optional.            (line 142)
 * AM_COND_IF <1>:                        Usage of Conditionals.
                                                               (line  66)
-* AM_COND_IF:                            Optional.            (line 156)
+* AM_COND_IF:                            Optional.            (line 158)
 * AM_CONDITIONAL <1>:                    Usage of Conditionals.
                                                               (line   6)
-* AM_CONDITIONAL:                        Optional.            (line 153)
+* AM_CONDITIONAL:                        Optional.            (line 155)
 * AM_CONFIG_HEADER:                      Obsolete Macros.     (line  14)
 * AM_DEP_TRACK:                          Private Macros.      (line  14)
-* AM_GNU_GETTEXT:                        Optional.            (line 162)
-* AM_GNU_GETTEXT_INTL_SUBDIR:            Optional.            (line 168)
+* AM_GNU_GETTEXT:                        Optional.            (line 164)
+* AM_GNU_GETTEXT_INTL_SUBDIR:            Optional.            (line 170)
 * AM_HEADER_TIOCGWINSZ_NEEDS_SYS_IOCTL:  Obsolete Macros.     (line  19)
 * AM_INIT_AUTOMAKE <1>:                  Public Macros.       (line   7)
 * AM_INIT_AUTOMAKE:                      Requirements.        (line   6)
 * AM_MAINTAINER_MODE <1>:                maintainer-mode.     (line  37)
 * AM_MAINTAINER_MODE:                    Rebuilding.          (line   9)
-* AM_MAINTAINER_MODE([DEFAULT-MODE]):    Optional.            (line 173)
+* AM_MAINTAINER_MODE([DEFAULT-MODE]):    Optional.            (line 175)
 * AM_MAKE_INCLUDE:                       Private Macros.      (line  20)
 * AM_MISSING_PROG:                       Public Macros.       (line 100)
 * AM_OUTPUT_DEPENDENCY_COMMANDS:         Private Macros.      (line  15)
@@ -4540,12 +4540,12 @@ B.1 Macro Index
 * AM_SANITY_CHECK:                       Private Macros.      (line  30)
 * AM_SET_DEPDIR:                         Private Macros.      (line  13)
 * AM_SILENT_RULES:                       Public Macros.       (line 108)
-* AM_SUBST_NOTMAKE(VAR):                 Optional.            (line 181)
+* AM_SUBST_NOTMAKE(VAR):                 Optional.            (line 183)
 * AM_SYS_POSIX_TERMIOS:                  Obsolete Macros.     (line  40)
 * AM_WITH_DMALLOC:                       Public Macros.       (line 112)
 * m4_include <1>:                        Basics of Distribution.
                                                               (line  14)
-* m4_include:                            Optional.            (line 191)
+* m4_include:                            Optional.            (line 193)
 
 
 File: automake.info,  Node: Variable Index,  Next: General Index,  Prev: Macro Index,  Up: Indices
@@ -4638,7 +4638,7 @@ B.2 Variable Index
                                                               (line 139)
 * AM_V_GEN:                              Automake silent-rules Option.
                                                               (line 139)
-* AM_VALAFLAGS:                          Vala Support.        (line  35)
+* AM_VALAFLAGS:                          Vala Support.        (line  41)
 * AM_YFLAGS:                             Yacc and Lex.        (line  37)
 * AR:                                    Public Macros.       (line  66)
 * AUTOCONF:                              automake Invocation. (line  28)
@@ -4776,7 +4776,7 @@ B.2 Variable Index
 * libexec_SCRIPTS:                       Scripts.             (line  18)
 * LIBOBJS <1>:                           LIBOBJS.             (line   6)
 * LIBOBJS <2>:                           LTLIBOBJS.           (line   6)
-* LIBOBJS:                               Optional.            (line  68)
+* LIBOBJS:                               Optional.            (line  70)
 * LIBRARIES:                             Uniform.             (line 102)
 * LIBS:                                  Program Variables.   (line  12)
 * LIBTOOLFLAGS:                          Libtool Flags.       (line   6)
@@ -4967,8 +4967,8 @@ B.2 Variable Index
                                                               (line  28)
 * V:                                     Automake silent-rules Option.
                                                               (line 104)
-* VALAC:                                 Vala Support.        (line  29)
-* VALAFLAGS:                             Vala Support.        (line  32)
+* VALAC:                                 Vala Support.        (line  34)
+* VALAFLAGS:                             Vala Support.        (line  38)
 * VERBOSE:                               Parallel Test Harness.
                                                               (line  30)
 * VERSION:                               Basics of Distribution.
@@ -4980,6 +4980,6 @@ B.2 Variable Index
                                                               (line  35)
 * XZ_OPT:                                The Types of Distributions.
                                                               (line  26)
-* YACC:                                  Optional.            (line 122)
+* YACC:                                  Optional.            (line 124)
 * YFLAGS:                                Yacc and Lex.        (line  37)
 

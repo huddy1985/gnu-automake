@@ -1,6 +1,7 @@
 #! /bin/sh
 # This file has been automatically generated.  DO NOT EDIT BY HAND!
 . test-lib.sh
+
 am_tap_implementation=perl
 # In the spirit of VPATH, we prefer a test in the build tree
 # over one in the source tree.

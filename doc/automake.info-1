@@ -1,7 +1,7 @@
 This is doc/automake.info, produced by makeinfo version 4.13 from
 ./doc/automake.texi.
 
-This manual is for GNU Automake (version 1.12.4, 16 September 2012), a
+This manual is for GNU Automake (version 1.12.5, 17 November 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -32,7 +32,7 @@ File: automake.info,  Node: Top,  Next: Introduction,  Up: (dir)
 GNU Automake
 ************
 
-This manual is for GNU Automake (version 1.12.4, 16 September 2012), a
+This manual is for GNU Automake (version 1.12.5, 17 November 2012), a
 program that creates GNU standards-compliant Makefiles from template
 files.
 
@@ -2525,9 +2525,11 @@ their effects are:
      macro.
 
 `AC_CONFIG_HEADERS'
-     Automake will generate rules to rebuild these headers.  Older
-     versions of Automake required the use of `AM_CONFIG_HEADER' (*note
-     Macros::); this is no longer the case.
+     Automake will generate rules to rebuild these headers from the
+     corresponding templates (usually, the template for a `foo.h'
+     header being `foo.h.in').  Older versions of Automake required the
+     use of `AM_CONFIG_HEADER' (*note Macros::); this is no longer the
+     case.
 
      As with `AC_CONFIG_FILES' (*note Requirements::), parts of the
      specification using shell variables will be ignored as far as
@@ -5890,17 +5892,23 @@ installed.
    Automake ships with an Autoconf macro called `AM_PROG_VALAC' that
 will locate the Vala compiler and optionally check its version number.
 
- -- Macro: AM_PROG_VALAC ([MINIMUM-VERSION])
-     Try to find a Vala compiler in `PATH'. If it is found, the variable
-     `VALAC' is set. Optionally a minimum release number of the compiler
-     can be requested:
-
-          AM_PROG_VALAC([0.7.0])
+ -- Macro: AM_PROG_VALAC ([MINIMUM-VERSION], [ACTION-IF-FOUND],
+     [ACTION-IF-NOT-FOUND]) Search for a Vala compiler in `PATH'.  If
+     it is found, the variable `VALAC' is set to point to it (see below
+     for more details).  This macro takes three optional arguments.
+     The first argument, if present, is the minimum version of the Vala
+     compiler required to compile this package.  If a compiler is found
+     and satisfies MINIMUM-VERSION, then ACTION-IF-FOUND is run (this
+     defaults to do nothing).  Otherwise, ACTION-IF-NOT-FOUND is run.
+     If ACTION-IF-NOT-FOUND is not specified, the default value is to
+     print a warning in case no compiler is found, or if a too-old
+     version of the compiler is found.
 
    There are a few variables that are used when compiling Vala sources:
 
 `VALAC'
-     Path to the Vala compiler.
+     Absolute path to the Vala compiler, or simply `valac' if no
+     suitable compiler Vala could be found at configure runtime.
 
 `VALAFLAGS'
      Additional arguments for the Vala compiler.
