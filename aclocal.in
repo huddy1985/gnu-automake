@@ -3,7 +3,7 @@
 # @configure_input@
 
 # aclocal - create aclocal.m4 by scanning configure.in
-# Copyright (C) 1996, 1997 Free Software Foundation, Inc.
+# Copyright (C) 1996, 1997, 1998 Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -84,7 +84,6 @@ $verbosity = 0;
 
 # These aren't quite obsolete.
 #      'md_PATH_PROG',
-#      'ud_GNU_GETTEXT',
 #      'ud_LC_MESSAGES',
 #      'ud_WITH_NLS'
      );
@@ -117,16 +116,17 @@ sub usage
 {
     local ($status) = @_;
 
-    print "Usage: aclocal [OPTIONS] ...\n";
-    print "\
+    print "Usage: aclocal [OPTIONS] ...\n\n";
+    print "Generate aclocal.m4 by scanning configure.in\n
   --acdir=DIR           directory holding config files
   --help                print this help, then exit
   -I DIR                add directory to search list for .m4 files
   --output=FILE         put output in FILE (default aclocal.m4)
+  --print-ac-dir        print name of directory holding m4 files
   --verbose             don't be silent
   --version             print version number, then exit
 
-Report bugs to <bug-gnu-utils\@prep.ai.mit.edu>\n";
+Report bugs to <automake-bugs\@gnu.org>.\n";
 
     exit $status;
 }
@@ -136,6 +136,7 @@ sub parse_arguments
 {
     local (@arglist) = @_;
     local (@dirlist);
+    local ($print_and_exit) = 0;
 
     while (@arglist)
     {
@@ -152,6 +153,10 @@ sub parse_arguments
 	    shift (@arglist);
 	    push (@dirlist, $arglist[0]);
 	}
+	elsif ($arglist[0] eq '--print-ac-dir')
+	{
+	    $print_and_exit = 1;
+	}
 	elsif ($arglist[0] eq '--verbose')
 	{
 	    ++$verbosity;
@@ -159,7 +164,7 @@ sub parse_arguments
 	elsif ($arglist[0] eq '--version')
 	{
 	    print "aclocal (GNU $PACKAGE) $VERSION\n\n";
-	    print "Copyright (C) 1996, 1997 Free Software Foundation, Inc.\n";
+	    print "Copyright (C) 1998 Free Software Foundation, Inc.\n";
 	    print "This is free software; see the source for copying conditions.  There is NO\n";
 	    print "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n";
 	    print "Written by Tom Tromey <tromey\@cygnus.com>\n";
@@ -175,6 +180,12 @@ sub parse_arguments
 	}
 
 	shift (@arglist);
+    }
+
+    if ($print_and_exit)
+    {
+	print $acdir, "\n";
+	exit 0;
     }
 
     return @dirlist;
@@ -208,8 +219,13 @@ sub scan_configure
 	}
 
 	# Search for things we know about.  The "search" sub is
-	# constructed dynamically, above.
-	&search;
+	# constructed dynamically by scan_m4_files.
+	if (! &search && /(^|\s+)(AM_[A-Z_]+)/)
+	{
+	    # Macro not found, but AM_ prefix found.
+	    warn "aclocal: configure.in: $.: macro \`$2' not found in library\n";
+	    $exit_status = 1;
+	}
     }
 
     close (CONFIGURE);
@@ -270,12 +286,14 @@ sub scan_m4_files
     # function (instead of just evalling $search in the loop) so that
     # "die" is correctly and easily propagated if run.
     local ($search, $expr, $key) = '';
-    foreach $key (keys %map)
+    foreach $key (reverse sort keys %map)
     {
 	# EXPR is a regexp matching the name of the macro.
 	($expr = $key) =~ s/(\W)/\\$1/g;
-	$search .= "&add_macro ('" . $key . "') if /" . $expr . "/;\n";
+	$search .= ("if (/" . $expr . "/) { & add_macro (" . $key
+		    . "); return 1; }\n");
     }
+    $search .= "return 0;\n";
     eval 'sub search { ' . $search . '};';
     die "internal error: $@\n search is $search " if $@;
 }
@@ -314,16 +332,23 @@ sub add_file
     $file_seen{$file} = 1;
 
     $output .= $file_contents{$file} . "\n";
-    local (@rlist);
+    local ($a, @rlist);
     foreach (split ("\n", $file_contents{$file}))
     {
-	if (/$ac_require_rx/g)
+	# This is a hack for Perl 4.
+	$a = $_;
+	if ($a =~ /$ac_require_rx/g)
 	{
 	    push (@rlist, $1);
 	}
 
 	# This function constructed dynamically.
-	&search;
+	if (! &search && /(^|\s+)(AM_[A-Z_]+)/)
+	{
+	    # Macro not found, but AM_ prefix found.
+	    warn "aclocal: configure.in: $.: macro \`$2' not found in library\n";
+	    $exit_status = 1;
+	}
     }
 
     local ($macro);
@@ -375,11 +400,23 @@ sub write_aclocal
 {
     return if ! length ($output);
 
-    print STDERR "Writing aclocal.m4\n" if $verbosity;
+    print STDERR "Writing $output_file\n" if $verbosity;
 
-    open (ACLOCAL, "> aclocal.m4")
-	|| die "aclocal: couldn't open \`aclocal.m4' for writing: $!\n";
-    print ACLOCAL "dnl aclocal.m4 generated automatically by aclocal $VERSION\n\n";
+    open (ACLOCAL, "> " . $output_file)
+	|| die "aclocal: couldn't open \`$output_file' for writing: $!\n";
+    print ACLOCAL "dnl $output_file generated automatically by aclocal $VERSION\n";
+    print ACLOCAL "\
+dnl Copyright (C) 1994, 1995, 1996, 1997, 1998 Free Software Foundation, Inc.
+dnl This Makefile.in is free software; the Free Software Foundation
+dnl gives unlimited permission to copy and/or distribute it,
+dnl with or without modifications, as long as this notice is preserved.
+
+dnl This program is distributed in the hope that it will be useful,
+dnl but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+dnl even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+dnl PARTICULAR PURPOSE.
+
+";
     print ACLOCAL $output;
     close (ACLOCAL);
 }

@@ -8,12 +8,12 @@ END-INFO-DIR-ENTRY
 
 INFO-DIR-SECTION Individual utilities
 START-INFO-DIR-ENTRY
-* aclocal: (automake)Invoking aclocal           Generating aclocal.m4
+* aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.2
+   This file documents GNU automake 1.3
 
-   Copyright (C) 1995, 96, 97 Free Software Foundation, Inc.
+   Copyright (C) 1995, 96, 97, 98 Free Software Foundation, Inc.
 
    Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -28,6 +28,81 @@ permission notice identical to this one.
 manual into another language, under the above conditions for modified
 versions, except that this permission notice may be stated in a
 translation approved by the Foundation.
+
+
+File: automake.info,  Node: A Shared Library,  Next: Program variables,  Prev: LIBOBJS,  Up: Programs
+
+Building a Shared Library
+=========================
+
+   Building shared libraries is a relatively complex matter.  For this
+reason, GNU Libtool (*note The Libtool Manual: (libtool)Top.) was
+created to help build shared libraries in a platform-independent way.
+
+   Automake uses Libtool to build libraries declared with the
+`LTLIBRARIES' primary.  Each `_LTLIBRARIES' variable is a list of
+shared libraries to build.  For instance, to create a library named
+`libgettext.a' and its corresponding shared libraries, and install them
+in `libdir', write:
+
+     lib_LTLIBRARIES = libgettext.la
+
+   Note that shared libraries *must* be installed, so
+`noinst_LTLIBRARIES' and `check_LTLIBRARIES' are not allowed.
+
+   For each library, the `library_LIBADD' variable contains the names
+of extra libtool objects (`.lo' files) to add to the shared library.
+The `library_LDFLAGS' variable contains any additional libtool flags,
+such as `-version-info' or `-static'.
+
+   Where an ordinary library might include `@LIBOBJS@', a libtool
+library must use `@LTLIBOBJS@'.  This is required because the object
+files that libtool operates on do not necessarily end in `.o'.  The
+libtool manual contains more details on this topic.
+
+   For libraries installed in some directory, `automake' will
+automatically supply the appropriate `-rpath' option.  However, for
+libraries determined at configure time (and thus mentioned in
+`EXTRA_LTLIBRARIES'), `automake' does not know the eventual
+installation directory; for such libraries you must add the `-rpath'
+option to the appropriate `_LDFLAGS' variable by hand.
+
+   *Note Using Automake with Libtool: (libtool)Using Automake, for more
+information.
+
+
+File: automake.info,  Node: Program variables,  Next: Yacc and Lex,  Prev: A Shared Library,  Up: Programs
+
+Variables used when building a program
+======================================
+
+   Occasionally it is useful to know which `Makefile' variables
+Automake uses for compilations; for instance you might need to do your
+own compilation in some special cases.
+
+   Some variables are inherited from Autoconf; these are `CC',
+`CFLAGS', `CPPFLAGS', `DEFS', `LDFLAGS', and `LIBS'.
+
+   There are some additional variables which Automake itself defines:
+
+`INCLUDES'
+     A list of `-I' options.  This can be set in your `Makefile.am' if
+     you have special directories you want to look in.  `automake'
+     already provides some `-I' options automatically.  In particular it
+     generates `-I$(srcdir)' and a `-I' pointing to the directory
+     holding `config.h' (if you've used `AC_CONFIG_HEADER' or
+     `AM_CONFIG_HEADER').
+
+     `INCLUDES' can actually be used for other `cpp' options besides
+     `-I'.  For instance, it is sometimes used to pass arbitrary `-D'
+     options to the compiler.
+
+`COMPILE'
+     This is the command used to actually compile a C source file.  The
+     filename is appended to form the complete command line.
+
+`LINK'
+     This is the command used to actually link a C program.
 
 
 File: automake.info,  Node: Yacc and Lex,  Next: C++,  Prev: Program variables,  Up: Programs
@@ -64,10 +139,6 @@ the variable `YACC'.  This is most easily done by invoking the macro
 must define the variable `LEX'.  You can use `AC_PROG_LEX' to do this.
 Automake's lex support also requires that you use the `AC_DECL_YYTEXT'
 macro--automake needs to know the value of `LEX_OUTPUT_ROOT'.
-
-   Any program including a lex source file must be linked against
-`@LEXLIB@'.  You can do this by putting `@LEXLIB@' into the appropriate
-`LDADD' variable.
 
    Automake makes it possible to include multiple yacc (or lex) source
 files in a single program.  Automake uses a small program called
@@ -236,7 +307,7 @@ instance if your `configure.in' uses `AM_WITH_REGEX', then any
 dependency on `rx.h' or `regex.h' should be removed, because the
 correct one cannot be known until the user configures the package.
 
-   As it turns out, `automake' is actually smart enough to the
+   As it turns out, `automake' is actually smart enough to handle the
 particular case of the regular expression header.  It will also
 automatically omit `libintl.h' if `AM_GNU_GETTEXT' is used.
 
@@ -247,7 +318,7 @@ automatically omit `libintl.h' if `AM_GNU_GETTEXT' is used.
 turn on the dependency-tracking code again, simply re-run `automake'.
 
    The actual dependency files are put under the build directory, in a
-subdirectory named `.deps'.  These depencencies are machine specific.
+subdirectory named `.deps'.  These dependencies are machine specific.
 It is safe to delete them if you like; they will be automatically
 recreated during the next build.
 
@@ -270,7 +341,7 @@ installation and distribution.
 * Sources::                     Derived sources
 
 
-File: automake.info,  Node: Scripts,  Next: Headers,  Up: Other objects
+File: automake.info,  Node: Scripts,  Next: Headers,  Prev: Other objects,  Up: Other objects
 
 Executable Scripts
 ==================
@@ -341,9 +412,8 @@ Built sources
 `.h' file) is actually derived from some other file.  Such files should
 be listed in the `BUILT_SOURCES' variable.
 
-   Built sources are also not compiled by default.  You must either
-explicitly mention them in some other `_SOURCES' variable for this to
-happen.
+   Built sources are also not compiled by default.  You must explicitly
+mention them in some other `_SOURCES' variable for this to happen.
 
    Note that, in some cases, `BUILT_SOURCES' will work in somewhat
 suprising ways.  In order to get the built sources to work with
@@ -366,9 +436,10 @@ use in GNU programs, it tries hard to interoperate with other GNU tools.
 * gettext::                     Gettext
 * Guile::                       Guile
 * Libtool::                     Libtool
+* Java::                        Java
 
 
-File: automake.info,  Node: Emacs Lisp,  Next: gettext,  Up: Other GNU Tools
+File: automake.info,  Node: Emacs Lisp,  Next: gettext,  Prev: Other GNU Tools,  Up: Other GNU Tools
 
 Emacs Lisp
 ==========
@@ -376,7 +447,8 @@ Emacs Lisp
    Automake provides some support for Emacs Lisp.  The `LISP' primary
 is used to hold a list of `.el' files.  Possible prefixes for this
 primary are `lisp_' and `noinst_'.  Note that if `lisp_LISP' is
-defined, then `configure.in' must run `AM_PATH_LISPDIR' (fixme xref).
+defined, then `configure.in' must run `AM_PATH_LISPDIR' (*note
+Macros::.).
 
    By default Automake will byte-compile all Emacs Lisp source files
 using the Emacs found by `AM_PATH_LISPDIR'.  If you wish to avoid
@@ -427,7 +499,7 @@ macro is understood to mean:
 grow as well.
 
 
-File: automake.info,  Node: Libtool,  Prev: Guile,  Up: Other GNU Tools
+File: automake.info,  Node: Libtool,  Next: Java,  Prev: Guile,  Up: Other GNU Tools
 
 Libtool
 =======
@@ -435,6 +507,25 @@ Libtool
    Automake provides support for GNU Libtool (*note The Libtool Manual:
 (libtool)Top.) with the `LTLIBRARIES' primary.  *Note A Shared
 Library::.
+
+
+File: automake.info,  Node: Java,  Prev: Libtool,  Up: Other GNU Tools
+
+Java
+====
+
+   Automake provides some minimal support for Java compilation with the
+`JAVA' primary.
+
+   Any `.java' files listed in a `_JAVA' variable will be compiled with
+`JAVAC' at build time.  By default, `.class' files are not included in
+the distribution.
+
+   Currently Automake enforces the restriction that only one `_JAVA'
+primary can be used in a given `Makefile.am'.  The reason for this
+restriction is that, in general, it isn't possible to know which
+`.class' files were generated from which `.java' files - so it would be
+impossible to know which files to install where.
 
 
 File: automake.info,  Node: Documentation,  Next: Install,  Prev: Other GNU Tools,  Up: Top
@@ -450,7 +541,7 @@ Building documentation
 * Man pages::                   Man pages
 
 
-File: automake.info,  Node: Texinfo,  Next: Man pages,  Up: Documentation
+File: automake.info,  Node: Texinfo,  Next: Man pages,  Prev: Documentation,  Up: Documentation
 
 Texinfo
 =======
@@ -547,8 +638,8 @@ share directory structure--these targets allow the machine-independent
 parts to be installed only once.  The `install' target depends on both
 of these targets.
 
-   Automake also generates an `uninstall' target, and an `installdirs'
-target.
+   Automake also generates an `uninstall' target, an `installdirs'
+target, and an `install-strip' target.
 
    It is possible to extend this mechanism by defining an
 `install-exec-local' or `install-data-local' target.  If these targets
@@ -565,6 +656,9 @@ exist, they will be run at `make install' time.
    Any variable using a user-defined directory prefix with `exec' in
 the name (eg `myexecbin_PROGRAMS' is installed by `install-exec'.  All
 other user-defined prefixes are installed by `install-data'.
+
+   Automake generates support for the `DESTDIR' variable in all install
+rules; see *Note Makefile Conventions: (standards)Makefile Conventions.
 
 
 File: automake.info,  Node: Clean,  Next: Dist,  Prev: Install,  Up: Top
@@ -638,7 +732,11 @@ Support for test suites
    If the variable `TESTS' is defined, its value is taken to be a list
 of programs to run in order to do the testing.  The programs can either
 be derived objects or source objects; the generated rule will look both
-in SRCDIR and `.'.
+in SRCDIR and `.'.  Programs needing data files should look for them in
+SRCDIR (which is both an environment variable and a make variable) so
+they work when building in a separate directory (*note Build
+Directories: (autoconf)Build Directories.), and in particular for the
+`distcheck' target (*note Dist::.).
 
    The number of failures will be printed at the end of the run.  If a
 given test program exits with a status of 77, then its result is ignored
@@ -654,11 +752,16 @@ this can be useful for debugging the tests.
    If `dejagnu' appears in `AUTOMAKE_OPTIONS', then the a
 `dejagnu'-based test suite is assumed.  The value of the variable
 `DEJATOOL' is passed as the `--tool' argument to `runtest'; it defaults
-to the name of the package.  The variables `EXPECT', `RUNTEST' and
-`RUNTESTFLAGS' can also be overridden to provide project-specific
-values.  For instance, you will need to do this if you are testing a
-compiler toolchain, because the default values do not take into account
-host and target names.
+to the name of the package.
+
+   The variable `RUNTESTDEFAULTFLAGS' holds the `--tool' and `--srcdir'
+flags that are passed to dejagnu by default; this can be overridden if
+necessary.
+
+   The variables `EXPECT', `RUNTEST' and `RUNTESTFLAGS' can also be
+overridden to provide project-specific values.  For instance, you will
+need to do this if you are testing a compiler toolchain, because the
+default values do not take into account host and target names.
 
    In either case, the testing is done via `make check'.
 
@@ -675,19 +778,9 @@ Changing Automake's Behavior
 `gnits'
 `gnu'
 `foreign'
-     Set the strictness as appropriate.
-
-`no-installman'
-     The generated `Makefile.in' will not cause man pages to be
-     installed by default.  However, an `install-man' target will still
-     be available for optional installation.  This option is disallowed
-     at `GNU' strictness and above.
-
-`no-installinfo'
-     The generated `Makefile.in' will not cause info pages to be built
-     or installed by default.  However, `info' and `install-info'
-     targets will still be available.  This option is disallowed at
-     `GNU' strictness and above.
+`cygnus'
+     Set the strictness as appropriate.  The `gnits' option also implies
+     `readme-alpha' and `check-news'.
 
 `ansi2knr'
 `path/ansi2knr'
@@ -696,6 +789,10 @@ Changing Automake's Behavior
      directory to find the `ansi2knr' program.  Generally the path
      should be a relative path to another directory in the same
      distribution (though Automake currently does not check this).
+
+`check-news'
+     Cause `make dist' to fail unless the current version number appears
+     in the first few lines of the `NEWS' file.
 
 `dejagnu'
      Cause `dejagnu'-specific rules to be generated.  *Note Tests::.
@@ -724,9 +821,30 @@ Changing Automake's Behavior
      Dependencies::.  In this case the effect is to effectively disable
      automatic dependency tracking.
 
+`no-installinfo'
+     The generated `Makefile.in' will not cause info pages to be built
+     or installed by default.  However, `info' and `install-info'
+     targets will still be available.  This option is disallowed at
+     `GNU' strictness and above.
+
+`no-installman'
+     The generated `Makefile.in' will not cause man pages to be
+     installed by default.  However, an `install-man' target will still
+     be available for optional installation.  This option is disallowed
+     at `GNU' strictness and above.
+
 `no-texinfo.tex'
      Don't require `texinfo.tex', even if there are texinfo files in
      this directory.
+
+`readme-alpha'
+     If this release is an alpha release, and the file `README-alpha'
+     exists, then it will be added to the distribution.  If this option
+     is given, version numbers are expected to follow one of two forms.
+     The first form is `MAJOR.MINOR.ALPHA', where each element is a
+     number; the final period and number should be left off for
+     non-alpha releases.  The second form is `MAJOR.MINORALPHA', where
+     ALPHA is a letter; it should be omitted for non-alpha releases.
 
 VERSION
      A version number (eg `0.30') can be specified.  If Automake is not
@@ -749,7 +867,7 @@ Miscellaneous Rules
 * Suffixes::                    Handling new file extensions
 
 
-File: automake.info,  Node: Tags,  Next: Suffixes,  Up: Miscellaneous
+File: automake.info,  Node: Tags,  Next: Suffixes,  Prev: Miscellaneous,  Up: Miscellaneous
 
 Interfacing to `etags'
 ======================
@@ -933,6 +1051,8 @@ will cause any generated `Makefile.in' to comply with Cygnus rules.
 
    * The macros `AM_MAINTAINER_MODE' and `AM_CYGWIN32' are required.
 
+   * The `check' target doesn't depend on `all'.
+
    GNU maintainers are advised to use `gnu' strictness in preference to
 the special Cygnus mode.
 
@@ -1015,166 +1135,4 @@ Some ideas for the future
 
    * Rewrite in Guile.  This won't happen in the near future, but it
      will eventually happen.
-
-
-File: automake.info,  Node: Index,  Prev: Future,  Up: Top
-
-Index
-*****
-
-* Menu:
-
-* _LDADD:                                A Program.
-* _LDFLAGS:                              A Program.
-* _LIBADD:                               A Library.
-* _SOURCES:                              A Program.
-* _TEXINFOS:                             Texinfo.
-* AC_ARG_PROGRAM:                        Requirements.
-* AC_CANONICAL_HOST:                     Optional.
-* AC_CANONICAL_SYSTEM:                   Optional.
-* AC_CHECK_PROG:                         Optional.
-* AC_CHECK_PROGS:                        Optional.
-* AC_CHECK_TOOL:                         Optional.
-* AC_CONFIG_AUX_DIR:                     Optional.
-* AC_CONFIG_HEADER:                      Optional.
-* AC_DECL_YYTEXT:                        Optional.
-* AC_FUNC_ALLOCA:                        Optional.
-* AC_FUNC_FNMATCH:                       Optional.
-* AC_FUNC_GETLOADAVG:                    Optional.
-* AC_FUNC_MEMCMP:                        Optional.
-* AC_OUTPUT:                             Requirements.
-* AC_PATH_PROG:                          Optional.
-* AC_PATH_PROGS:                         Optional.
-* AC_PATH_XTRA:                          Optional.
-* AC_PROG_CXX:                           Optional.
-* AC_PROG_INSTALL:                       Requirements.
-* AC_PROG_LEX:                           Optional.
-* AC_PROG_MAKE_SET:                      Requirements.
-* AC_PROG_RANLIB:                        Optional.
-* AC_PROG_YACC:                          Optional.
-* AC_REPLACE_FUNCS:                      Optional.
-* AC_REPLACE_GNU_GETOPT:                 Optional.
-* AC_STRUCT_ST_BLOCKS:                   Optional.
-* AC_SUBST:                              Optional.
-* all:                                   Extending.
-* ALL_LINGUAS:                           Optional.
-* AM_C_PROTOTYPES <1>:                   ANSI.
-* AM_C_PROTOTYPES <2>:                   Macros.
-* AM_C_PROTOTYPES:                       Optional.
-* AM_CONDITIONAL:                        Conditionals.
-* AM_CONFIG_HEADER:                      Macros.
-* AM_FUNC_ERROR_AT_LINE:                 Macros.
-* AM_FUNC_MKTIME:                        Macros.
-* AM_FUNC_OBSTACK:                       Macros.
-* AM_FUNC_STRTOD <1>:                    Macros.
-* AM_FUNC_STRTOD:                        Optional.
-* AM_GNU_GETTEXT:                        Optional.
-* AM_HEADER_TIOCGWINSZ_NEEDS_SYS_IOCTL:  Macros.
-* AM_INIT_AUTOMAKE:                      Requirements.
-* AM_MAINTAINER_MODE:                    Optional.
-* AM_PATH_LISPDIR:                       Macros.
-* AM_PROG_CC_STDC:                       Macros.
-* AM_PROG_INSTALL <1>:                   Macros.
-* AM_PROG_INSTALL:                       Requirements.
-* AM_PROG_LIBTOOL:                       Optional.
-* AM_SANITY_CHECK:                       Macros.
-* AM_SYS_POSIX_TERMIOS:                  Macros.
-* AM_TYPE_PTRDIFF_T:                     Macros.
-* AM_WITH_DMALLOC:                       Macros.
-* AM_WITH_REGEX <1>:                     Macros.
-* AM_WITH_REGEX:                         Optional.
-* ansi2knr:                              ANSI.
-* AUTOMAKE_OPTIONS <1>:                  Options.
-* AUTOMAKE_OPTIONS <2>:                  Dependencies.
-* AUTOMAKE_OPTIONS:                      ANSI.
-* build_alias:                           Optional.
-* BUILT_SOURCES:                         Sources.
-* check:                                 Extending.
-* CLEANFILES:                            Clean.
-* CXX:                                   C++.
-* CXXCOMPILE:                            C++.
-* CXXFLAGS:                              C++.
-* CXXLINK:                               C++.
-* DATA <1>:                              Data.
-* DATA:                                  Uniform.
-* dejagnu:                               Tests.
-* DEJATOOL:                              Tests.
-* dist <1>:                              Dist.
-* dist:                                  Dependencies.
-* dist-hook:                             Extending.
-* dist-shar:                             Options.
-* dist-tarZ:                             Options.
-* dist-zip:                              Options.
-* DIST_SUBDIRS:                          Dist.
-* distcheck:                             Dist.
-* DISTCLEANFILES:                        Clean.
-* dvi:                                   Extending.
-* ELCFILES:                              Emacs Lisp.
-* ETAGS_ARGS:                            Tags.
-* EXPECT:                                Tests.
-* EXTRA_DIST:                            Dist.
-* EXTRA_PROGRAMS:                        A Program.
-* HEADERS <1>:                           Headers.
-* HEADERS:                               Uniform.
-* host_alias:                            Optional.
-* host_triplet:                          Optional.
-* id:                                    Tags.
-* info <1>:                              Extending.
-* info:                                  Options.
-* info_TEXINFOS:                         Texinfo.
-* install:                               Install.
-* install-data <1>:                      Extending.
-* install-data:                          Install.
-* install-data-hook:                     Extending.
-* install-data-local:                    Install.
-* install-exec <1>:                      Extending.
-* install-exec:                          Install.
-* install-exec-hook:                     Extending.
-* install-exec-local:                    Install.
-* install-info:                          Options.
-* install-man <1>:                       Options.
-* install-man:                           Man pages.
-* installdirs:                           Install.
-* LDADD:                                 A Program.
-* LDFLAGS:                               Program variables.
-* LIBADD:                                A Library.
-* LIBOBJS:                               Optional.
-* LIBRARIES:                             Uniform.
-* LISP <1>:                              Emacs Lisp.
-* LISP:                                  Uniform.
-* lisp_LISP:                             Emacs Lisp.
-* MAINTAINERCLEANFILES:                  Clean.
-* man_MANS:                              Man pages.
-* MANS <1>:                              Man pages.
-* MANS:                                  Uniform.
-* MOSTLYCLEANFILES:                      Clean.
-* no-dependencies:                       Dependencies.
-* no-installman:                         Man pages.
-* noinst_LISP:                           Emacs Lisp.
-* OMIT_DEPENDENCIES:                     Dependencies.
-* PACKAGE <1>:                           Dist.
-* PACKAGE <2>:                           Requirements.
-* PACKAGE:                               Uniform.
-* PROGRAMS:                              Uniform.
-* RUNTEST:                               Tests.
-* RUNTESTFLAGS:                          Tests.
-* SCRIPTS <1>:                           Scripts.
-* SCRIPTS:                               Uniform.
-* SOURCES:                               A Program.
-* SUBDIRS <1>:                           Top level.
-* SUBDIRS:                               Depth.
-* SUFFIXES:                              Suffixes.
-* tags:                                  Tags.
-* TAGS_DEPENDENCIES:                     Tags.
-* target_alias:                          Optional.
-* TESTS:                                 Tests.
-* TESTS_ENVIRONMENT:                     Tests.
-* TEXINFOS <1>:                          Texinfo.
-* TEXINFOS:                              Uniform.
-* uninstall <1>:                         Extending.
-* uninstall:                             Install.
-* VERSION <1>:                           Dist.
-* VERSION:                               Requirements.
-* YACC:                                  Optional.
-
 

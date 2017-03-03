@@ -15,7 +15,7 @@ libtool.am ltlib.am ltlibrary.am mans-vars.am program.am progs.am \
 remake-hdr.am remake.am scripts.am subdirs.am tags.am tags-clean.am \
 texi-vers.am texinfos.am libs-clean.am ltlib-clean.am progs-clean.am \
 data-clean.am COPYING INSTALL texinfo.tex ansi2knr.c ansi2knr.1	\
-lisp.am lisp-clean.am
+lisp.am lisp-clean.am mans.am java.am java-clean.am
 
 ## These must all be executable when installed.
 pkgdata_SCRIPTS = config.guess config.sub install-sh mdate-sh missing \
@@ -30,7 +30,6 @@ TAGS_DEPENDENCIES = automake.in aclocal.in automake.texi
 
 ## `test -x' is not portable.  So we use Perl instead.  If Perl
 ## doesn't exist, then this test is meaningless anyway.
-# Check to make sure some installed files are executable.
 installcheck-local:
 	for file in $(pkgdata_SCRIPTS); do \
 	  $(PERL) -e "exit ! -x '$(pkgdatadir)/$$file';" || exit 1; \
@@ -81,6 +80,11 @@ maintainer-check: automake aclocal
 ## We never want to use "undef", only "delete".
 	@if grep undef $(srcdir)/automake.in > /dev/null 2>&1; then \
 	  echo "Found undef in automake.in; use delete instead" 1>&2; \
+	  exit 1; \
+	fi
+## We never want split (/ /,...), only split (' ', ...).
+	@if fgrep 'split (/ /' $(srcdir)/automake.in > /dev/null 2>&1; then \
+	  echo "Found bad split in automake.in" 1>&2; \
 	  exit 1; \
 	fi
 

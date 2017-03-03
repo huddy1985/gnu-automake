@@ -1,3 +1,131 @@
+Sun Apr  5 15:26:42 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* version3.test: Increased version number to ensure failure for a
+	long time to come.
+
+	* library.test: New file.
+
+	* lex2.test: Updated since lex error changed to warning.
+
+Fri Apr  3 13:04:50 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* colon5.test: New file.
+
+	* exdir2.test: New file.
+	* instdata.test: New file.
+
+Wed Mar 25 15:30:39 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* badopt.test: new file.
+	* version3.test: New file.
+
+Mon Mar 23 10:52:36 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* libobj8.test: New file.
+
+Fri Mar 20 00:32:16 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* lex2.test: New file.
+
+	* aclocalii.test: New file.
+
+	* javasubst.test: New file.
+
+Thu Mar 19 14:11:45 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* javaprim.test: New file.
+
+	* sinclude.test: New file.
+
+Wed Mar 18 17:15:22 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* java.test: New file.
+
+Sun Mar  8 15:35:14 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* colon4.test: New file.
+
+Fri Mar  6 21:17:10 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* colon3.test: Refined tests.
+
+Tue Feb 24 12:29:05 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* man.test: Removed.
+
+	* condman2.test: New file.
+
+Mon Feb 23 16:20:49 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* texinfo6.test: New file.
+
+Mon Feb 16 00:08:58 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* aclocali.test: New file.
+
+Fri Feb 13 00:36:38 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* texinfo5.test (info_TEXINFOS): New file.
+
+	* condman.test: New file.
+
+	* Makefile.am (distclean-local): Ignore rm return value.
+
+Thu Feb 12 21:00:34 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* unused.test: New file.
+
+	* whoami.test: New file.
+
+	* alpha.test: New file.
+
+Wed Feb 11 17:28:30 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* aclocal.test: New file.
+
+Thu Feb  5 13:22:17 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* cxxcpp.test: New file.
+
+Mon Dec  1 15:48:16 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* cond3.test: New file.
+
+Sat Nov 29 22:09:27 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* objc.test: New file.
+
+Sat Oct 25 00:04:04 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* libobj7.test: New file.
+
+Tue Oct 21 00:46:24 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* lex2.test: Removed; @LEXLIB@ no longer required.
+
+	* depacl2.test: Use -I, not --acdir.
+
+	* install.test: New file.
+	* ammissing.test: New file.
+
+Sun Sep 28 17:19:52 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* cxxnoc.test: Changed to reflect MKDEP change.
+
+Wed Sep 24 16:01:59 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* output5.test: New file.
+
+	* depend3.test: New file.
+
+Mon Aug 25 17:24:42 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* cygwin32.test: Use AM_EXEEXT, not AM_CYGWIN32.
+
+Tue Aug  5 20:33:33 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* libobj6.test: New file.
+
 Mon May 26 22:47:36 1997  Tom Tromey  <tromey@cygnus.com>
 
 	* depend.test: Fixed test.

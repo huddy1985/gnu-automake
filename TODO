@@ -1,3 +1,35 @@
+* give user more control over -I flags
+  in particular document a way to override the defaults
+
+* Reimplement maintainer mode to use conditionals
+  Also add a conditional for dependency tracking
+
+* Allow for multiple translations of a texinfo file:
+	LL_info_TEXINFOS = ...
+  will put info files for language LL into $(infodir)/LL.
+
+* something like this fails:
+
+	foo = q \
+
+	lib_LTLIBRARIES = foo.la
+
+  this should give an error.
+
+* dependency tracking doesn't work well when a file is removed
+  the new code to track header dependencies exacerbates this
+  what is the fix?
+  ANSWER: for each dependency foo.h, make a dummy target `foo.h:'
+  in the .P file.  Then the right thing ought to happen
+
+* Every program foo has FOOFLAGS right now.
+  It should also have AM_FOOFLAGS, which can be set in Makefile.am.
+
+* when cleaning, should recurse depth first
+
+* quoting bugs
+  - how to install file with a space in its name?
+
 * "make diff" capability
   look at gcc's Makefile.in to see what to do
   or look at maint program
@@ -7,14 +39,14 @@
 
 * add $(srcdir)/ before some dependencies?
 
+* mention PACKAGE/VERSION -vs- autoheader in manual
+
 * define LINK if a program is mentioned, even if no C sources appear
 
 * BUILT_SOURCES should not be distributed, even when they appear in
   another _SOURCES line. [? or maybe just leave this up to the
   to-be-defined generic distribution method ]
   must completely revisit the entire BUILT_SOURCES idea
-  probably should generate dependencies as side effect of compile
-  (but that will mess up guile distributions... sigh)
 
 * in --cygnus, clean-info not generated at top level
 
@@ -48,18 +80,9 @@
 * cross-compilation support:
   programs built and used by the build process need to be
   built for CC_FOR_BUILD
+  introduce a new variable for this
 
 * if foo.y is a source, foo.h isn't auto-distributed?
-
-* dependency tracking doesn't work well when a file is removed
-  the new code to track header dependencies exacerbates this
-  what is the fix?
-  it would probably be better to use "gcc -MD" and move the .d
-  file into the .deps directory.  That is, create the dependencies
-  as a side effect of compilation
-  This still won't solve the file-deletion problem
-  [ also: jim makes distributions by checking out, configuring,
-    and running "make dist".  This scheme would cause that to fail ]
 
 * copyrights on m4 files, aclocal output
 
@@ -74,13 +97,13 @@
 
 * *all* installed scripts should support --version, --help
 
-* have aclocal diagnose unrecognized AM_ macros
-
 For now I guess I'll just have automake give an error if it encounters
 non-C source in a libtool library specification.
 
 * must split $obj into two parts: one for libtool and one for
   deansification.  Otherwise .S files will be deansified!
+
+* ansi2knr must currently appear in a directory that has some source
 
 * if program has the same name as a target, do something sensible:
   - if the target is internal, rename it

@@ -8,12 +8,12 @@ END-INFO-DIR-ENTRY
 
 INFO-DIR-SECTION Individual utilities
 START-INFO-DIR-ENTRY
-* aclocal: (automake)Invoking aclocal           Generating aclocal.m4
+* aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.2
+   This file documents GNU automake 1.3
 
-   Copyright (C) 1995, 96, 97 Free Software Foundation, Inc.
+   Copyright (C) 1995, 96, 97, 98 Free Software Foundation, Inc.
 
    Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -31,68 +31,70 @@ translation approved by the Foundation.
 
 
 Indirect:
-automake.info-1: 1129
-automake.info-2: 48949
+automake.info-1: 1133
+automake.info-2: 49431
+automake.info-3: 92513
 
 Tag Table:
 (Indirect)
-Node: Top1129
-Node: Introduction2644
-Node: Generalities4077
-Node: General Operation4587
-Node: Depth6871
-Node: Strictness7873
-Node: Uniform9318
-Node: Canonicalization12562
-Node: Examples13228
-Node: Complete13553
-Node: Hello15484
-Node: etags18066
-Node: Invoking Automake19607
-Node: configure23403
-Node: Requirements24325
-Node: Optional26509
-Node: Invoking aclocal30430
-Node: Macros32104
-Node: Extending aclocal36569
-Node: Top level37399
-Node: Programs38880
-Node: A Program39690
-Node: A Library44112
-Node: LIBOBJS45223
-Node: A Shared Library45861
-Node: Program variables47638
-Node: Yacc and Lex48949
-Node: C++52776
-Node: ANSI53596
-Node: Dependencies55417
-Node: Other objects57849
-Node: Scripts58440
-Node: Headers59277
-Node: Data59940
-Node: Sources60504
-Node: Other GNU Tools61234
-Node: Emacs Lisp61684
-Node: gettext62713
-Node: Guile63358
-Node: Libtool63907
-Node: Documentation64146
-Node: Texinfo64447
-Node: Man pages66606
-Node: Install67812
-Node: Clean69348
-Node: Dist69825
-Node: Tests72136
-Node: Options73682
-Node: Miscellaneous76380
-Node: Tags76717
-Node: Suffixes77998
-Node: Conditionals78623
-Node: Gnits80734
-Node: Cygnus82438
-Node: Extending83789
-Node: Distributing85448
-Node: Future85962
-Node: Index86909
+Node: Top1133
+Node: Introduction4778
+Node: Generalities6204
+Node: General Operation6714
+Node: Depth9019
+Node: Strictness10021
+Node: Uniform11466
+Node: Canonicalization14710
+Node: Examples15376
+Node: Complete15701
+Node: Hello17651
+Node: etags20233
+Node: Invoking Automake21774
+Node: configure26096
+Node: Requirements27018
+Node: Optional29228
+Node: Invoking aclocal33153
+Node: Macros35093
+Node: Extending aclocal39697
+Node: Top level40527
+Node: Programs42481
+Node: A Program43243
+Node: A Library47682
+Node: LIBOBJS48793
+Node: A Shared Library49431
+Node: Program variables51208
+Node: Yacc and Lex52519
+Node: C++56189
+Node: ANSI57009
+Node: Dependencies58830
+Node: Other objects61269
+Node: Scripts61860
+Node: Headers62719
+Node: Data63382
+Node: Sources63946
+Node: Other GNU Tools64669
+Node: Emacs Lisp65156
+Node: gettext66214
+Node: Guile66859
+Node: Libtool67408
+Node: Java67660
+Node: Documentation68319
+Node: Texinfo68620
+Node: Man pages70801
+Node: Install72007
+Node: Clean73715
+Node: Dist74192
+Node: Tests76503
+Node: Options78497
+Node: Miscellaneous81912
+Node: Tags82249
+Node: Suffixes83552
+Node: Conditionals84177
+Node: Gnits86288
+Node: Cygnus87992
+Node: Extending89393
+Node: Distributing91052
+Node: Future91566
+Node: Index92513
 
 End Tag Table

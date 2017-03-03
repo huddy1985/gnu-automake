@@ -1,3 +1,658 @@
+Sun Apr  5 13:58:24 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* Released 1.3.
+
+	* automake.in (handle_options): Correctly handle trailing alpha
+ 	version letter or lack thereof.  Test version3.test.
+
+	* automake.in (am_conf_line_warning): Perl 4 fixlet; typo fix.
+
+	* automake.in (handle_ltlibraries): Examine _DEPENDENCIES
+	variable.  Report from Chris Provenzano.  Test library.test.
+	(handle_libraries): Likewise.
+
+	* m4/lex.m4: Allow AM_PROG_LEX to be called with no arguments.
+
+Sun Apr  5 13:54:25 1998  Alexandre Oliva <oliva@dcc.unicamp.br>
+
+	* automake.in (scan_one_configure_file): Only warn about
+	AC_DECL_YYTEXT and AC_PROG_LEXX.
+	(am_conf_line_warning): New function.
+
+Fri Apr  3 15:43:46 1998  Doug Evans  <devans@seba.cygnus.com>
+
+	* automake.in (handle_configure): Fix setting of colon_infile
+	in case where multiple files are used to build Makefile.
+	[ Test colon5.test ]
+	
+Fri Apr  3 13:07:58 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* ansi2knr.c, texinfo.tex: New versions from respective
+	maintainers.
+
+	* automake.in (scan_one_configure_file): Exclude INSTALL_DATA from
+	configure_vars.  Test instdata.test.
+
+Tue Mar 31 21:07:42 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (handle_yacc_lex_cxx): Changed to use new version of
+	ansi2knr.
+	* ansi2knr.c: New version from L. Peter Deutsch.
+
+Thu Mar 26 11:00:04 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* m4/exeext.m4: Correctly eliminate bad cases when computing
+	am_cv_exeext.  Report from Markus F.X.J. Oberhumer.
+
+Wed Mar 25 15:09:56 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (handle_options): Support alpha version numbers.
+
+	* lisp.am (install-@DIR@LISP): Allow .el files to appear in build
+	directory.  From Gary V Vaughan.
+
+Mon Mar 23 07:55:04 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* Released 1.2h.
+
+	* header.am (install-@DIR@HEADERS): A header can appear in the
+	build directory as well as the source directory.  From Gary V
+	Vaughan.
+
+	* automake.in (handle_yacc_lex_cxx): Push lib sources onto
+	de_ansi_files before generating ._c dependencies.  Test
+	libobj8.test.
+
+	* m4/mktime.m4: New version from Jim Meyering.
+
+	* aclocal.in (usage): Document --print-ac-dir.
+	(parse_arguments): Added --print-ac-dir.
+
+	* ansi2knr.c, ansi2knr.1: New versions from ghostscript.
+	(main): Reapplied "-" change from Harlan Stenn.
+
+Fri Mar 20 22:42:30 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (scan_one_configure_file): Use &am_conf_line_error,
+	not warn.  Check to make sure warnings happen only for
+	configure.in, not for "not aclocal.m4".
+
+Fri Mar 20 22:35:31 1998  Alexandre Oliva <oliva@dcc.unicamp.br>
+
+	* automake.in: understand AM_PROG_LEX as a replacement for
+	AC_PROG_LEX and AC_DECL_YYTEXT
+	warn if the replaced macros are used.
+	* m4/Makefile.am: add lex.m4
+	* m4/lex.m4 (AM_PROG_LEX): new file and macro
+	* missing: added lex/flex support
+	instead of touching flex and bison output files, try to copy
+	them from a filename based on the last given argument
+
+Fri Mar 20 00:26:10 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* m4/protos.m4: Require AC_PROG_CPP.
+
+	* aclocal.in (add_file): If &search fails, and macro matches AM_,
+	then print error.  Test aclocalii.test.
+
+	De-ansi-fication fixes from Harlan Stenn:
+	* ansi2knr.c (main): Accept "-" argument to mean stdin.
+	* automake.in (handle_yacc_lex_cxx): Preprocess C source before
+	running through ANSI2KNR.
+	(get_object_extension): Generate rule for <dir>/ansi2knr.o.
+
+	* texinfos.am: Include $(DESTDIR).
+	* lisp.am: Include $(DESTDIR).
+	* java.am: Include $(DESTDIR).
+	* mans.am (install-man@SECTION@): Include $(DESTDIR).
+	* automake.in (handle_man_pages): Include $(DESTDIR) in
+	installdirs variable.
+	(handle_texinfo): Likewise.
+	(am_install_var): Likewise.
+	* header-vars.am (DISTDIR): Define.
+	* data.am, header.am, libs.am, ltlib.am, progs.am, scripts.am:
+	Support $(DESTDIR) at install time.  From Assar Westerlund.
+
+	* automake.in (handle_java): Put Java sources in distribution.
+
+Thu Mar 19 01:33:35 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (handle_java): Put JAVACFLAGS after -d option.  From
+	Per Bothner.
+
+	* automake.in (handle_java): Use $(JAVAROOT) in place of `../..'
+	in default CLASSPATH.
+	(am_install_var): Allow `JAVA' variable to be defined.  Don't
+	define `JAVA' primary.
+
+	* automake.in (scan_one_configure_file): Check for `sinclude' and
+	turn into recursive call.
+
+	* automake.in (initialize_per_input): Set $output_all.
+	(generate_makefile): Don't set $output_header or generate
+	`default' target.  Print $output_all before $output_header.
+	(handle_merge_targets): Put `all' target into $output_all.
+
+Wed Mar 18 14:48:44 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (handle_configure): Put secondary dependencies from
+	multi-":" AC_OUTPUT entry into dependency list for file created by
+	config.status, not file created by automake.  Test colon3.test.
+	(generate_makefile): Pass $output, not $makefile, to
+	handle_merge_targets.
+
+	* Makefile.am (pkgdata_DATA): Added java.am, java-clean.am.
+	* java-clean.am: New file.
+	* java.am: New file.
+	* automake.in (generate_makefile): Call handle_java.
+	(handle_java): New sub.
+	(am_install_var): Only push primary variable on @all if not doing
+	Java.
+
+Sun Mar  8 15:43:09 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (handle_configure): When recognizing AC_OUTPUT ":"
+	syntax, make regexp less greedy.  From Maciej W. Rozycki.  Test
+	colon4.test.
+
+Fri Mar  6 21:20:53 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* m4/exeext.m4 (AM_EXEEXT): Ignore am_c_test.o.  From Bruno
+	Haible.
+
+Tue Feb 24 12:10:44 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* Released 1.2f.
+
+	* mans.am (install-man@SECTION@, uninstall-man@SECTION@): Quote
+	`$' in sed expression.
+
+	* config.guess, config.sub, texinfo.tex: New versions from FSF.
+
+	* Makefile.am (pkgdata_DATA): Added mans.am.
+	* automake.in (handle_man_pages): Rewrote for new man page
+	handling.
+	(initialize_global_constants): Removed install_man_format,
+	uninstall_man_format.
+	* mans.am: New file.
+
+	* data.am, header.am, libs.am, lisp.am, ltlib.am, progs.am,
+	scripts.am, texinfos.am: Put `@' before NORMAL_UNINSTALL
+	invocation.
+
+Mon Feb 23 13:38:56 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (get_object_extension): Remove .c.lo rule from
+	libtool when dependencies turned on.
+	* libtool.am (.c.lo): Disable when dependency checking turned on.
+
+	Dependency fixes from Alexandre Oliva:
+	* automake.in (handle_dependencies): Fixed quoting when
+	substituting @PFX@ and @EXT@.  Don't look for the `.P' file.
+	* depend2.am (%.o): Use @PFX@ and @EXT@.
+	(%.lo): New rule.
+
+	* texinfos.am (.txi.info, .txi.dvi, .txi): New rules.
+	* automake.in (handle_texinfo): Recognize .txi files.  From Karl
+	Berry.
+
+	* automake.in (handle_single_transform_list): $objpat now a
+	parameter.  Set $objpat when suffix rule found.
+
+	* aclocal.in (parse_arguments): Only put current year in --version
+	output.
+	* automake.in (parse_arguments): Only put current year in
+	--version output.
+
+Mon Feb 16 00:12:03 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (handle_aclocal_m4): When processing -I options,
+	directory is separate argument.  Test aclocali.test.
+
+Fri Feb 13 14:35:39 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* automake.in (handle_texinfo): Correct condition for whether
+	texinfo.tex is required.  [Test texinfo5.test]
+
+Fri Feb 13 00:28:53 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* Released 1.2e.
+
+	* Makefile.am: Removed bogus line.
+
+Thu Feb 12 22:27:05 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (get_object_extension): Conditionally include .c.o
+	rule from compile.am.
+	(handle_dependencies): Generate correct code when including new
+	depend2.am.
+	(file_contents_with_transform): Better error reporting.
+	* depend.am (MKDEP): Removed.
+	(.deps/.P): Removed.  Don't include .deps/.P.
+	* compile.am (.c.o): Now conditional on dependencies not being
+	generated by compiles.
+	* depend2.am (%.o): New rule.
+	(.deps/%.P): Removed.
+
+	* tags.am (TAGS): Uniquify list of files.  From Harlan Stenn.
+
+	* aclocal.in (scan_m4_files): Reverse-sort keys when constructing
+	`search' function.  From Johan Danielsson.
+
+Tue Sep 16 14:13:15 1997  Paul D. Smith  <psmith@baynetworks.com>
+
+	* automake.in: Create new option --generate-deps.  This option has
+	automake generate a .dep_segment file containing just the
+	dependencies created from the .P list.  This is needed to maintain
+	other makefiles that automake doesn't deal with (Makefile.DOS,
+	SMakefile, etc.)
+	* automake.texi (Invoking Automake): Document it.
+
+Thu Feb 12 19:45:16 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* aclocal.in (scan_configure): Tightened regexp a bit.  Test
+	whoami.test.  From Johan Danielsson.
+
+	Report from H.J. Lu.
+	* automake.in (output_yacc_build_rule): Don't write rule to create
+	`.h' file.
+	(handle_yacc_lex_cxx): Generate rule to build each .h file.
+
+	* automake.in (handle_options): Set readme-alpha and check-news
+	for Gnits after main processing.  Test alpha.test.  From Jim
+	Meyering.
+
+	* aclocal.in (usage): Updated bug-reporting address.
+	* automake.in (usage): Updated bug-reporting address.
+
+	* compile.am: Remove *.core for 4.4BSD systems.  From Assar
+	Westerlund.
+
+	* automake.in (handle_single_transform_list): Don't set
+	seen_any_source if all sources are C++.
+
+Wed Feb 11 17:30:01 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* aclocal.in (write_aclocal): Write to $output_file, not
+	aclocal.m4.  From Alexandre Oliva.
+
+Thu Feb  5 13:38:55 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (scan_one_configure_file): Put CXCPP before CXX in
+	regexp.  From Garth Corral.  Test cxxxcpp.test.
+
+Sun Jan 25 11:16:53 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (generate_makefile): Run handle_minor_options before
+	handle_dist, to make sure README-alpha ends up in distribution.
+	From Jim Meyering.
+
+Tue Jan 13 09:19:33 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* aclocal.in (add_file): Hack for Perl 4.  From Seth Alves.
+
+Thu Dec 11 12:29:46 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* scripts.am: Don't add @EXEEXT@ to installed scripts.  Scripts
+	are not executables.
+
+Tue Dec  2 20:07:18 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (initialize_global_constants): Bug fix in
+	uninstall_man_format.  Report from Eric Backus.
+
+Mon Dec  1 13:52:39 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (handle_source_transform): Correctly generate
+	_OBJECTS when _SOURCES is defined conditionally.  Reported by Rob
+	Savoye.  Test cond3.test.
+
+	Fixes for test objc.test:
+	* automake.in (initialize_per_input): New global seen_any_source.
+	(handle_yacc_lex_cxx): Use seen_any_source to decide when to
+	define LINK, et al.
+	(handle_single_transform_list): Set seen_any_source.
+	(handle_lib_objects_cond): Likewise.
+
+Wed Nov 26 13:41:57 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* Released 1.2d.
+
+	* m4/ccstdc.m4: Don't force AM_PROG_CC_STDC before AC_PROG_CPP.
+	Temporary hack.
+
+	* m4/mktime.m4 (AM_FUNC_MTIME): New version from Paul Eggert.
+
+	* header-vars.am (NORMAL_INSTALL, PRE_INSTALL, POST_INSTALL,
+	NORMAL_UNINSTALL, PRE_UNINSTALL, POST_UNINSTALL): Define as `:',
+	not `true'.
+
+	* automake.in (output_yacc_build_rule): Don't overwrite .h file in
+	non-ylwrap case.
+
+	* tags.am (ID): Scan lisp files.
+	(TAGS): Make tags for lisp files.
+
+Tue Nov 25 14:20:42 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* ltlib.am: Use INSTALL_DATA, not INSTALL_PROGRAM.  From Gord
+	Matzigkeit.
+
+Fri Nov 21 15:15:50 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* m4/mingw.m4, m4/cygwin.m4: Argument to AC_TRY_COMPILE is
+	function body, not entire function.  From Ian Taylor.
+
+Sat Oct 25 12:39:19 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (scan_one_configure_file): Skip empty string for
+	Perl 4.  From Assar Westerlund.
+
+	* config.guess, config.sub, texinfo.tex: New versions from FSF.
+
+Fri Oct 24 23:15:09 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (output_yacc_build_rule): Use YFLAGS again.
+	(handle_yacc_lex_cxx): Error if YACCFLAGS used.
+
+Wed Aug 27 19:26:45 1997  Rob Savoye  <rob@chinadoll.cygnus.com>
+
+	* compile.am: Add suffix rules for ".s.o" and ".S.o" so assembler
+	files can be used.
+	* libtool.am: Add suffix rules for ".s.lo" and ".S.lo" so assembler
+	files can be used.
+	* automake.in: Add .S and .s to the standard list of suffixes so
+	assembler files can be used.
+
+Fri Oct 24 13:39:01 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* m4/exeext.m4: Require AM_MINGW32.  Check MINGW32 setting.
+
+Thu Oct 23 21:16:28 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* m4/init.m4 (missing_dir): AC_REQUIRE AM_SANITY_CHECK,
+	AC_ARG_PROGRAM, and AC_PROG_MAKE_SET.
+
+Tue Oct 21 16:49:36 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (handle_options): Recognize `cygnus'.
+
+Tue Sep  9 17:09:47 1997  Rob Savoye  <rob@chinadoll.cygnus.com>
+
+	* m4/mingw.m4: New file for mingw32 support.
+	* m4/exeext.m4: Also check for the mingw32 environment.
+
+Tue Oct 21 00:39:44 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* m4/Makefile.am (m4data_DATA): Added mingw.m4.
+
+	* automake.in (handle_lib_objects_cond): Don't require @LEXLIB@.
+	(handle_programs): Likewise.
+
+	* subdirs.am (check-recursive installcheck-recursive
+	info-recursive dvi-recursive): Handle case when SUBDIRS is empty.
+	(maintainer-clean-recursive): Likewise.  From Assar Westerlund.
+
+	* aclocal.in (scan_m4_files): If macro recognized, &search will
+	return 1.
+	(scan_configure): If AM_ macro not found, give error.
+
+	* m4/sanity.m4: If `ls' completely fails, die.  From Jim
+	Meyering.
+
+Mon Oct 20 16:13:48 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (handle_single_transform_list): Fixlet for Fortran.
+	From Bernard Urban.
+
+	* libtool.am: Remove _libs, for libtool 1.0d.  From Gord
+	Matzigkeit.
+
+Sun Oct 19 22:59:35 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* texinfos.am: Bug fix.  From John W. Coomes.
+
+Mon Sep 29 12:57:00 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* Released 1.2c.
+
+	* automake.in (handle_dist_worker): In topmost directory of
+	project, use `distdir', not `top_distdir', as argument to
+	--output-dir; likewise when building in subdirs.
+
+Sun Sep 28 15:55:46 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* m4/sanity.m4: Test $*, not $@.  From Akim Demaille.
+
+	* automake.in (handle_minor_options): New sub.
+	(check_gnits_standards): Don't handle README-alpha here.
+	(handle_dist_worker): Check NEWS file if `check-news' option
+	requested.
+	(generate_makefile): Run handle_minor_options.
+	(handle_options): Handle readme-alpha and check-news.  Set them if
+	--gnits.
+
+	* depend.am (MKDEP): Use $(CC), not gcc.
+
+Wed Sep 24 23:48:26 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* Release 1.2b.
+
+	* m4/ccstdc.m4 (AM_PROG_CC_STDC): Make sure this is run before
+	AC_PROG_CPP.  From Markus Oberhumer.
+
+Fri Sep 12 00:04:19 1997  Paul Eggert  <eggert@twinsun.com>
+
+	* m4/ccstdc.m4 (AM_PROG_CC_STDC): Don't look at __STDC__;
+	look only at whether function prototypes are supported.
+
+Wed Sep 24 16:10:37 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* Various: Put "-" before each `rm' line.  This avoids a bug in
+	some losing makes (Ultrix, 4.3 BSD).
+
+	* automake.in (handle_dist_worker): Correctly handle subdirs that
+	have their own configure.in.  From Peter Mattis.
+
+	* automake.in (handle_yacc_lex_cxx): Handle de-ansi-fied sources
+	in srcdir as well as build dir.
+
+	* automake.in (scan_one_configure_file): Detect AC_OUTPUT().
+	(handle_single_transform_list): Don't apply length() to a list.
+
+	* automake.in (handle_programs): Define _DEPENDENCIES variable if
+	not defined by user.
+
+Thu Sep 18 19:43:38 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* m4/sanity.m4: Quote "$@" for m4.  From Gord Matzigkeit.
+
+Mon Sep  1 23:50:38 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (handle_texinfo): Set need_texi_file only when
+	TEXINFO_TEX not defined.
+
+Thu Aug 28 09:37:29 1997  Tom Tromey  <tromey@cygnus.com>
+
+	From Juergen Erhard:
+	* automake.in (SUFFIX_RULE_PATTERN): New global.
+	(handle_single_transform_list): If suffix matches a source suffix,
+	rewrite.
+	(read_am_file): Add suffix rules to %suffix_rules.
+	(initialize_per_input): Initialize %suffix_rules.
+
+Wed Aug 27 12:56:50 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (handle_texinfo): Also remove .kys and .ps files.
+
+	* automake.in (handle_yacc_lex_cxx): Quoting fixlet.  From Kaveh
+	Ghazi.
+
+	* aclocal.in (write_aclocal): Print copyright and copying
+	permissions.  From RMS.
+	* automake.in (initialize_global_constants): More copyright stuff
+	from RMS.
+
+	* automake.in (handle_texinfo): Only require texinfo.tex in
+	appropriate situations.  Report from Paul D. Smith.
+
+Mon Aug 25 15:45:52 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (scan_dependency_file): Fix so that
+	OMIT_DEPENDENCIES will work.  From Alexander Lukyanov.
+
+	* automake.in (handle_texinfo): texi2dvi can generate `.cn'
+	files.  From Akim Demaille.
+
+Wed Aug  6 10:51:37 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (handle_texinfo): Reversed sense of test.
+
+Tue Aug  5 17:49:54 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (handle_dependencies): Always mark OMIT_DEPENDENCIES
+	as seen.
+
+	* automake.in (handle_yacc_lex_cxx): Make each _.c file depend on
+	ansi2knr.
+
+	* automake.in (handle_yacc_lex_cxx): Fix for makes which don't
+	allow $< in non-suffix rules.  From Akim Demaille.
+
+	* automake.in (value_to_list): If variable name contains configure
+	substitution, then just ignore it.
+
+	* automake.in (variable_defined): Mark variable is seen, even if
+	only conditionally seen.
+
+	* Makefile.am: Check for bad splits.
+	* automake.in (various): Use split(' ',...), not split(/ /,...).
+
+Tue Aug  5 14:08:51 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* ylwrap: If the program is a relative path, force it to be
+	absolute.
+
+Tue Aug  5 16:59:41 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* missing: Examine A[CM]_CONFIG_HEADER for name of files to
+	touch.  From Markus F.X.J. Oberhumer.
+
+	* automake.in (require_file_internal): Better error message when
+	installing.
+
+	* automake.in (handle_texinfo): Smarter test when deleting output
+	of makeinfo.
+
+Sat Aug  2 13:32:45 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (do_check_merge_target): In --cygnus mode, check
+	doesn't depend on all.
+
+	* automake.in (output_yacc_build_rule): Use YACCFLAGS, not
+	YFLAGS.  Per GNU Standards.
+
+	* dejagnu.am (RUNTESTDEFAULTFLAGS): New macro.
+	(check-DEJAGNU): Use it.
+
+	* subdirs.am (maintainer-clean-recursive): Actually reverse subdir
+	list.  From Alexander Lukyanov.
+
+	* automake.in (initialize_global_constants): Changed generated
+	copyright.  From RMS.
+
+	* automake.in (handle_configure): Pass correct value for
+	CONFIG_FILES.  From Ian Taylor.
+
+Thu Jul 31 17:36:10 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* ylwrap (pairlist): Shift out trailing "--"; don't pass it to
+	$prog.
+
+Thu Jul 24 00:52:02 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (initialize_global_constants): Changed index names
+	in dist hash so that alternate dist targets will be generated.
+	Report from Glenn Amerine.
+
+	Suggestion from Karl Berry:
+	* automake.in (usage): Added short info line.
+
+	* aclocal.in (usage): Updated bug-reporting address.  Added short
+	info line.
+
+	* automake.in (handle_emacs_lisp): Put contents of lisp-clean.am
+	into output.  Report from Karl Berry.
+
+Mon Aug 25 16:14:32 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (handle_configure): Only generate ":" syntax for
+	CONFIG_FILES when really needed.
+
+Wed Aug  6 14:47:12 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* remake-hdr.am (@CONFIG_HEADER@): Use a dummy command to force
+	GNU make to recheck the file modification time.
+
+Tue Aug  5 14:44:10 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* ylwrap: If the program is a relative path, force it to be
+	absolute.
+
+Mon Aug  4 14:52:08 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* automake.in ($RULE_PATTERN): Accept $ in body of rule name.
+ 	(handle_programs): Don't append $(EXEEXT) if the
+	program name contains '.'.
+	(am_install_var): When rewriting _PROGRAMS, don't append $(EXEEXT)
+	if the program names contains '.'.  Also, handle conditionals.
+
+Sat Aug  2 14:43:41 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* m4/exeext.m4: Fixed quoting.
+
+	* m4/exeext.m4 (am_cv_exeext): Use echo, not ls.
+
+	* automake.in (handle_programs): Transform @EXEEXT@ when including
+	program.am.
+
+Fri Aug  1 17:09:09 1997  Tom Tromey  <tromey@cygnus.com>
+
+	* automake.in (handle_programs): Don't transform CYGWIN or
+	NOTCYGWIN.
+	(am_install_var): Likewise.
+
+	* progs-clean.am (clean-@DIR@PROGRAMS): Never include EXEEXT.
+
+	* progs.am: Removed @EXEEXT@; it is now implicit.
+	* program.am: Add @EXEEXT@ in appropriate places; removed
+	cygwin-dependent code.
+	* automake.in (seen_exeext): Renamed from seen_cygwin32.
+	(handle_programs): Use seen_exeext.
+	(scan_one_configure_file): Look for AM_EXEEXT, not AM_CYGWIN32.
+	(check_cygnus): Use seen_exeext.
+	(am_install_var): Likewise.
+	(am_install_var): When handling PROGRAMS primary, append EXELIST
+	to program names as necessary.
+	* m4/exeext.m4: Require AM_CYGWIN32.
+
+Thu Jul 31 17:36:10 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* ylwrap (pairlist): Shift out trailing "--"; don't pass it to
+	$prog.
+
+	* texinfos.am: Add -I $(srcdir) when invoking $(MAKEINFO) for
+	CYGNUS .texinfo.info case and .texinfo case.
+
+	* automake.in (handle_configure): Correct handling of inputs for
+	for AC_OUTPUT files when invoking config.status.
+
+Mon Jul 28 15:29:25 1997  Rob Savoye  <rob@chinadoll.cygnus.com>
+
+	* m4/cygwin.m4: Set a variable CYGWIN32, rather than EXEEXT.
+	* m4/exeext.m4: New autoconf test for an executable suffix.
+	* m4/Makefile.in: Install the new exeext.m4 test.
+
 Sun Jun 22 14:01:59 1997  Tom Tromey  <tromey@cygnus.com>
 
 	* Released version 1.2.

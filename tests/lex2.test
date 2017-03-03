@@ -1,21 +1,22 @@
 #! /bin/sh
 
-# Test of lex error case.
+# Test to make sure AC_PROG_LEX is an error.
 
 . $srcdir/defs || exit 1
 
 cat >> configure.in << 'END'
+AC_PROG_CC
 AC_PROG_LEX
 AC_DECL_YYTEXT
-AC_PROG_CC
 END
 
 cat > Makefile.am << 'END'
 bin_PROGRAMS = zot
 zot_SOURCES = joe.l
+LDADD = @LEXLIB@
 END
 
 : > joe.l
 
-$AUTOMAKE && exit 1
-exit 0
+$AUTOMAKE 2> output || exit 1
+test -n "`cat output`"

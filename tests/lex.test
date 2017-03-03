@@ -6,8 +6,7 @@
 
 cat >> configure.in << 'END'
 AC_PROG_CC
-AC_PROG_LEX
-AC_DECL_YYTEXT
+AM_PROG_LEX
 END
 
 cat > Makefile.am << 'END'
