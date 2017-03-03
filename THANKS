@@ -34,6 +34,7 @@ Bob Proulx		rwp@hprwp.fc.hp.com
 Braden N. McDaniel	braden@endoframe.com
 Brendan O'Dea		bod@compusol.com.au
 Brian Ford		ford@vss.fsi.com
+Brian Gough		bjg@network-theory.co.uk
 Brian Jones		cbj@nortel.net
 Bruce Korb		bkorb@gnu.org
 Bruno Haible		haible@ilog.fr
@@ -55,6 +56,7 @@ Dieter Baron		dillo@stieltjes.smc.univie.ac.at
 Dmitry Mikhin		dmitrym@acres.com.au
 Doug Evans		devans@cygnus.com
 Duncan Gibson		duncan@thermal.esa.int
+Ed Hartnett		ed@unidata.ucar.edu
 Eleftherios Gkioulekas	lf@amath.washington.edu
 Elena A. Vengerova	helen@oktetlabs.ru
 Elmar Hoffmann		elho@elho.net
@@ -86,6 +88,7 @@ Gustavo Carneiro	gjc@inescporto.pt
 Gwenole Beauchesne      gbeauchesne@mandrakesoft.com
 H.J. Lu			hjl@lucon.org
 H.Merijn Brand		h.m.brand@hccnet.nl
+Harald Dunkel		harald@CoWare.com
 Harlan Stenn		Harlan.Stenn@pfcs.com
 He Li  			tippa000@yahoo.com
 Henrik Frystyk Nielsen	frystyk@w3.org
@@ -122,6 +125,7 @@ Joshua Cowan		jcowan@jcowan.reslife.okstate.edu
 js pendry		js.pendry@msdw.com
 Juergen A. Erhard	jae@laden.ilk.de
 Juergen Keil		jk@tools.de
+Julien Sopena		julien.sopena@lip6.fr
 Karl Berry		kb@cs.umb.edu
 Karl Heuer		kwzh@gnu.org
 Kelley Cook		kcook@gcc.gnu.org
@@ -137,6 +141,7 @@ Lars Hecking		lhecking@nmrc.ucc.ie
 Lars J. Aas		larsa@sim.no
 Laurent Morichetti	laurentm@cup.hp.com
 Leo Davis		ldavis@fonix.com
+Leonardo Boiko		leoboiko@conectiva.com.br
 Loulou Pouchet		loulou@lrde.epita.fr
 Maciej Stachowiak	mstachow@mit.edu
 Maciej W. Rozycki	macro@ds2.pg.gda.pl
@@ -155,6 +160,7 @@ Markus F.X.J. Oberhumer	k3040e4@wildsau.idv-edu.uni-linz.ac.at
 Martin Bravenboer       martin@cs.uu.nl
 Martin Frydl		martin@idoox.com
 Mathias Doreille	doreille@smr.ch
+Mathias Froehlich	M.Froehlich@science-computing.de
 Matt Leach		mleach@cygnus.com
 Matthew D. Langston	langston@SLAC.Stanford.EDU
 Matthias Andree		matthias.andree@gmx.de
@@ -263,11 +269,13 @@ Ulrich Drepper		drepper@gnu.ai.mit.edu
 Ulrich Eckhardt		eckhardt@satorlaser.com
 Václav Haisman		V.Haisman@sh.cvut.cz
 Vadim Zeitlin		Vadim.zeitlin@dptmaths.ens-cachan.fr
+Vincent Lefevre		vincent@vinc17.org
 Volker Boerchers	vboerchers@tecon.de
 Werner John		john@oswf.de
 Werner Koch		wk@isil.d.shuttle.de
 William S Fulton	wsf@fultondesigns.co.uk
 Yann Droneaud		ydroneaud@meuh.eu.org
+Zack Weinberg		zack@codesourcery.com
 
 ;; Local Variables:
 ;; mode: text

@@ -1,3 +1,47 @@
+Bugs fixed in 1.9.6:
+
+* Longstanding bugs:
+
+  - Correctly diagnose `#' comments following trailing backslash.
+
+  - Preserve backslashes preceding `##' lines.
+
+  - Preserve the order of items conditionally appended (+=) to variables.
+
+  - Fix support of installation directory names with spaces on systems
+    where mkinstalldirs cannot use `mkdir -p'.
+
+  - Avoid infinite loop in mdate-sh when TIME_STYLE is set.
+
+  - Do not output two definitions of SOURCES (an internal variable).
+    One was not formatted and could exceed the maximum line length of
+    some third-party tools (e.g., AIX 5.1 grep, breaking dependency
+    tracking).
+
+  - Do not empty info files when attempting to rebuild them without makeinfo.
+
+  - Be smarter when a Makefile.am references files in both "./dir" and
+    "dir": do not output two rules to create these directories.
+    (PR/461)
+
+  - Do not attempt to recover a missing *.elc file if it cannot be
+    created because emacs does not exist.
+
+  - Several aclocal fixes for issues occuring when configure.ac
+    includes some other m4 files explicitely with m4_include or m4_sinclude.
+    (PR/450)
+
+  - depcomp's cpp mode now understands preprocessors that output either
+    `#line 42 file' or `# 42 file'.  (Only the latter was supported.)
+
+* Other miscellaneous changes:
+
+  - Update the GPL, and the FSF postal address.
+
+  - Anticipate for python2.5 in AM_PATH_PYTHON.
+
+  - The manual should now compile without any warning from TeX.
+
 Bugs fixed in 1.9.5:
 
 * Longstanding bugs:
@@ -1209,5 +1253,5 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GNU Automake; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA 02110-1301, USA.

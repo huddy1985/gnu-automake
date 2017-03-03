@@ -20,6 +20,7 @@ acloca14.test \
 acloca15.test \
 acloca16.test \
 acloca17.test \
+acloca19.test \
 acoutnoq.test \
 acoutpt.test \
 acoutpt2.test \
@@ -95,6 +96,8 @@ comment5.test \
 comment6.test \
 comment7.test \
 comment8.test \
+comment9.test \
+commen10.test \
 compile.test \
 compile_f90_c_cxx.test \
 compile_f_c_cxx.test \
@@ -134,6 +137,7 @@ cond34.test \
 cond35.test \
 cond36.test \
 cond37.test \
+cond38.test \
 condd.test \
 condhook.test \
 condinc.test \
@@ -315,6 +319,8 @@ lisp3.test \
 lisp4.test \
 lisp5.test \
 lisp6.test \
+lisp7.test \
+lisp8.test \
 listval.test \
 location.test \
 longline.test \
@@ -339,8 +345,9 @@ mdate4.test \
 missing.test \
 missing2.test \
 missing3.test \
-mkinst2.test \
 mkinstall.test \
+mkinst2.test \
+mkinst3.test \
 multlib.test \
 nobase.test \
 nodef.test \
@@ -533,6 +540,7 @@ txinfo26.test \
 txinfo27.test \
 txinfo28.test \
 txinfo29.test \
+txinfo30.test \
 transform.test \
 unused.test \
 vars.test \

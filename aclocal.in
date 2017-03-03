@@ -22,8 +22,8 @@ eval 'case $# in 0) exec @PERL@ -S "$0";; *) exec @PERL@ -S "$0" "$@";; esac'
 
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-# 02111-1307, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
 
 # Written by Tom Tromey <tromey@redhat.com>.
 
@@ -108,7 +108,7 @@ $ac_defun_rx =
 $ac_require_rx = "AC_REQUIRE\\((?:\\[([^]]+)\\]|([^],)\n]+))\\)";
 
 # Matches an m4_include line
-$m4_include_rx = "(?:m4_)?s?include\\((?:\\[([^]]+)\\]|([^],)\n]+))\\)";
+$m4_include_rx = "(?:m4_)?(s?)include\\((?:\\[([^]]+)\\]|([^],)\n]+))\\)";
 
 
 ################################################################
@@ -201,29 +201,10 @@ sub add_macro ($)
     &add_file ($map{$macro});
 }
 
-# rel2abs ($file, $directory)
-# ---------------------------
-# Similar to File::Spec->rel2abs ($file, $directory), but
-# work with Perl 5.005.  (File::Spec->rel2abs is available
-# only in Perl 5.6.)
-# Remove this once we require 5.6.
-sub rel2abs ($$)
-{
-  my ($file, $dir) = @_;
-  if (! File::Spec->file_name_is_absolute ($file))
-    {
-      $dir = cwd () . "/$dir"
-	unless File::Spec->file_name_is_absolute ($dir);
-      $file = "$dir/$file";
-    }
-  $file = File::Spec->canonpath ($file);
-  return $file;
-}
-
 # scan_configure_dep ($file)
 # --------------------------
 # Scan a configure dependency (configure.ac, or separate m4 files)
-# for uses of know macros and AC_REQUIREs of possibly unknown macros.
+# for uses of known macros and AC_REQUIREs of possibly unknown macros.
 # Recursively scan m4_included files.
 my %scanned_configure_dep = ();
 sub scan_configure_dep ($)
@@ -252,7 +233,10 @@ sub scan_configure_dep ($)
 
       while (/$m4_include_rx/go)
 	{
-	  push (@ilist, $1 || $2);
+	  my $ifile = $2 || $3;
+	  # Skip missing `sinclude'd files.
+	  next if $1 eq 's' && ! -f $ifile;
+	  push @ilist, $ifile;
 	}
 
       while (/$ac_require_rx/go)
@@ -275,8 +259,7 @@ sub scan_configure_dep ($)
     }
 
   add_macro ($_) foreach (@rlist);
-  my $dirname = dirname $file;
-  &scan_configure_dep (rel2abs ($_, $dirname)) foreach (@ilist);
+  &scan_configure_dep ($_) foreach (@ilist);
 }
 
 # Add a file to output.
@@ -303,7 +286,6 @@ my $underquoted_manual_once = 0;
 sub scan_file ($$)
 {
   my ($file, $where) = @_;
-  my $base = dirname $file;
 
   # Do not scan the same file twice.
   return @$file_includes{$file} if exists $file_includes{$file};
@@ -361,16 +343,9 @@ sub scan_file ($$)
 
       while (/$m4_include_rx/go)
 	{
-	  my $ifile = $1 || $2;
-	  # m4_include is relative to the directory of the file which
-	  # perform the include, but we want paths relative to the
-	  # directory where aclocal is run.  Do not use
-	  # File::Spec->rel2abs, because we want to store relative
-	  # paths (they might be used later of aclocal outputs an
-	  # m4_include for this file, or if the user itself includes
-	  # this file).
-	  $ifile = "$base/$ifile"
-	    unless $base eq '.' || File::Spec->file_name_is_absolute ($ifile);
+	  my $ifile = $2 || $3;
+	  # Skip missing `sinclude'd files.
+	  next if $1 eq 's' && ! -f $ifile;
 	  push (@inc_files, $ifile);
 	  $inc_lines{$ifile} = $.;
 	}
@@ -396,6 +371,12 @@ sub scan_file ($$)
 sub strip_redundant_includes (%)
 {
   my %files = @_;
+
+  # Always include acinclude.m4, even if it does not appear to be used.
+  $files{'acinclude.m4'} = 1 if -f 'acinclude.m4';
+  # File included by $configure_ac are redundant.
+  $files{$configure_ac} = 1;
+
   # Files at the end of @file_order should override those at the beginning,
   # so it is important to preserve these trailing files.  We can remove
   # a file A if it is going to be output before a file B that includes
@@ -411,16 +392,17 @@ sub strip_redundant_includes (%)
 	    if $verbose;
 	}
     }
+
+  # configure.ac is implicitly included.
+  delete $files{$configure_ac};
+
   return %files;
 }
 
 sub trace_used_macros ()
 {
   my %files = map { $map{$_} => 1 } keys %macro_seen;
-  $files{'acinclude.m4'} = 1 if -f 'acinclude.m4';
   %files = strip_redundant_includes %files;
-  # configure.ac is implicitly included.
-  delete $files{$configure_ac};
 
   my $traces = ($ENV{AUTOM4TE} || 'autom4te');
   $traces .= " --language Autoconf-without-aclocal-m4 ";
@@ -485,9 +467,7 @@ sub write_aclocal ($@)
     {
       $files{$map{$m}} = 1 if $map{$m} eq $map_traced_defs{$m};
     }
-  $files{'acinclude.m4'} = 1 if -f 'acinclude.m4';
   %files = strip_redundant_includes %files;
-  delete $files{$configure_ac};
 
   for $file (grep { exists $files{$_} } @file_order)
     {

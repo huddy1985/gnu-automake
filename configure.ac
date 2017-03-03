@@ -15,8 +15,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-# 02111-1307, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
 
 dnl Autoconf 2.58 defines abs_top_builddir incorrectly, so we
 dnl have to require 2.58a, otherwise all our test cases will fail
@@ -24,7 +24,7 @@ dnl (abs_top_builddir is used in tests/automake.in).  Note that
 dnl this is a requirement for the Automake package itself.
 dnl Automake users can still use Autoconf 2.58.
 AC_PREREQ(2.58a)
-AC_INIT([GNU Automake], [1.9.5], [bug-automake@gnu.org])
+AC_INIT([GNU Automake], [1.9.6], [bug-automake@gnu.org])
 
 AC_CONFIG_SRCDIR(automake.in)
 AC_CONFIG_AUX_DIR(lib)

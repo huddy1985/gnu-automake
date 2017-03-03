@@ -1,5 +1,5 @@
 ## automake - create Makefile.in from Makefile.am
-## Copyright (C) 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2004
+## Copyright (C) 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
 ## Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
@@ -14,8 +14,8 @@
 
 ## You should have received a copy of the GNU General Public License
 ## along with this program; if not, write to the Free Software
-## Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-## 02111-1307, USA.
+## Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+## 02110-1301, USA.
 
 if %?INSTALL%
 include inst-vars.am
@@ -47,10 +47,32 @@ elc-stamp: $(LISP)
 ## by the user (to disable byte-compilation), and POSIX does not allow
 ## an empty target.
 $(am__ELCFILES): elc-stamp
-## Recover from the removal of $@
-	@if test ! -f $@; then \
-	  rm -f elc-stamp; \
-	  $(MAKE) $(AM_MAKEFLAGS) elc-stamp; \
+## Recover from the removal of $@.
+##
+## Do not call `make elc-stamp' if emacs is not available, because it would
+## be useless.
+	@if test "$(EMACS)" != no && test ! -f $@; then \
+## If `make -j' is used and more than one file has been erased, several
+## processes can execute this block.  We have to make sure that only
+## the first one will run `$(MAKE) $(AM_MAKEFLAGS) elc-stamp', and the
+## other ones will wait.
+##
+## There is a race here if only one child of make receive a signal.
+## In that case the build may fail.  We remove elc-stamp when we receive
+## a signal so we are sure the build will succeed the next time.
+	  trap 'rm -rf elc-lock elc-stamp' 1 2 13 15; \
+	  if mkdir elc-lock 2>/dev/null; then \
+## This code is being executed by the first process.
+	    rm -f elc-stamp; \
+	    $(MAKE) $(AM_MAKEFLAGS) elc-stamp; \
+	    rmdir elc-lock; \
+	  else \
+## This code is being executed by the follower processes.
+## Wait until the first process is done.
+	    while test -d elc-lock; do sleep 1; done; \
+## Succeed if and only if the first process succeeded.
+	    test -f elc-stamp; exit $$?; \
+	  fi; \
 	else : ; fi
 
 

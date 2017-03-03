@@ -21,8 +21,8 @@ eval 'case $# in 0) exec @PERL@ -S "$0";; *) exec @PERL@ -S "$0" "$@";; esac'
 
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-# 02111-1307, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
 
 # Originally written by David Mackenzie <djm@gnu.ai.mit.edu>.
 # Perl reimplementation by Tom Tromey <tromey@redhat.com>.
@@ -142,6 +142,7 @@ use Automake::Rule;
 use Automake::RuleDef;
 use Automake::Wrap 'makefile_wrap';
 use File::Basename;
+use File::Spec;
 use Carp;
 
 ## ----------- ##
@@ -506,7 +507,9 @@ my %object_compilation_map;
 
 
 # This keeps track of the directories for which we've already
-# created dirstamp code.
+# created dirstamp code.  Keys are directories, values are stamp files.
+# Several keys can share the same stamp files if they are equivalent
+# (as are `.//foo' and `foo').
 my %directory_map;
 
 # All .P files.
@@ -4123,11 +4126,6 @@ sub handle_gettext
 # Handle footer elements.
 sub handle_footer
 {
-    # NOTE don't use define_pretty_variable here, because
-    # $contents{...} is already defined.
-    $output_vars .= 'SOURCES = ' . variable_value ('SOURCES') . "\n\n"
-      if variable_value ('SOURCES');
-
     reject_rule ('.SUFFIXES',
 		 "use variable `SUFFIXES', not target `.SUFFIXES'");
 
@@ -4813,6 +4811,9 @@ sub scan_autoconf_traces ($)
 	     || $macro eq 'm4_sinclude'
 	     || $macro eq 'sinclude')
 	{
+          # Skip missing `sinclude'd files.
+          next if $macro ne 'm4_include' && ! -f $args[1];
+
 	  # Some modified versions of Autoconf don't use
 	  # forzen files.  Consequently it's possible that we see all
 	  # m4_include's performed during Autoconf's startup.
@@ -5828,6 +5829,9 @@ sub read_am_file ($$)
 	if (/$IGNORE_PATTERN/o)
 	{
 	    # Merely delete comments beginning with two hashes.
+
+	    # Keep any backslash from the previous line.
+	    $new_saw_bk = $saw_bk;
 	}
 	elsif (/$WHITE_PATTERN/o)
 	{
@@ -5838,11 +5842,12 @@ sub read_am_file ($$)
 	}
 	elsif (/$COMMENT_PATTERN/o)
 	{
+	    error $where, "comment following trailing backslash"
+	      if $saw_bk && $comment eq '';
+
 	    # Stick comments before the incoming macro or rule.
 	    $comment .= $spacing . $_;
 	    $spacing = '';
-	    error $where, "comment following trailing backslash"
-	      if $saw_bk && $comment eq '';
 	    $prev_state = IN_COMMENT;
 	}
 	elsif ($saw_bk)
@@ -7002,27 +7007,38 @@ sub require_conf_file_with_macro ($$$@)
 # Emit rules to create $DIRECTORY if needed, and return
 # the file that any target requiring this directory should be made
 # dependent upon.
+# We don't want to emit the rule twice, and want to reuse it
+# for directories with equivalent names (e.g., `foo/bar' and `./foo//bar').
 sub require_build_directory ($)
 {
   my $directory = shift;
-  my $dirstamp = "$directory/\$(am__dirstamp)";
 
-  # Don't emit the rule twice.
-  if (! defined $directory_map{$directory})
+  return $directory_map{$directory} if exists $directory_map{$directory};
+
+  my $cdir = File::Spec->canonpath ($directory);
+
+  if (exists $directory_map{$cdir})
     {
-      $directory_map{$directory} = 1;
-
-      # Set a variable for the dirstamp basename.
-      define_pretty_variable ('am__dirstamp', TRUE, INTERNAL,
-			      '$(am__leading_dot)dirstamp');
-
-      # Directory must be removed by `make distclean'.
-      $clean_files{$dirstamp} = DIST_CLEAN;
-
-      $output_rules .= ("$dirstamp:\n"
-			. "\t\@\$(mkdir_p) $directory\n"
-			. "\t\@: > $dirstamp\n");
+      my $stamp = $directory_map{$cdir};
+      $directory_map{$directory} = $stamp;
+      return $stamp;
     }
+
+  my $dirstamp = "$cdir/\$(am__dirstamp)";
+
+  $directory_map{$directory} = $dirstamp;
+  $directory_map{$cdir} = $dirstamp;
+
+  # Set a variable for the dirstamp basename.
+  define_pretty_variable ('am__dirstamp', TRUE, INTERNAL,
+			  '$(am__leading_dot)dirstamp');
+
+  # Directory must be removed by `make distclean'.
+  $clean_files{$dirstamp} = DIST_CLEAN;
+
+  $output_rules .= ("$dirstamp:\n"
+		    . "\t\@\$(mkdir_p) $directory\n"
+		    . "\t\@: > $dirstamp\n");
 
   return $dirstamp;
 }
