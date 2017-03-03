@@ -1,27 +1,38 @@
 ## Process this file with automake to create Makefile.in
 
-AUTOMAKE_OPTIONS = gnits
+AUTOMAKE_OPTIONS = gnits 1.4
 MAINT_CHARSET = latin1
 
-SUBDIRS = tests m4
+## We need `.' in SUBDIRS because we want `check' to build `.' before
+## tests.
+SUBDIRS = . m4 tests
 
 bin_SCRIPTS = automake aclocal
 info_TEXINFOS = automake.texi
 
-pkgdata_DATA = clean-kr.am clean.am clean-hdr.am comp-vars.am \
-compile.am data.am dejagnu.am depend.am depend2.am dist-vars.am	\
-footer.am header.am header-vars.am kr-extra.am libs.am library.am \
-libtool.am ltlib.am ltlibrary.am mans-vars.am program.am progs.am \
-remake-hdr.am remake.am scripts.am subdirs.am tags.am tags-clean.am \
-texi-vers.am texinfos.am libs-clean.am ltlib-clean.am progs-clean.am \
-data-clean.am COPYING INSTALL texinfo.tex ansi2knr.c ansi2knr.1	\
-lisp.am lisp-clean.am mans.am java.am java-clean.am
+amfiles = clean-hdr.am clean-kr.am clean.am comp-vars.am compile.am \
+data-clean.am data.am dejagnu.am depend.am depend2.am dist-vars.am \
+footer.am header-vars.am header.am java-clean.am java.am kr-extra.am \
+library.am libs-clean.am libs.am libtool.am lisp-clean.am lisp.am \
+ltlib-clean.am ltlib.am ltlibrary.am mans-vars.am mans.am multilib.am \
+program.am progs-clean.am progs.am remake-hdr.am remake.am scripts.am \
+subdirs.am tags-clean.am tags.am texi-vers.am texinfos.am
 
-## These must all be executable when installed.
-pkgdata_SCRIPTS = config.guess config.sub install-sh mdate-sh missing \
+pkgdata_DATA = COPYING INSTALL texinfo.tex ansi2knr.c ansi2knr.1 $(amfiles)
+
+## These must all be executable when installed.  However, if we use
+## _SCRIPTS, then the program transform will be applied, which is not
+## what we want.  So we make them executable by hand.
+scriptdir = $(pkgdatadir)
+script_DATA = config.guess config.sub install-sh mdate-sh missing \
 mkinstalldirs elisp-comp ylwrap acinstall
 
-EXTRA_DIST = acinstall $(pkgdata_DATA)
+install-data-hook:
+	@for prog in $(script_DATA); do \
+	  chmod +x $(scriptdir)/$$prog; \
+	done
+
+EXTRA_DIST = acinstall $(pkgdata_DATA) $(script_DATA)
 
 # The following requires a fixed version of the Emacs 19.30 etags.
 ETAGS_ARGS = automake.in aclocal.in --lang=none \
@@ -31,7 +42,7 @@ TAGS_DEPENDENCIES = automake.in aclocal.in automake.texi
 ## `test -x' is not portable.  So we use Perl instead.  If Perl
 ## doesn't exist, then this test is meaningless anyway.
 installcheck-local:
-	for file in $(pkgdata_SCRIPTS); do \
+	for file in $(script_DATA); do \
 	  $(PERL) -e "exit ! -x '$(pkgdatadir)/$$file';" || exit 1; \
 	done
 
@@ -53,9 +64,9 @@ maintainer-check: automake aclocal
 ## This check avoids accidental configure substitutions in the source.
 ## There are exactly 8 lines that should be modified.  This works out
 ## to 24 lines of diffs.
-	@if test `diff automake.in automake | wc -l` -ne 24; then \
+	@if test `diff $(srcdir)/automake.in automake | wc -l` -ne 24; then \
 	  echo "found too many diffs between automake.in and automake"; 1>&2; \
-	  diff -c automake.in automake; \
+	  diff -c $(srcdir)/automake.in automake; \
 	  exit 1; \
 	fi
 ## Syntax check with default Perl (on my machine, Perl 5).
@@ -63,7 +74,8 @@ maintainer-check: automake aclocal
 	$(PERL) -c -w aclocal
 ## expect no instances of '${...}'.  However, $${...} is ok, since that
 ## is a shell construct, not a Makefile construct.
-	@if test `fgrep '$${' $(srcdir)/[a-z]*.am | fgrep -v '$$$$' | wc -l` -ne 0; then \
+## The backslash in `$${' is needed for some versions of bash.
+	@if test `fgrep '\$${' $(srcdir)/[a-z]*.am | fgrep -v '$$$$' | wc -l` -ne 0; then \
 	  echo "found too many uses of '\$${'" 1>&2; \
 	  exit 1;				\
 	else :; fi
@@ -95,7 +107,7 @@ cvs-dist: maintainer-check perl4-check distcheck
 	  echo "NEWS not updated; not releasing" 1>&2; \
 	  exit 1;				\
 	fi
-	cvs -q tag `echo "Release-$(VERSION)" | sed 's/\./-/g'`
+	cd $(srcdir) && cvs -q tag `echo "Release-$(VERSION)" | sed 's/\./-/g'`
 	$(MAKE) dist
 
 cvs-diff:
@@ -116,3 +128,8 @@ path-check: distdir
 	  status=$$?; \
 	  rm -rf $(distdir); \
 	  exit $$status
+
+## Just get the .am files into TAGS.  We don't really care too much if
+## any interesting tags show up.
+ETAGS_ARGS = $(amfiles)
+TAGS_DEPENDENCIES = $(ETAGS_ARGS)

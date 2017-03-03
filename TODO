@@ -1,34 +1,99 @@
+* Run automake before libtool.  It will report an error but
+  still won't put the file into the disty.  This is wrong.
+  From Mark H Wilkinson <mhw@kremvax.demon.co.uk>
+
+* AM_CONFIG_HEADER might generate the wrong stamp file names
+  when given multiple headers.  Write a test.
+
+* Currently don't correctly handle multiple inputs to a config header.
+
+* header stamp files still in wrong dirs.
+  stamp-h.in must be in dir with h.in file
+  stamp-h must be in dir with output file
+
+* foo=bar
+  if cond
+  foo += joe
+  endif
+  ... this ought to work.  The fix is probably complicated
+
+* `distcheck' and `dist' should depend on `all'
+
+* Document why putting @FOO@ in _SOURCES doesn't work.
+
+* Add code to generate foo-config script like gnome, gtk
+
+* right now automake sets `TAR' when automake is configured
+  this loses in some situations.
+  however, checking for it in every configure.in also seems lame.
+  probably should just give in on this; meanwhile people can
+  override TAR themselves.
+
+* `DEFS += foo' won't work.
+  That's because DEFS is defined in header-vars.am, which is read
+  after the user's Makefile.am.
+  This will be a problem for any macro defined internally
+    [ fixing this will probabl fix the nasty `exeext redefines
+      foo_PROGRAMS' hack that is in there right now ]
+
+* document user namespace for macro/target names
+  adopt some conventions and use uniformly
+    [ this is a good thing for the rewrite ]
+
+* make distcheck uses directories like `=build'.
+  Some (very rare) POSIX systems don't support `=' in filenames.
+  If this ever becomes a problem, fix it
+
+* distclean must remove config.status
+  can't this cause problems for maintainer-clean?
+  shouldn't maintainer-clean print the message before running
+  any part of the make?  (just to slow things down long enough
+  for the user to stop it)
+  (maybe doesn't matter since people who even know about
+  maintainer-clean already have a clue)
+
+* There are probably more bugs in variable_conditions_sub along
+  the lines of the one that caused cond4.test to fail.
+
 * give user more control over -I flags
   in particular document a way to override the defaults
 
-* Reimplement maintainer mode to use conditionals
-  Also add a conditional for dependency tracking
+* reintroduce AM_FUNC_FNMATCH which sets LIBOBJS
+  Then have automake know about fnmatch.h.
+    [ probably should wait for autoconf to get right functionality ]
+
+* Add a conditional for dependency tracking
+  (what to name it is the biggest problem here)
+  (because we want it to flag dist/no-dist -- not just deps)
+    [ this might not really be correctly doable.
+      instead we need a compile-time conditional for this
+      yuck ]
+
+* Allow per-object cflags:
+	bin_PROGRAMS = foo
+	foo_CFLAGS = -DFOO
+* At the same time, allow sources in subdirs:
+	foo_SOURCES = x/y.c
+  This requires `mkdir x' at build time
+ [ both of these require per-file rules, and not pattern rules ]
+ [ use user-written suffix rules to generate the per-file rules in
+   an automatic way -- this would be mucho cool ]
 
 * Allow for multiple translations of a texinfo file:
 	LL_info_TEXINFOS = ...
   will put info files for language LL into $(infodir)/LL.
 
-* something like this fails:
-
-	foo = q \
-
-	lib_LTLIBRARIES = foo.la
-
-  this should give an error.
-
-* dependency tracking doesn't work well when a file is removed
-  the new code to track header dependencies exacerbates this
-  what is the fix?
-  ANSWER: for each dependency foo.h, make a dummy target `foo.h:'
-  in the .P file.  Then the right thing ought to happen
+* If you suppress an internal variable by specifying a variable
+  in a Makefile.am, but the variable is conditional, then automake
+  should generate the internal variable conditionally.
+  You have to scan the map of all conditions and fill in the holes here
 
 * Every program foo has FOOFLAGS right now.
   It should also have AM_FOOFLAGS, which can be set in Makefile.am.
+DONE: but needs to be documented
 
-* when cleaning, should recurse depth first
-
-* quoting bugs
-  - how to install file with a space in its name?
+* Should be able to update files that would be installed with -a
+  (--force?)
 
 * "make diff" capability
   look at gcc's Makefile.in to see what to do
@@ -38,8 +103,6 @@
   maybe we need something more general?
 
 * add $(srcdir)/ before some dependencies?
-
-* mention PACKAGE/VERSION -vs- autoheader in manual
 
 * define LINK if a program is mentioned, even if no C sources appear
 
@@ -65,8 +128,6 @@
 * if no AM_INIT_AUTOMAKE, then don't handle `missing' stuff.
   Yuck!
 * missing should handle install -d and rmdir -p (for uninstall)
-
-* allow 'cygnus' in AUTOMAKE_OPTIONS
 
 * a couple ways to be smarter:
   - notice when a .c file is a target somewhere, and auto-add it to
@@ -141,9 +202,6 @@ might make editing conceptually easier.
 * consider adding pkglibexecdir, maybe others?
   requests for pkg-dirs with version included
 
-Further:
-- man page fixes
-
 Avoid loops when installing; instead unroll them in automake
 
 * for new autoconf:
@@ -162,10 +220,10 @@ Avoid loops when installing; instead unroll them in automake
 Some long-term projects:
 * if $(FOO) is used somewhere, ensure FOO is defined, either by
   user or by automake if possible
-* Don't rearrange order of `include' lines relative to += assignments.
-* Handle += assignments at all.
-* Handle `include' lines by scanning other files, and adding
-  to Makefile.in dependency
+
+[ include, += support ]
+* even better would be allowing targets in different included
+  fragments to be merged.  e.g., `install-local'.
 
 consider putting all check-* targets onto @check?
 To support --help/--version checking?
@@ -194,7 +252,7 @@ Per> .class files from a list of .java source files.
   certain part of the standards apply.  saw idea in message from
   Craig Burley.  wouldn't it be really cool if compile-mode in Emacs
   understood this convention, and you could click on such text to
-  go to the appropriate info page?
+  go to the appropriate info page?  [ I think you can ]
 
 Jim's idea: should look for @setfilename and warn if filenames too long
 * guess split size
@@ -228,11 +286,7 @@ characters long.
 *    Make sure that all the files in the distribution are world-readable.
 ** also, check --help output and --version output.  Idea from François
 * standards no longer prohibit ANSI C.  What does this imply
-  for the de-ansi-fication feature?
-
-consider supporting "var+= stuff" syntax.  rewrite to just var=... on
-output.  This is sometimes convenient when you want to write a
-Makefile.am in more-or-less modular parts
+  for the de-ansi-fication feature? [ must keep it -- some users rely on it ]
 
 should be able to determine what is built by looking at rules (and
 configure.in).  Then built man pages (eg) could automatically be
@@ -448,6 +502,7 @@ document how to use Automake with CVS.  Idea from Mark Galassi.  Also
 include Greg Woods' more sophisticated "cvs-dist" target.
 
 document rebuilding configure.  CONFIGURE_DEPENDENCIES
+CONFIG_STATUS_DEPENDENCIES
 
 -- must document all variables that are supposed
    to be public knowledge
@@ -462,6 +517,22 @@ section on relationship to GNU make.  include notes on parallel makes
 add a concept index
 
 move discussion of cygwin32, etags, mkid under other gnu tools
+
+CCLD, CXXLD, FLD
+
+================================================================
+
+Things to do for gcc:
+
+Regularize dependency generation.  Add new flags:
+
+-MH   Generate a dummy dependency for each header file mentioned.
+-MT NAME
+      Set name of target
+-MF NAME
+      Set name of output file
+
+Then automake can use -MD -MH -MT 'foo.o foo.lo' -MF .deps/...
 
 ================================================================
 
@@ -559,3 +630,7 @@ Is this worth implementing?
 Scan source directories and warn about missing files, eg .c/.h files
 that aren't mentioned?
   [ distcheck makes this less useful ]
+
+* quoting bugs
+  - how to install file with a space in its name?
+  [ don't bother with this -- make is just too losing ]

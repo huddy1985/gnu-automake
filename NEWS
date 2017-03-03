@@ -1,3 +1,15 @@
+New in 1.4:
+* Added support for the Fortran 77 programming language.
+* Re-indexed the Automake Texinfo manual.
+* Added `AM_FOOFLAGS' variable for each compiler invocation;
+  e.g. AM_CFLAGS can be used in Makefile.am to set C compiler flags
+* Support for latest autoconf, including support for objext
+* Can now put `.' in SUBDIRS to control build order
+* `include' command and `+=' support for macro assignment
+* Dependency tracking no long susceptible to deleted header file problem
+* Maintainer mode now a conditional.  @MAINT@ is now an anachronism.
+* Bug fixes
+
 New in 1.3:
 * Bug fixes
 * Better Cygwin32 support

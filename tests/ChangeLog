@@ -1,3 +1,217 @@
+1999-01-14  Tom Tromey  <tromey@cygnus.com>
+
+	* confh3.test: New file.
+	* Makefile.am (TESTS): Added confh3.test.
+
+	* confh2.test: New file.
+	* Makefile.am (TESTS): Added confh2.test.
+
+	* confh.test: Run automake differently the second time.
+
+	* mdate3.test: New file.
+	* Makefile.am (TESTS): Added mdate3.test.
+
+1999-01-11  Tom Tromey  <tromey@cygnus.com>
+
+	* confh.test: New file.
+	* Makefile.am (TESTS): Added confh.test.
+
+1999-01-10  Tom Tromey  <tromey@cygnus.com>
+
+	* objc.test: Updated to account for new ObjC support.
+
+	* pluseq5.test: New file.
+	* Makefile.am (TESTS): Added pluseq5.test.
+
+	* all.test: Test all *-local targets, not just all-local.
+
+	* all.test: New file.
+	* Makefile.am (TESTS): Added all.test.
+
+1999-01-07  Tom Tromey  <tromey@cygnus.com>
+
+	* include.test: New file.
+	* Makefile.am (TESTS): Added include.test.
+
+1998-12-21  Tom Tromey  <tromey@cygnus.com>
+
+	* insthook.test: Updated to fail when it should.
+
+1998-12-11  Tom Tromey  <tromey@cygnus.com>
+
+	* insthook.test: New file.
+	* Makefile.am (TESTS): Added insthook.test.
+
+1998-11-27  Tom Tromey  <tromey@cygnus.com>
+
+	* cond7.test: New file.  From Pavel Roskin.
+	* Makefile.am (TESTS): New file.
+
+1998-11-10  Tom Tromey  <tromey@cygnus.com>
+
+	* pluseq4.test: New file.
+	* Makefile.am (TESTS): Added pluseq4.test.
+
+1998-11-09  Tom Tromey  <tromey@cygnus.com>
+
+	* pluseq3.test: New file.
+	* Makefile.am (TESTS): Added pluseq3.test.
+
+	* pluseq2.test: New file.
+	* Makefile.am (TESTS): Added pluseq2.test.
+
+1998-10-30  Tom Tromey  <tromey@cygnus.com>
+
+	* pluseq.test: New file.
+	* Makefile.am (TESTS): Added pluseq.test.
+
+1998-10-28  Tom Tromey  <tromey@cygnus.com>
+
+	* Makefile.am (distclean-local): Typo fix.
+
+1998-10-20  Tom Tromey  <tromey@cygnus.com>
+
+	* Makefile.am (TESTS): Sorted tests.  From Jeff Garzik.
+
+1998-10-13  Tom Tromey  <tromey@cygnus.com>
+
+	* libobj7.test: Updated to reflect minor change in automake (test
+	wasn't resilient enough).
+	* instman.test: Updated to reflect fact that mkinstalldirs will be
+	in distribution.
+
+	* cxxonly.test: Removed.
+
+Mon Aug 31 09:46:59 1998  Matthew D. Langston  <langston@SLAC.Stanford.EDU>
+
+	* Makefile.am (TESTS): Added compile_f_c_cxx.test.
+	* compile_f_c_cxx.test: New file.
+
+Sat Aug 29 18:17:58 1998  Matthew D. Langston  <langston@SLAC.Stanford.EDU>
+
+	* Makefile.am (TESTS): Added flink.test link_c_cxx.test
+	link_f_c.test link_f_c_cxx.test link_f_cxx.test link_f_only.test.
+	Removed flink.test.
+	* flibs.test: New File.
+	* link_c_cxx.test: New file.
+	* link_f_c.test: New file.
+	* link_f_c_cxx.test: New file.
+	* link_f_cxx.test: New file.
+	* link_f_only.test: New file.
+
+Tue Aug 11 10:46:36 1998  Matthew D. Langston  <langston@SLAC.Stanford.EDU>
+
+	* Makefile.am (TESTS): Add cxxonly.test, fonly.test, flink.test,
+	fnoc.test and fo.test.
+	* cxxonly.test: New file.
+	* fonly.test: New file.
+	* flink.test: New file.
+	* fnoc.test: New file.
+	* fo.test: New file.
+
+1998-10-08  Tom Tromey  <tromey@cygnus.com>
+
+	* confdist.test: New file.
+	* Makefile.am (TESTS): Added confdist.test.
+
+1998-10-07  Tom Tromey  <tromey@cygnus.com>
+
+	* extra4.test: New file.
+	* extra3.test: New file.
+	* Makefile.am (TESTS): Added extra3.test, extra4.test.
+
+Mon Oct  5 12:47:32 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* badline.test: New file.
+	* Makefile.am (TESTS): Added badline.test.
+
+Thu Oct  1 00:03:39 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* seenc.test: Updated test to account for removed line numbers.
+
+	* xsource.test: Correctly fail if source in subdir.
+
+Wed Sep 30 12:17:34 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* colon7.test: New file.
+	* Makefile.am (TESTS): Added colon7.test.
+
+Tue Sep 29 02:09:11 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* config.test: New file.
+	* Makefile.am (TESTS): Added config.test.
+
+	* Makefile.am (TESTS): Reference clean.test, not clean.am.
+
+Mon Sep 28 01:46:34 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* recurs2.test: New file, from Jim Meyering.
+	* Makefile.am (TESTS): Added recurs2.test.
+
+	* Makefile.am (TESTS): Added clean.am.
+	* clean.test: New file.
+	* ansi2.test: Updated test for new SUBDIRS change.
+	* noinst.test: Updated test for new SUBDIRS change.
+	* checkall.test: Added check to make sure check-local is handled.
+	Updated test for new SUBDIRS change.
+	* java.test: Updated test for new SUBDIRS change.
+
+Sun Sep 27 20:01:20 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* Makefile.am (TESTS): Added else.test.
+	* else.test: New file.
+
+	* Makefile.am (TESTS): Added parse.test.
+	* parse.test: New file.
+
+Sat Sep 26 19:17:43 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* aclocal.test: Put AM_INIT_AUTOMAKE into configure.in.
+	* library.test: Use AC_EXEEXT.
+	* texinfo5.test: Use AC_EXEEXT.
+	* Many files: use AC_PROG_INSTALL, not AM_PROG_INSTALL.
+
+	Test suite updates for the @SHELL@ change:
+	* exsource.test: Set SHELL on `make' command line.
+	* ansi.test: Set SHELL on `make' command line.
+	* texinfo.test: Set SHELL on `make' command line.
+	* insh2.test: Set SHELL on `make' command line.
+	* empty.test: Rewrite @SHELL@ to /bin/sh.
+
+Tue Sep 22 01:20:00 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* ansi3.test: Use gcc and not gcc -traditional.
+
+Tue Sep 15 22:19:48 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* texinfo7.test: New file.
+
+Sun Aug 16 23:17:38 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* colon6.test: New file.
+
+Fri Aug 14 11:09:03 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* cond6.test: New file.
+
+Mon Aug 10 21:05:15 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* ansi3.test: New file.
+
+Sat Jul 18 00:27:26 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* recurs.test: New file.
+
+	* cond3.test: Changed to match recent fixes.
+
+Fri Jul 17 23:44:49 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* cond4.test, cond5.test: New files.
+
+Tue May 26 01:44:37 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* syntax.test: New file.
+
 Sun Apr  5 15:26:42 1998  Tom Tromey  <tromey@cygnus.com>
 
 	* version3.test: Increased version number to ensure failure for a
