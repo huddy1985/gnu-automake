@@ -23,7 +23,7 @@
 ## ------------ ##
 
 if %?INSTALL%
-_am_installdirs += $(DESTDIR)$(%NDIR%dir)
+am__installdirs += $(DESTDIR)$(%NDIR%dir)
 ?BASE?%DIR%PROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 ?!BASE?%DIR%PROGRAMS_INSTALL = $(install_sh_PROGRAM)
 ?EXEC?.PHONY install-exec-am: install-%DIR%PROGRAMS
@@ -52,9 +52,9 @@ install-%DIR%PROGRAMS: $(%DIR%_PROGRAMS)
 ## lossage if the install program doesn't have a name that libtool
 ## expects.
 ?LIBTOOL?	   echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(%DIR%PROGRAMS_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
-?LIBTOOL?	   $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(%DIR%PROGRAMS_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f; \
+?LIBTOOL?	   $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(%DIR%PROGRAMS_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f || exit 1; \
 ?!LIBTOOL?	   echo " $(INSTALL_PROGRAM_ENV) $(%DIR%PROGRAMS_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
-?!LIBTOOL?	   $(INSTALL_PROGRAM_ENV) $(%DIR%PROGRAMS_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f; \
+?!LIBTOOL?	   $(INSTALL_PROGRAM_ENV) $(%DIR%PROGRAMS_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f || exit 1; \
 	  else :; fi; \
 	done
 endif %?INSTALL%
@@ -99,3 +99,31 @@ clean-%DIR%PROGRAMS:
 ?LIBTOOL?	  echo " rm -f $$p $$f"; \
 ?LIBTOOL?	  rm -f $$p $$f ; \
 ?LIBTOOL?	done
+
+
+## ---------- ##
+## Checking.  ##
+## ---------- ##
+
+if %?CK-OPTS%
+.PHONY installcheck-am: installcheck-%DIR%PROGRAMS
+installcheck-%DIR%PROGRAMS: $(%DIR%_PROGRAMS)
+	bad=0; pid=$$$$; list="$(%DIR%_PROGRAMS)"; for p in $$list; do \
+	  case ' $(AM_INSTALLCHECK_STD_OPTIONS_EXEMPT) ' in \
+## Match $(srcdir)/$$p in addition to $$p because Sun make might rewrite
+## filenames in AM_INSTALLCHECK_STD_OPTIONS_EXEMPT during VPATH builds.
+	   *" $$p "* | *" $(srcdir)/$$p "*) continue;; \
+	  esac; \
+## Strip the directory and $(EXEEXT) before applying $(transform).
+	  f=`echo "$$p" | \
+	     sed 's,^.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
+## Insert the directory back if nobase_ is used.
+?!BASE?	  f=`echo "$$p" | sed 's|[^/]*$$||'`"$$f"; \
+	  for opt in --help --version; do \
+	    if $(DESTDIR)$(%NDIR%dir)/$$f $$opt > c$${pid}_.out 2> c$${pid}_.err \
+	         && test -n "`cat c$${pid}_.out`" \
+	         && test -z "`cat c$${pid}_.err`"; then :; \
+	    else echo "$$f does not support $$opt" 1>&2; bad=1; fi; \
+	  done; \
+	done; rm -f c$${pid}_.???; exit $$bad
+endif %?CK-OPTS%

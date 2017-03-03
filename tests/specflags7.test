@@ -1,8 +1,27 @@
 #! /bin/sh
+# Copyright (C) 2002  Free Software Foundation, Inc.
+#
+# This file is part of GNU Automake.
+#
+# GNU Automake is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# GNU Automake is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with autoconf; see the file COPYING.  If not, write to
+# the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
 
-# The ctags/etags example from the manual, plus a check for _SHORTNAME.
+# The true/false example from the manual, plus a check for _SHORTNAME.
 
-. $srcdir/defs || exit 1
+required=gcc
+. ./defs || exit 1
 
 set -e
 
@@ -12,24 +31,24 @@ AC_OUTPUT
 END
 
 cat > Makefile.am << 'END'
-bin_PROGRAMS = etags ctags
-ctags_SOURCES = etags.c
-ctags_CFLAGS = -DCTAGS
-ctags_SHORTNAME = c
-# No etags_SOURCES definition.  Use the default source.
-etags_CFLAGS = -DETAGS
-etags_SHORTNAME = e
+bin_PROGRAMS = false true
+true_SOURCES = false.c
+true_CFLAGS = -DAM_TRUE
+true_SHORTNAME = t
+# No false_SOURCES definition.  Use the default source.
+false_CFLAGS = -DAM_FALSE
+false_SHORTNAME = f
 END
 
-cat > etags.c << 'END'
+cat > false.c << 'END'
 #include <stdio.h>
 int
 main (int argc, char *argv[])
 {
-#ifdef CTAGS
-   puts ("ctags");
+#ifdef AM_TRUE
+   puts ("true");
 #else
-   puts ("etags");
+   puts ("false");
 #endif
    return 0;
 }
@@ -41,7 +60,7 @@ $AUTOMAKE -a
 
 ./configure
 $MAKE
-./ctags | grep ctags
-./etags | grep etags
-test -f ./c-etags.o
-test -f ./e-etags.o
+./true | grep true
+./false | grep false
+test -f ./t-false.o
+test -f ./f-false.o

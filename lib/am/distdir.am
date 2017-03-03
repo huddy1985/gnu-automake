@@ -1,5 +1,5 @@
 ## automake - create Makefile.in from Makefile.am
-## Copyright 2001 Free Software Foundation, Inc.
+## Copyright (C) 2001, 2002 Free Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -42,11 +42,12 @@ distdir: $(DISTFILES)
 ##
 if %?TOPDIR_P%
 if  %?CK-NEWS%
-	@if sed 15q $(srcdir)/NEWS | fgrep -e "$(VERSION)" >/dev/null; \
-	then :; else \
+	@case `sed 15q $(srcdir)/NEWS` in \
+	*"$(VERSION)"*) : ;; \
+	*) \
 	  echo "NEWS not updated; not releasing" 1>&2; \
-	  exit 1; \
-	fi
+	  exit 1;; \
+	esac
 endif  %?CK-NEWS%
 endif %?TOPDIR_P%
 ##
@@ -61,7 +62,35 @@ endif %?TOPDIR_P%
 ?DISTDIRS?	$(mkinstalldirs) %DISTDIRS%
 ##
 ##
-	@list='$(DISTFILES)'; for file in $$list; do \
+	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
+	list='$(DISTFILES)'; for file in $$list; do \
+##
+## Yet another hack to support SUN make.
+##
+## Let's assume `foo' appears in DISTFILES and is not a built file.
+## When building with VPATH=$(srcdir), SUN make will rewrite `foo' as
+## `$(srcdir)/foo'.  An attempt to install the file with
+##    cp $file $(distdir)/$file
+## will thus install $(srcdir)/foo as $(distdir)/$(srcdir)/foo
+## instead of $(distdir)/foo.
+##
+## So let's strip this leading $(srcdir)/ when it exists.  (As far we
+## know, only SUN make adds it.)  Searching whether the file is to be
+## found in the source or build directory will be done latter.
+##
+## In case we are _not_ using SUN make, how can we be sure we are
+## not stripping a legitimate filename that starts with the same
+## pattern as $(srcdir)?
+## Well, it can't happen without the Makefile author distributing
+## something out of the distribution (which is bad).   As an example,
+## consider `EXTRA_DIST = ../bar'.  This is an issue if $srcdir is `..',
+## however getting this value for srcdir is impossible: `EXTRA_DIST = ../bar'
+## implies we are in a subdirectory (so `../bar' is within the package),
+## hence `$srcdir' is something like `../../subdir'.
+##
+	  case $$file in \
+	    $(srcdir)/*) file=`echo "$$file" | sed "s|^$$srcdirstrip/||"`;; \
+	  esac; \
 ##
 ## Always look for the file in the build directory first.  That way
 ## for something like yacc output we will correctly pick up the latest
@@ -142,7 +171,7 @@ endif %?SUBDIRS%
 ##
 if %?DIST-TARGETS%
 	$(MAKE) $(AM_MAKEFLAGS) \
-	  top_distdir="${top_distdir}" distdir="$(distdir)" \
+	  top_distdir="$(top_distdir)" distdir="$(distdir)" \
 	  %DIST-TARGETS%
 endif %?DIST-TARGETS%
 ##
@@ -270,9 +299,16 @@ distcheck: dist
 ## Undo the write access.
 	chmod a-w $(distdir)
 	dc_install_base=`$(am__cd) $(distdir)/=inst && pwd` \
+## We will attemp a DESTDIR install in $dc_destdir.  We don't
+## create this directory under $dc_install_base, because it would
+## create very long directory names.
+	  && dc_destdir="$${TMPDIR-/tmp}/am-dc-$$$$/" \
+## Build the directory, so we can cd into it even if `make install'
+## didn't create it.
+	  && $(mkinstalldirs) $$dc_destdir \
 ?DISTCHECK-HOOK?	  && $(MAKE) $(AM_MAKEFLAGS) distcheck-hook \
 	  && cd $(distdir)/=build \
-	  && ../configure --srcdir=.. --prefix=$$dc_install_base \
+	  && ../configure --srcdir=.. --prefix="$$dc_install_base" \
 ?GETTEXT?	    --with-included-gettext \
 ## Additional flags for configure.  Keep this last in the configure
 ## invocation so the user can override previous options.
@@ -283,11 +319,23 @@ distcheck: dist
 	  && $(MAKE) $(AM_MAKEFLAGS) install \
 	  && $(MAKE) $(AM_MAKEFLAGS) installcheck \
 	  && $(MAKE) $(AM_MAKEFLAGS) uninstall \
-## We use -le 1 because the `dir' file might still exist after uninstall.
-	  && (test `find $$dc_install_base -type f -print | wc -l` -le 1 \
-	      || { echo "ERROR: files left after uninstall:" ; \
-	           find $$dc_install_base -type f -print ; \
-	           exit 1; } >&2 ) \
+	  && $(MAKE) $(AM_MAKEFLAGS) distuninstallcheck_dir="$$dc_install_base" \
+	        distuninstallcheck \
+## Make sure the package has proper DESTDIR support (we could not test this
+## in the previous install/installcheck/uninstall test, because it's reasonable
+## for installcheck to fail in a DESTDIR install).
+## We make the `$dc_install_base' read-only because this is where files
+## with missing DESTDIR support are likely to be installed.
+	  && chmod -R a-w "$$dc_install_base" \
+## The logic here is quite convoluted because we must clean $dc_destdir
+## whatever happens (it won't be erased by the next run of distcheck like
+## $(distdir) is).
+	  && ({   $(MAKE) $(AM_MAKEFLAGS) DESTDIR="$$dc_destdir" install \
+	       && $(MAKE) $(AM_MAKEFLAGS) DESTDIR="$$dc_destdir" uninstall \
+	       && $(MAKE) $(AM_MAKEFLAGS) DESTDIR="$$dc_destdir" \
+	            distuninstallcheck_dir="$$dc_destdir" distuninstallcheck; \
+	      } || { rm -rf "$$dc_destdir"; exit 1; }) \
+	  && rm -rf "$$dc_destdir" \
 	  && $(MAKE) $(AM_MAKEFLAGS) dist-gzip \
 ## Make sure to remove the dist file we created in the test build
 ## directory.
@@ -297,8 +345,24 @@ distcheck: dist
 	@echo "$(distdir).tar.gz is ready for distribution" | \
 	  sed 'h;s/./=/g;p;x;p;x'
 
+## Define distuninstallcheck_listfiles and distuninstallcheck separately
+## from distcheck, so that they can be overridden by the user.
+.PHONY: distuninstallcheck
+distuninstallcheck_listfiles = find . -type f -print
+distuninstallcheck:
+## We use -le 1 because the `dir' file might still exist after
+## uninstall.
+	cd $(distuninstallcheck_dir) \
+	&& test `$(distuninstallcheck_listfiles) | wc -l` -le 1 \
+	   || { echo "ERROR: files left after uninstall:" ; \
+	        if test -n "$(DESTDIR)"; then \
+	          echo "  (check DESTDIR support)"; \
+	        fi ; \
+	        $(distuninstallcheck_listfiles) ; \
+	        exit 1; } >&2
+
 ## Define distcleancheck_listfiles and distcleancheck separately
-## from distcheck, so that they can be overriden by the user.
+## from distcheck, so that they can be overridden by the user.
 .PHONY: distcleancheck
 distcleancheck_listfiles = find . -type f -print
 distcleancheck: distclean
@@ -307,7 +371,7 @@ distcleancheck: distclean
 	  exit 1 ; \
 	fi
 	test `$(distcleancheck_listfiles) | wc -l` -eq 0 \
-	  || { echo "ERROR: files left after distclean:" ; \
+	  || { echo "ERROR: files left in build directory after distclean:" ; \
 	       $(distcleancheck_listfiles) ; \
 	       exit 1; } >&2
 endif %?TOPDIR_P%

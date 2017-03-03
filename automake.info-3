@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.6.3
+   This file documents GNU automake 1.7
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free
 Software Foundation, Inc.
@@ -29,6 +29,275 @@ permission notice identical to this one.
 manual into another language, under the above conditions for modified
 versions, except that this permission notice may be stated in a
 translation approved by the Foundation.
+
+
+File: automake.info,  Node: Mixing Fortran 77 With C and C++,  Next: Fortran 77 and Autoconf,  Prev: Compiling Fortran 77 Files,  Up: Fortran 77 Support
+
+Mixing Fortran 77 With C and C++
+--------------------------------
+
+   Automake currently provides _limited_ support for creating programs
+and shared libraries that are a mixture of Fortran 77 and C and/or C++.
+However, there are many other issues related to mixing Fortran 77 with
+other languages that are _not_ (currently) handled by Automake, but
+that are handled by other packages(1).
+
+   Automake can help in two ways:
+
+  1. Automatic selection of the linker depending on which combinations
+     of source code.
+
+  2. Automatic selection of the appropriate linker flags (e.g. `-L' and
+     `-l') to pass to the automatically selected linker in order to link
+     in the appropriate Fortran 77 intrinsic and run-time libraries.
+
+     These extra Fortran 77 linker flags are supplied in the output
+     variable `FLIBS' by the `AC_F77_LIBRARY_LDFLAGS' Autoconf macro
+     supplied with newer versions of Autoconf (Autoconf version 2.13 and
+     later).  *Note Fortran 77 Compiler Characteristics:
+     (autoconf)Fortran 77 Compiler Characteristics.
+
+   If Automake detects that a program or shared library (as mentioned in
+some `_PROGRAMS' or `_LTLIBRARIES' primary) contains source code that
+is a mixture of Fortran 77 and C and/or C++, then it requires that the
+macro `AC_F77_LIBRARY_LDFLAGS' be called in `configure.in', and that
+either `$(FLIBS)' or `@FLIBS@' appear in the appropriate `_LDADD' (for
+programs) or `_LIBADD' (for shared libraries) variables.  It is the
+responsibility of the person writing the `Makefile.am' to make sure
+that `$(FLIBS)' or `@FLIBS@' appears in the appropriate `_LDADD' or
+`_LIBADD' variable.
+
+   For example, consider the following `Makefile.am':
+
+     bin_PROGRAMS = foo
+     foo_SOURCES  = main.cc foo.f
+     foo_LDADD    = libfoo.la @FLIBS@
+     
+     pkglib_LTLIBRARIES = libfoo.la
+     libfoo_la_SOURCES  = bar.f baz.c zardoz.cc
+     libfoo_la_LIBADD   = $(FLIBS)
+
+   In this case, Automake will insist that `AC_F77_LIBRARY_LDFLAGS' is
+mentioned in `configure.in'.  Also, if `@FLIBS@' hadn't been mentioned
+in `foo_LDADD' and `libfoo_la_LIBADD', then Automake would have issued
+a warning.
+
+* Menu:
+
+* How the Linker is Chosen::
+
+   ---------- Footnotes ----------
+
+   (1) For example, the cfortran package
+(http://www-zeus.desy.de/~burow/cfortran/) addresses all of these
+inter-language issues, and runs under nearly all Fortran 77, C and C++
+compilers on nearly all platforms.  However, `cfortran' is not yet Free
+Software, but it will be in the next major release.
+
+
+File: automake.info,  Node: How the Linker is Chosen,  Prev: Mixing Fortran 77 With C and C++,  Up: Mixing Fortran 77 With C and C++
+
+How the Linker is Chosen
+........................
+
+   The following diagram demonstrates under what conditions a particular
+linker is chosen by Automake.
+
+   For example, if Fortran 77, C and C++ source code were to be compiled
+into a program, then the C++ linker will be used.  In this case, if the
+C or Fortran 77 linkers required any special libraries that weren't
+included by the C++ linker, then they must be manually added to an
+`_LDADD' or `_LIBADD' variable by the user writing the `Makefile.am'.
+
+                          \              Linker
+               source      \
+                code        \     C        C++     Fortran
+          -----------------  +---------+---------+---------+
+                             |         |         |         |
+          C                  |    x    |         |         |
+                             |         |         |         |
+                             +---------+---------+---------+
+                             |         |         |         |
+              C++            |         |    x    |         |
+                             |         |         |         |
+                             +---------+---------+---------+
+                             |         |         |         |
+                    Fortran  |         |         |    x    |
+                             |         |         |         |
+                             +---------+---------+---------+
+                             |         |         |         |
+          C + C++            |         |    x    |         |
+                             |         |         |         |
+                             +---------+---------+---------+
+                             |         |         |         |
+          C +       Fortran  |         |         |    x    |
+                             |         |         |         |
+                             +---------+---------+---------+
+                             |         |         |         |
+              C++ + Fortran  |         |    x    |         |
+                             |         |         |         |
+                             +---------+---------+---------+
+                             |         |         |         |
+          C + C++ + Fortran  |         |    x    |         |
+                             |         |         |         |
+                             +---------+---------+---------+
+
+
+File: automake.info,  Node: Fortran 77 and Autoconf,  Prev: Mixing Fortran 77 With C and C++,  Up: Fortran 77 Support
+
+Fortran 77 and Autoconf
+-----------------------
+
+   The current Automake support for Fortran 77 requires a recent enough
+version of Autoconf that also includes support for Fortran 77.  Full
+Fortran 77 support was added to Autoconf 2.13, so you will want to use
+that version of Autoconf or later.
+
+
+File: automake.info,  Node: Java Support,  Next: Support for Other Languages,  Prev: Fortran 77 Support,  Up: Programs
+
+Java Support
+============
+
+   Automake includes support for compiled Java, using `gcj', the Java
+front end to the GNU Compiler Collection.
+
+   Any package including Java code to be compiled must define the output
+variable `GCJ' in `configure.in'; the variable `GCJFLAGS' must also be
+defined somehow (either in `configure.in' or `Makefile.am').  The
+simplest way to do this is to use the `AM_PROG_GCJ' macro.
+
+   By default, programs including Java source files are linked with
+`gcj'.
+
+   As always, the contents of `AM_GCJFLAGS' are passed to every
+compilation invoking `gcj' (in its role as an ahead-of-time compiler -
+when invoking it to create `.class' files, `AM_JAVACFLAGS' is used
+instead).  If it is necessary to pass options to `gcj' from
+`Makefile.am', this variable, and not the user variable `GCJFLAGS',
+should be used.
+
+   `gcj' can be used to compile `.java', `.class', `.zip', or `.jar'
+files.
+
+   When linking, `gcj' requires that the main class be specified using
+the `--main=' option.  The easiest way to do this is to use the
+`_LDFLAGS' variable for the program.
+
+
+File: automake.info,  Node: Support for Other Languages,  Next: ANSI,  Prev: Java Support,  Up: Programs
+
+Support for Other Languages
+===========================
+
+   Automake currently only includes full support for C, C++ (*note C++
+Support::), Fortran 77 (*note Fortran 77 Support::), and Java (*note
+Java Support::).  There is only rudimentary support for other
+languages, support for which will be improved based on user demand.
+
+   Some limited support for adding your own languages is available via
+the suffix rule handling; see *Note Suffixes::.
+
+
+File: automake.info,  Node: ANSI,  Next: Dependencies,  Prev: Support for Other Languages,  Up: Programs
+
+Automatic de-ANSI-fication
+==========================
+
+   Although the GNU standards allow the use of ANSI C, this can have the
+effect of limiting portability of a package to some older compilers
+(notably the SunOS C compiler).
+
+   Automake allows you to work around this problem on such machines by
+"de-ANSI-fying" each source file before the actual compilation takes
+place.
+
+   If the `Makefile.am' variable `AUTOMAKE_OPTIONS' (*note Options::)
+contains the option `ansi2knr' then code to handle de-ANSI-fication is
+inserted into the generated `Makefile.in'.
+
+   This causes each C source file in the directory to be treated as
+ANSI C.  If an ANSI C compiler is available, it is used.  If no ANSI C
+compiler is available, the `ansi2knr' program is used to convert the
+source files into K&R C, which is then compiled.
+
+   The `ansi2knr' program is simple-minded.  It assumes the source code
+will be formatted in a particular way; see the `ansi2knr' man page for
+details.
+
+   Support for de-ANSI-fication requires the source files `ansi2knr.c'
+and `ansi2knr.1' to be in the same package as the ANSI C source; these
+files are distributed with Automake.  Also, the package `configure.in'
+must call the macro `AM_C_PROTOTYPES' (*note Macros::).
+
+   Automake also handles finding the `ansi2knr' support files in some
+other directory in the current package.  This is done by prepending the
+relative path to the appropriate directory to the `ansi2knr' option.
+For instance, suppose the package has ANSI C code in the `src' and
+`lib' subdirs.  The files `ansi2knr.c' and `ansi2knr.1' appear in
+`lib'.  Then this could appear in `src/Makefile.am':
+
+     AUTOMAKE_OPTIONS = ../lib/ansi2knr
+
+   If no directory prefix is given, the files are assumed to be in the
+current directory.
+
+   Files mentioned in `LIBOBJS' which need de-ANSI-fication will not be
+automatically handled.  That's because `configure' will generate an
+object name like `regex.o', while `make' will be looking for `regex_.o'
+(when de-ANSI-fying).  Eventually this problem will be fixed via
+`autoconf' magic, but for now you must put this code into your
+`configure.in', just before the `AC_OUTPUT' call:
+
+     # This is necessary so that .o files in LIBOBJS are also built via
+     # the ANSI2KNR-filtering rules.
+     LIBOBJS=`echo $LIBOBJS|sed 's/\.o /\$U.o /g;s/\.o$/\$U.o/'`
+
+   Note that automatic de-ANSI-fication will not work when the package
+is being built for a different host architecture.  That is because
+automake currently has no way to build `ansi2knr' for the build machine.
+
+
+File: automake.info,  Node: Dependencies,  Next: EXEEXT,  Prev: ANSI,  Up: Programs
+
+Automatic dependency tracking
+=============================
+
+   As a developer it is often painful to continually update the
+`Makefile.in' whenever the include-file dependencies change in a
+project.  Automake supplies a way to automatically track dependency
+changes.
+
+   Automake always uses complete dependencies for a compilation,
+including system headers.  Automake's model is that dependency
+computation should be a side effect of the build.  To this end,
+dependencies are computed by running all compilations through a special
+wrapper program called `depcomp'.  `depcomp' understands how to coax
+many different C and C++ compilers into generating dependency
+information in the format it requires.  `automake -a' will install
+`depcomp' into your source tree for you.  If `depcomp' can't figure out
+how to properly invoke your compiler, dependency tracking will simply
+be disabled for your build.
+
+   Experience with earlier versions of Automake (1) taught us that it
+is not reliable to generate dependencies only on the maintainer's
+system, as configurations vary too much.  So instead Automake
+implements dependency tracking at build time.
+
+   Automatic dependency tracking can be suppressed by putting
+`no-dependencies' in the variable `AUTOMAKE_OPTIONS', or passing
+`no-dependencies' as an argument to `AM_INIT_AUTOMAKE' (this should be
+the prefered way).  Or, you can invoke `automake' with the `-i' option.
+Dependency tracking is enabled by default.
+
+   The person building your package also can choose to disable
+dependency tracking by configuring with `--disable-dependency-tracking'.
+
+   ---------- Footnotes ----------
+
+   (1) See `http://sources.redhat.com/automake/dependencies.html' for
+more information on the history and experiences with automatic
+dependency tracking in Automake
 
 
 File: automake.info,  Node: EXEEXT,  Prev: Dependencies,  Up: Programs
@@ -327,11 +596,10 @@ files are included in the distribution by default.
 
    Automake ships with an Autoconf macro called `AM_PATH_PYTHON' which
 will determine some Python-related directory variables (see below).  If
-have called `AM_PATH_PYTHON' from you `configure.in', then you may use
+you have called `AM_PATH_PYTHON' from `configure.in', then you may use
 the following variables to list you Python source files in your
-variables: `python_PYTHON', `pkgpython_PYTHON', `pkgpython_PYTHON',
-`pyexecdir_PYTHON', `pkgpyexecdir_PYTHON', depending where you want
-your files installed.
+variables: `python_PYTHON', `pkgpython_PYTHON', `pyexecdir_PYTHON',
+`pkgpyexecdir_PYTHON', depending where you want your files installed.
 
    `AM_PATH_PYTHON' takes a single optional argument.  This argument,
 if present, is the minimum version of Python which can be used for this
@@ -401,18 +669,25 @@ Texinfo
 
    If the current directory contains Texinfo source, you must declare it
 with the `TEXINFOS' primary.  Generally Texinfo files are converted
-into info, and thus the `info_TEXINFOS' macro is most commonly used
+into info, and thus the `info_TEXINFOS' variable is most commonly used
 here.  Any Texinfo source file must end in the `.texi', `.txi', or
 `.texinfo' extension.  We recommend `.texi' for new manuals.
 
+   Automake generates rules to build `.info', `.dvi', `.ps', and `.pdf'
+files from your Texinfo sources.  The `.info' files are built by `make
+all' and installed by `make install' (unless you use `no-installinfo',
+see below).  The other files can be built on request by `make dvi',
+`make ps', and `make pdf'.
+
    If the `.texi' file `@include's `version.texi', then that file will
 be automatically generated.  The file `version.texi' defines four
-Texinfo macros you can reference:
+Texinfo flag you can reference using `@value{EDITION}',
+`@value{VERSION}', `@value{UPDATED}', and `@value{UPDATED-MONTH}'.
 
 `EDITION'
 `VERSION'
-     Both of these macros hold the version number of your program.
-     They are kept separate for clarity.
+     Both of these flags hold the version number of your program.  They
+     are kept separate for clarity.
 
 `UPDATED'
      This holds the date the primary `.texi' file was last modified.
@@ -462,7 +737,8 @@ the relative path from the current `Makefile.am' to `texinfo.tex':
 
    The option `no-texinfo.tex' can be used to eliminate the requirement
 for `texinfo.tex'.  Use of the variable `TEXINFO_TEX' is preferable,
-however, because that allows the `dvi' target to still work.
+however, because that allows the `dvi', `ps', and `pdf' targets to
+still work.
 
    Automake generates an `install-info' target; some people apparently
 use this.  By default, info pages are installed by `make install'.
@@ -476,8 +752,8 @@ Man pages
 
    A package can also include man pages (but see the GNU standards on
 this matter, *Note Man Pages: (standards)Man Pages.)  Man pages are
-declared using the `MANS' primary.  Generally the `man_MANS' macro is
-used.  Man pages are automatically installed in the correct
+declared using the `MANS' primary.  Generally the `man_MANS' variable
+is used.  Man pages are automatically installed in the correct
 subdirectory of `mandir', based on the file extension.
 
    File extensions such as `.1c' are handled by looking for the valid
@@ -802,6 +1078,24 @@ the user build the package.  (Think about the user missing the tool
 required to build the file; or if the required tool is built by your
 package, consider the cross-compilation case where it can't be run.)
 
+   `distcheck' also checks that the `uninstall' target works properly,
+both for ordinary and `DESTDIR' builds.  It does this by invoking `make
+uninstall', and then it checks the install tree to see if any files are
+left over.  This check will make sure that you correctly coded your
+`uninstall'-related targets.
+
+   By default, the checking is done by the `distuninstallcheck' target,
+and the list of files in the install tree is generated by
+`$(distuninstallcheck_listfiles') (this is a variable whose value is a
+shell command to run that prints the list of files to stdout).
+
+   Either of these can be overridden to modify the behavior of
+`distcheck'.  For instance, to disable this check completely, you would
+write:
+
+     distuninstallcheck:
+             @:
+
 The types of distributions
 ==========================
 
@@ -889,395 +1183,4 @@ Install Tests
    The `installcheck' target is available to the user as a way to run
 any tests after the package has been installed.  You can add tests to
 this by writing an `installcheck-local' target.
-
-
-File: automake.info,  Node: Options,  Next: Miscellaneous,  Prev: Tests,  Up: Top
-
-Changing Automake's Behavior
-****************************
-
-   Various features of Automake can be controlled by options in the
-`Makefile.am'.  Such options are applied on a per-`Makefile' basis when
-listed in a special `Makefile' variable named `AUTOMAKE_OPTIONS'.  They
-are applied globally to all processed `Makefiles' when listed in the
-first argument of `AM_INIT_AUTOMAKE' in `configure.in'.  Currently
-understood options are:
-
-`gnits'
-`gnu'
-`foreign'
-`cygnus'
-     Set the strictness as appropriate.  The `gnits' option also implies
-     `readme-alpha' and `check-news'.
-
-`ansi2knr'
-`PATH/ansi2knr'
-     Turn on automatic de-ANSI-fication.  *Note ANSI::.  If preceded by
-     a path, the generated `Makefile.in' will look in the specified
-     directory to find the `ansi2knr' program.  The path should be a
-     relative path to another directory in the same distribution
-     (Automake currently does not check this).
-
-`check-news'
-     Cause `make dist' to fail unless the current version number appears
-     in the first few lines of the `NEWS' file.
-
-`dejagnu'
-     Cause `dejagnu'-specific rules to be generated.  *Note Tests::.
-
-`dist-bzip2'
-     Generate a `dist-bzip2' target, creating a bzip2 tar archive of the
-     distribution.  `dist' will create it in addition to the other
-     formats.  bzip2 archives are frequently smaller than gzipped
-     archives.
-
-`dist-shar'
-     Generate a `dist-shar' target, creating a shar archive of the
-     distribution.  `dist' will create it in addition to the other
-     formats.
-
-`dist-zip'
-     Generate a `dist-zip' target, creating a zip archive of the
-     distribution.  `dist' will create it in addition to the other
-     formats.
-
-`dist-tarZ'
-     Generate a `dist-tarZ' target, creating a compressed tar archive of
-     the distribution.  `dist' will create it in addition to the other
-     formats.
-
-`no-define'
-     This options is meaningful only when passed as an argument to
-     AM_INIT_AUTOMAKE.  It will prevent the `PACKAGE' and `VERSION'
-     variable to be `AC_DEFINE'd.
-
-`no-dependencies'
-     This is similar to using `--include-deps' on the command line, but
-     is useful for those situations where you don't have the necessary
-     bits to make automatic dependency tracking work *Note
-     Dependencies::.  In this case the effect is to effectively disable
-     automatic dependency tracking.
-
-`no-exeext'
-     If your `Makefile.am' defines a target `foo', it will override a
-     target named `foo$(EXEEXT)'.  This is necessary when `EXEEXT' is
-     found to be empty.  However, by default automake will generate an
-     error for this use.  The `no-exeext' option will disable this
-     error.  This is intended for use only where it is known in advance
-     that the package will not be ported to Windows, or any other
-     operating system using extensions on executables.
-
-`no-installinfo'
-     The generated `Makefile.in' will not cause info pages to be built
-     or installed by default.  However, `info' and `install-info'
-     targets will still be available.  This option is disallowed at
-     `GNU' strictness and above.
-
-`no-installman'
-     The generated `Makefile.in' will not cause man pages to be
-     installed by default.  However, an `install-man' target will still
-     be available for optional installation.  This option is disallowed
-     at `GNU' strictness and above.
-
-`nostdinc'
-     This option can be used to disable the standard `-I' options which
-     are ordinarily automatically provided by Automake.
-
-`no-texinfo.tex'
-     Don't require `texinfo.tex', even if there are texinfo files in
-     this directory.
-
-`readme-alpha'
-     If this release is an alpha release, and the file `README-alpha'
-     exists, then it will be added to the distribution.  If this option
-     is given, version numbers are expected to follow one of two forms.
-     The first form is `MAJOR.MINOR.ALPHA', where each element is a
-     number; the final period and number should be left off for
-     non-alpha releases.  The second form is `MAJOR.MINORALPHA', where
-     ALPHA is a letter; it should be omitted for non-alpha releases.
-
-`subdir-objects'
-     If this option is specified, then objects are placed into the
-     subdirectory of the build directory corresponding to the
-     subdirectory of the source file.  For instance if the source file
-     is `subdir/file.cxx', then the output file would be
-     `subdir/file.o'.
-
-VERSION
-     A version number (e.g. `0.30') can be specified.  If Automake is
-     not newer than the version specified, creation of the `Makefile.in'
-     will be suppressed.
-
-   Unrecognized options are diagnosed by `automake'.
-
-   If you want an option to apply to all the files in the tree, you can
-use the `AM_INIT_AUTOMAKE' macro in `configure.in'.  *Note Macros::.
-
-
-File: automake.info,  Node: Miscellaneous,  Next: Include,  Prev: Options,  Up: Top
-
-Miscellaneous Rules
-*******************
-
-   There are a few rules and variables that didn't fit anywhere else.
-
-* Menu:
-
-* Tags::                        Interfacing to etags and mkid
-* Suffixes::                    Handling new file extensions
-* Multilibs::                   Support for multilibbing.
-
-
-File: automake.info,  Node: Tags,  Next: Suffixes,  Prev: Miscellaneous,  Up: Miscellaneous
-
-Interfacing to `etags'
-======================
-
-   Automake will generate rules to generate `TAGS' files for use with
-GNU Emacs under some circumstances.
-
-   If any C, C++ or Fortran 77 source code or headers are present, then
-`tags' and `TAGS' targets will be generated for the directory.
-
-   At the topmost directory of a multi-directory package, a `tags'
-target file will be generated which, when run, will generate a `TAGS'
-file that includes by reference all `TAGS' files from subdirectories.
-
-   The `tags' target will also be generated if the variable
-`ETAGS_ARGS' is defined.  This variable is intended for use in
-directories which contain taggable source that `etags' does not
-understand.  The user can use the `ETAGSFLAGS' to pass additional flags
-to `etags'; `AM_ETAGSFLAGS' is also available for use in `Makefile.am'.
-
-   Here is how Automake generates tags for its source, and for nodes in
-its Texinfo file:
-
-     ETAGS_ARGS = automake.in --lang=none \
-      --regex='/^@node[ \t]+\([^,]+\)/\1/' automake.texi
-
-   If you add filenames to `ETAGS_ARGS', you will probably also want to
-set `TAGS_DEPENDENCIES'.  The contents of this variable are added
-directly to the dependencies for the `tags' target.
-
-   Automake will also generate an `ID' target which will run `mkid' on
-the source.  This is only supported on a directory-by-directory basis.
-
-   Automake also supports the GNU Global Tags program
-(http://www.gnu.org/software/global/).  The `GTAGS' target runs Global
-Tags automatically and puts the result in the top build directory.  The
-variable `GTAGS_ARGS' holds arguments which are passed to `gtags'.
-
-
-File: automake.info,  Node: Suffixes,  Next: Multilibs,  Prev: Tags,  Up: Miscellaneous
-
-Handling new file extensions
-============================
-
-   It is sometimes useful to introduce a new implicit rule to handle a
-file type that Automake does not know about.
-
-   For instance, suppose you had a compiler which could compile `.foo'
-files to `.o' files.  You would simply define an suffix rule for your
-language:
-
-     .foo.o:
-             foocc -c -o $@ $<
-
-   Then you could directly use a `.foo' file in a `_SOURCES' variable
-and expect the correct results:
-
-     bin_PROGRAMS = doit
-     doit_SOURCES = doit.foo
-
-   This was the simpler and more common case.  In other cases, you will
-have to help Automake to figure which extensions you are defining your
-suffix rule for.  This usually happens when your extensions does not
-start with a dot.  Then, all you have to do is to put a list of new
-suffixes in the `SUFFIXES' variable *before* you define your implicit
-rule.
-
-   For instance the following definition prevents Automake to
-misinterpret `.idlC.cpp:' as an attemp to transform `.idlC' into `.cpp'.
-
-     SUFFIXES = .idl C.cpp
-     .idlC.cpp:
-             # whatever
-
-   As you may have noted, the `SUFFIXES' macro behaves like the
-`.SUFFIXES' special target of `make'.  You should not touch `.SUFFIXES'
-yourself, but use `SUFFIXES' instead and let Automake generate the
-suffix list for `.SUFFIXES'.  Any given `SUFFIXES' go at the start of
-the generated suffixes list, followed by Automake generated suffixes
-not already in the list.
-
-
-File: automake.info,  Node: Multilibs,  Prev: Suffixes,  Up: Miscellaneous
-
-Support for Multilibs
-=====================
-
-   Automake has support for an obscure feature called multilibs.  A
-"multilib" is a library which is built for multiple different ABIs at a
-single time; each time the library is built with a different target
-flag combination.  This is only useful when the library is intended to
-be cross-compiled, and it is almost exclusively used for compiler
-support libraries.
-
-   The multilib support is still experimental.  Only use it if you are
-familiar with multilibs and can debug problems you might encounter.
-
-
-File: automake.info,  Node: Include,  Next: Conditionals,  Prev: Miscellaneous,  Up: Top
-
-Include
-*******
-
-   Automake supports an `include' directive which can be used to
-include other `Makefile' fragments when `automake' is run.  Note that
-these fragments are read and interpreted by `automake', not by `make'.
-As with conditionals, `make' has no idea that `include' is in use.
-
-   There are two forms of `include':
-
-`include $(srcdir)/file'
-     Include a fragment which is found relative to the current source
-     directory.
-
-`include $(top_srcdir)/file'
-     Include a fragment which is found relative to the top source
-     directory.
-
-   Note that if a fragment is included inside a conditional, then the
-condition applies to the entire contents of that fragment.
-
-
-File: automake.info,  Node: Conditionals,  Next: Gnits,  Prev: Include,  Up: Top
-
-Conditionals
-************
-
-   Automake supports a simple type of conditionals.
-
-   Before using a conditional, you must define it by using
-`AM_CONDITIONAL' in the `configure.in' file (*note Macros::).
-
- - Macro: AM_CONDITIONAL (CONDITIONAL, CONDITION)
-     The conditional name, CONDITIONAL, should be a simple string
-     starting with a letter and containing only letters, digits, and
-     underscores.  It must be different from `TRUE' and `FALSE' which
-     are reserved by Automake.
-
-     The shell CONDITION (suitable for use in a shell `if' statement)
-     is evaluated when `configure' is run.  Note that you must arrange
-     for _every_ `AM_CONDITIONAL' to be invoked every time `configure'
-     is run - if `AM_CONDITIONAL' is run conditionally (e.g., in a
-     shell `if' statement), then the result will confuse automake.
-
-   Conditionals typically depend upon options which the user provides to
-the `configure' script.  Here is an example of how to write a
-conditional which is true if the user uses the `--enable-debug' option.
-
-     AC_ARG_ENABLE(debug,
-     [  --enable-debug    Turn on debugging],
-     [case "${enableval}" in
-       yes) debug=true ;;
-       no)  debug=false ;;
-       *) AC_MSG_ERROR(bad value ${enableval} for --enable-debug) ;;
-     esac],[debug=false])
-     AM_CONDITIONAL(DEBUG, test x$debug = xtrue)
-
-   Here is an example of how to use that conditional in `Makefile.am':
-
-     if DEBUG
-     DBG = debug
-     else
-     DBG =
-     endif
-     noinst_PROGRAMS = $(DBG)
-
-   This trivial example could also be handled using EXTRA_PROGRAMS
-(*note Conditional Programs::).
-
-   You may only test a single variable in an `if' statement, possibly
-negated using `!'.  The `else' statement may be omitted.  Conditionals
-may be nested to any depth.  You may specify an argument to `else' in
-which case it must be the negation of the condition used for the
-current `if'.  Similarly you may specify the condition which is closed
-by an `end':
-
-     if DEBUG
-     DBG = debug
-     else !DEBUG
-     DBG =
-     endif !DEBUG
-
-Unbalanced conditions are errors.
-
-   Conditionals do not interact very smoothly with the append operator.
-In particular, an append must happen in the same conditional context as
-the original assignment.  This means that the following will not work:
-
-     DBG = foo
-     if DEBUG
-     DBG += bar
-     endif DEBUG
-
-   The behaviour which is probably desired in this situation can be
-obtained using a temporary variable:
-
-     if DEBUG
-     TMP_DBG = bar
-     endif DEBUG
-     DBG = foo $(TMP_DBG)
-
-   This restriction may be lifted in future versions of automake.
-
-   Note that conditionals in Automake are not the same as conditionals
-in GNU Make.  Automake conditionals are checked at configure time by the
-`configure' script, and affect the translation from `Makefile.in' to
-`Makefile'.  They are based on options passed to `configure' and on
-results that `configure' has discovered about the host system.  GNU
-Make conditionals are checked at `make' time, and are based on
-variables passed to the make program or defined in the `Makefile'.
-
-   Automake conditionals will work with any make program.
-
-
-File: automake.info,  Node: Gnits,  Next: Cygnus,  Prev: Conditionals,  Up: Top
-
-The effect of `--gnu' and `--gnits'
-***********************************
-
-   The `--gnu' option (or `gnu' in the `AUTOMAKE_OPTIONS' variable)
-causes `automake' to check the following:
-
-   * The files `INSTALL', `NEWS', `README', `COPYING', `AUTHORS', and
-     `ChangeLog' are required at the topmost directory of the package.
-
-   * The options `no-installman' and `no-installinfo' are prohibited.
-
-   Note that this option will be extended in the future to do even more
-checking; it is advisable to be familiar with the precise requirements
-of the GNU standards.  Also, `--gnu' can require certain non-standard
-GNU programs to exist for use by various maintainer-only targets; for
-instance in the future `pathchk' might be required for `make dist'.
-
-   The `--gnits' option does everything that `--gnu' does, and checks
-the following as well:
-
-   * `make dist' will check to make sure the `NEWS' file has been
-     updated to the current version.
-
-   * `VERSION' is checked to make sure its format complies with Gnits
-     standards.
-
-   * If `VERSION' indicates that this is an alpha release, and the file
-     `README-alpha' appears in the topmost directory of a package, then
-     it is included in the distribution.  This is done in `--gnits'
-     mode, and no other, because this mode is the only one where version
-     number formats are constrained, and hence the only mode where
-     Automake can automatically determine whether `README-alpha' should
-     be included.
-
-   * The file `THANKS' is required.
 

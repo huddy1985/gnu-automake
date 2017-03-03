@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 
-XFAIL_TESTS = condd.test subdir5.test auxdir2.test cond17.test
+XFAIL_TESTS = subdir5.test auxdir2.test cond17.test
 
 TESTS =	\
 acinclude.test \
@@ -28,8 +28,11 @@ ansi4.test \
 ansi5.test \
 ansi6.test \
 ansi7.test \
+ansi8.test \
 ar.test \
 asm.test \
+autoheader.test \
+autoheader2.test \
 auxdir.test \
 auxdir2.test \
 backsl.test \
@@ -61,6 +64,7 @@ comment3.test \
 comment4.test \
 comment5.test \
 comment6.test \
+comment7.test \
 compile_f_c_cxx.test \
 cond.test \
 cond2.test \
@@ -82,9 +86,11 @@ cond17.test \
 cond18.test \
 cond19.test \
 cond20.test \
+cond21.test \
 cond22.test \
 cond23.test \
 cond24.test \
+cond25.test \
 condd.test \
 condincl.test \
 condincl2.test \
@@ -104,6 +110,7 @@ confvar2.test \
 copy.test \
 ctarget1.test \
 cxx.test \
+cxx2.test \
 cxxansi.test \
 cxxcpp.test \
 cxxlibobj.test \
@@ -125,8 +132,9 @@ depend.test \
 depend2.test \
 depend3.test \
 depend4.test \
+destdir.test \
 dirforbid.test \
-dirname.test \
+dirlist.test \
 discover.test \
 distcommon.test \
 distcommon2.test \
@@ -149,6 +157,7 @@ exeext.test \
 exeext2.test \
 exsource.test \
 ext.test \
+ext2.test \
 extra.test \
 extra3.test \
 extra4.test \
@@ -166,12 +175,18 @@ gcj.test \
 gcj2.test \
 gcj3.test \
 gcj4.test \
+gcj5.test \
+getopt.test \
 gettext.test \
 gettext2.test \
+gnuwarn.test \
 gnits.test \
+gnits2.test \
+gnits3.test \
 header.test \
 implicit.test \
 include.test \
+include2.test \
 info.test \
 insh.test \
 insh2.test \
@@ -197,21 +212,24 @@ lex2.test \
 lex3.test \
 lex4.test \
 lex5.test \
-libobj.test \
 libobj2.test \
 libobj3.test \
 libobj4.test \
 libobj5.test \
-libobj6.test \
 libobj7.test \
 libobj8.test \
-libobj9.test \
 libobj10.test \
 libobj11.test \
+libobj12.test \
+libobj12b.test \
 library.test \
+library2.test \
 libtool.test \
 libtool2.test \
 libtool3.test \
+libtool4.test \
+libtool5.test \
+libtool6.test \
 link_c_cxx.test	\
 link_dist.test \
 link_f_c.test \
@@ -219,6 +237,7 @@ link_f_c_cxx.test \
 link_f_cxx.test	\
 link_f_only.test \
 lisp.test \
+lisp2.test \
 listval.test \
 ltdeps.test \
 ltlibobjs.test \
@@ -256,6 +275,9 @@ output4.test \
 output5.test \
 package.test \
 parse.test \
+percent.test \
+percent2.test \
+phony.test \
 pluseq.test \
 pluseq2.test \
 pluseq3.test \
@@ -264,6 +286,7 @@ pluseq5.test \
 pluseq6.test \
 pluseq7.test \
 pluseq8.test \
+pluseq9.test \
 postproc.test \
 ppf77.test \
 pr2.test \
@@ -289,6 +312,7 @@ primary.test \
 primary2.test \
 proginst.test \
 python.test \
+python2.test \
 ranlib.test \
 recurs.test \
 recurs2.test \
@@ -311,6 +335,7 @@ specflags3.test	\
 specflags6.test	\
 specflags7.test	\
 specflags8.test	\
+specflags9.test	\
 spell.test \
 spell2.test \
 spell3.test \
@@ -325,8 +350,11 @@ subdir3.test \
 subdir4.test \
 subdir5.test \
 subdir6.test \
+subdir7.test \
 subdirbuiltsources.test \
 subdircond.test \
+subdircond2.test \
+subdircond3.test \
 subobj.test \
 subobj2.test \
 subobj3.test \
@@ -337,6 +365,7 @@ subobj7.test \
 subobj8.test \
 subobj9.test \
 subobjname.test \
+subpkg.test \
 subst.test \
 substref.test \
 substtarg.test \
@@ -347,6 +376,9 @@ suffix4.test \
 suffix5.test \
 suffix6.test \
 suffix7.test \
+suffix8.test \
+suffix9.test \
+suffix10.test \
 symlink.test \
 symlink2.test \
 symlink3.test \
@@ -355,6 +387,7 @@ tags.test \
 tagsub.test \
 target.test \
 target-cflags.test \
+targetclash.test \
 texinfo.test \
 texinfo2.test \
 texinfo3.test \
@@ -365,8 +398,13 @@ texinfo7.test \
 texinfo8.test \
 texinfo9.test \
 texinfo10.test \
+texinfo13.test \
+texinfo16.test \
+transform.test \
 unused.test \
 vars.test \
+vars2.test \
+vars3.test \
 vartar.test \
 version.test \
 version2.test \
@@ -377,6 +415,7 @@ version6.test \
 vpath.test \
 vtexi.test \
 vtexi2.test \
+warnopts.test \
 werror.test \
 whoami.test \
 xsource.test \
@@ -391,7 +430,10 @@ yacc8.test \
 yaccpp.test \
 yaccvpath.test
 
-EXTRA_DIST = defs ChangeLog-old $(TESTS)
+EXTRA_DIST = ChangeLog-old $(TESTS)
+
+# Each test case depends on defs.
+check_SCRIPTS = defs
 
 distclean-local:
 	-rm -rf testSubDir

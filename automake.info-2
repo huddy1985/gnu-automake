@@ -11,7 +11,7 @@ START-INFO-DIR-ENTRY
 * aclocal: (automake)Invoking aclocal.          Generating aclocal.m4
 END-INFO-DIR-ENTRY
 
-   This file documents GNU automake 1.6.3
+   This file documents GNU automake 1.7
 
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free
 Software Foundation, Inc.
@@ -31,24 +31,224 @@ versions, except that this permission notice may be stated in a
 translation approved by the Foundation.
 
 
+File: automake.info,  Node: Public macros,  Next: Private macros,  Prev: Macros,  Up: Macros
+
+Public macros
+-------------
+
+`AM_CONFIG_HEADER'
+     Automake will generate rules to automatically regenerate the config
+     header.  This obsolete macro is a synonym of `AC_CONFIG_HEADERS'
+     today (*note Optional::).
+
+`AM_ENABLE_MULTILIB'
+     This is used when a "multilib" library is being built.  The first
+     optional argument is the name of the `Makefile' being generated; it
+     defaults to `Makefile'.  The second option argument is used to find
+     the top source directory; it defaults to the empty string
+     (generally this should not be used unless you are familiar with
+     the internals).  *Note Multilibs::.
+
+`AM_C_PROTOTYPES'
+     Check to see if function prototypes are understood by the
+     compiler.  If so, define `PROTOTYPES' and set the output variables
+     `U' and `ANSI2KNR' to the empty string.  Otherwise, set `U' to `_'
+     and `ANSI2KNR' to `./ansi2knr'.  Automake uses these values to
+     implement automatic de-ANSI-fication.
+
+`AM_HEADER_TIOCGWINSZ_NEEDS_SYS_IOCTL'
+     If the use of `TIOCGWINSZ' requires `<sys/ioctl.h>', then define
+     `GWINSZ_IN_SYS_IOCTL'.  Otherwise `TIOCGWINSZ' can be found in
+     `<termios.h>'.
+
+`AM_INIT_AUTOMAKE([OPTIONS])'
+`AM_INIT_AUTOMAKE(PACKAGE, VERSION, [NO-DEFINE])'
+     Runs many macros required for proper operation of the generated
+     Makefiles.
+
+     This macro has two forms, the second of which has two required
+     arguments: the package and the version number.  This latter form is
+     obsolete because the PACKAGE and VERSION can be obtained from
+     Autoconf's `AC_INIT' macro (which itself has an old and a new
+     form).
+
+     If your `configure.in' has:
+          AC_INIT(src/foo.c)
+          AM_INIT_AUTOMAKE(mumble, 1.5)
+     you can modernize it as follow:
+          AC_INIT(mumble, 1.5)
+          AC_CONFIG_SRCDIR(src/foo.c)
+          AM_INIT_AUTOMAKE
+
+     Note that if you're upgrading your `configure.in' from an earlier
+     version of Automake, it is not always correct to simply move the
+     package and version arguments from `AM_INIT_AUTOMAKE' directly to
+     `AC_INIT', as in the example above.  The first argument of
+     `AC_INIT' is the name of your package (e.g. `GNU Automake'), not
+     the tarball name (e.g. `automake') you used to pass to
+     `AM_INIT_AUTOMAKE'.  Autoconf's rule to derive a tarball name from
+     the package name should work for most but not all packages.
+     Especially, if your tarball name is not all lower case, you will
+     have to use the four-argument form of `AC_INIT' (supported in
+     Autoconf versions greater than 2.52g).
+
+     When `AM_INIT_AUTOMAKE' is called with a single argument, it is
+     interpreted as a space-separated list of Automake options which
+     should be applied to every `Makefile.am' in the tree.  The effect
+     is as if each option were listed in `AUTOMAKE_OPTIONS'.
+
+     By default this macro `AC_DEFINE''s `PACKAGE' and `VERSION'.  This
+     can be avoided by passing the `no-define' option, as in:
+          AM_INIT_AUTOMAKE([gnits 1.5 no-define dist-bzip2])
+     or by passing a third non-empty argument to the obsolete form.
+
+`AM_PATH_LISPDIR'
+     Searches for the program `emacs', and, if found, sets the output
+     variable `lispdir' to the full path to Emacs' site-lisp directory.
+
+     Note that this test assumes the `emacs' found to be a version that
+     supports Emacs Lisp (such as GNU Emacs or XEmacs).  Other emacsen
+     can cause this test to hang (some, like old versions of MicroEmacs,
+     start up in interactive mode, requiring `C-x C-c' to exit, which
+     is hardly obvious for a non-emacs user).  In most cases, however,
+     you should be able to use `C-c' to kill the test.  In order to
+     avoid problems, you can set `EMACS' to "no" in the environment, or
+     use the `--with-lispdir' option to `configure' to explictly set
+     the correct path (if you're sure you have an `emacs' that supports
+     Emacs Lisp.
+
+`AM_PROG_AS'
+     Use this macro when you have assembly code in your project.  This
+     will choose the assembler for you (by default the C compiler) and
+     set `CCAS', and will also set `CCASFLAGS' if required.
+
+`AM_PROG_CC_C_O'
+     This is like `AC_PROG_CC_C_O', but it generates its results in the
+     manner required by automake.  You must use this instead of
+     `AC_PROG_CC_C_O' when you need this functionality.
+
+`AM_PROG_CC_STDC'
+     If the C compiler is not in ANSI C mode by default, try to add an
+     option to output variable `CC' to make it so.  This macro tries
+     various options that select ANSI C on some system or another.  It
+     considers the compiler to be in ANSI C mode if it handles function
+     prototypes correctly.
+
+     If you use this macro, you should check after calling it whether
+     the C compiler has been set to accept ANSI C; if not, the shell
+     variable `am_cv_prog_cc_stdc' is set to `no'.  If you wrote your
+     source code in ANSI C, you can make an un-ANSIfied copy of it by
+     using the `ansi2knr' option (*note ANSI::).
+
+`AM_PROG_LEX'
+     Like `AC_PROG_LEX' (*note Particular Program Checks:
+     (autoconf)Particular Programs.), but uses the `missing' script on
+     systems that do not have `lex'.  `HP-UX 10' is one such system.
+
+`AM_PROG_GCJ'
+     This macro finds the `gcj' program or causes an error.  It sets
+     `GCJ' and `GCJFLAGS'.  `gcj' is the Java front-end to the GNU
+     Compiler Collection.
+
+`AM_SYS_POSIX_TERMIOS'
+     Check to see if POSIX termios headers and functions are available
+     on the system.  If so, set the shell variable
+     `am_cv_sys_posix_termios' to `yes'.  If not, set the variable to
+     `no'.
+
+`AM_WITH_DMALLOC'
+     Add support for the dmalloc
+     (ftp://ftp.letters.com/src/dmalloc/dmalloc.tar.gz) package.  If
+     the user configures with `--with-dmalloc', then define
+     `WITH_DMALLOC' and add `-ldmalloc' to `LIBS'.
+
+`AM_WITH_REGEX'
+     Adds `--with-regex' to the `configure' command line.  If specified
+     (the default), then the `regex' regular expression library is
+     used, `regex.o' is put into `LIBOBJS', and `WITH_REGEX' is
+     defined.  If `--without-regex' is given, then the `rx' regular
+     expression library is used, and `rx.o' is put into `LIBOBJS'.
+
+
+File: automake.info,  Node: Private macros,  Prev: Public macros,  Up: Macros
+
+Private macros
+--------------
+
+   The following macros are private macros you should not call directly.
+They are called by the other public macros when appropriate.  Do not
+rely on them, as they might be changed in a future version.  Consider
+them as implementation details; or better, do not consider them at all:
+skip this section!
+
+`_AM_DEPENDENCIES'
+`AM_SET_DEPDIR'
+`AM_DEP_TRACK'
+`AM_OUTPUT_DEPENDENCY_COMMANDS'
+     These macros are used to implement automake's automatic dependency
+     tracking scheme.  They are called automatically by automake when
+     required, and there should be no need to invoke them manually.
+
+`AM_MAKE_INCLUDE'
+     This macro is used to discover how the user's `make' handles
+     `include' statements.  This macro is automatically invoked when
+     needed; there should be no need to invoke it manually.
+
+`AM_PROG_INSTALL_STRIP'
+     This is used to find a version of `install' which can be used to
+     `strip' a program at installation time.  This macro is
+     automatically included when required.
+
+`AM_SANITY_CHECK'
+     This checks to make sure that a file created in the build
+     directory is newer than a file in the source directory.  This can
+     fail on systems where the clock is set incorrectly.  This macro is
+     automatically run from `AM_INIT_AUTOMAKE'.
+
+
+File: automake.info,  Node: Extending aclocal,  Prev: Macros,  Up: configure
+
+Writing your own aclocal macros
+===============================
+
+   The `aclocal' program doesn't have any built-in knowledge of any
+macros, so it is easy to extend it with your own macros.
+
+   This is mostly used for libraries which want to supply their own
+Autoconf macros for use by other programs.  For instance the `gettext'
+library supplies a macro `AM_GNU_GETTEXT' which should be used by any
+package using `gettext'.  When the library is installed, it installs
+this macro so that `aclocal' will find it.
+
+   A file of macros should be a series of `AC_DEFUN''s.  The `aclocal'
+programs also understands `AC_REQUIRE', so it is safe to put each macro
+in a separate file.  *Note Prerequisite Macros: (autoconf)Prerequisite
+Macros, and *Note Macro Definitions: (autoconf)Macro Definitions.
+
+   A macro file's name should end in `.m4'.  Such files should be
+installed in ``aclocal --print-ac-dir`' (which usually happens to be
+`$(datadir)/aclocal').
+
+
 File: automake.info,  Node: Top level,  Next: Alternative,  Prev: configure,  Up: Top
 
 The top-level `Makefile.am'
 ***************************
 
+Recursing subdirectories
+========================
+
    In packages with subdirectories, the top level `Makefile.am' must
 tell Automake which subdirectories are to be built.  This is done via
 the `SUBDIRS' variable.
 
-   The `SUBDIRS' macro holds a list of subdirectories in which building
-of various sorts can occur.  Many targets (e.g. `all') in the generated
-`Makefile' will run both locally and in all specified subdirectories.
-Note that the directories listed in `SUBDIRS' are not required to
-contain `Makefile.am's; only `Makefile's (after configuration).  This
-allows inclusion of libraries from packages which do not use Automake
-(such as `gettext').  The directories mentioned in `SUBDIRS' must be
-direct children of the current directory.  For instance, you cannot put
-`src/subdir' into `SUBDIRS'.
+   The `SUBDIRS' variable holds a list of subdirectories in which
+building of various sorts can occur.  Many targets (e.g. `all') in the
+generated `Makefile' will run both locally and in all specified
+subdirectories.  Note that the directories listed in `SUBDIRS' are not
+required to contain `Makefile.am's; only `Makefile's (after
+configuration).  This allows inclusion of libraries from packages which
+do not use Automake (such as `gettext').
 
    In packages that use subdirectories, the top-level `Makefile.am' is
 often very short.  For instance, here is the `Makefile.am' from the GNU
@@ -57,38 +257,16 @@ Hello distribution:
      EXTRA_DIST = BUGS ChangeLog.O README-alpha
      SUBDIRS = doc intl po src tests
 
-   It is possible to override the `SUBDIRS' variable if, like in the
-case of GNU `Inetutils', you want to only build a subset of the entire
-package.  In your `Makefile.am' include:
-
-     SUBDIRS = @MY_SUBDIRS@
-
-   Then in your `configure.in' you can specify:
-
-     MY_SUBDIRS="src doc lib po"
-     AC_SUBST(MY_SUBDIRS)
-
-   (Note that we don't use the variable name `SUBDIRS' in our
-`configure.in'; that would cause Automake to believe that every
-`Makefile.in' should recurse into the listed subdirectories.)
-
-   The upshot of this is that Automake is tricked into building the
-package to take the subdirs, but doesn't actually bind that list until
-`configure' is run.
-
-   Although the `SUBDIRS' macro can contain configure substitutions
-(e.g. `@DIRS@'); Automake itself does not actually examine the contents
-of this variable.
-
-   If `SUBDIRS' is defined, then your `configure.in' must include
-`AC_PROG_MAKE_SET'.  When Automake invokes `make' in a subdirectory, it
-uses the value of the `MAKE' variable.  It passes the value of the
-variable `AM_MAKEFLAGS' to the `make' invocation; this can be set in
+   When Automake invokes `make' in a subdirectory, it uses the value of
+the `MAKE' variable.  It passes the value of the variable
+`AM_MAKEFLAGS' to the `make' invocation; this can be set in
 `Makefile.am' if there are flags you must always pass to `make'.
 
-   The use of `SUBDIRS' is not restricted to just the top-level
-`Makefile.am'.  Automake can be used to construct packages of arbitrary
-depth.
+   The directories mentioned in `SUBDIRS' must be direct children of
+the current directory.  For instance, you cannot put `src/subdir' into
+`SUBDIRS'.  Instead you should put `SUBDIRS = subdir' into
+`src/Makefile.am'.  Automake can be used to construct packages of
+arbitrary depth this way.
 
    By default, Automake generates `Makefiles' which work depth-first
 (`postfix').  However, it is possible to change this ordering.  You can
@@ -96,13 +274,108 @@ do this by putting `.' into `SUBDIRS'.  For instance, putting `.'
 first will cause a `prefix' ordering of directories.  All `clean'
 targets are run in reverse order of build targets.
 
-   Sometimes, such as when running `make dist', you want all possible
-subdirectories to be examined.  In this case Automake will use
-`DIST_SUBDIRS', instead of `SUBDIRS', to determine where to recurse.
-This variable will also be used when the user runs `distclean' or
-`maintainer-clean'.  It should be set to the full list of
-subdirectories in the project.  If this macro is not set, Automake will
-attempt to set it for you.
+Conditional subdirectories
+==========================
+
+   It is possible to define the `SUBDIRS' variable conditionally if,
+like in the case of GNU `Inetutils', you want to only build a subset of
+the entire package.
+
+   To illustrate how this works, let's assume we have two directories
+`src/' and `opt/'.  `src/' should always be built, but we want to
+decide in `./configure' whether `opt/' will be built or not.  (For this
+example we will assume that `opt/' should be built when the variable
+`$want_opt' was set to `yes'.)
+
+   Running `make' should thus recurse into `src/' always, and then
+maybe in `opt/'.
+
+   However `make dist' should always recurse into both `src/' and
+`opt/'.  Because `opt/' should be distributed even if it is not needed
+in the current configuration. This means `opt/Makefile' should be
+created unconditionally.  (1)
+
+   There are two ways to setup a project like this.  You can use
+Automake conditionals (*note Conditionals::) or use Autoconf `AC_SUBST'
+variables (*note Setting Output Variables: (autoconf)Setting Output
+Variables.).  Using Automake conditionals is the preferred solution.
+
+Conditional subdirectories with `AM_CONDITIONAL'
+------------------------------------------------
+
+   `configure' should output the `Makefile' for each directory and
+define a condition into which `opt/' should be built.
+
+     ...
+     AM_CONDITIONAL([COND_OPT], [test "$want_opt" = yes])
+     AC_CONFIG_FILES([Makefile src/Makefile opt/Makefile])
+     ...
+
+   Then `SUBDIRS' can be defined in the top-level `Makefile.am' as
+follows.
+
+     if COND_OPT
+       MAYBE_OPT = opt
+     endif
+     SUBDIRS = src $(MAYBE_OPT)
+
+   As you can see, running `make' will rightly recurse into `src/' and
+maybe `opt/'.
+
+   As you can't see, running `make dist' will recurse into both `src/'
+and `opt/' directories because `make dist', unlike `make all', doesn't
+use the `SUBDIRS' variable.  It uses the `DIST_SUBDIRS' variable.
+
+   In this case Automake will define `DIST_SUBDIRS = src opt'
+automatically because it knows that `MAYBE_OPT' can contain `opt' in
+some condition.
+
+Conditional subdirectories with `AC_SUBST'
+------------------------------------------
+
+   Another idea is to define `MAYBE_OPT' from `./configure' using
+`AC_SUBST':
+
+     ...
+     if test "$want_opt" = yes; then
+       MAYBE_OPT=opt
+     else
+       MAYBE_OPT=
+     fi
+     AC_SUBST([MAYBE_OPT])
+     AC_CONFIG_FILES([Makefile src/Makefile opt/Makefile])
+     ...
+
+   In this case the top-level `Makefile.am' should look as follows.
+
+     SUBDIRS = src $(MAYBE_OPT)
+     DIST_SUBDIRS = src opt
+
+   The drawback is that since Automake cannot guess what the possible
+values of `MAYBE_OPT' are, it is necessary to define `DIST_SUBDIRS'.
+
+How `DIST_SUBDIRS' is used
+--------------------------
+
+   As shown in the above examples, `DIST_SUBDIRS' is used by targets
+that need to recurse in all directories, even those which have been
+conditionally left out of the build.
+
+   Precisely, `DIST_SUBDIRS' is used by `make dist', `make distclean',
+and `make maintainer-clean'.  All other recursive targets use `SUBDIRS'.
+
+   Automake will define `DIST_SUBDIRS' automatically from the possibles
+values of `SUBDIRS' in all conditions.
+
+   If `SUBDIRS' contains `AC_SUBST' variables, `DIST_SUBDIRS' will not
+be defined correctly because Automake doesn't know the possible values
+of these variables.  In this case `DIST_SUBDIRS' needs to be defined
+manually.
+
+   ---------- Footnotes ----------
+
+   (1) Don't try seeking a solution where `opt/Makefile' is created
+conditionally, this is a lot trickier than the solutions presented here.
 
 
 File: automake.info,  Node: Alternative,  Next: Rebuilding,  Prev: Top level,  Up: Top
@@ -160,8 +433,8 @@ automatic rebuilding rules are only enabled in maintainer mode.
 tell it where to find `.m4' files.  Since sometimes `make' will
 automatically run `aclocal', you need a way to specify these arguments.
 You can do this by defining `ACLOCAL_AMFLAGS'; this holds arguments
-which are passed verbatim to `aclocal'.  This macro is only useful in
-the top-level `Makefile.am'.
+which are passed verbatim to `aclocal'.  This variable is only useful
+in the top-level `Makefile.am'.
 
 
 File: automake.info,  Node: Programs,  Next: Other objects,  Prev: Rebuilding,  Up: Top
@@ -379,16 +652,16 @@ conditional using `AM_CONDITIONAL' (*note Conditionals::).
 variable, because Automake will examine the contents of each variable
 to construct the complete list of source files.
 
-   If your program uses a lot of files, you will probably prefer to use
-an intermediate variable to hold conditional sources.
+   If your program uses a lot of files, you will probably prefer a
+conditional `+='.
 
      bin_PROGRAMS = hello
+     hello_SOURCES = hello-common.c
      if LINUX
-     hello_cond = hello-linux.c
+     hello_cond += hello-linux.c
      else
-     hello_cond = hello-generic.c
+     hello_cond += hello-generic.c
      endif
-     hello_SOURCES = hello-common.c $(hello_cond)
 
 
 File: automake.info,  Node: Conditional Programs,  Prev: Conditional Sources,  Up: A Program
@@ -567,14 +840,13 @@ libraries differ.
      variable.  This is usually used with C++; some C++ compilers
      require a special invocation in order to instantiate all the
      templates which should go into a library.  For instance, the SGI
-     C++ compiler likes this macro set like so:
+     C++ compiler likes this variable set like so:
           libmaude_a_AR = $(CXX) -ar -o
 
 `maude_LIBADD'
-     Extra objects can be added to a static library using the `_LIBADD'
+     Extra objects can be added to a library using the `_LIBADD'
      variable.  This should be used for objects determined by
-     `configure'.  Note that `_LIBADD' is not used for shared
-     libraries; there you must use `_LDADD'.
+     `configure'.
 
 `maude_LDADD'
      Extra objects can be added to a shared library or a program by
@@ -605,14 +877,23 @@ libraries differ.
 
           maude_LINK = $(CCLD) -magic -o $@
 
+`maude_CCASFLAGS'
 `maude_CFLAGS'
+`maude_CPPFLAGS'
+`maude_CXXFLAGS'
+`maude_FFLAGS'
+`maude_GCJFLAGS'
+`maude_LFLAGS'
+`maude_OBJCFLAGS'
+`maude_RFLAGS'
+`maude_YFLAGS'
      Automake allows you to set compilation flags on a per-program (or
      per-library) basis.  A single source file can be included in
      several programs, and it will potentially be compiled with
      different flags for each program.  This works for any language
-     directly supported by Automake.  The flags are `_CFLAGS',
-     `_CXXFLAGS', `_OBJCFLAGS', `_LFLAGS', `_YFLAGS', `_CCASFLAGS',
-     `_FFLAGS', `_RFLAGS', and `_GCJFLAGS'.
+     directly supported by Automake.  The flags are `_CCASFLAGS',
+     `_CFLAGS', `_CPPFLAGS', `_CXXFLAGS', `_FFLAGS', `_GCJFLAGS',
+     `_LFLAGS', `_OBJCFLAGS', `_RFLAGS', and `_YFLAGS'.
 
      When using a per-program compilation flag, Automake will choose a
      different name for the intermediate object files.  Ordinarily a
@@ -691,21 +972,24 @@ own compilation in some special cases.
    There are some additional variables which Automake itself defines:
 
 `AM_CPPFLAGS'
-     The contents of this macro are passed to every compilation which
-     invokes the C preprocessor; it is a list of arguments to the
+     The contents of this variable are passed to every compilation
+     which invokes the C preprocessor; it is a list of arguments to the
      preprocessor.  For instance, `-I' and `-D' options should be
      listed here.
 
      Automake already provides some `-I' options automatically.  In
      particular it generates `-I$(srcdir)', `-I.', and a `-I' pointing
      to the directory holding `config.h' (if you've used
-     `AC_CONFIG_HEADER' or `AM_CONFIG_HEADER').  You can disable the
+     `AC_CONFIG_HEADERS' or `AM_CONFIG_HEADER').  You can disable the
      default `-I' options using the `nostdinc' option.
+
+     `AM_CPPFLAGS' is ignored in preference to a per-executable (or
+     per-library) `_CPPFLAGS' variable if it is defined.
 
 `INCLUDES'
      This does the same job as `AM_CPPFLAGS'.  It is an older name for
-     the same functionality.  This macro is deprecated; we suggest using
-     `AM_CPPFLAGS' instead.
+     the same functionality.  This variable is deprecated; we suggest
+     using `AM_CPPFLAGS' instead.
 
 `AM_CFLAGS'
      This is the variable which the `Makefile.am' author can use to pass
@@ -775,14 +1059,15 @@ former is a user variable and the latter is intended for the
 `Makefile.am' author.
 
    Automake makes it possible to include multiple `yacc' (or `lex')
-source files in a single program.  Automake uses a small program called
-`ylwrap' to run `yacc' (or `lex') in a subdirectory.  This is necessary
-because yacc's output filename is fixed, and a parallel make could
-conceivably invoke more than one instance of `yacc' simultaneously.
-The `ylwrap' program is distributed with Automake.  It should appear in
-the directory specified by `AC_CONFIG_AUX_DIR' (*note Finding
-`configure' Input: (autoconf)Input.), or the current directory if that
-macro is not used in `configure.in'.
+source files in a single program.  When there is more than one distinct
+`yacc' (or `lex') source file in a directory, Automake uses a small
+program called `ylwrap' to run `yacc' (or `lex') in a subdirectory.
+This is necessary because yacc's output filename is fixed, and a
+parallel make could conceivably invoke more than one instance of `yacc'
+simultaneously.  The `ylwrap' program is distributed with Automake.  It
+should appear in the directory specified by `AC_CONFIG_AUX_DIR' (*note
+Finding `configure' Input: (autoconf)Input.), or the current directory
+if that macro is not used in `configure.in'.
 
    For `yacc', simply managing locking is insufficient.  The output of
 `yacc' always uses the same symbol names internally, so it isn't
@@ -984,273 +1269,4 @@ the Fortran 77 compiler.  The precise command used is as follows:
 
 `.r'
      `$(F77) -c $(AM_FFLAGS) $(FFLAGS) $(AM_RFLAGS) $(RFLAGS)'
-
-
-File: automake.info,  Node: Mixing Fortran 77 With C and C++,  Next: Fortran 77 and Autoconf,  Prev: Compiling Fortran 77 Files,  Up: Fortran 77 Support
-
-Mixing Fortran 77 With C and C++
---------------------------------
-
-   Automake currently provides _limited_ support for creating programs
-and shared libraries that are a mixture of Fortran 77 and C and/or C++.
-However, there are many other issues related to mixing Fortran 77 with
-other languages that are _not_ (currently) handled by Automake, but
-that are handled by other packages(1).
-
-   Automake can help in two ways:
-
-  1. Automatic selection of the linker depending on which combinations
-     of source code.
-
-  2. Automatic selection of the appropriate linker flags (e.g. `-L' and
-     `-l') to pass to the automatically selected linker in order to link
-     in the appropriate Fortran 77 intrinsic and run-time libraries.
-
-     These extra Fortran 77 linker flags are supplied in the output
-     variable `FLIBS' by the `AC_F77_LIBRARY_LDFLAGS' Autoconf macro
-     supplied with newer versions of Autoconf (Autoconf version 2.13 and
-     later).  *Note Fortran 77 Compiler Characteristics:
-     (autoconf)Fortran 77 Compiler Characteristics.
-
-   If Automake detects that a program or shared library (as mentioned in
-some `_PROGRAMS' or `_LTLIBRARIES' primary) contains source code that
-is a mixture of Fortran 77 and C and/or C++, then it requires that the
-macro `AC_F77_LIBRARY_LDFLAGS' be called in `configure.in', and that
-either `$(FLIBS)' or `@FLIBS@' appear in the appropriate `_LDADD' (for
-programs) or `_LIBADD' (for shared libraries) variables.  It is the
-responsibility of the person writing the `Makefile.am' to make sure
-that `$(FLIBS)' or `@FLIBS@' appears in the appropriate `_LDADD' or
-`_LIBADD' variable.
-
-   For example, consider the following `Makefile.am':
-
-     bin_PROGRAMS = foo
-     foo_SOURCES  = main.cc foo.f
-     foo_LDADD    = libfoo.la @FLIBS@
-     
-     pkglib_LTLIBRARIES = libfoo.la
-     libfoo_la_SOURCES  = bar.f baz.c zardoz.cc
-     libfoo_la_LIBADD   = $(FLIBS)
-
-   In this case, Automake will insist that `AC_F77_LIBRARY_LDFLAGS' is
-mentioned in `configure.in'.  Also, if `@FLIBS@' hadn't been mentioned
-in `foo_LDADD' and `libfoo_la_LIBADD', then Automake would have issued
-a warning.
-
-* Menu:
-
-* How the Linker is Chosen::
-
-   ---------- Footnotes ----------
-
-   (1) For example, the cfortran package
-(http://www-zeus.desy.de/~burow/cfortran/) addresses all of these
-inter-language issues, and runs under nearly all Fortran 77, C and C++
-compilers on nearly all platforms.  However, `cfortran' is not yet Free
-Software, but it will be in the next major release.
-
-
-File: automake.info,  Node: How the Linker is Chosen,  Prev: Mixing Fortran 77 With C and C++,  Up: Mixing Fortran 77 With C and C++
-
-How the Linker is Chosen
-........................
-
-   The following diagram demonstrates under what conditions a particular
-linker is chosen by Automake.
-
-   For example, if Fortran 77, C and C++ source code were to be compiled
-into a program, then the C++ linker will be used.  In this case, if the
-C or Fortran 77 linkers required any special libraries that weren't
-included by the C++ linker, then they must be manually added to an
-`_LDADD' or `_LIBADD' variable by the user writing the `Makefile.am'.
-
-                          \              Linker
-               source      \
-                code        \     C        C++     Fortran
-          -----------------  +---------+---------+---------+
-                             |         |         |         |
-          C                  |    x    |         |         |
-                             |         |         |         |
-                             +---------+---------+---------+
-                             |         |         |         |
-              C++            |         |    x    |         |
-                             |         |         |         |
-                             +---------+---------+---------+
-                             |         |         |         |
-                    Fortran  |         |         |    x    |
-                             |         |         |         |
-                             +---------+---------+---------+
-                             |         |         |         |
-          C + C++            |         |    x    |         |
-                             |         |         |         |
-                             +---------+---------+---------+
-                             |         |         |         |
-          C +       Fortran  |         |         |    x    |
-                             |         |         |         |
-                             +---------+---------+---------+
-                             |         |         |         |
-              C++ + Fortran  |         |    x    |         |
-                             |         |         |         |
-                             +---------+---------+---------+
-                             |         |         |         |
-          C + C++ + Fortran  |         |    x    |         |
-                             |         |         |         |
-                             +---------+---------+---------+
-
-
-File: automake.info,  Node: Fortran 77 and Autoconf,  Prev: Mixing Fortran 77 With C and C++,  Up: Fortran 77 Support
-
-Fortran 77 and Autoconf
------------------------
-
-   The current Automake support for Fortran 77 requires a recent enough
-version of Autoconf that also includes support for Fortran 77.  Full
-Fortran 77 support was added to Autoconf 2.13, so you will want to use
-that version of Autoconf or later.
-
-
-File: automake.info,  Node: Java Support,  Next: Support for Other Languages,  Prev: Fortran 77 Support,  Up: Programs
-
-Java Support
-============
-
-   Automake includes support for compiled Java, using `gcj', the Java
-front end to the GNU Compiler Collection.
-
-   Any package including Java code to be compiled must define the output
-variable `GCJ' in `configure.in'; the variable `GCJFLAGS' must also be
-defined somehow (either in `configure.in' or `Makefile.am').  The
-simplest way to do this is to use the `AM_PROG_GCJ' macro.
-
-   By default, programs including Java source files are linked with
-`gcj'.
-
-   As always, the contents of `AM_GCJFLAGS' are passed to every
-compilation invoking `gcj' (in its role as an ahead-of-time compiler -
-when invoking it to create `.class' files, `AM_JAVACFLAGS' is used
-instead).  If it is necessary to pass options to `gcj' from
-`Makefile.am', this macro, and not the user macro `GCJFLAGS', should be
-used.
-
-   `gcj' can be used to compile `.java', `.class', `.zip', or `.jar'
-files.
-
-   When linking, `gcj' requires that the main class be specified using
-the `--main=' option.  The easiest way to do this is to use the
-`_LDFLAGS' variable for the program.
-
-
-File: automake.info,  Node: Support for Other Languages,  Next: ANSI,  Prev: Java Support,  Up: Programs
-
-Support for Other Languages
-===========================
-
-   Automake currently only includes full support for C, C++ (*note C++
-Support::), Fortran 77 (*note Fortran 77 Support::), and Java (*note
-Java Support::).  There is only rudimentary support for other
-languages, support for which will be improved based on user demand.
-
-   Some limited support for adding your own languages is available via
-the suffix rule handling; see *Note Suffixes::.
-
-
-File: automake.info,  Node: ANSI,  Next: Dependencies,  Prev: Support for Other Languages,  Up: Programs
-
-Automatic de-ANSI-fication
-==========================
-
-   Although the GNU standards allow the use of ANSI C, this can have the
-effect of limiting portability of a package to some older compilers
-(notably the SunOS C compiler).
-
-   Automake allows you to work around this problem on such machines by
-"de-ANSI-fying" each source file before the actual compilation takes
-place.
-
-   If the `Makefile.am' variable `AUTOMAKE_OPTIONS' (*note Options::)
-contains the option `ansi2knr' then code to handle de-ANSI-fication is
-inserted into the generated `Makefile.in'.
-
-   This causes each C source file in the directory to be treated as
-ANSI C.  If an ANSI C compiler is available, it is used.  If no ANSI C
-compiler is available, the `ansi2knr' program is used to convert the
-source files into K&R C, which is then compiled.
-
-   The `ansi2knr' program is simple-minded.  It assumes the source code
-will be formatted in a particular way; see the `ansi2knr' man page for
-details.
-
-   Support for de-ANSI-fication requires the source files `ansi2knr.c'
-and `ansi2knr.1' to be in the same package as the ANSI C source; these
-files are distributed with Automake.  Also, the package `configure.in'
-must call the macro `AM_C_PROTOTYPES' (*note Macros::).
-
-   Automake also handles finding the `ansi2knr' support files in some
-other directory in the current package.  This is done by prepending the
-relative path to the appropriate directory to the `ansi2knr' option.
-For instance, suppose the package has ANSI C code in the `src' and
-`lib' subdirs.  The files `ansi2knr.c' and `ansi2knr.1' appear in
-`lib'.  Then this could appear in `src/Makefile.am':
-
-     AUTOMAKE_OPTIONS = ../lib/ansi2knr
-
-   If no directory prefix is given, the files are assumed to be in the
-current directory.
-
-   Files mentioned in `LIBOBJS' which need de-ANSI-fication will not be
-automatically handled.  That's because `configure' will generate an
-object name like `regex.o', while `make' will be looking for `regex_.o'
-(when de-ANSI-fying).  Eventually this problem will be fixed via
-`autoconf' magic, but for now you must put this code into your
-`configure.in', just before the `AC_OUTPUT' call:
-
-     # This is necessary so that .o files in LIBOBJS are also built via
-     # the ANSI2KNR-filtering rules.
-     LIBOBJS=`echo $LIBOBJS|sed 's/\.o /\$U.o /g;s/\.o$/\$U.o/'`
-
-   Note that automatic de-ANSI-fication will not work when the package
-is being built for a different host architecture.  That is because
-automake currently has no way to build `ansi2knr' for the build machine.
-
-
-File: automake.info,  Node: Dependencies,  Next: EXEEXT,  Prev: ANSI,  Up: Programs
-
-Automatic dependency tracking
-=============================
-
-   As a developer it is often painful to continually update the
-`Makefile.in' whenever the include-file dependencies change in a
-project.  Automake supplies a way to automatically track dependency
-changes.
-
-   Automake always uses complete dependencies for a compilation,
-including system headers.  Automake's model is that dependency
-computation should be a side effect of the build.  To this end,
-dependencies are computed by running all compilations through a special
-wrapper program called `depcomp'.  `depcomp' understands how to coax
-many different C and C++ compilers into generating dependency
-information in the format it requires.  `automake -a' will install
-`depcomp' into your source tree for you.  If `depcomp' can't figure out
-how to properly invoke your compiler, dependency tracking will simply
-be disabled for your build.
-
-   Experience with earlier versions of Automake (1) taught us that it
-is not reliable to generate dependencies only on the maintainer's
-system, as configurations vary too much.  So instead Automake
-implements dependency tracking at build time.
-
-   Automatic dependency tracking can be suppressed by putting
-`no-dependencies' in the variable `AUTOMAKE_OPTIONS', or passing
-`no-dependencies' as an argument to `AM_INIT_AUTOMAKE' (this should be
-the prefered way).  Or, you can invoke `automake' with the `-i' option.
-Dependency tracking is enabled by default.
-
-   The person building your package also can choose to disable
-dependency tracking by configuring with `--disable-dependency-tracking'.
-
-   ---------- Footnotes ----------
-
-   (1) See `http://sources.redhat.com/automake/dependencies.html' for
-more information on the history and experiences with automatic
-dependency tracking in Automake
 

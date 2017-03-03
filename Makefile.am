@@ -2,7 +2,8 @@
 
 ## Makefile for Automake.
 
-## Copyright 1995, 1996, 1997, 1998, 1999, 2001 Free Software Foundation, Inc.
+## Copyright (C) 1995, 1996, 1997, 1998, 1999, 2001, 2002 Free
+## Software Foundation, Inc.
 
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -26,15 +27,18 @@ SUBDIRS = . m4 lib tests
 bin_SCRIPTS = automake aclocal
 info_TEXINFOS = automake.texi
 
+CLEANFILES = $(bin_SCRIPTS)
+AUTOMAKESOURCES = automake.in aclocal.in
 
-TAGS_FILES = automake.in aclocal.in
+TAGS_FILES = $(AUTOMAKESOURCES)
 
 # The following requires a fixed version of the Emacs 19.30 etags.
 ETAGS_ARGS = --lang=none \
  --regex='/^@node[ \t]+\([^,]+\)/\1/' $(srcdir)/automake.texi
 TAGS_DEPENDENCIES = automake.texi
 
-EXTRA_DIST = ChangeLog.1996 ChangeLog.1998 ChangeLog.2000 ChangeLog.2001
+EXTRA_DIST = ChangeLog.1996 ChangeLog.1998 ChangeLog.2000 ChangeLog.2001 \
+  $(AUTOMAKESOURCES)
 
 ## Make versioned links.  We only run the transform on the root name;
 ## then we make a versioned link with the transformed base name.  This
@@ -56,6 +60,30 @@ uninstall-hook:
 	  rm -f $(DESTDIR)$(bindir)/$$fv; \
 	done
 
+
+## We can't use configure to do the substitution here; we must do it
+## by hand.  We use a funny notation here to avoid configure
+## substitutions in our text.
+do_subst = sed -e 's,[@]datadir[@],$(datadir),g' -e 's,[@]PERL[@],$(PERL),g' \
+	    -e 's,[@]configure_input[@],@configure_input@,g' \
+	    -e 's,[@]PACKAGE[@],$(PACKAGE),g' \
+	    -e 's,[@]VERSION[@],$(VERSION),g' \
+	    -e 's,[@]APIVERSION[@],$(APIVERSION),g'
+
+automake: automake.in Makefile
+	$(do_subst) < $(srcdir)/automake.in > automake
+	chmod +x automake
+
+aclocal: aclocal.in Makefile
+	$(do_subst) < $(srcdir)/aclocal.in > aclocal
+	chmod +x aclocal
+
+## The master location for INSTALL is lib/INSTALL.
+## This is where `make fetch' will install new versions.
+## Make sure we also update this copy.
+INSTALL: lib/INSTALL
+	cp lib/INSTALL $@
+
 ################################################################
 ##
 ## Everything past here is useful to the maintainer, but probably not
@@ -68,7 +96,7 @@ maintainer-check: automake aclocal
 ## This check avoids accidental configure substitutions in the source.
 ## There are exactly 7 lines that should be modified.  This works out
 ## to 22 lines of diffs.
-	@if test `diff $(srcdir)/automake.in automake | wc -l` -ne 28; then \
+	@if test `diff $(srcdir)/automake.in automake | wc -l` -ne 24; then \
 	  echo "found too many diffs between automake.in and automake"; 1>&2; \
 	  diff -c $(srcdir)/automake.in automake; \
 	  exit 1; \
@@ -78,40 +106,39 @@ maintainer-check: automake aclocal
 	perllibdir=$(srcdir)/lib $(PERL) -c -w aclocal
 ## expect no instances of '${...}'.  However, $${...} is ok, since that
 ## is a shell construct, not a Makefile construct.
-## The backslash in `$${' is needed for some versions of bash.
-	@if fgrep '\$${' $(srcdir)/lib/am/[a-z]*.am | \
-	       fgrep -v '$$$$'; then \
+	@if grep -F '$${' $(srcdir)/lib/am/[a-z]*.am | \
+	       grep -F -v '$$$$'; then \
 	  echo "Found too many uses of '\$${' in the lines above." 1>&2; \
 	  exit 1;				\
 	else :; fi
 ## Make sure `rm' is called with `-f'.
-	@if egrep '\<rm ([^-]|\-[^f ]*\>)' \
+	@if grep -E '\<rm ([^-]|\-[^f ]*\>)' \
 	          $(srcdir)/lib/am/[a-z]*.am $(srcdir)/tests/*.test | \
-	      fgrep -v '##'; then \
+	      grep -v '##'; then \
 	  echo "Suspicious 'rm' invocation." 1>&2; \
 	  exit 1;				\
 	else :; fi
 ## Never use something like `for file in $(FILES)', this doesn't work
 ## if FILES is empty or if it contains shell meta characters (e.g. $ is
 ## commonly used in Java filenames).
-	@if egrep 'for .* in \$$\(' $(srcdir)/lib/am/[a-z]*.am; then \
+	@if grep 'for .* in \$$(' $(srcdir)/lib/am/[a-z]*.am; then \
 	  echo 'Use "list=$$(mumble); for var in $$$$list".' 1>&2 ; \
 	  exit 1; \
 	else :; fi
 ## Make sure all invocations of mkinstalldirs are correct.
-	@if fgrep -n 'mkinstalldirs' $(srcdir)/lib/am/[a-z]*.am | \
-	      fgrep -v '$$(mkinstalldirs)'; then \
+	@if grep -n 'mkinstalldirs' $(srcdir)/lib/am/[a-z]*.am | \
+	      grep -F -v '$$(mkinstalldirs)'; then \
 	  echo "Found incorrect use of mkinstalldirs in the lines above" 1>&2; \
 	  exit 1; \
 	else :; fi
 ## We never want to use "undef", only "delete", but for $/.
 	@if grep -n -w 'undef ' $(srcdir)/automake.in | \
-	      fgrep -v 'undef $$/'; then \
+	      grep -F -v 'undef $$/'; then \
 	  echo "Found undef in automake.in; use delete instead" 1>&2; \
 	  exit 1; \
 	fi
 ## We never want split (/ /,...), only split (' ', ...).
-	@if fgrep -n 'split (/ /' $(srcdir)/automake.in; then \
+	@if grep -n 'split (/ /' $(srcdir)/automake.in; then \
 	  echo "Found bad split in the lines above." 1>&2; \
 	  exit 1; \
 	fi
@@ -153,34 +180,39 @@ maintainer-check: automake aclocal
 	  exit 1; \
 	fi
 ## Tests should never call make directly.
-	@if grep -v '^#' $(srcdir)/tests/*.test | egrep ':[	]*make'; then \
+	@if grep -v '^#' $(srcdir)/tests/*.test | grep ':[	]*make'; then \
 	  echo 'Do not run "make" in the above tests.  Use "$$MAKE" instead.' 1>&2; \
 	  exit 1; \
 	fi
 ## Tests should never call autoconf directly.
-	@if grep -v '^#' $(srcdir)/tests/*.test | egrep ':[	]*autoconf'; then \
+	@if grep -v '^#' $(srcdir)/tests/*.test | grep ':[	]*autoconf'; then \
 	  echo 'Do not run "autoconf" in the above tests.  Use "$$AUTOCONF" instead.' 1>&2; \
 	  exit 1; \
 	fi
+## Tests should never call autoupdate directly.
+	@if grep -v '^#' $(srcdir)/tests/*.test | grep ':[	]*autoupdate'; then \
+	  echo 'Do not run "autoupdate" in the above tests.  Use "$$AUTOUPDATE" instead.' 1>&2; \
+	  exit 1; \
+	fi
 ## Tests should never call automake directly.
-	@if grep -v '^#' $(srcdir)/tests/*.test | egrep ':[	]*automake'; then \
+	@if grep -v '^#' $(srcdir)/tests/*.test | grep ':[	]*automake'; then \
 	  echo 'Do not run "automake" in the above tests.  Use "$$AUTOMAKE" instead.' 1>&2;  \
 	  exit 1; \
 	fi
 ## Tests should never call aclocal directly.
-	@if grep -v '^#' $(srcdir)/tests/*.test | egrep ':[	]*aclocal'; then \
+	@if grep -v '^#' $(srcdir)/tests/*.test | grep ':[	]*aclocal'; then \
 	  echo 'Do not run "aclocal" in the above tests.  Use "$$ACLOCAL" instead.' 1>&2;  \
 	  exit 1; \
 	fi
 ## Tests should never call perl directly.
-	@if grep -v '^#' $(srcdir)/tests/*.test | egrep ':[	]*perl'; then \
+	@if grep -v '^#' $(srcdir)/tests/*.test | grep ':[	]*perl'; then \
 	  echo 'Do not run "perl" in the above tests.  Use "$$PERL" instead.' 1>&2; \
 	  exit 1; \
 	fi
 ## Overriding a Makefile macro on the command line is not portable when
 ## recursive targets are used.  Better use an envvar.  SHELL is an exception,
 ## POSIX says it can't come from the environment.
-	@if egrep '\$$MAKE .*(SHELL=.*=|=.*SHELL=)' $(srcdir)/tests/*.test; then \
+	@if grep -E '\$$MAKE .*(SHELL=.*=|=.*SHELL=)' $(srcdir)/tests/*.test; then \
 	  echo 'Rewrite "$$MAKE foo=bar SHELL=/bin/sh" as "foo=bar $$MAKE -e SHELL=/bin/sh"' 1>&2; \
 	  echo ' in the above lines, it is more portable.' 1>&2; \
 	  exit 1; \
@@ -197,7 +229,7 @@ maintainer-check: automake aclocal
 	  echo 'Use "$$MAKE -e SHELL=/bin/sh" in the above lines.' 1>&2; \
 	  exit 1; \
 	fi
-	@if egrep 'SHELL=.*\$$MAKE' $(srcdir)/tests/*.test; then \
+	@if grep 'SHELL=.*\$$MAKE' $(srcdir)/tests/*.test; then \
 	  echo '$$MAKE ignores the SHELL envvar, use "$$MAKE SHELL=/bin/sh" in' 1>&2; \
 	  echo 'the above lines.' 1>&2; \
 	  exit 1; \
@@ -205,8 +237,28 @@ maintainer-check: automake aclocal
 ## Never use `sleep 1' to create files with different timestamps.
 ## Use `sleep 2' instead.  Some filesystems (e.g., Windows') have only
 ## a 2sec resolution.
-	@if egrep '\bsleep +1\b' $(srcdir)/tests/*.test; then \
+	@if grep -E '\bsleep +1\b' $(srcdir)/tests/*.test; then \
 	  echo 'Do not use "sleep 1" in the above tests.  Use "sleep 2" instead.' 1>&2; \
+	  exit 1; \
+	fi
+## fgrep and egrep are not required by POSIX.
+	@if grep -E '\b[ef]grep\b' $(srcdir)/tests/*.test ; then \
+	  echo 'Do not use egrep or fgrep in test cases.  Use $FGREP or $EGREP.' 1>&2; \
+	  exit 1; \
+	fi
+	@if grep -E '\b[ef]grep\b' $(srcdir)/lib/am/*.am $(srcdir)/m4/*.m4; then \
+	  echo 'Do not use egrep or fgrep in the above files, they are not portable.' 1>&2; \
+	  exit 1; \
+	fi
+## Try to make sure all @...@ substitutions are covered by our
+## substitution rule.
+	@if test `grep -E '@[A-Za-z_0-9]+@' aclocal | wc -l` -ne 0; then \
+	  echo "Unresolved @...@ substitution in aclocal" 1>&2; \
+	  exit 1; \
+	fi
+## In automake there are a few valid ones.
+	@if test `grep -E '@[A-Za-z_0-9]+@' automake | wc -l` -ne 4; then \
+	  echo "Unresolved @...@ substitution in aclocal" 1>&2; \
 	  exit 1; \
 	fi
 
@@ -245,8 +297,14 @@ WGET = wget
 
 ## Files that we fetch and which we compare against.
 ## FIXME should be a lot more here
-FETCHFILES = config.guess config.sub texinfo.tex Automake/XFile.pm INSTALL \
-	install-sh
+FETCHFILES = \
+Automake/Struct.pm \
+Automake/XFile.pm \
+INSTALL \
+config.guess \
+config.sub \
+install-sh \
+texinfo.tex
 
 ## Fetch the latest versions of files we care about.
 fetch:
@@ -257,10 +315,12 @@ fetch:
 	$(WGET) ftp://ftp.gnu.org/gnu/config/config.guess; \
 	$(WGET) ftp://ftp.gnu.org/gnu/config/config.sub; \
 	$(WGET) ftp://ftp.gnu.org/gnu/texinfo/texinfo.tex; \
+	$(WGET) http://savannah.gnu.org/cgi-bin/viewcvs/~checkout~/autoconf/autoconf/lib/Autom4te/Struct.pm?content-type=text/plain -O Automake/Struct.pm; \
 	$(WGET) http://savannah.gnu.org/cgi-bin/viewcvs/~checkout~/autoconf/autoconf/lib/Autom4te/XFile.pm?content-type=text/plain -O Automake/XFile.pm; \
 	$(WGET) http://savannah.gnu.org/cgi-bin/viewcvs/~checkout~/autoconf/autoconf/config/install-sh?content-type=text/plain -O install-sh; \
 	$(WGET) http://savannah.gnu.org/cgi-bin/viewcvs/~checkout~/autoconf/autoconf/INSTALL?content-type=text/plain -O INSTALL)
-	perl -pi -e 's/Autom4te::/Automake::/g' Fetchdir/Automake/XFile.pm
+	perl -pi -e 's/Autom4te::/Automake::/g' \
+	  Fetchdir/Automake/Struct.pm Fetchdir/Automake/XFile.pm
 ## Don't exit after test because we want to give as many errors as
 ## possible.
 	@stat=0; for file in $(FETCHFILES); do \
