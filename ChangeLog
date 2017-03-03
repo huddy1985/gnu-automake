@@ -1,4 +1,49 @@
+2003-05-18  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.in: Bump version to 1.7.5.
+	* NEWS: Update for release.
+	* lib/config.guess, lib/config.sub, lib/texinfo.tex: New upstream
+	versions.
+
+2003-05-17  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.texi: Fix some typos.
+
+	* lib/am/install.am (install, install-exec, install-data, uninstall):
+	Declare conditionally using a if/else/endif block instead of
+	using ?SUBDIRS?-style conditions.  The latter fail when
+	%maybe_BUILT_SOURCES% is replaced by several lines.
+	This fixes a bug introduced on 2003-04-06.
+	* tests/bsource.test: New file.
+	* tests/Makefile.am (TESTS): Add bsource.test.
+	Reported by Bruno Haible.
+
+2003-05-11  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.texi (renamed objects): New node.
+	(Program and Library Variables): Move maude_DEPENDENCIES closer
+	to maude_LDADD.  Define and use `per-target compilation flags' in the
+	explanation for maude_CFLAGS et al.  Link to the `renamed objects'
+	node.  Illustrate maude_SHORTNAME.
+
+2003-05-09  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* lib/install-sh: Update copyright notice and license to that of
+	X11R6.  This removes an advertising clause reported as Debian bug
+	#191717.
+
+2003-05-07  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* m4/make.m4: Rename the doit target as am__doit,
+	and make it phony.
+	Reported by Philip S Tellis.
+
 2003-04-23  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* automake.texi (Requirements): Typo in index
+	s/AC_CONFIG_FILE/AC_CONFIG_FILES/.
+
+	* configure.in: Bump version to 1.7.4a.
 
 	* configure.in, NEWS: Bump version to 1.7.4.
 
