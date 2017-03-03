@@ -1,3 +1,44 @@
+2012-07-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	release: bug-fixing stable release 1.11.6
+
+	Fixes security vulnerability CVE-2012-3386.
+
+	* configure.ac (AC_INIT): Bump version number to 1.11.6.
+	* m4/amversion.m4: Likewise (auto-updated by "./bootstrap").
+
+2012-07-09  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	distcheck: never make part of $(distdir) world-writable
+
+	This fixes a locally-exploitable security vulnerability (CVE-2012-3386).
+	Cherry-picked from: v1.12.1-105-gbab7065.
+
+	In the 'distcheck' rule, we used to make the just-extracted (from
+	the distribution tarball) $(distdir) directory and all its files and
+	subdirectories read-only; then, in order to create the '_inst' and
+	'_build' subdirectories in there (used by the rest of the recipe) we
+	made the top-level $(distdir) *world-writable* for an instant (the
+	time to create those two directories) before making it read-only
+	again.
+
+	Making that directory world-writable (albeit only briefly) introduced a
+	locally exploitable race condition for those who run "make distcheck" with
+	a non-restrictive umask (e.g., 022) in a directory that is accessible by
+	others.  A successful exploit would result in arbitrary code execution
+	with the privileges of the user running "make distcheck" -- game over.
+	Jim Meyering wrote a proof-of-concept script showing that such exploit is
+	easily implemented.
+
+	This issue is similar to the CVE-2009-4029 vulnerability:
+	<http://lists.gnu.org/archive/html/automake/2009-12/msg00012.html>
+
+	* lib/am/distdir.am (distcheck): Don't make $(distdir) world-writable,
+	not even for an instant; make it user-writable instead, which is enough.
+	* NEWS: Update.
+
+	Helped-By: Jim Meyering <jim@meyering.net>
+
 2012-04-13  Stefano Lattarini  <stefano.lattarini@gmail.com>
 
 	release: stable maintenance release 1.11.5
