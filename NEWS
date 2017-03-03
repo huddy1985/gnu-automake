@@ -1,3 +1,71 @@
+Bugs fixed in 1.8.3:
+
+* Long standing bugs:
+
+  - Quote filenames in installation rules, in case $DESTDIR, $prefix,
+    or any of the other *dir variables contain a space.
+
+    Please note that Automake does not and cannot support spaces in
+    filenames that are involved during the build.  This change affects
+    only installation paths, so that `make install' does not bomb out
+    in packages configured with
+      ./configure --prefix '/c/Program Files'
+
+  - Fix the depfiles output so it works with GNU sed (<4.1) even when
+    POSIXLY_CORRECT is set.
+
+  - Do not AC_SUBST(LIBOBJS) in AM_WITH_REGEX.  This macro was unusable
+    since Autoconf 2.54, which defines LIBOBJS itself.
+
+  - Fix a potential (but unlikely) race condition in parallel elisp
+    builds.  (Introduced in 1.7.3.)
+
+  - Do not assume that users override _DEPENDENCIES in all conditions
+    where Automake will try to define them.
+
+  - Do not use `mkdir -p' in mkinstalldirs, unless this is GNU mkdir.
+    Solaris 8's `mkdir -p' is not thread-safe and can break parallel
+    builds.
+
+    This fix also affects the $(mkdir_p) variable defined since
+    Automake 1.8.  It will be set to `mkdir -p' only if mkdir is GNU
+    mkdir, and to `mkinstalldirs' or `install-sh -d' otherwise.
+
+  - Secure temporary directory creation in `make distcheck'. (PR/413)
+
+  - Do not generate two build rules for `parser.h' when the
+    parser appears in two different conditionals.
+
+  - Work around a Solaris 8 /bin/sh bug in the test for dependency
+    checking.  Usually ./configure will not pick this shell; so this
+    fix only helps cases where the shell is forced to /bin/sh.
+
+* Bugs introduced by 1.8:
+
+  - In some situations (hand-written `m4_include's), aclocal would
+    call the `File::Spec->rel2abs' method, which was only introduced
+    in Perl 5.6.  This new version reestablish support Perl 5.005.
+
+    It is likely that the next major Automake releases will require at
+    least Perl 5.6.  Consider upgrading your development environment
+    if you are still using the five-year-old Perl 5.005.
+
+  - Automake would sometimes fail to define rules for targets listed
+    in variables defined in multiple conditions.  For instance on
+      if C1
+	bin_PROGRAMS = a
+      else
+	bin_PROGRAMS = b
+      endif
+    it would define only the `a.$(OBJEXT): a.c' rule and omit the
+    `b.$(OBJEXT): b.c' rule.
+
+* New sections in manual:
+
+  - Third-Party Makefiles: how to interface third party Makefiles.
+  - Upgrading: upgrading packages to newer Automake versions.
+  - Multiple Outputs: handling tools that produce many outputs.
+
 Bug fixed in 1.8.2:
 
 * A (well known) portability bug slipped in the changes made to

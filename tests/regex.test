@@ -1,5 +1,5 @@
-#!/bin/sh
-# Copyright (C) 2003, 2004  Free Software Foundation, Inc.
+#! /bin/sh
+# Copyright (C) 2004  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -18,44 +18,17 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# For PR/352: make sure we support bin_PROGRAMS being defined conditionally.
+# Make sure AM_WITH_REGEX compiles and runs.
 
-. ./defs
+. ./defs || exit 1
 
 set -e
 
-cat >>configure.in <<'EOF'
-AC_PROG_CC
-AM_CONDITIONAL(C1, [test -z "$two"])
-AM_CONDITIONAL(C2, [test -n "$two"])
-AC_OUTPUT
-EOF
-
-cat >>Makefile.am <<'EOF'
-if C1
-bin_PROGRAMS = a
-endif
-if C2
-bin_PROGRAMS = b $(undefined)
-endif
-
-print:
-	@echo 'BEG: $(bin_PROGRAMS) :END'
-EOF
+cat >> configure.in << 'END'
+AM_WITH_REGEX
+END
 
 $ACLOCAL
 $AUTOCONF
-$AUTOMAKE
-
 ./configure
-EXEEXT=.foo $MAKE -e print > stdout
-cat stdout
-grep 'BEG: a.foo :END' stdout
-
-./configure two=yes
-EXEEXT=.foo $MAKE -e print > stdout
-cat stdout
-grep 'BEG: b.foo :END' stdout
-
-grep 'a_SOURCES = a.c' Makefile.in
-grep 'b_SOURCES = b.c' Makefile.in
+./configure --without-regex

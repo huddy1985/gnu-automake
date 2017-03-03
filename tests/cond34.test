@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2003, 2004  Free Software Foundation, Inc.
+# Copyright (C) 2004  Free Software Foundation, Inc.
 #
 # This file is part of GNU Automake.
 #
@@ -18,44 +18,55 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-# For PR/352: make sure we support bin_PROGRAMS being defined conditionally.
+# Check for _DEPDENDENCIES definition with conditional _LDADD.
+# Report from Elena A. Vengerova
 
 . ./defs
 
 set -e
 
 cat >>configure.in <<'EOF'
+AM_CONDITIONAL([TWO], test -n "$two")
 AC_PROG_CC
-AM_CONDITIONAL(C1, [test -z "$two"])
-AM_CONDITIONAL(C2, [test -n "$two"])
 AC_OUTPUT
 EOF
 
 cat >>Makefile.am <<'EOF'
-if C1
-bin_PROGRAMS = a
-endif
-if C2
-bin_PROGRAMS = b $(undefined)
-endif
+OBJEXT=z
 
-print:
-	@echo 'BEG: $(bin_PROGRAMS) :END'
+bin_PROGRAMS = test1 test2
+
+if TWO
+  test1_LDADD = two.$(OBJEXT)
+  test2_LDADD = two.$(OBJEXT)
+  test2_DEPENDENCIES = $(test2_LDADD) somethingelse.a
+else !TWO
+  test1_LDADD = one.$(OBJEXT)
+  test2_LDADD = three.$(OBJEXT)
+endif !TWO
+
+test1_DEPENDENCIES = $(test1_LDADD) somethingelse.a
+
+dep-test1:
+	echo BEG: $(test1_DEPENDENCIES) :END
+dep-test2:
+	echo BEG: $(test2_DEPENDENCIES) :END
+
 EOF
+
+:> test.c
 
 $ACLOCAL
 $AUTOCONF
 $AUTOMAKE
-
 ./configure
-EXEEXT=.foo $MAKE -e print > stdout
-cat stdout
-grep 'BEG: a.foo :END' stdout
+$MAKE dep-test1 >out
+grep 'BEG: one.z somethingelse.a :END' out
+$MAKE dep-test2 >out
+grep 'BEG: three.z :END' out
 
-./configure two=yes
-EXEEXT=.foo $MAKE -e print > stdout
-cat stdout
-grep 'BEG: b.foo :END' stdout
-
-grep 'a_SOURCES = a.c' Makefile.in
-grep 'b_SOURCES = b.c' Makefile.in
+./configure two=2
+$MAKE dep-test1 >out
+grep 'BEG: two.z somethingelse.a :END' out
+$MAKE dep-test2 >out
+grep 'BEG: two.z somethingelse.a :END' out

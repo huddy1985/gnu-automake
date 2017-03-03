@@ -3,7 +3,7 @@ automake.texi.
 
 
 
-   This manual is for GNU Automake (version 1.8.2, 7 January 2004), a
+   This manual is for GNU Automake (version 1.8.3, 15 February 2004), a
 program which creates GNU standards-compliant Makefiles from template
 files.
 
@@ -40,7 +40,7 @@ GNU Automake
 
 
 
-   This manual is for GNU Automake (version 1.8.2, 7 January 2004), a
+   This manual is for GNU Automake (version 1.8.3, 15 February 2004), a
 program which creates GNU standards-compliant Makefiles from template
 files.
 
@@ -83,9 +83,10 @@ files.
 * Conditionals::                Conditionals
 * Gnits::                       The effect of `--gnu' and `--gnits'
 * Cygnus::                      The effect of `--cygnus'
-* Extending::                   Extending Automake
+* Not Enough::                  When Automake is not Enough
 * Distributing::                Distributing the Makefile.in
 * API versioning::              About compatibility between Automake versions
+* Upgrading::                   Upgrading to a Newer Automake Version
 * FAQ::                         Frequently Asked Questions
 * Copying This Manual::         How to make copies of this manual
 * Indices::                     Indices of variables, macros, and concepts
@@ -208,6 +209,11 @@ Miscellaneous Rules
 * Suffixes::                    Handling new file extensions
 * Multilibs::                   Support for multilibs.
 
+When Automake Isn't Enough
+
+* Extending::                   Adding new rules or overriding existing ones.
+* Third-Party Makefiles::       Integrating Non-Automake `Makefile's.
+
 Frequently Asked Questions about Automake
 
 * CVS::                         CVS and generated files
@@ -215,6 +221,7 @@ Frequently Asked Questions about Automake
 * wildcards::                   Why doesn't Automake support wildcards?
 * distcleancheck::              Files left in build directory after distclean
 * renamed objects::             Why are object files sometimes renamed?
+* Multiple Outputs::            Writing rules for tools with many output files
 
 Copying This Manual
 
@@ -1759,8 +1766,9 @@ otherwise is an indication of how that feature is misplaced.
 
    The new implementation will probably be done slightly differently.
 For instance it could enforce the `m4/'-style layout discussed in *Note
-Local Macros::, and take care of copying (or even updating) third-party
-macro into this directory.
+Local Macros::, and take care of copying (and even updating)
+third-party macros from `/usr/share/aclocal/' into the local `m4/'
+directory.
 
    We have no idea when and how this will happen.  This has been
 discussed several times in the past, but someone still has to commit
@@ -1784,6 +1792,13 @@ consider using `autoreconf'.  That should simplify its logic a lot
 (less things to maintain, yum!), it's even likely you will not need the
 script anymore, and more to the point you will not call `aclocal'
 directly anymore.
+
+   For the time being, third-party packages should continue to install
+public macros into `/usr/share/aclocal/'.  If `aclocal' is replaced by
+another tool it might make sense to rename the directory, but
+supporting `/usr/share/aclocal/' for backward compatibility should be
+really easy provided all macros are properly written (*note Extending
+aclocal::).
 
 
 File: automake.info,  Node: Top level,  Next: Alternative,  Prev: configure,  Up: Top
@@ -3907,9 +3922,9 @@ recommended the following construct.
      lisp_LISP = file1.el file2.el
      ELCFILES =
 
-`ELCFILES' is an internal Automake variables that normally lists all
+`ELCFILES' is an internal Automake variable that normally lists all
 `.elc' files that must be byte-compiled.  Automake defines `ELCFILES'
-automatically from `lisp_LISP'.  Emptying this variables explicitly
+automatically from `lisp_LISP'.  Emptying this variable explicitly
 prevents byte-compilation to occur.
 
    Since Automake 1.8, we now recommend using `lisp_DATA' instead.  As
@@ -4549,12 +4564,16 @@ supply additional flags to `configure', define them in the
 `DISTCHECK_CONFIGURE_FLAGS' variable, either in your top-level
 `Makefile.am', or on the command line when invoking `make'.
 
-   If the `distcheck-hook' rule is defined in your `Makefile.am', then
-it will be invoked by `distcheck' after the new distribution has been
-unpacked, but before the unpacked copy is configured and built.  Your
-`distcheck-hook' can do almost anything, though as always caution is
-advised.  Generally this hook is used to check for potential
-distribution errors not caught by the standard mechanism.
+   If the `distcheck-hook' rule is defined in your top-level
+`Makefile.am', then it will be invoked by `distcheck' after the new
+distribution has been unpacked, but before the unpacked copy is
+configured and built.  Your `distcheck-hook' can do almost anything,
+though as always caution is advised.  Generally this hook is used to
+check for potential distribution errors not caught by the standard
+mechanism.  Note that `distcheck-hook' as well as
+`DISTCHECK_CONFIGURE_FLAGS' are not honored in a subpackage
+`Makefile.am', but the `DISTCHECK_CONFIGURE_FLAGS' are passed down to
+the `configure' script of the subpackage.
 
    Speaking about potential distribution errors, `distcheck' will also
 ensure that the `distclean' rule actually removes all built files.
@@ -5210,7 +5229,7 @@ the following as well:
    * The file `THANKS' is required.
 
 
-File: automake.info,  Node: Cygnus,  Next: Extending,  Prev: Gnits,  Up: Top
+File: automake.info,  Node: Cygnus,  Next: Not Enough,  Prev: Gnits,  Up: Top
 
 The effect of `--cygnus'
 ************************
@@ -5257,10 +5276,24 @@ more standards compliant).  At that time the special Cygnus mode will be
 removed.
 
 
-File: automake.info,  Node: Extending,  Next: Distributing,  Prev: Cygnus,  Up: Top
+File: automake.info,  Node: Not Enough,  Next: Distributing,  Prev: Cygnus,  Up: Top
 
 When Automake Isn't Enough
 **************************
+
+In some situations, where Automake is not up to one task, one has to
+resort to handwritten rules or even handwritten `Makefile's.
+
+* Menu:
+
+* Extending::                   Adding new rules or overriding existing ones.
+* Third-Party Makefiles::       Integrating Non-Automake `Makefile's.
+
+
+File: automake.info,  Node: Extending,  Next: Third-Party Makefiles,  Up: Not Enough
+
+Extending Automake Rules
+========================
 
 With some minor exceptions (like `_PROGRAMS' variables being rewritten
 to append `$(EXEEXT)'), the contents of a `Makefile.am' is copied to
@@ -5341,7 +5374,165 @@ symbolic link, not the real binary.  Also we `cd' into the destination
 directory in order to create relative links.
 
 
-File: automake.info,  Node: Distributing,  Next: API versioning,  Prev: Extending,  Up: Top
+File: automake.info,  Node: Third-Party Makefiles,  Prev: Extending,  Up: Not Enough
+
+Third-Party `Makefile's
+=======================
+
+In most projects all `Makefile's are generated by Automake.  In some
+cases, however, projects need to embed subdirectories with handwritten
+`Makefile's.  For instance one subdirectory could be a third-party
+project with its own build system, not using Automake.
+
+   It is possible to list arbitrary directories in `SUBDIRS' or
+`DIST_SUBDIRS' provided each of these directories has a `Makefile' that
+recognizes all the following recursive targets.
+
+   When a user runs one of these targets, that target is run recursively
+in all subdirectories.  This is why it is important that even
+third-party `Makefile's support them.
+
+`all'
+     Compile the entire package.  This is the default target in
+     Automake-generated `Makefile's, but it does not need to be the
+     default in third-party `Makefile's.
+
+`distdir'
+     Copy files to distribute into `$(distdir)', before a tarball is
+     constructed.  Of course this target is not required if the
+     `no-dist' option (*note Options::) is used.
+
+     The variables `$(top_distdir)' and `$(distdir)' (*note Dist::)
+     will be passed from the outer package to the subpackage when the
+     `distdir' target is invoked.  These two variables have been
+     adjusted for the directory which is being recursed into, so they
+     are ready to use.
+
+`install'
+`install-data'
+`install-exec'
+`uninstall'
+     Install or uninstall files (*note Install::).
+
+`install-info'
+     Install only the Texinfo documentation (*note Texinfo::).
+
+`installdirs'
+     Create install directories, but do not install any files.
+
+`check'
+`installcheck'
+     Check the package (*note Tests::).
+
+`mostlyclean'
+`clean'
+`distclean'
+`maintainer-clean'
+     Cleaning rules (*note Clean::).
+
+`dvi'
+`pdf'
+`ps'
+`info'
+`html'
+     Build the documentation in various formats (*note Texinfo::).
+
+`tags'
+`ctags'
+     Build `TAGS' and `CTAGS' (*note Tags::).
+
+   If you have ever used Gettext in a project, this is a good example of
+how third-party `Makefile's can be used with Automake.  The `Makefile's
+`gettextize' puts in the `po/' and `intl/' directories are handwritten
+`Makefile's that implement all these targets.  That way they can be
+added to `SUBDIRS' in Automake packages.
+
+   Directories which are only listed in `DIST_SUBDIRS' but not in
+`SUBDIRS' need only the `distclean', `maintainer-clean', and `distdir'
+rules (*note Top level::).
+
+   Usually, many of these rules are irrelevant to the third-party
+subproject, but they are required for the whole package to work.  It's
+OK to have a rule that does nothing, so if you are integrating a
+third-party project with no documentation or tag support, you could
+simply augment its `Makefile' as follows:
+
+     EMPTY_AUTOMAKE_TARGETS = dvi pdf ps info html tags ctags
+     .PHONY: $(EMPTY_AUTOMAKE_TARGETS)
+     $(EMPTY_AUTOMAKE_TARGETS):
+
+   Another aspect of integrating third-party build systems is whether
+they support VPATH builds.  Obviously if the subpackage does not
+support VPATH builds the whole package will not support VPATH builds.
+This in turns means that `make distcheck' will not work, because it
+relies on VPATH builds.  Some people can live without this (actually,
+many Automake users have never heard of `make distcheck').  Other
+people may prefer to revamp the existing `Makefile's to support VPATH.
+Doing so does not necessarily require Automake, only Autoconf is needed
+(*note Build Directories: (autoconf)Build Directories.).  The necessary
+substitutions: `@scrdir@', `@top_srcdir@', and `@top_buildir@' are
+defined by `configure' when it processes a `Makefile' (*note Preset
+Output Variables: (autoconf)Preset Output Variables.), they are not
+computed by the Makefile like the aforementioned `$(distdir)' and
+`$(top_distdir)' variables..
+
+   It is sometimes inconvenient to modify a third-party `Makefile' to
+introduce the above required targets.  For instance one may want to
+keep the third-party sources untouched to ease upgrades to new versions.
+
+   Here are two other ideas.  If GNU make is assumed, one possibility is
+to add to that subdirectory a `GNUmakefile' that defines the required
+targets and include the third-party `Makefile'.  For this to work in
+VPATH builds, `GNUmakefile' must lie in the build directory; the
+easiest way to do this is to write a `GNUmakefile.in' instead, and have
+it processed with `AC_CONFIG_FILES' from the outer package.  For
+example if we assume `Makefile' defines all targets except the
+documentation targets, and that the `check' target is actually called
+`test', we could write `GNUmakefile' (or `GNUmakefile.in') like this:
+
+     # First, include the real Makefile
+     include Makefile
+     # Then, define the other targets needed by Automake Makefiles.
+     .PHONY: dvi pdf ps info html check
+     dvi pdf ps info html:
+     check: test
+
+   A similar idea that does not use `include' is to write a proxy
+`Makefile' that dispatches rules to the real `Makefile', either with
+`$(MAKE) -f Makefile.real $(AM_MAKEFLAGS) target' (if it's OK to rename
+the original `Makefile') or with `cd subdir && $(MAKE) $(AM_MAKEFLAGS)
+target' (if it's OK to store the subdirectory project one directory
+deeper).  The good news is that this proxy `Makefile' can be generated
+with Automake.  All we need are -local targets (*note Extending::) that
+perform the dispatch.  Of course the other Automake features are
+available, so you could decide to let Automake perform distribution or
+installation.  Here is a possible `Makefile.am':
+
+     all-local:
+             cd subdir && $(MAKE) $(AM_MAKEFLAGS) all
+     check-local:
+             cd subdir && $(MAKE) $(AM_MAKEFLAGS) test
+     clean-local:
+             cd subdir && $(MAKE) $(AM_MAKEFLAGS) clean
+     
+     # Assuming the package knows how to install itself
+     install-data-local:
+             cd subdir && $(MAKE) $(AM_MAKEFLAGS) install-data
+     install-exec-local:
+             cd subdir && $(MAKE) $(AM_MAKEFLAGS) install-exec
+     uninstall-local:
+             cd subdir && $(MAKE) $(AM_MAKEFLAGS) uninstall
+     
+     # Distribute files from here.
+     EXTRA_DIST = subdir/Makefile subdir/program.c ...
+
+   Pushing this idea to the extreme, it is also possible to ignore the
+subproject build system and build everything from this proxy
+`Makefile.am'.  This might sounds very sensible if you need VPATH
+builds but the subproject does not support them.
+
+
+File: automake.info,  Node: Distributing,  Next: API versioning,  Prev: Not Enough,  Up: Top
 
 Distributing `Makefile.in's
 ***************************
@@ -5357,7 +5548,7 @@ a special exception allowing you to distribute them with your package,
 regardless of the licensing you choose.
 
 
-File: automake.info,  Node: API versioning,  Next: FAQ,  Prev: Distributing,  Up: Top
+File: automake.info,  Node: API versioning,  Next: Upgrading,  Prev: Distributing,  Up: Top
 
 Automake API versioning
 ***********************
@@ -5380,16 +5571,16 @@ This means you can install several versions of Automake in the same
 Furthermore, `Makefile''s generated by Automake 1.6 will use
 `automake-1.6' explicitly in their rebuild rules.
 
-   Note that `1.6' in `automake-1.6' is Automake's API version, not
+   The number `1.6' in `automake-1.6' is Automake's API version, not
 Automake's version.  If a bug fix release is made, for instance
 Automake 1.6.1, the API version will remain 1.6.  This means that a
 package which work with Automake 1.6 should also work with 1.6.1; after
 all, this is what people expect from bug fix releases.
 
-   Note that if your package relies on a feature or a bug fix
-introduced in a release, you can pass this version as an option to
-Automake to ensure older releases will not be used.  For instance, use
-this in your `configure.ac':
+   If your package relies on a feature or a bug fix introduced in a
+release, you can pass this version as an option to Automake to ensure
+older releases will not be used.  For instance, use this in your
+`configure.ac':
 
        AM_INIT_AUTOMAKE(1.6.1)    dnl Require Automake 1.6.1 or better.
 
@@ -5422,7 +5613,58 @@ bug).
 test-suite.
 
 
-File: automake.info,  Node: FAQ,  Next: Copying This Manual,  Prev: API versioning,  Up: Top
+File: automake.info,  Node: Upgrading,  Next: FAQ,  Prev: API versioning,  Up: Top
+
+Upgrading a Package to a Newer Automake Version
+***********************************************
+
+Automake maintains three kind of files in a package.
+
+   * `aclocal.m4'
+
+   * `Makefile.in's
+
+   * auxiliary tools like `install-sh' or `py-compile'
+
+   `aclocal.m4' is generated by `aclocal' and contains some
+Automake-supplied M4 macros.  Auxiliary tools are installed by
+`automake --add-missing' when needed.  `Makefile.in's are built from
+`Makefile.am' by `automake', and rely on the definitions of the M4
+macros put in `aclocal.m4' as well as the behavior of the auxiliary
+tools installed.
+
+   Because all these files are closely related, it is important to
+regenerate all of them when upgrading to a newer Automake release.  The
+usual way to do that is
+
+     aclocal # with any option needed (such a -I m4)
+     autoconf
+     automake --add-missing --force-missing
+
+or more conveniently:
+
+     autoreconf -vfi
+
+   The use of `--force-missing' ensures that auxiliary tools will be
+overridden by new versions (*note Invoking Automake::).
+
+   It is important to regenerate all these files each time Automake is
+upgraded, even between bug fixes releases.  For instance it is not
+unusual for a bug fix to involve changes to both the rules generated in
+`Makefile.in' and the supporting M4 macros copied to `aclocal.m4'.
+
+   Presently `automake' is able to diagnose situations where
+`aclocal.m4' has been generated with another version of `aclocal'.
+However it never checks whether auxiliary scripts are up-to-date.  In
+other words, `automake' will tell you when `aclocal' needs to be rerun,
+but it will never diagnose a missing `--force-missing'.
+
+   Before upgrading to a new major release, it is a good idea to read
+the file `NEWS'.  This file lists all changes between releases: new
+features, obsolete constructs, known incompatibilities, and workarounds.
+
+
+File: automake.info,  Node: FAQ,  Next: Copying This Manual,  Prev: Upgrading,  Up: Top
 
 Frequently Asked Questions about Automake
 *****************************************
@@ -5437,6 +5679,7 @@ lists.
 * wildcards::                   Why doesn't Automake support wildcards?
 * distcleancheck::              Files left in build directory after distclean
 * renamed objects::             Why are object files sometimes renamed?
+* Multiple Outputs::            Writing rules for tools with many output files
 
 
 File: automake.info,  Node: CVS,  Next: maintainer-mode,  Up: FAQ
@@ -5856,7 +6099,7 @@ you do this.  `distcleancheck_listfiles' is a way to _hide_ errors, not
 to fix them.  You can always do better.
 
 
-File: automake.info,  Node: renamed objects,  Prev: distcleancheck,  Up: FAQ
+File: automake.info,  Node: renamed objects,  Next: Multiple Outputs,  Prev: distcleancheck,  Up: FAQ
 
 Why are object files sometimes renamed?
 =======================================
@@ -5893,6 +6136,188 @@ the following example.
 
    Note that the renaming of objects is also affected by the
 `_SHORTNAME' variable (*note Program and Library Variables::).
+
+
+File: automake.info,  Node: Multiple Outputs,  Prev: renamed objects,  Up: FAQ
+
+Handling Tools that Produce Many Outputs
+========================================
+
+This section describes a `make' idiom that can be used when a tool
+produces multiple output files.  It is not specific to Automake and can
+be used in ordinary `Makefile's.
+
+   Suppose we have a program called `foo' that will read one file
+called `data.foo' and produce two files named `data.c' and `data.h'.
+We want to write a `Makefile' rule that captures this one-to-two
+dependency.
+
+   The naive rule is incorrect:
+
+     # This is incorrect.
+     data.c data.h: data.foo
+             foo data.foo
+
+What the above rule really says is that `data.c' and `data.h' each
+depend on `data.foo', and can each be built by running `foo data.foo'.
+In other words it is equivalent to:
+
+     # We do not want this.
+     data.c: data.foo
+             foo data.foo
+     data.h: data.foo
+             foo data.foo
+
+which means that `foo' can be run twice.  Usually it will not be run
+twice, because `make' implementations are smart enough to check for the
+existence of the second file after the first one has been built; they
+will therefore detect that it already exists.  However there are a few
+situations where it can run twice anyway:
+
+   * The most worrying case is when running a parallel `make'.  If
+     `data.c' and `data.h' are built in parallel, two `foo data.foo'
+     commands will run concurrently.  This is harmful.
+
+   * Another case is when the dependency (here `data.foo') is (or
+     depends upon) a phony target.
+
+   A solution that works with parallel `make' but not with phony
+dependencies is the following:
+
+     data.c data.h: data.foo
+             foo data.foo
+     data.h: data.c
+
+The above rules are equivalent to
+
+     data.c: data.foo
+             foo data.foo
+     data.h: data.foo data.c
+             foo data.foo
+
+therefore a parallel `make' will have to serialize the builds of
+`data.c' and `data.h', and will detect that the second is no longer
+needed once the first is over.
+
+   Using this pattern is probably enough for most cases.  However it
+does not scale easily to more output files (in this scheme all output
+files must be totally ordered by the dependency relation), so we will
+explore a more complicated solution.
+
+   Another idea is to write the following:
+
+     # There is still a problem with this one.
+     data.c: data.foo
+             foo data.foo
+     data.h: data.c
+
+The idea is that `foo data.foo' is run only when `data.c' needs to be
+updated, but we further state that `data.h' depends upon `data.c'.
+That way, if `data.h' is required and `data.foo' is out of date, the
+dependency on `data.c' will trigger the build.
+
+   This is almost perfect, but suppose we have built `data.h' and
+`data.c', and then we erase `data.h'.  Then, running `make data.h' will
+not rebuild `data.h'.  The above rules just state that `data.c' must be
+up-to-date with respect to `data.foo', and this is already the case.
+
+   What we need is a rule that forces a rebuild when `data.h' is
+missing.  Here it is:
+
+     data.c: data.foo
+             foo data.foo
+     data.h: data.c
+             @if test -f $@; then :; else \
+               rm -f data.c; \
+               $(MAKE) $(AM_MAKEFLAGS) data.c; \
+             fi
+
+   The above scales easily to more outputs and more inputs.  One of the
+output is picked up to serve as a witness of the run of the command, it
+depends upon all inputs, and all other outputs depend upon it.  For
+instance if `foo' should additionally read `data.bar' and also produce
+`data.w' and `data.x', we would write:
+
+     data.c: data.foo data.bar
+             foo data.foo data.bar
+     data.h data.w data.x: data.c
+             @if test -f $@; then :; else \
+               rm -f data.c; \
+               $(MAKE) $(AM_MAKEFLAGS) data.c; \
+             fi
+
+   There is still a minor problem with this setup.  `foo' outputs four
+files, but we do not know in which order these files are created.
+Suppose that `data.h' is created before `data.c'.  Then we have a weird
+situation.  The next time `make' is run, `data.h' will appear older
+than `data.c', the second rule will be triggered, a shell will be
+started to execute the `if...fi' command, but actually it will just
+execute the `then' branch, that is: nothing.  In other words, because
+the witness we selected is not the first file created by `foo', `make'
+will start a shell to do nothing each time it is run.
+
+   A simple riposte is to fix the timestamps when this happens.
+
+     data.c: data.foo data.bar
+             foo data.foo data.bar
+     data.h data.w data.x: data.c
+             @if test -f $@; then \
+               touch $@; \
+             else \
+               rm -f data.c; \
+               $(MAKE) $(AM_MAKEFLAGS) data.c; \
+             fi
+
+   Another solution, not incompatible with the previous one, is to use a
+different and dedicated file as witness, rather than using any of
+`foo''s outputs.
+
+     data.stamp: data.foo data.bar
+             @rm -f data.tmp
+             @touch data.tmp
+             foo data.foo data.bar
+             @mv -f data.tmp $@
+     data.c data.h data.w data.x: data.stamp
+             @if test -f $@; then \
+               touch $@; \
+             else \
+               rm -f data.stamp; \
+               $(MAKE) $(AM_MAKEFLAGS) data.stamp; \
+             fi
+
+   `data.tmp' is created before `foo' is run, so it has a timestamp
+older than output files output by `foo'.  It is then renamed to
+`data.stamp' after `foo' has run, because we do not want to update
+`data.stamp' if `foo' fails.
+
+   Using a dedicated witness like this is very handy when the list of
+output files is not known beforehand.  As an illustration, consider the
+following rules to compile many `*.el' files into `*.elc' files in a
+single command.  It does not matter how `ELFILES' is defined (as long
+as it is not empty: empty targets are not accepted by POSIX).
+
+     ELFILES = one.el two.el three.el ...
+     ELCFILES = $(ELFILES:=c)
+     
+     elc-stamp: $(ELFILES)
+             @rm -f elc-temp
+             @touch elc-temp
+             $(elisp_comp) $(ELFILES)
+             @mv -f elc-temp $@
+     
+     $(ELCFILES): elc-stamp
+             @if test -f $@; then \
+               touch $@; \
+             else \
+               rm -f elc-stamp; \
+               $(MAKE) $(AM_MAKEFLAGS) elc-stamp; \
+             fi
+
+   For completeness it should be noted that GNU `make' is able to
+express rules with multiple output files using pattern rules (*note
+Pattern Rule Examples: (make)Pattern Examples.).  We do not discuss
+pattern rules here because they are not portable, but they can be
+convenient in packages that assume GNU `make'.
 
 
 File: automake.info,  Node: Copying This Manual,  Next: Indices,  Prev: FAQ,  Up: Top
@@ -6453,6 +6878,7 @@ Macro and Variable Index
 * distcleancheck_listfiles <1>:          distcleancheck.
 * distcleancheck_listfiles:              Dist.
 * DISTCLEANFILES:                        Clean.
+* distdir <1>:                           Third-Party Makefiles.
 * distdir:                               Dist.
 * distuninstallcheck_listfiles:          Dist.
 * DVIPS:                                 Texinfo.
@@ -6561,6 +6987,7 @@ Macro and Variable Index
 * TEXINFO_TEX:                           Texinfo.
 * TEXINFOS <1>:                          Texinfo.
 * TEXINFOS:                              Uniform.
+* top_distdir <1>:                       Third-Party Makefiles.
 * top_distdir:                           Dist.
 * VERSION:                               Dist.
 * VERSION, prevent definition:           Public macros.
@@ -6569,489 +6996,4 @@ Macro and Variable Index
 * WITH_REGEX:                            Public macros.
 * XFAIL_TESTS:                           Tests.
 * YACC:                                  Optional.
-
-
-File: automake.info,  Node: General Index,  Prev: Macro and Variable Index,  Up: Indices
-
-General Index
-=============
-
-* Menu:
-
-* ## (special Automake comment):         General Operation.
-* --acdir:                               aclocal options.
-* --add-missing:                         Invoking Automake.
-* --copy:                                Invoking Automake.
-* --cygnus:                              Invoking Automake.
-* --enable-maintainer-mode:              Optional.
-* --force:                               aclocal options.
-* --force-missing:                       Invoking Automake.
-* --foreign:                             Invoking Automake.
-* --gnits:                               Invoking Automake.
-* --gnu:                                 Invoking Automake.
-* --help <1>:                            aclocal options.
-* --help:                                Invoking Automake.
-* --include-deps:                        Invoking Automake.
-* --libdir:                              Invoking Automake.
-* --no-force:                            Invoking Automake.
-* --output:                              aclocal options.
-* --output-dir:                          Invoking Automake.
-* --print-ac-dir:                        aclocal options.
-* --verbose <1>:                         aclocal options.
-* --verbose:                             Invoking Automake.
-* --version <1>:                         aclocal options.
-* --version:                             Invoking Automake.
-* --warnings:                            Invoking Automake.
-* --with-dmalloc:                        Public macros.
-* --with-regex:                          Public macros.
-* -a:                                    Invoking Automake.
-* -c:                                    Invoking Automake.
-* -enable-debug, example:                Conditionals.
-* -f:                                    Invoking Automake.
-* -gnits, complete description:          Gnits.
-* -gnu, complete description:            Gnits.
-* -gnu, required files:                  Gnits.
-* -hook targets:                         Extending.
-* -I:                                    aclocal options.
-* -i:                                    Invoking Automake.
-* -local targets:                        Extending.
-* -module, libtool:                      Libtool Modules.
-* -o:                                    Invoking Automake.
-* -v:                                    Invoking Automake.
-* -W:                                    Invoking Automake.
-* .la suffix, defined:                   Libtool Concept.
-* _DATA primary, defined:                Data.
-* _DEPENDENCIES, defined:                Linking.
-* _HEADERS primary, defined:             Headers.
-* _JAVA primary, defined:                Java.
-* _LDFLAGS, defined:                     Linking.
-* _LDFLAGS, libtool:                     Libtool Flags.
-* _LIBADD primary, defined:              A Library.
-* _LIBADD, libtool:                      Libtool Flags.
-* _LIBRARIES primary, defined:           A Library.
-* _LISP primary, defined:                Emacs Lisp.
-* _LTLIBRARIES primary, defined:         Libtool Libraries.
-* _MANS primary, defined:                Man pages.
-* _PROGRAMS primary variable:            Uniform.
-* _PYTHON primary, defined:              Python.
-* _SCRIPTS primary, defined:             Scripts.
-* _SOURCES and header files:             Program Sources.
-* _SOURCES primary, defined:             Program Sources.
-* _SOURCES, default:                     Default _SOURCES.
-* _SOURCES, empty:                       Default _SOURCES.
-* _TEXINFOS primary, defined:            Texinfo.
-* AC_SUBST and SUBDIRS:                  Top level.
-* acinclude.m4, defined:                 Complete.
-* aclocal program, introduction:         Complete.
-* aclocal search path:                   Macro search path.
-* aclocal's scheduled death:             Future of aclocal.
-* aclocal, extending:                    Extending aclocal.
-* aclocal, Invoking:                     Invoking aclocal.
-* aclocal, Options:                      aclocal options.
-* aclocal.m4, preexisting:               Complete.
-* Adding new SUFFIXES:                   Suffixes.
-* all:                                   Extending.
-* all-local:                             Extending.
-* ALLOCA, special handling:              LIBOBJS.
-* AM_CONDITIONAL and SUBDIRS:            Top level.
-* AM_INIT_AUTOMAKE, example use:         Complete.
-* AM_MAINTAINER_MODE, purpose:           maintainer-mode.
-* ansi2knr:                              ANSI.
-* ansi2knr and LIBOBJS:                  ANSI.
-* ansi2knr and LTLIBOBJS:                ANSI.
-* Append operator:                       General Operation.
-* autogen.sh and autoreconf:             Libtool Issues.
-* Automake constraints:                  Introduction.
-* Automake options:                      Invoking Automake.
-* Automake requirements <1>:             Requirements.
-* Automake requirements:                 Introduction.
-* Automake, invoking:                    Invoking Automake.
-* Automake, recursive operation:         General Operation.
-* Automatic dependency tracking:         Dependencies.
-* Automatic linker selection:            How the Linker is Chosen.
-* autoreconf and libtoolize:             Libtool Issues.
-* Auxiliary programs:                    Auxiliary Programs.
-* Avoiding path stripping:               Alternative.
-* bootstrap.sh and autoreconf:           Libtool Issues.
-* BUGS, reporting:                       Introduction.
-* BUILT_SOURCES, defined:                Sources.
-* C++ support:                           C++ Support.
-* canonicalizing Automake variables:     Canonicalization.
-* cfortran:                              Mixing Fortran 77 With C and C++.
-* check:                                 Extending.
-* check primary prefix, definition:      Uniform.
-* check-local:                           Extending.
-* check_PROGRAMS example:                Default _SOURCES.
-* clean:                                 Extending.
-* clean-local:                           Extending.
-* Comment, special to Automake:          General Operation.
-* Complete example:                      Complete.
-* Conditional example,  -enable-debug:   Conditionals.
-* conditional libtool libraries:         Conditional Libtool Libraries.
-* Conditional programs:                  Conditional Programs.
-* Conditional subdirectories:            Top level.
-* Conditional SUBDIRS:                   Top level.
-* Conditionals:                          Conditionals.
-* config.guess:                          Invoking Automake.
-* configure.ac, from GNU Hello:          Hello.
-* configure.ac, scanning:                configure.
-* conflicting definitions:               Extending.
-* Constraints of Automake:               Introduction.
-* convenience libraries, libtool:        Libtool Convenience Libraries.
-* copying semantics:                     Extending.
-* cpio example:                          Uniform.
-* CVS and generated files:               CVS.
-* CVS and third-party files:             CVS.
-* CVS and timestamps:                    CVS.
-* cvs-dist:                              General Operation.
-* cvs-dist, non-standard example:        General Operation.
-* Cygnus strictness:                     Cygnus.
-* DATA primary, defined:                 Data.
-* de-ANSI-fication, defined:             ANSI.
-* default _SOURCES:                      Default _SOURCES.
-* default source, Libtool modules example: Default _SOURCES.
-* definitions, conflicts:                Extending.
-* dejagnu:                               Tests.
-* depcomp:                               Dependencies.
-* dependencies and distributed files:    distcleancheck.
-* Dependency tracking:                   Dependencies.
-* Dependency tracking, disabling:        Dependencies.
-* dirlist:                               Macro search path.
-* Disabling dependency tracking:         Dependencies.
-* dist:                                  Dist.
-* dist-bzip2 <1>:                        Options.
-* dist-bzip2:                            Dist.
-* dist-gzip:                             Dist.
-* dist-hook <1>:                         Extending.
-* dist-hook:                             Dist.
-* dist-shar <1>:                         Options.
-* dist-shar:                             Dist.
-* dist-tarZ <1>:                         Options.
-* dist-tarZ:                             Dist.
-* dist-zip <1>:                          Options.
-* dist-zip:                              Dist.
-* dist_ and nobase_:                     Alternative.
-* DIST_SUBDIRS, explained:               Top level.
-* distcheck:                             Dist.
-* distclean <1>:                         distcleancheck.
-* distclean:                             Extending.
-* distclean, diagnostic:                 distcleancheck.
-* distclean-local:                       Extending.
-* distcleancheck <1>:                    distcleancheck.
-* distcleancheck:                        Dist.
-* dmalloc, support for:                  Public macros.
-* dvi:                                   Extending.
-* DVI output using Texinfo:              Texinfo.
-* dvi-local:                             Extending.
-* E-mail, bug reports:                   Introduction.
-* EDITION Texinfo flag:                  Texinfo.
-* else:                                  Conditionals.
-* empty _SOURCES:                        Default _SOURCES.
-* endif:                                 Conditionals.
-* Example conditional -enable-debug:     Conditionals.
-* Example of recursive operation:        General Operation.
-* Example of shared libraries:           Libtool Libraries.
-* Example, EXTRA_PROGRAMS:               Uniform.
-* Example, false and true:               true.
-* Example, GNU Hello:                    Hello.
-* Example, handling Texinfo files:       Hello.
-* Example, mixed language:               Mixing Fortran 77 With C and C++.
-* Example, regression test:              Hello.
-* Executable extension:                  EXEEXT.
-* Exit status 77, special interpretation: Tests.
-* Expected test failure:                 Tests.
-* Extending aclocal:                     Extending aclocal.
-* Extending list of installation directories: Uniform.
-* Extension, executable:                 EXEEXT.
-* Extra files distributed with Automake: Invoking Automake.
-* EXTRA_, prepending:                    Uniform.
-* EXTRA_prog_SOURCES, defined:           Conditional Sources.
-* EXTRA_PROGRAMS, defined <1>:           Conditional Programs.
-* EXTRA_PROGRAMS, defined:               Uniform.
-* false Example:                         true.
-* FDL, GNU Free Documentation License:   GNU Free Documentation License.
-* Files distributed with Automake:       Invoking Automake.
-* First line of Makefile.am:             General Operation.
-* FLIBS, defined:                        Mixing Fortran 77 With C and C++.
-* foreign strictness:                    Strictness.
-* Fortran 77 support:                    Fortran 77 Support.
-* Fortran 77, mixing with C and C++:     Mixing Fortran 77 With C and C++.
-* Fortran 77, Preprocessing:             Preprocessing Fortran 77.
-* generated files and CVS:               CVS.
-* generated files, distributed:          CVS.
-* Gettext support:                       gettext.
-* gnits strictness:                      Strictness.
-* GNU Gettext support:                   gettext.
-* GNU Hello, configure.ac:               Hello.
-* GNU Hello, example:                    Hello.
-* GNU make extensions:                   General Operation.
-* GNU Makefile standards:                Introduction.
-* gnu strictness:                        Strictness.
-* Header files in _SOURCES:              Program Sources.
-* HEADERS primary, defined:              Headers.
-* HEADERS, installation directories:     Headers.
-* Hello example:                         Hello.
-* Hello, configure.ac:                   Hello.
-* hook targets:                          Extending.
-* HP-UX 10, lex problems:                Public macros.
-* html:                                  Extending.
-* HTML installation, example:            Uniform.
-* HTML output using Texinfo:             Texinfo.
-* html-local:                            Extending.
-* id:                                    Tags.
-* if:                                    Conditionals.
-* include:                               Include.
-* INCLUDES, example usage:               Hello.
-* Including Makefile fragment:           Include.
-* info <1>:                              Extending.
-* info:                                  Options.
-* info-local:                            Extending.
-* install <1>:                           Extending.
-* install:                               Install.
-* Install hook:                          Install.
-* Install, two parts of:                 Install.
-* install-data:                          Install.
-* install-data-hook:                     Extending.
-* install-data-local <1>:                Extending.
-* install-data-local:                    Install.
-* install-exec <1>:                      Extending.
-* install-exec:                          Install.
-* install-exec-hook:                     Extending.
-* install-exec-local <1>:                Extending.
-* install-exec-local:                    Install.
-* install-info <1>:                      Options.
-* install-info:                          Texinfo.
-* install-info target:                   Texinfo.
-* install-man <1>:                       Options.
-* install-man:                           Man pages.
-* install-man target:                    Man pages.
-* install-strip:                         Install.
-* Installation directories, extending list: Uniform.
-* Installation support:                  Install.
-* installcheck:                          Extending.
-* installcheck-local:                    Extending.
-* installdirs <1>:                       Extending.
-* installdirs:                           Install.
-* installdirs-local:                     Extending.
-* Installing headers:                    Headers.
-* Installing scripts:                    Scripts.
-* installing versioned binaries:         Extending.
-* Invoking aclocal:                      Invoking aclocal.
-* Invoking Automake:                     Invoking Automake.
-* JAVA primary, defined:                 Java.
-* JAVA restrictions:                     Java.
-* Java support:                          Java Support.
-* lex problems with HP-UX 10:            Public macros.
-* lex, multiple lexers:                  Yacc and Lex.
-* LIBADD primary, defined:               A Library.
-* libltdl, introduction:                 Libtool Concept.
-* LIBOBJS and ansi2knr:                  ANSI.
-* LIBOBJS, special handling:             LIBOBJS.
-* LIBRARIES primary, defined:            A Library.
-* libtool convenience libraries:         Libtool Convenience Libraries.
-* libtool libraries, conditional:        Conditional Libtool Libraries.
-* libtool library, definition:           Libtool Concept.
-* libtool modules:                       Libtool Modules.
-* Libtool modules, default source example: Default _SOURCES.
-* libtool, introduction:                 Libtool Concept.
-* libtoolize and autoreconf:             Libtool Issues.
-* libtoolize, no longer run by Automake: Libtool Issues.
-* Linking Fortran 77 with C and C++:     Mixing Fortran 77 With C and C++.
-* LISP primary, defined:                 Emacs Lisp.
-* LN_S example:                          Extending.
-* local targets:                         Extending.
-* LTLIBOBJS and ansi2knr:                ANSI.
-* LTLIBOBJS, special handling:           LTLIBOBJ.
-* LTLIBRARIES primary, defined:          Libtool Libraries.
-* ltmain.sh not found:                   Libtool Issues.
-* Macro search path:                     Macro search path.
-* Macros Automake recognizes:            Optional.
-* make check:                            Tests.
-* make clean support:                    Clean.
-* make dist:                             Dist.
-* make distcheck:                        Dist.
-* make distcleancheck:                   Dist.
-* make distuninstallcheck:               Dist.
-* make install support:                  Install.
-* make installcheck:                     Options.
-* Make rules, overriding:                General Operation.
-* Make targets, overriding:              General Operation.
-* Makefile fragment, including:          Include.
-* Makefile.am, first line:               General Operation.
-* MANS primary, defined:                 Man pages.
-* mdate-sh:                              Texinfo.
-* missing, purpose:                      maintainer-mode.
-* Mixed language example:                Mixing Fortran 77 With C and C++.
-* Mixing Fortran 77 with C and C++:      Mixing Fortran 77 With C and C++.
-* Mixing Fortran 77 with C and/or C++:   Mixing Fortran 77 With C and C++.
-* modules, libtool:                      Libtool Modules.
-* mostlyclean:                           Extending.
-* mostlyclean-local:                     Extending.
-* Multiple configure.ac files:           Invoking Automake.
-* Multiple lex lexers:                   Yacc and Lex.
-* Multiple yacc parsers:                 Yacc and Lex.
-* no-dependencies:                       Dependencies.
-* no-dist-gzip:                          Options.
-* no-installinfo:                        Texinfo.
-* no-installman:                         Man pages.
-* no-texinfo.tex:                        Texinfo.
-* nobase_:                               Alternative.
-* nobase_ and dist_ or nodist_:          Alternative.
-* nodist_ and nobase_:                   Alternative.
-* noinst primary prefix, definition:     Uniform.
-* noinstall-info target:                 Texinfo.
-* noinstall-man target:                  Man pages.
-* Non-GNU packages:                      Strictness.
-* Non-standard targets:                  General Operation.
-* Objects in subdirectory:               Program and Library Variables.
-* Option, ansi2knr:                      Options.
-* Option, check-news:                    Options.
-* Option, cygnus:                        Options.
-* Option, dejagnu:                       Options.
-* Option, dist-bzip2:                    Options.
-* Option, dist-shar:                     Options.
-* Option, dist-tarZ:                     Options.
-* Option, dist-zip:                      Options.
-* Option, foreign:                       Options.
-* Option, gnits:                         Options.
-* Option, gnu:                           Options.
-* Option, no-define:                     Options.
-* Option, no-dependencies:               Options.
-* Option, no-dist:                       Options.
-* Option, no-dist-gzip:                  Options.
-* Option, no-exeext:                     Options.
-* Option, no-installinfo:                Options.
-* Option, no-installman:                 Options.
-* Option, no-texinfo:                    Options.
-* Option, nostdinc:                      Options.
-* Option, readme-alpha:                  Options.
-* Option, version:                       Options.
-* Option, warnings:                      Options.
-* Options, aclocal:                      aclocal options.
-* Options, Automake:                     Invoking Automake.
-* Options, std-options:                  Options.
-* Overriding make rules:                 General Operation.
-* Overriding make targets:               General Operation.
-* Overriding make variables:             General Operation.
-* overriding rules:                      Extending.
-* overriding semantics:                  Extending.
-* Path stripping, avoiding:              Alternative.
-* pdf:                                   Extending.
-* PDF output using Texinfo:              Texinfo.
-* pdf-local:                             Extending.
-* per-target compilation flags, defined: Program and Library Variables.
-* pkgdatadir, defined:                   Uniform.
-* pkgincludedir, defined:                Uniform.
-* pkglibdir, defined:                    Uniform.
-* POSIX termios headers:                 Public macros.
-* Preprocessing Fortran 77:              Preprocessing Fortran 77.
-* Primary variable, DATA:                Data.
-* Primary variable, defined:             Uniform.
-* Primary variable, HEADERS:             Headers.
-* Primary variable, JAVA:                Java.
-* Primary variable, LIBADD:              A Library.
-* Primary variable, LIBRARIES:           A Library.
-* Primary variable, LISP:                Emacs Lisp.
-* Primary variable, LTLIBRARIES:         Libtool Libraries.
-* Primary variable, MANS:                Man pages.
-* Primary variable, PROGRAMS:            Uniform.
-* Primary variable, PYTHON:              Python.
-* Primary variable, SCRIPTS:             Scripts.
-* Primary variable, SOURCES:             Program Sources.
-* Primary variable, TEXINFOS:            Texinfo.
-* prog_LDADD, defined:                   Linking.
-* PROGRAMS primary variable:             Uniform.
-* Programs, auxiliary:                   Auxiliary Programs.
-* PROGRAMS, bindir:                      Program Sources.
-* Programs, conditional:                 Conditional Programs.
-* ps:                                    Extending.
-* PS output using Texinfo:               Texinfo.
-* ps-local:                              Extending.
-* PYTHON primary, defined:               Python.
-* Ratfor programs:                       Preprocessing Fortran 77.
-* README-alpha:                          Gnits.
-* rebuild rules <1>:                     CVS.
-* rebuild rules:                         Rebuilding.
-* Recognized macros by Automake:         Optional.
-* Recursive operation of Automake:       General Operation.
-* regex package:                         Public macros.
-* Regression test example:               Hello.
-* Reporting BUGS:                        Introduction.
-* Requirements of Automake:              Requirements.
-* Requirements, Automake:                Introduction.
-* Restrictions for JAVA:                 Java.
-* Rule, install-info:                    Texinfo.
-* Rule, install-man:                     Man pages.
-* Rule, noinstall-info:                  Texinfo.
-* Rule, noinstall-man:                   Man pages.
-* rules, conflicting:                    Extending.
-* rules, overriding:                     Extending.
-* rx package:                            Public macros.
-* Scanning configure.ac:                 configure.
-* SCRIPTS primary, defined:              Scripts.
-* SCRIPTS, installation directories:     Scripts.
-* Selecting the linker automatically:    How the Linker is Chosen.
-* Shared libraries, support for:         A Shared Library.
-* site.exp:                              Tests.
-* SOURCES primary, defined:              Program Sources.
-* Special Automake comment:              General Operation.
-* Strictness, command line:              Invoking Automake.
-* Strictness, defined:                   Strictness.
-* Strictness, foreign:                   Strictness.
-* Strictness, gnits:                     Strictness.
-* Strictness, gnu:                       Strictness.
-* Subdirectories, building conditionally: Top level.
-* Subdirectory, objects in:              Program and Library Variables.
-* SUBDIRS and AC_SUBST:                  Top level.
-* SUBDIRS and AM_CONDITIONAL:            Top level.
-* SUBDIRS, conditional:                  Top level.
-* SUBDIRS, explained:                    Top level.
-* suffix .la, defined:                   Libtool Concept.
-* suffix .lo, defined:                   Libtool Concept.
-* SUFFIXES, adding:                      Suffixes.
-* Support for C++:                       C++ Support.
-* Support for Fortran 77:                Fortran 77 Support.
-* Support for GNU Gettext:               gettext.
-* Support for Java:                      Java Support.
-* tags:                                  Tags.
-* TAGS support:                          Tags.
-* Target, install-info:                  Texinfo.
-* Target, install-man:                   Man pages.
-* Target, noinstall-info:                Texinfo.
-* Target, noinstall-man:                 Man pages.
-* termios POSIX headers:                 Public macros.
-* Test suites:                           Tests.
-* Tests, expected failure:               Tests.
-* Texinfo file handling example:         Hello.
-* Texinfo flag, EDITION:                 Texinfo.
-* Texinfo flag, UPDATED:                 Texinfo.
-* Texinfo flag, UPDATED-MONTH:           Texinfo.
-* Texinfo flag, VERSION:                 Texinfo.
-* texinfo.tex:                           Texinfo.
-* TEXINFOS primary, defined:             Texinfo.
-* third-party files and CVS:             CVS.
-* timestamps and CVS:                    CVS.
-* true Example:                          true.
-* underquoted AC_DEFUN:                  Extending aclocal.
-* Uniform naming scheme:                 Uniform.
-* uninstall <1>:                         Extending.
-* uninstall:                             Install.
-* uninstall-hook:                        Extending.
-* uninstall-local:                       Extending.
-* UPDATED Texinfo flag:                  Texinfo.
-* UPDATED-MONTH Texinfo flag:            Texinfo.
-* user variables:                        User Variables.
-* variables, conflicting:                Extending.
-* Variables, overriding:                 General Operation.
-* variables, reserved for the user:      User Variables.
-* VERSION Texinfo flag:                  Texinfo.
-* version.m4, example:                   Rebuilding.
-* version.sh, example:                   Rebuilding.
-* versioned binaries, installing:        Extending.
-* wildcards:                             wildcards.
-* Windows:                               EXEEXT.
-* yacc, multiple parsers:                Yacc and Lex.
-* ylwrap:                                Yacc and Lex.
-* zardoz example:                        Complete.
-
 

@@ -120,6 +120,9 @@ cond30.test \
 cond31.test \
 cond32.test \
 cond33.test \
+cond34.test \
+cond35.test \
+cond36.test \
 condd.test \
 condinc.test \
 condinc2.test \
@@ -246,6 +249,7 @@ instexec.test \
 insthook.test \
 instman.test \
 instman2.test \
+instspc.test \
 interp.test \
 interp2.test \
 java.test \
@@ -286,7 +290,6 @@ link_fc.test \
 link_fccxx.test \
 link_fcxx.test	\
 link_f_only.test \
-lisp.test \
 lisp2.test \
 lisp3.test \
 lisp4.test \
@@ -399,6 +402,7 @@ remake2.test \
 remake3.test \
 remake4.test \
 remake5.test \
+regex.test \
 req.test \
 reqd.test \
 reqd2.test \

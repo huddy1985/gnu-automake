@@ -1,3 +1,148 @@
+2004-03-07  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.in, NEWS: Bump version to 1.8.3.
+
+	* lib/config.guess: New upstream version.
+
+2004-02-29  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* configure.in: Bump version to 1.8.2c.
+
+	* configure.in, NEWS: Bump version to 1.8.2b.
+
+	* lib/config-ml.in, lib/config.guess, lib/config.sub,
+	lib/texinfo.tex: New upstream versions.
+
+	* m4/depend.m4 (_AM_DEPENDENCIES): Use `touch' rather than `: >'
+	to create numbered dependencies.  This fixes a portability issue
+	when CONFIG_SHELL is forced to /bin/sh on Solaris 8.
+	Reported by Mark Phillips.
+
+	* automake.in (lang_yacc_target_hook): Use Automake::Rule::define
+	so that rules for the same headers are not output twice.
+	* lib/Automake/Variable.pm (value_as_list_recursive): Do not
+	call `return' inside `map'.
+	* tests/cond30.test: Make sure `a.c' and `b.c' both appear
+	in the Makefile.in.
+	* tests/cond35.test, tests/cond36.test: New files.
+	* tests/Makefile.am (TESTS): Add cond35.test and cond36.test.
+	Report from Roman Fietze.
+
+	Fix for PR/413:
+	* lib/am/distdir.am (distcheck): Create $dc_destdir with `umask
+	077 && mkdir' instead of `$(mkdir_p)'.  This prevents possible
+	symlink attacks reported by Stefan Nordhausen.
+
+2004-02-16  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (Multiple Outputs): More text, based on
+	comments from Eric Siegerman, Tim Van Holder, and Oren Ben-Kiki.
+
+2004-02-15  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* m4/mkdirp.m4: Use `mkdir -p' only with GNU mkdir, because
+	Solaris 8's mkdir is not thread-safe.
+	* lib/mkinstalldirs: Likewise.
+	* lib/install-sh: Abort when mkdir fails to create a directory.
+	Report from Nathanael Nerode.
+
+2004-02-07  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* aclocal.in (rel2abs): New function.
+	(scan_configure_dep): Use rel2abs instead of File::Spec->rel2abs,
+	the later does was introduced in Perl 5.6 so using it breaks with
+	Perl 5.005.
+	Report from Werner John.
+
+2004-02-03  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (Future of aclocal): Make clearer that
+	it's ok to install macros into /usr/share/aclocal/.
+
+2004-02-01  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/lisp.test: Delete (pointless).
+	* tests/Makefile.am (TESTS): Remove lisp.test.
+
+	* lib/Automake/Variable.pm (transform_variable_recursively):
+	Define rewritten variables in all conditions not *covered* by user
+	definitions, not simply in conditions without a previous
+	definition.
+	* tests/cond34.test: New file.
+	* tests/Makefile.am (TESTS): Add cond34.test.
+	Report from Elena A. Vengerova.
+
+	* doc/automake.texi (Multiple Outputs): Typo.
+
+	* doc/automake.texi (Emacs Lisp): Typos.
+
+	* automake.in (handle_emacs_lisp): Define $(ELCFILES) as
+	$(am__ELCFILES), and always push it on @all.  Do not mention
+	elc-stamp.
+	* lib/am/lisp.am (.el.elc): Rewrite as ...
+	($(am__ELCFILES)): ... this, and depend on elc-stamp.
+	(elc-stamp): Make sure elc-stamp is older that all .elc files, as
+	explained in the manual entry below.
+
+	* doc/automake.texi (Multiple Outputs): New node.
+
+2004-01-31  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* m4/regex.m4: Do not AC_SUBST(LIBOBJS), and quote most arguments.
+	* tests/regex.test: New file.
+	* tests/Makefile.am (TESTS): Add regex.test.
+
+2004-01-28  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* NEWS: Summarize recent changes.
+
+	* Makefile.am (maintainer-check): Check for unquoted $(DESTDIR) uses.
+	* lib/am/data.am, lib/am/distdir.am, lib/am/java.am, lib/am/libs.am,
+	lib/am/lisp.am, lib/am/ltlib.am, lib/am/mans.am, lib/am/progs.am,
+	lib/am/python.am, lib/am/scripts.am, lib/am/texinfos.am: Quote
+	installation paths in install, uninstall, and installcheck rules,
+	as well as in am__installdirs variables.  This is for the sake
+	of paths containing spaces.
+	* lib/am/install.am (installdirs-am, installdirs): Do not try
+	to create "" directories.
+	* test/instspc.test: New file.
+	* test/Makefile.am (TESTS): Add instspc.test.
+	Report from James Amundson.
+
+	* doc/automake.texi (Not Enough, Third-Party Makefiles): New nodes.
+	(Extending): Make it a subsection of Not Enough.
+
+2004-01-23  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* m4/depout.m4 (_AM_OUTPUT_DEPENDENCY_COMMANDS): Use `s/xx//p'
+	instead of `/xx/ s///p'; the latter fails when GNU sed is run with
+	POSIXLY_CORRECT.  Also strip superfluous -e.
+	Report from Miloslav Trmac.
+
+2004-01-22  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/lex5.test: Sleep before calling AUTOMAKE the second time,
+	this fixes a spurious failure reported by Andreas Schwab.  Also
+	make sure ylwrap is not installed unless needed, and exercise
+	--no-force.
+
+2004-01-20  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>  (tiny change)
+
+	* doc/automake.texi (Dist): Document limitations of distcheck-hook
+	and DISTCHECK_CONFIGURE_FLAGS with regard to subdirs and
+	subpackages.
+
+2004-01-20  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* doc/automake.texi (Upgrading): New node.
+
+2004-01-13  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* tests/conflnk3.test: Skip if `test -e' does not work.
+	Report from Lars Hecking.
+
+	* configure.ac, NEWS: Bump version to 1.8.2a.
+
 2004-01-12  Alexandre Duret-Lutz  <adl@gnu.org>
 
 	* configure.ac, NEWS: Bump version to 1.8.2.

@@ -105,9 +105,10 @@ published by the Free Software Foundation raise funds for
 * Conditionals::                Conditionals
 * Gnits::                       The effect of @code{--gnu} and @code{--gnits}
 * Cygnus::                      The effect of @code{--cygnus}
-* Extending::                   Extending Automake
+* Not Enough::                  When Automake is not Enough
 * Distributing::                Distributing the Makefile.in
 * API versioning::              About compatibility between Automake versions
+* Upgrading::                   Upgrading to a Newer Automake Version
 * FAQ::                         Frequently Asked Questions
 * Copying This Manual::         How to make copies of this manual
 * Indices::                     Indices of variables, macros, and concepts
@@ -231,6 +232,11 @@ Miscellaneous Rules
 * Suffixes::                    Handling new file extensions
 * Multilibs::                   Support for multilibs.
 
+When Automake Isn't Enough
+
+* Extending::                   Adding new rules or overriding existing ones.
+* Third-Party Makefiles::       Integrating Non-Automake @file{Makefile}s.
+
 Frequently Asked Questions about Automake
 
 * CVS::                         CVS and generated files
@@ -238,6 +244,7 @@ Frequently Asked Questions about Automake
 * wildcards::                   Why doesn't Automake support wildcards?
 * distcleancheck::              Files left in build directory after distclean
 * renamed objects::             Why are object files sometimes renamed?
+* Multiple Outputs::            Writing rules for tools with many output files
 
 Copying This Manual
 
@@ -2081,8 +2088,9 @@ feature is misplaced.
 
 The new implementation will probably be done slightly differently.
 For instance it could enforce the @file{m4/}-style layout discussed in
-@ref{Local Macros}, and take care of copying (or even updating)
-third-party macro into this directory.
+@ref{Local Macros}, and take care of copying (and even updating)
+third-party macros from @file{/usr/share/aclocal/} into the local
+@file{m4/} directory.
 
 We have no idea when and how this will happen.  This has been
 discussed several times in the past, but someone still has to commit
@@ -2108,6 +2116,13 @@ can do for you.  If your package has such a @file{bootstrap.sh} or
 should simplify its logic a lot (less things to maintain, yum!), it's
 even likely you will not need the script anymore, and more to the point
 you will not call @command{aclocal} directly anymore.
+
+For the time being, third-party packages should continue to install
+public macros into @code{/usr/share/aclocal/}.  If @command{aclocal}
+is replaced by another tool it might make sense to rename the
+directory, but supporting @code{/usr/share/aclocal/} for backward
+compatibility should be really easy provided all macros are properly
+written (@pxref{Extending aclocal}).
 
 
 @node Top level
@@ -4567,10 +4582,10 @@ lisp_LISP = file1.el file2.el
 ELCFILES =
 @end example
 @noindent
-@code{ELCFILES} is an internal Automake variables that normally lists
+@code{ELCFILES} is an internal Automake variable that normally lists
 all @file{.elc} files that must be byte-compiled.  Automake defines
 @code{ELCFILES} automatically from @code{lisp_LISP}.  Emptying this
-variables explicitly prevents byte-compilation to occur.
+variable explicitly prevents byte-compilation to occur.
 
 Since Automake 1.8, we now recommend using @code{lisp_DATA} instead.  As
 in
@@ -5364,13 +5379,17 @@ to supply additional flags to @code{configure}, define them in the
 @file{Makefile.am}, or on the command line when invoking @code{make}.
 @vindex DISTCHECK_CONFIGURE_FLAGS
 
-If the @code{distcheck-hook} rule is defined in your
+If the @code{distcheck-hook} rule is defined in your top-level
 @file{Makefile.am}, then it will be invoked by @code{distcheck} after
 the new distribution has been unpacked, but before the unpacked copy
 is configured and built.  Your @code{distcheck-hook} can do almost
 anything, though as always caution is advised.  Generally this hook is
 used to check for potential distribution errors not caught by the
-standard mechanism.
+standard mechanism.  Note that @code{distcheck-hook} as well as
+@code{DISTCHECK_CONFIGURE_FLAGS} are not honored in a subpackage
+@file{Makefile.am}, but the @code{DISTCHECK_CONFIGURE_FLAGS} are
+passed down to the @code{configure} script of the subpackage.
+
 
 Speaking about potential distribution errors, @code{distcheck} will also
 ensure that the @code{distclean} rule actually removes all built
@@ -6229,8 +6248,19 @@ more standards compliant).  At that time the special Cygnus mode will be
 removed.
 
 
-@node Extending
+@node Not Enough
 @chapter When Automake Isn't Enough
+
+In some situations, where Automake is not up to one task, one has to
+resort to handwritten rules or even handwritten @file{Makefile}s.
+
+@menu
+* Extending::                   Adding new rules or overriding existing ones.
+* Third-Party Makefiles::       Integrating Non-Automake @file{Makefile}s.
+@end menu
+
+@node Extending
+@section Extending Automake Rules
 
 With some minor exceptions (like @code{_PROGRAMS} variables being
 rewritten to append @code{$(EXEEXT)}), the contents of a
@@ -6380,13 +6410,192 @@ destination directory in order to create relative links.
 @c FIXME should include discussion of variables you can use in these
 @c rules
 
+@node Third-Party Makefiles
+@section Third-Party @file{Makefile}s
+
+@cindex Third-party packages, interfacing with
+@cindex Interfacing with third-party packages
+
+In most projects all @file{Makefile}s are generated by Automake.  In
+some cases, however, projects need to embed subdirectories with
+handwritten @file{Makefile}s.  For instance one subdirectory could be
+a third-party project with its own build system, not using Automake.
+
+It is possible to list arbitrary directories in @code{SUBDIRS} or
+@code{DIST_SUBDIRS} provided each of these directories has a
+@file{Makefile} that recognizes all the following recursive targets.
+
+@cindex recursive targets and third-party @file{Makefile}s
+When a user runs one of these targets, that target is run recursively
+in all subdirectories.  This is why it is important that even
+third-party @file{Makefile}s support them.
+
+@table @code
+@item all
+Compile the entire package.  This is the default target in
+Automake-generated @file{Makefile}s, but it does not need to be the
+default in third-party @file{Makefile}s.
+
+@item distdir
+@trindex distdir
+@vindex distdir
+@vindex top_distdir
+Copy files to distribute into @code{$(distdir)}, before a tarball is
+constructed.  Of course this target is not required if the
+@code{no-dist} option (@pxref{Options}) is used.
+
+The variables @code{$(top_distdir)} and @code{$(distdir)}
+(@pxref{Dist}) will be passed from the outer package to the subpackage
+when the @code{distdir} target is invoked.  These two variables have
+been adjusted for the directory which is being recursed into, so they
+are ready to use.
+
+@item install
+@itemx install-data
+@itemx install-exec
+@itemx uninstall
+Install or uninstall files (@pxref{Install}).
+
+@item install-info
+Install only the Texinfo documentation (@pxref{Texinfo}).
+
+@item installdirs
+Create install directories, but do not install any files.
+
+@item check
+@itemx installcheck
+Check the package (@pxref{Tests}).
+
+@item mostlyclean
+@itemx clean
+@itemx distclean
+@itemx maintainer-clean
+Cleaning rules (@pxref{Clean}).
+
+@item dvi
+@itemx pdf
+@itemx ps
+@itemx info
+@itemx html
+Build the documentation in various formats (@pxref{Texinfo}).
+
+@item tags
+@itemx ctags
+Build @code{TAGS} and @code{CTAGS} (@pxref{Tags}).
+@end table
+
+If you have ever used Gettext in a project, this is a good example of
+how third-party @file{Makefile}s can be used with Automake.  The
+@file{Makefile}s @command{gettextize} puts in the @file{po/} and
+@file{intl/} directories are handwritten @file{Makefile}s that
+implement all these targets.  That way they can be added to
+@code{SUBDIRS} in Automake packages.
+
+Directories which are only listed in @code{DIST_SUBDIRS} but not in
+@code{SUBDIRS} need only the @code{distclean},
+@code{maintainer-clean}, and @code{distdir} rules (@pxref{Top level}).
+
+Usually, many of these rules are irrelevant to the third-party
+subproject, but they are required for the whole package to work.  It's
+OK to have a rule that does nothing, so if you are integrating a
+third-party project with no documentation or tag support, you could
+simply augment its @file{Makefile} as follows:
+
+@example
+EMPTY_AUTOMAKE_TARGETS = dvi pdf ps info html tags ctags
+.PHONY: $(EMPTY_AUTOMAKE_TARGETS)
+$(EMPTY_AUTOMAKE_TARGETS):
+@end example
+
+Another aspect of integrating third-party build systems is whether
+they support VPATH builds.  Obviously if the subpackage does not
+support VPATH builds the whole package will not support VPATH builds.
+This in turns means that @code{make distcheck} will not work, because
+it relies on VPATH builds.  Some people can live without this
+(actually, many Automake users have never heard of @code{make
+distcheck}).  Other people may prefer to revamp the existing
+@file{Makefile}s to support VPATH.  Doing so does not necessarily
+require Automake, only Autoconf is needed (@pxref{Build Directories, ,
+Build Directories, autoconf, The Autoconf Manual}).  The necessary
+substitutions: @code{@@scrdir@@}, @code{@@top_srcdir@@}, and
+@code{@@top_buildir@@} are defined by @file{configure} when it
+processes a @file{Makefile} (@pxref{Preset Output Variables, , Preset
+Output Variables, autoconf, The Autoconf Manual}), they are not
+computed by the Makefile like the aforementioned @code{$(distdir)} and
+@code{$(top_distdir)} variables..
+
+It is sometimes inconvenient to modify a third-party @file{Makefile}
+to introduce the above required targets.  For instance one may want to
+keep the third-party sources untouched to ease upgrades to new
+versions.
+
+@cindex @file{GNUmakefile} including @file{Makefile}
+Here are two other ideas.  If GNU make is assumed, one possibility is
+to add to that subdirectory a @file{GNUmakefile} that defines the
+required targets and include the third-party @file{Makefile}.  For
+this to work in VPATH builds, @file{GNUmakefile} must lie in the build
+directory; the easiest way to do this is to write a
+@file{GNUmakefile.in} instead, and have it processed with
+@code{AC_CONFIG_FILES} from the outer package.  For example if we
+assume @file{Makefile} defines all targets except the documentation
+targets, and that the @code{check} target is actually called
+@code{test}, we could write @file{GNUmakefile} (or
+@file{GNUmakefile.in}) like this:
+
+@example
+# First, include the real Makefile
+include Makefile
+# Then, define the other targets needed by Automake Makefiles.
+.PHONY: dvi pdf ps info html check
+dvi pdf ps info html:
+check: test
+@end example
+
+@cindex Proxy @file{Makefile} for third-party packages
+A similar idea that does not use @code{include} is to write a proxy
+@file{Makefile} that dispatches rules to the real @file{Makefile},
+either with @code{$(MAKE) -f Makefile.real $(AM_MAKEFLAGS) target} (if
+it's OK to rename the original @file{Makefile}) or with @code{cd
+subdir && $(MAKE) $(AM_MAKEFLAGS) target} (if it's OK to store the
+subdirectory project one directory deeper).  The good news is that
+this proxy @file{Makefile} can be generated with Automake.  All we
+need are -local targets (@pxref{Extending}) that perform the dispatch.
+Of course the other Automake features are available, so you could
+decide to let Automake perform distribution or installation.  Here is
+a possible @file{Makefile.am}:
+
+@example
+all-local:
+        cd subdir && $(MAKE) $(AM_MAKEFLAGS) all
+check-local:
+        cd subdir && $(MAKE) $(AM_MAKEFLAGS) test
+clean-local:
+        cd subdir && $(MAKE) $(AM_MAKEFLAGS) clean
+
+# Assuming the package knows how to install itself
+install-data-local:
+        cd subdir && $(MAKE) $(AM_MAKEFLAGS) install-data
+install-exec-local:
+        cd subdir && $(MAKE) $(AM_MAKEFLAGS) install-exec
+uninstall-local:
+        cd subdir && $(MAKE) $(AM_MAKEFLAGS) uninstall
+
+# Distribute files from here.
+EXTRA_DIST = subdir/Makefile subdir/program.c ...
+@end example
+
+Pushing this idea to the extreme, it is also possible to ignore the
+subproject build system and build everything from this proxy
+@file{Makefile.am}.  This might sounds very sensible if you need VPATH
+builds but the subproject does not support them.
+
 @node Distributing
 @chapter Distributing @file{Makefile.in}s
 
 Automake places no restrictions on the distribution of the resulting
-@file{Makefile.in}s.  We still encourage software authors to distribute
-their work under terms like those of the GPL, but doing so is not
-required to use Automake.
+@file{Makefile.in}s.  We still encourage software authors to
+distribute their work under terms like those of the GPL, but doing so
+is not required to use Automake.
 
 Some of the files that can be automatically installed via the
 @code{--add-missing} switch do fall under the GPL@.  However, these also
@@ -6415,13 +6624,13 @@ means you can install several versions of Automake in the same
 @samp{$PATH}.  Furthermore, @file{Makefile}'s generated by Automake 1.6
 will use @samp{automake-1.6} explicitly in their rebuild rules.
 
-Note that @samp{1.6} in @samp{automake-1.6} is Automake's API version,
+The number @samp{1.6} in @samp{automake-1.6} is Automake's API version,
 not Automake's version.  If a bug fix release is made, for instance
 Automake 1.6.1, the API version will remain 1.6.  This means that a
 package which work with Automake 1.6 should also work with 1.6.1; after
 all, this is what people expect from bug fix releases.
 
-Note that if your package relies on a feature or a bug fix introduced in
+If your package relies on a feature or a bug fix introduced in
 a release, you can pass this version as an option to Automake to ensure
 older releases will not be used.  For instance, use this in your
 @file{configure.ac}:
@@ -6459,6 +6668,62 @@ If it turns out you need to use such a undocumented feature, contact
 @email{automake@@gnu.org} and try to get it documented and exercised by
 the test-suite.
 
+@node Upgrading
+@chapter Upgrading a Package to a Newer Automake Version
+
+Automake maintains three kind of files in a package.
+
+@itemize
+@item @file{aclocal.m4}
+@item @file{Makefile.in}s
+@item auxiliary tools like @file{install-sh} or @file{py-compile}
+@end itemize
+
+@file{aclocal.m4} is generated by @command{aclocal} and contains some
+Automake-supplied M4 macros.  Auxiliary tools are installed by
+@samp{automake --add-missing} when needed.  @file{Makefile.in}s are
+built from @file{Makefile.am} by @command{automake}, and rely on the
+definitions of the M4 macros put in @file{aclocal.m4} as well as the
+behavior of the auxiliary tools installed.
+
+Because all these files are closely related, it is important to
+regenerate all of them when upgrading to a newer Automake release.
+The usual way to do that is
+
+@example
+aclocal # with any option needed (such a -I m4)
+autoconf
+automake --add-missing --force-missing
+@end example
+
+@noindent
+or more conveniently:
+
+@example
+autoreconf -vfi
+@end example
+
+The use of @code{--force-missing} ensures that auxiliary tools will be
+overridden by new versions (@pxref{Invoking Automake}).
+
+It is important to regenerate all these files each time Automake is
+upgraded, even between bug fixes releases.  For instance it is not
+unusual for a bug fix to involve changes to both the rules generated
+in @file{Makefile.in} and the supporting M4 macros copied to
+@file{aclocal.m4}.
+
+Presently @command{automake} is able to diagnose situations where
+@file{aclocal.m4} has been generated with another version of
+@command{aclocal}.  However it never checks whether auxiliary scripts
+are up-to-date.  In other words, @command{automake} will tell you when
+@command{aclocal} needs to be rerun, but it will never diagnose a
+missing @code{--force-missing}.
+
+Before upgrading to a new major release, it is a good idea to read the
+file @file{NEWS}.  This file lists all changes between releases: new
+features, obsolete constructs, known incompatibilities, and
+workarounds.
+
 @node FAQ
 @chapter Frequently Asked Questions about Automake
 
@@ -6471,6 +6736,7 @@ lists.
 * wildcards::                   Why doesn't Automake support wildcards?
 * distcleancheck::              Files left in build directory after distclean
 * renamed objects::             Why are object files sometimes renamed?
+* Multiple Outputs::            Writing rules for tools with many output files
 @end menu
 
 @node CVS
@@ -6980,6 +7246,221 @@ false_SOURCES = false.c version.c
 Note that the renaming of objects is also affected by the
 @code{_SHORTNAME} variable (@pxref{Program and Library Variables}).
 
+
+@node Multiple Outputs
+@section Handling Tools that Produce Many Outputs
+@cindex multiple outputs, rules with
+@cindex many outputs, rules with
+@cindex rules with multiple outputs
+
+This section describes a @command{make} idiom that can be used when a
+tool produces multiple output files.  It is not specific to Automake
+and can be used in ordinary @file{Makefile}s.
+
+Suppose we have a program called @command{foo} that will read one file
+called @file{data.foo} and produce two files named @file{data.c} and
+@file{data.h}.  We want to write a @file{Makefile} rule that captures
+this one-to-two dependency.
+
+The naive rule is incorrect:
+
+@example
+# This is incorrect.
+data.c data.h: data.foo
+        foo data.foo
+@end example
+
+@noindent
+What the above rule really says is that @file{data.c} and
+@file{data.h} each depend on @file{data.foo}, and can each be built by
+running @code{foo data.foo}.  In other words it is equivalent to:
+
+@example
+# We do not want this.
+data.c: data.foo
+        foo data.foo
+data.h: data.foo
+        foo data.foo
+@end example
+
+@noindent
+which means that @command{foo} can be run twice.  Usually it will not
+be run twice, because @command{make} implementations are smart enough
+to check for the existence of the second file after the first one has
+been built; they will therefore detect that it already exists.
+However there are a few situations where it can run twice anyway:
+
+@itemize
+@item
+The most worrying case is when running a parallel @command{make}.  If
+@file{data.c} and @file{data.h} are built in parallel, two @code{foo
+data.foo} commands will run concurrently.  This is harmful.
+@item
+Another case is when the dependency (here @code{data.foo}) is
+(or depends upon) a phony target.
+@end itemize
+
+A solution that works with parallel @command{make} but not with
+phony dependencies is the following:
+
+@example
+data.c data.h: data.foo
+        foo data.foo
+data.h: data.c
+@end example
+
+@noindent
+The above rules are equivalent to
+
+@example
+data.c: data.foo
+        foo data.foo
+data.h: data.foo data.c
+        foo data.foo
+@end example
+@noindent
+therefore a parallel @command{make} will have to serialize the builds
+of @file{data.c} and @file{data.h}, and will detect that the second is
+no longer needed once the first is over.
+
+Using this pattern is probably enough for most cases.  However it does
+not scale easily to more output files (in this scheme all output files
+must be totally ordered by the dependency relation), so we will
+explore a more complicated solution.
+
+Another idea is to write the following:
+
+@example
+# There is still a problem with this one.
+data.c: data.foo
+        foo data.foo
+data.h: data.c
+@end example
+
+@noindent
+The idea is that @code{foo data.foo} is run only when @file{data.c}
+needs to be updated, but we further state that @file{data.h} depends
+upon @file{data.c}.  That way, if @file{data.h} is required and
+@file{data.foo} is out of date, the dependency on @file{data.c} will
+trigger the build.
+
+This is almost perfect, but suppose we have built @file{data.h} and
+@file{data.c}, and then we erase @file{data.h}.  Then, running
+@code{make data.h} will not rebuild @file{data.h}.  The above rules
+just state that @file{data.c} must be up-to-date with respect to
+@file{data.foo}, and this is already the case.
+
+What we need is a rule that forces a rebuild when @file{data.h} is
+missing.  Here it is:
+
+@example
+data.c: data.foo
+        foo data.foo
+data.h: data.c
+        @@if test -f $@@; then :; else \
+          rm -f data.c; \
+          $(MAKE) $(AM_MAKEFLAGS) data.c; \
+        fi
+@end example
+
+The above scales easily to more outputs and more inputs.  One of the
+output is picked up to serve as a witness of the run of the command,
+it depends upon all inputs, and all other outputs depend upon it.  For
+instance if @command{foo} should additionally read @file{data.bar} and
+also produce @file{data.w} and @file{data.x}, we would write:
+
+@example
+data.c: data.foo data.bar
+        foo data.foo data.bar
+data.h data.w data.x: data.c
+        @@if test -f $@@; then :; else \
+          rm -f data.c; \
+          $(MAKE) $(AM_MAKEFLAGS) data.c; \
+        fi
+@end example
+
+There is still a minor problem with this setup.  @command{foo} outputs
+four files, but we do not know in which order these files are created.
+Suppose that @file{data.h} is created before @file{data.c}.  Then we
+have a weird situation.  The next time @command{make} is run,
+@file{data.h} will appear older than @file{data.c}, the second rule
+will be triggered, a shell will be started to execute the
+@code{if...fi} command, but actually it will just execute the
+@code{then} branch, that is: nothing.  In other words, because the
+witness we selected is not the first file created by @command{foo},
+@command{make} will start a shell to do nothing each time it is run.
+
+A simple riposte is to fix the timestamps when this happens.
+
+@example
+data.c: data.foo data.bar
+        foo data.foo data.bar
+data.h data.w data.x: data.c
+        @@if test -f $@@; then \
+          touch $@@; \
+        else \
+          rm -f data.c; \
+          $(MAKE) $(AM_MAKEFLAGS) data.c; \
+        fi
+@end example
+
+Another solution, not incompatible with the previous one, is to use a
+different and dedicated file as witness, rather than using any of
+@command{foo}'s outputs.
+
+@example
+data.stamp: data.foo data.bar
+        @@rm -f data.tmp
+        @@touch data.tmp
+        foo data.foo data.bar
+        @@mv -f data.tmp $@@
+data.c data.h data.w data.x: data.stamp
+        @@if test -f $@@; then \
+          touch $@@; \
+        else \
+          rm -f data.stamp; \
+          $(MAKE) $(AM_MAKEFLAGS) data.stamp; \
+        fi
+@end example
+
+@file{data.tmp} is created before @command{foo} is run, so it has a
+timestamp older than output files output by @command{foo}.  It is then
+renamed to @file{data.stamp} after @command{foo} has run, because we
+do not want to update @file{data.stamp} if @command{foo} fails.
+
+Using a dedicated witness like this is very handy when the list of
+output files is not known beforehand.  As an illustration, consider
+the following rules to compile many @file{*.el} files into
+@file{*.elc} files in a single command.  It does not matter how
+@code{ELFILES} is defined (as long as it is not empty: empty targets
+are not accepted by POSIX).
+
+@example
+ELFILES = one.el two.el three.el @dots{}
+ELCFILES = $(ELFILES:=c)
+
+elc-stamp: $(ELFILES)
+        @@rm -f elc-temp
+        @@touch elc-temp
+        $(elisp_comp) $(ELFILES)
+        @@mv -f elc-temp $@@
+
+$(ELCFILES): elc-stamp
+        @@if test -f $@@; then \
+          touch $@@; \
+        else \
+          rm -f elc-stamp; \
+          $(MAKE) $(AM_MAKEFLAGS) elc-stamp; \
+        fi
+@end example
+
+For completeness it should be noted that GNU @command{make} is able to
+express rules with multiple output files using pattern rules
+(@pxref{Pattern Examples, , Pattern Rule Examples, make, The GNU Make
+Manual}).  We do not discuss pattern rules here because they are not
+portable, but they can be convenient in packages that assume GNU
+@command{make}.
+
 @c ========================================================== Appendices
 
 @page
@@ -7076,3 +7557,4 @@ Note that the renaming of objects is also affected by the
 @c  LocalWords:  LTLIBOBJ Libtool's libtool's libltdl dlopening itutions libbar
 @c  LocalWords:  WANTEDLIBS libhello sublibraries libtop libsub dlopened Ratfor
 @c  LocalWords:  mymodule timestamps timestamp underquoted MAKEINFOHTMLFLAGS
+@c  LocalWords:  GNUmakefile buildir
